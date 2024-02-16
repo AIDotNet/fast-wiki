@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Masa.Utils.Models.Config" Version="$(MasaFrameworkPackageVersion)" />
+  </ItemGroup>
+
 </Project>

@@ -25,3 +25,6 @@ global using System.ComponentModel.DataAnnotations;
 global using System.Reflection;
 global using System.Text.Json;
 global using System.Net.Http.Json;
+global using BlazorComponent.JSInterop;
+global using Microsoft.JSInterop;
+global using Microsoft.Extensions.DependencyInjection;

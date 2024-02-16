@@ -3,3 +3,8 @@ global using Microsoft.Extensions.Logging;
 global using System.Net;
 global using System.Reflection;
 global using System.Text.Json;
+global using Masa.BuildingBlocks.Service.Caller;
+global using Masa.Contrib.Service.Caller.HttpClient;
+global using FastWiki.ApiGateway.Caller.Service;
+global using FastWiki.Service.Contracts.Storage;
+global using FastWiki.Service.Contracts.Wikis;

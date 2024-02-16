@@ -21,3 +21,7 @@ global using Masa.BuildingBlocks.Data.UoW;
 global using Masa.Contrib.Ddd.Domain.Repository.EFCore;
 global using FastWiki.Service.Application.Storage.Commands;
 global using FastWiki.Service.Domain.Storage.Repositories;
+global using FastWiki.Service.Application.Wikis.Queries;
+global using FastWiki.Service.Contracts.Wikis;
+global using System.ComponentModel;
+global using FastWiki.Service.Contracts.Storage.Dto;

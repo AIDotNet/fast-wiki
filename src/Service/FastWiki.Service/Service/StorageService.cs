@@ -1,16 +1,15 @@
-﻿using System.ComponentModel;
-using FastWiki.Service.Contracts.Storage.Dto;
+﻿namespace FastWiki.Service.Service;
 
-namespace FastWiki.Service.Service;
-
+/// <summary>
+/// 文件存储服务
+/// </summary>
 public sealed class StorageService : ApplicationService<StorageService>
 {
     /// <summary>
     /// 上传文件
     /// </summary>
-    /// <param name="file"></param>
+    /// <param name="context"></param>
     /// <returns></returns>
-    [Description("上传文件")]
     public async Task<UploadFileResult> UploadFile(HttpContext context)
     {
         var file = context.Request.Form.Files[0];

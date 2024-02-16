@@ -11,6 +11,8 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
     public DbSet<User> Users { get; set; }
 
+    public DbSet<WikiDetail> WikiDetails { get; set; }
+
     protected override void OnModelCreatingExecuting(ModelBuilder modelBuilder)
     {
         base.OnModelCreatingExecuting(modelBuilder);
@@ -31,6 +33,17 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.HasIndex(e => e.Name);
         });
 
+        modelBuilder.Entity<WikiDetail>(entity =>
+        {
+            entity.ToTable("wiki-wiki_details");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+            entity.Property(e => e.FileName).HasMaxLength(100);
+            entity.Property(e => e.Path).HasMaxLength(200);
+            entity.Property(e => e.Type).HasMaxLength(100);
+        });
+        
         modelBuilder.Entity<FileStorage>(entity =>
         {
             entity.ToTable("wiki-file_storages");
@@ -50,6 +63,7 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.Password).HasMaxLength(100);
         });
+        
 
         var user = new User("admin", "admin", "Aa123456",
             "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", "239573049@qq.com", "13049809673", false);

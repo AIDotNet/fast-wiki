@@ -1,0 +1,56 @@
+﻿@inject JsHelperModule JsHelperModule
+@inject IWikiService WikiService
+@inject IPopupService PopupService
+@inject IStorageService StorageService
+
+<MDialog Persistent
+         @bind-Value="Visible"
+         MaxWidth="400">
+    <ActivatorContent>
+        <MButton Color="primary"
+                 Dark
+                 @attributes="@context.Attrs">
+            创建知识库
+        </MButton>
+    </ActivatorContent>
+    <ChildContent>
+        <MCard>
+            <MCardTitle>
+                <span class="text-h5">添加知识库</span>
+            </MCardTitle>
+            <MCardText>
+                <MContainer>
+                    <InputFile  style="display: none !important;" @ref="inputFile" OnChange="ShowPreview" />
+                    设置知识库Logo：
+                    <MAvatar Size="80">
+                        <img @onclick="OpenInputFile" @ref="previewImageElem" src="https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg" alt="" />
+                    </MAvatar>
+                    <MRow>
+                        <MTextField Label="知识库名称*"
+                                    @bind-Value="input.Name">
+                        </MTextField>
+                    </MRow>
+                    <MRow>
+                        <MTextField Label="知识库模型*"
+                                    @bind-Value="input.Model">
+                        </MTextField>
+                    </MRow>
+                </MContainer>
+                <small>*为必填</small>
+            </MCardText>
+            <MCardActions>
+                <MSpacer></MSpacer>
+                <MButton Color="blue darken-1"
+                         Text
+                         OnClick="() => Visible = false">
+                    关闭
+                </MButton>
+                <MButton Color="blue darken-1"
+                         OnClick="OnSubmit"
+                         Text>
+                    添加
+                </MButton>
+            </MCardActions>
+        </MCard>
+    </ChildContent>
+</MDialog>

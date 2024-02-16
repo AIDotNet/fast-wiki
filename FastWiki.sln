@@ -24,13 +24,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{78
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Contracts", "Contracts", "{BFBCAAC7-31A3-4B4A-B974-CF46500A7AC0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastWiki.Service.Contracts", "src\Contracts\FastWiki.Service.Contracts\FastWiki.Service.Contracts.csproj", "{5F0668AA-165B-46A8-B933-034F22FAD066}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastWiki.Service.Contracts", "src\Contracts\FastWiki.Service.Contracts\FastWiki.Service.Contracts.csproj", "{5F0668AA-165B-46A8-B933-034F22FAD066}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastWiki.Service", "src\Service\FastWiki.Service\FastWiki.Service.csproj", "{EF8AE318-7534-4687-8663-BB6B5F5DE5F2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{D6D3A051-B8FE-4356-B582-921A6726ED40}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastWiki.Infrastructure.Common", "src\Infrastructure\FastWiki.Infrastructure.Common\FastWiki.Infrastructure.Common.csproj", "{0C90BE14-96EC-4E1B-A017-258E36ED6B1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastWiki.Infrastructure.Common", "src\Infrastructure\FastWiki.Infrastructure.Common\FastWiki.Infrastructure.Common.csproj", "{0C90BE14-96EC-4E1B-A017-258E36ED6B1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

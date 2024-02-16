@@ -1,4 +1,7 @@
 ﻿@page "/wiki"
+@inject IWikiService WikiService
+@inject IPopupService PopupService
+@inject NavigationManager NavigationManager
 
 <MCard Class="mt-6">
     <MCardText Class="pa-6">
@@ -20,21 +23,55 @@
             </MCol>
             <MCol Cols="6"
                   Md="2">
-                <MButton Right Color="primary" MinWidth=80 Height=32 Class="ml-6 rounded-pill" OnClick="() => AddWikiVisible = true">
-                    添加知识库
-                </MButton>
+                <AddWiki OnSucceed="OnSearch"/>
             </MCol>
         </MRow>
     </MCardText>
 
+    @if (Result?.Result == null || Result.Result.Count == 0)
+    {
+        <p style="font-size: 20px;text-align: center;color: darkgray;">
+            暂无数据
+        </p>
+    }
+    else
+    {
+        <MRow NoGutters Style="padding: 8px;">
+            @foreach (var item in Result.Result)
+            {
+                <MCol key="@item.Id" Cols=4 Style="margin: 5px;">
+                    <MCard Elevation="2">
+                        <MCardTitle>
+                            <MAvatar>
+                                <MImage Src="@item.Icon"></MImage>
+                            </MAvatar>
+                            <span>
+                                @item.Name
+                            </span>
+                        </MCardTitle>
+                        <MCardActions>
+                            <MChip>@item.Model</MChip>
+                            <MSpacer></MSpacer>
+                            <MButton Text OnClick="() => OpenWiki(item)">
+                                打开
+                            </MButton>
+                            <MButton Icon OnClick="async () => await Remove(item.Id)">
+                                <MIcon>mdi-delete</MIcon>
+                            </MButton>
+                        </MCardActions>
+                    </MCard>
+                </MCol>
+            }
+        </MRow>
+    }
 
     <MCardText>
         <div class="d-flex">
-            @* <div class="mr-auto pt-3 text-btn neutral-lighten-1--text">Showing @((_userPage.PageIndex-1)*_userPage.PageSize+1) to @(_userPage.PageIndex*_userPage.PageSize) of @_userPage.CurrentCount entries</div> *@
-            @* @if (_userPage.PageCount > 0) *@
-            @* { *@
-            @*     <MPagination @bind-Value="_userPage.PageIndex" Color="primary" Circle Length=@_userPage.PageCount></MPagination> *@
-            @* } *@
+            <div class="mr-auto pt-3 text-btn neutral-lighten-1--text">Showing @((page - 1) * pageSize + 1) to @(page * pageSize) of @(page) entries</div>
+            @if (Result?.Total > 0)
+            {
+                <MPagination @bind-Value="page" Color="primary" Circle Length=@((int)(Result?.Total??0))></MPagination>
+            }
         </div>
     </MCardText>
 </MCard>

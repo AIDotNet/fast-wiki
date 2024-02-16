@@ -4,8 +4,15 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DocumentationFile>bin\Debug\FastWiki.Service.xml</DocumentationFile>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\FastWiki.Service.xml</DocumentationFile>
+    </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Masa.BuildingBlocks.Data.MappingExtensions" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.BuildingBlocks.Data.UoW" Version="$(MasaFrameworkPackageVersion)"/>
         <PackageReference Include="Masa.Contrib.Data.EFCore.PostgreSql" Version="$(MasaFrameworkPackageVersion)"/>
         <PackageReference Include="Masa.Contrib.Data.Mapping.Mapster" Version="$(MasaFrameworkPackageVersion)"/>
@@ -26,6 +33,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Application\Wikis\Queries\"/>
+      <Folder Include="wwwroot\" />
     </ItemGroup>
 </Project>

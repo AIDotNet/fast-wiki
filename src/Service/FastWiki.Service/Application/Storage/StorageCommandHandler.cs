@@ -6,11 +6,13 @@ namespace FastWiki.Service.Application.Storage;
 /// 存储命令处理器
 /// </summary>
 /// <param name="fileStorageRepository"></param>
-public class StorageCommandHandler(IFileStorageRepository fileStorageRepository)
+public class StorageCommandHandler(IFileStorageRepository fileStorageRepository, IHttpContextAccessor accessor)
 {
     [EventHandler]
     public async Task UploadFileStorage(UploadFileStorageCommand command)
     {
+
+
         var filePath = "uploads/" + Guid.NewGuid().ToString("N") + Path.GetExtension(command.File.FileName);
         var fileStreamPath = Path.Combine("wwwroot", filePath);
 
@@ -21,10 +23,13 @@ public class StorageCommandHandler(IFileStorageRepository fileStorageRepository)
             fileInfo.Directory.Create();
         }
 
+        var host =
+            $"{(accessor.HttpContext.Request.IsHttps ? ("https") : ("http"))}://{accessor.HttpContext.Request.Host}";
+
         await using var fileStream = fileInfo.Create();
         await command.File.CopyToAsync(fileStream);
 
-        var fileStorage = new FileStorage(command.File.FileName, "/" + filePath, command.File.Length, false);
+        var fileStorage = new FileStorage(command.File.FileName, host + "/" + filePath, command.File.Length, false);
 
         fileStorage = await fileStorageRepository.AddAsync(fileStorage);
 

@@ -2,6 +2,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Services
     .AddEndpointsApiExplorer()
+    .AddMapster()
+    .AddHttpContextAccessor()
     .AddSwaggerGen(options =>
     {
         options.SwaggerDoc("v1", new OpenApiInfo { Title = "FastWiki.ServiceApp", Version = "v1", Contact = new OpenApiContact { Name = "FastWiki.ServiceApp", } });
