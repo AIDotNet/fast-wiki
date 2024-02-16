@@ -1,0 +1,80 @@
+﻿@inherits LayoutComponentBase
+@inject GlobalConfig GlobalConfig
+
+<MApp>
+    <PPageTabsProvider>
+        <CascadingValue Value="GlobalConfig.Culture.Name" Name="CultureName">
+            <MAppBar Elevation=0 App Height="100" Class="default-app-bar mx-6">
+                <div class="default-app-bar__actions @PageModeClass">
+                    <Favorite />
+                    <MSpacer />
+                    <Search />
+                    <MIcon Size=20 Class="ml-5" Color="neutral-lighten-3">mdi-message-processing-outline</MIcon>
+                    <MIcon Size=20 Class="ml-5" Color="neutral-lighten-3" OnClick="() => _showSetting = true">mdi-cog-outline</MIcon>
+                    <Language OnLanguageChanged="OnLanguageChanged" />
+                    <Login />
+                </div>
+                <div class="default-app-bar__nav @PageModeClass">
+                    @if (_pageTab == PageModes.PageTab)
+                    {
+                        <PageTabs @ref="_pageTabs" SelfPatterns="@s_selfPatterns" />
+                    }
+                    else
+                    {
+                        <Breadcrumb />
+                    }
+                </div>
+            </MAppBar>
+
+            <Navigation />
+
+            <MMain Class="fill-lighten-1">
+                <div class="pa-6">
+                    @if (_pageTab == PageModes.PageTab)
+                    {
+                        <PPageContainer PageTabs="@_pageTabs?.PPageTabs" SelfPatterns="@s_selfPatterns">
+                            @Body
+                        </PPageContainer>
+                    }
+                    else
+                    {
+                        @Body
+                    }
+                </div>
+            </MMain>
+            <Settings @bind-PageModel="_pageTab" @bind-Show=_showSetting />
+        </CascadingValue>
+    </PPageTabsProvider>
+</MApp>
+
+@code {
+
+    private static readonly string[] s_selfPatterns =
+    {
+        "/app/todo"
+    };
+
+    private bool? _showSetting;
+
+    private string? _pageTab;
+
+    private PageTabs? _pageTabs;
+
+    private string PageModeClass => _pageTab == PageModes.PageTab ? "page-mode--tab" : "page-mode--breadcrumb";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await GlobalConfig.InitFromStorage();
+        }
+    }
+
+    void OnLanguageChanged(CultureInfo culture)
+    {
+        GlobalConfig.Culture = culture;
+    }
+
+}

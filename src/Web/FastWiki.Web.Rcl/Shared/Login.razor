@@ -1,0 +1,33 @@
+﻿<MMenu OffsetX Left OffsetY>
+    <ActivatorContent Context="menuContext">
+        <div class="text-center border-left-solid" style="width:88px;">
+            <MAvatar @attributes="menuContext.Attrs" Size=40>
+                <MImage Src="/img/avatar/2.svg"></MImage>
+            </MAvatar>
+        </div>
+    </ActivatorContent>
+    <ChildContent>
+        <MList Dense>
+            <MListItem Link Href="/pages/authentication/login-v1">
+                <MListItemIcon Class="mr-4">
+                    <MIcon Size=20 Color="neutral-lighten-4">fa:fas fa-user-circle</MIcon>
+                </MListItemIcon>
+                <MListItemContent>
+                    <MListItemTitle>
+                        <span class="neutral-lighten-4--text">Login v1</span>
+                    </MListItemTitle>
+                </MListItemContent>
+            </MListItem>
+            <MListItem Link Href="/pages/authentication/login-v2">
+                <MListItemIcon Class="mr-4">
+                    <MIcon Size=20 Color="neutral-lighten-4">fa:fas fa-sign-in-alt</MIcon>
+                </MListItemIcon>
+                <MListItemContent>
+                    <MListItemTitle>
+                        <span class="neutral-lighten-4--text">Login v2</span>
+                    </MListItemTitle>
+                </MListItemContent>
+            </MListItem>
+        </MList>
+    </ChildContent>
+</MMenu>

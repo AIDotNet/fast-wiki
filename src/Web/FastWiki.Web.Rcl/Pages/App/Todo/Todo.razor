@@ -1,0 +1,88 @@
+﻿@page "/app/todo/{FilterText?}"
+
+<CascadingValue Value="this">
+    <div>
+        <MRow Class="no-gutters">
+            <div style="height:calc(100vh - 112px );">
+                <TodoNav />
+            </div>
+            <div class="pl-6 rounded-2" style="height:calc(100vh - 112px ); width: calc(100% - 300px); overflow: hidden; display:block;">
+                @*<TodoList FilterText=@FilterText />*@
+                <div>
+                    <MToolbar Dense Elevation="0" Class="rounded-2" Height="60">
+                        <MTextField TValue="string"
+                                    Class="task-search mx-4"
+                                    HideDetails=true
+                                    Placeholder="Search Task" @bind-Value=InputText>
+                            <PrependContent>
+                                <MIcon Small Class="mt-1">fa fa-search</MIcon>
+                            </PrependContent>
+
+                        </MTextField>
+                        <MMenu OffsetX Left OffsetY>
+                            <ActivatorContent>
+                                <MButton Class="mr-5" Icon Large @attributes="context.Attrs">
+                                    <MIcon>mdi-dots-horizontal</MIcon>
+                                </MButton>
+                            </ActivatorContent>
+                            <ChildContent>
+                                <MList Dense>
+                                    <MListItem Link OnClick=ResetSort>
+                                        <MListItemContent>
+                                            <MListItemTitle>
+                                                Reset Sort
+                                            </MListItemTitle>
+                                        </MListItemContent>
+                                    </MListItem>
+                                    <MListItem Link OnClick=SortbyAssignee>
+                                        <MListItemContent>
+                                            <MListItemTitle>
+                                                Sort Assignee
+                                            </MListItemTitle>
+                                        </MListItemContent>
+                                    </MListItem>
+                                    <MListItem Link OnClick=SortbyDueDate>
+                                        <MListItemContent>
+                                            <MListItemTitle>
+                                                Sort Due Date
+                                            </MListItemTitle>
+                                        </MListItemContent>
+                                    </MListItem>
+                                </MList>
+                            </ChildContent>
+                        </MMenu>
+                    </MToolbar>
+
+                    <MList Dense Class="rounded-4 mt-6" Style="height: calc(100vh - 196px ); overflow-y:auto;">
+                        @foreach (var item in _thisList)
+                        {
+                            <MListItem Style="height:58px;" Dense Link OnClick="() => ShowDetail(item)">
+                                <span @onclick:stopPropagation>
+                                    <MCheckbox TValue="bool" Class="pa-0 ma-0" @bind-Value=@item.IsChecked Color="primary"></MCheckbox>
+                                </span>
+
+                                <MListItemContent Class="text-body neutral-lighten-2--text">
+                                    @item.Title
+                                </MListItemContent>
+
+                                <MListItemAction>
+                                    @foreach (var tag in item.Tag)
+                                    {
+                                        <MChip Class="mx-1 text-btn" Small TextColor="@_tagColorMap[tag]" Color="@(_tagColorMap[tag] + "-lighten-5")">@tag</MChip>
+                                    }
+                                    <span class="ml-4 mr-2 text-caption">@item.DueDate</span>
+                                </MListItemAction>
+
+                                <MListItemAvatar>
+                                    <img style="height:32px;width:32px" src=@_avas[item.Avatar]>
+                                </MListItemAvatar>
+                            </MListItem>
+                            <MDivider></MDivider>
+                        }
+                    </MList>
+                </div>
+            </div>
+        </MRow>
+    </div>
+    <TodoDetail @bind-Value="_visible" SelectItem=_selectItem></TodoDetail>
+</CascadingValue>

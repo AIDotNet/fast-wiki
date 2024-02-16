@@ -1,0 +1,76 @@
+﻿@inherits ProComponentBase
+@inject GlobalConfig GlobalConfig
+
+<MNavigationDrawer Value=Show ValueChanged=ShowChanged Fixed Right Temporary Width="300">
+    <PrependContent>
+        <MContainer>
+            <MToolbar Style="width: 100%;" Absolute Elevation=0 Class="pr-4">
+                <span class="text-h6">@T("Settings")</span>
+                <MSpacer></MSpacer>
+                <MButton Icon OnClick="()=>{ Show = false; }">
+                    <MIcon>mdi-close</MIcon>
+                </MButton>
+            </MToolbar>
+        </MContainer>
+    </PrependContent>
+    <ChildContent>
+        <MContainer Fluid>
+            <p class="mt-8 text-subtitle2">@T("Mode")</p>
+            <MRadioGroup TValue="string" Mandatory Value=GlobalConfig.PageMode ValueChanged="PageModeChanged" Row>
+                <MRadio Label="@T("Breadcrumb")" Value="PageModes.Breadcrumb"></MRadio>
+                <MRadio Label="@T("PageTab")" Value="PageModes.PageTab"></MRadio>
+            </MRadioGroup>
+        </MContainer>
+        <MContainer Fluid>
+            <p class="mt-8 text-subtitle2">@T("NavigationStyle")</p>
+            <MRadioGroup TValue="string" Mandatory Value=GlobalConfig.NavigationStyle ValueChanged="NavigationStyleChanged" Row>
+                <MRadio Label="@T("Flat")" Value="NavigationStyles.Flat"></MRadio>
+                <MRadio Label="@T("Rounded")" Value="NavigationStyles.Rounded"></MRadio>
+            </MRadioGroup>
+        </MContainer>
+    </ChildContent>
+</MNavigationDrawer>
+
+@code {
+    [Parameter]
+    public bool? Show { get; set; }
+
+    [Parameter]
+    public EventCallback<bool?> ShowChanged { get; set; }
+
+    [Parameter]
+    public string PageModel { get; set; } = PageModes.PageTab;
+
+    [Parameter]
+    public string NavigationStyle { get; set; } = NavigationStyles.Flat;
+
+    [Parameter]
+    public EventCallback<string> PageModelChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<string> NavigationBarStyleChanged { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (PageModelChanged.HasDelegate)
+            await PageModelChanged.InvokeAsync(GlobalConfig.PageMode);
+        if (NavigationBarStyleChanged.HasDelegate)
+            await NavigationBarStyleChanged.InvokeAsync(GlobalConfig.NavigationStyle);
+    }
+
+    async Task PageModeChanged(string value)
+    {
+        GlobalConfig.PageMode = value;
+        if (PageModelChanged.HasDelegate)
+            await PageModelChanged.InvokeAsync(value);
+        else PageModel = value;
+    }
+
+    async Task NavigationStyleChanged(string value)
+    {
+        GlobalConfig.NavigationStyle = value;
+        if (NavigationBarStyleChanged.HasDelegate)
+            await NavigationBarStyleChanged.InvokeAsync(value);
+        else NavigationStyle = value;
+    }
+}
