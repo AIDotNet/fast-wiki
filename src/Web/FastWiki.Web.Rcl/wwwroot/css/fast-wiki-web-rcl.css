@@ -1,0 +1,48 @@
+﻿.flex {
+	display: flex;
+}
+
+.flex-col {
+	flex-direction: column;
+}
+
+.items-center {
+	align-items: center;
+}
+
+.justify-center {
+	justify-content: center;
+}
+
+.h-full {
+	height: 100%;
+}
+
+.text-h6 {
+	font-size: 1.25rem;
+	font-weight: 500;
+}
+
+.text-caption {
+	font-size: 0.75rem;
+	font-weight: 400;
+}
+
+.upload-item{
+	border: 2px dashed #d3dce6;
+	border-radius: 8px;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	margin: 20px 10px;
+	padding: 20px;
+	user-select: none;
+	
+}
+
+.upload-item:hover{
+	border: 2px dashed #4a90e2;
+}

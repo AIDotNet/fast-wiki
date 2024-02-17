@@ -1,0 +1,127 @@
+﻿<MDialog @bind-Value="_visible"
+         Fullscreen
+         Transition="dialog-bottom-transition">
+    <ActivatorContent>
+        <MListItem Link 
+                   @attributes="@context.Attrs">
+            <MListItemIcon>
+                <MIcon>mdi-file-chart-outline</MIcon>
+            </MListItemIcon>
+            <MListItemContent>
+                <MListItemTitle>本地文件</MListItemTitle>
+            </MListItemContent>
+        </MListItem>
+    </ActivatorContent>
+    <ChildContent>
+        <MCard>
+            <MToolbar Dark
+                      Color="primary">
+                <MToolbarTitle>上传本地文件</MToolbarTitle>
+                <MSpacer></MSpacer>
+                <MToolbarItems>
+                    <MButton Icon
+                             Dark
+                             OnClick="() => _visible = false">
+                        <MIcon>mdi-close</MIcon>
+                    </MButton>
+                </MToolbarItems>
+            </MToolbar>
+            <MDivider></MDivider>
+            <MStepper Value="_step">
+                <MStepperHeader>
+                    <MStepperStep Step="1" Complete="_step>1">
+                        选择文件
+                    </MStepperStep>
+                    <MDivider></MDivider>
+                    <MStepperStep Step="2" Complete="_step>2">
+                        数据处理
+                    </MStepperStep>
+                    <MDivider></MDivider>
+                    <MStepperStep Step="3">
+                        上传数据 
+                    </MStepperStep>
+                </MStepperHeader>
+
+                <MStepperItems>
+                    <MStepperContent Step="1">
+                        <MCard Outlined Class="mb-12">
+                            <div class="flex flex-col items-center justify-center h-full upload-item">
+                                <MIcon Size="48">mdi-file-upload</MIcon>
+                                <div class="text-h6">拖拽文件到此处</div>
+                                <div class="text-caption">或者点击上传</div>
+                            </div>
+                            <MCardActions>
+                                <MSpacer></MSpacer>
+                                <MButton Color="primary" OnClick="() => _step = 2">下一步</MButton>
+                            </MCardActions>
+                        </MCard>
+                        @code {
+                            private void OnDragOver(EventArgs e)
+                            {
+                            // 这里不需要显式调用 PreventDefault
+                            // 在HTML标记中返回false即可防止默认行为
+                            }
+
+                            private async Task OnDrop(DragEventArgs e)
+                            {
+                                if (e.DataTransfer.Items.Length > 0)
+                                {
+                                    var items = e.DataTransfer.Items;
+
+                                    for (int i = 0; i < items.Length; i++)
+                                    {
+                                        var item = items[i];
+
+                                        if (item.Kind == "file")
+                                        {
+                                            var file = item.();
+                            // 在这里处理文件，比如上传到服务器
+                                            await UploadFile(file);
+                                        }
+                                    }
+                                }
+                            }
+
+                            private async Task UploadFile(File file)
+                            {
+                            // 实现文件上传逻辑
+                            // ...
+                            }
+                        }
+
+                    </MStepperContent>
+                    <MStepperContent Step="2">
+                        <MCard Outlined Class="mb-12" Height="200" >
+                            <MListItem ThreeLine>
+                                <MListItemContent>
+                                    <div class="text-overline mb-4">
+                                        OVERLINE
+                                    </div>
+                                    <MListItemTitle Class="text-h5 mb-1">
+                                        Headline 5
+                                    </MListItemTitle>
+                                    <MListItemSubtitle>Greyhound divisely hello coldly fonwderfully</MListItemSubtitle>
+                                </MListItemContent>
+                                <MListItemAvatar Tile Size=80 Color="grey"> </MListItemAvatar>
+                            </MListItem>
+                            <MCardActions>
+                                <MSpacer></MSpacer>
+                                <MButton Color="primary" OnClick="() => _step = 1">上一步</MButton>
+                                <MButton Color="primary" OnClick="() => _step = 3">下一步</MButton>
+                            </MCardActions>
+                        </MCard>
+                    </MStepperContent>
+                    <MStepperContent Step="3">
+                        <MCard Outlined Class="mb-12" Height="200">
+                            <MCardActions>
+                                <MSpacer></MSpacer>
+                                <MButton Color="primary" OnClick="()=>_step=2">上一步</MButton>
+                                <MButton Color="primary">完成</MButton>
+                            </MCardActions>
+                        </MCard>
+                    </MStepperContent>
+                </MStepperItems>
+            </MStepper>
+        </MCard>
+    </ChildContent>
+</MDialog>

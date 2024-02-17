@@ -1,4 +1,4 @@
-﻿namespace FastWiki.ApiGateway.Caller;
+﻿namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
