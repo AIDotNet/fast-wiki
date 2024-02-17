@@ -1,0 +1,109 @@
+﻿@page "/wiki/{id:long}"
+
+@inject IWikiService WikiService
+
+<MCard Class="mt-6" Style="padding: 8px;height:85vh">
+    <MTabs Vertical>
+        <MTab>
+            <MIcon Left>
+                mdi-database-outline
+            </MIcon>
+            数据列表
+        </MTab>
+        <MTab>
+            <MIcon Left>
+                mdi-radar
+            </MIcon>
+            搜索测试
+        </MTab>
+        <MTab>
+            <MIcon Left>
+                mdi-cog
+            </MIcon>
+            数据配置
+        </MTab>
+
+        <MTabItem>
+            <MCard Flat>
+                <MCardTitle>
+                    <span>数据数量</span>
+                    <MSpacer></MSpacer>
+                    <MTextField Dense Outlined TValue="string" Label="搜索"></MTextField>
+                    <MMenu OffsetY>
+                        <ActivatorContent>
+                            <MButton @attributes="@context.Attrs" Style="margin-bottom: 18px;margin-left: 8px;">
+                                新增/导入
+                            </MButton>
+                        </ActivatorContent>
+                        <ChildContent>
+                            <MList Nav Dense>
+                                <MListItem Link>
+                                    <MListItemIcon>
+                                        <MIcon>mdi-file-chart-outline</MIcon>
+                                    </MListItemIcon>
+                                    <MListItemContent>
+                                        <MListItemTitle>本地文件</MListItemTitle>
+                                    </MListItemContent>
+                                </MListItem>
+                                <MListItem Link>
+                                    <MListItemIcon>
+                                        <MIcon>mdi-web</MIcon>
+                                    </MListItemIcon>
+                                    <MListItemContent>
+                                        <MListItemTitle>网页链接</MListItemTitle>
+                                    </MListItemContent>
+                                </MListItem>
+                                <MListItem Link>
+                                    <MListItemIcon>
+                                        <MIcon>mdi-text-box-edit-outline</MIcon>
+                                    </MListItemIcon>
+
+                                    <MListItemContent>
+                                        <MListItemTitle>自定义文本</MListItemTitle>
+                                    </MListItemContent>
+                                </MListItem>
+                            </MList>
+                        </ChildContent>
+                    </MMenu>
+                </MCardTitle>
+                <MCardText>
+                    <MDataTable Stripe
+                                Headers="_headers"
+                                Items="_wikiDetails.Result"
+                                ItemKey="r=>r.Id.ToString()"
+                                Class="elevation-1"></MDataTable>
+
+                </MCardText>
+            </MCard>
+        </MTabItem>
+        <MTabItem>
+            <MCard Flat>
+            </MCard>
+        </MTabItem>
+        <MTabItem>
+            <MCard Flat>
+            </MCard>
+        </MTabItem>
+    </MTabs>
+</MCard>
+
+<style>
+    .flex {
+        display: flex;
+    }
+
+    .flex-1 {
+        flex: 1;
+    }
+
+    .w-64 {
+        width: 16rem;
+        /* 黑色边框 */
+        border: 1px solid #000;
+        border-radius: 12px;
+    }
+
+    .mt-6 {
+        margin-top: 1.5rem;
+    }
+</style>
