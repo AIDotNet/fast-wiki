@@ -1,4 +1,6 @@
 using FastWiki.Service;
+using Microsoft.SemanticKernel.Plugins.Core;
+using Microsoft.SemanticKernel.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 

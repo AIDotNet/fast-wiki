@@ -14,6 +14,7 @@
   <ItemGroup>
     <PackageReference Include="Masa.Blazor" Version="$(MASABlazorVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.4.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Contracts\FastWiki.Service.Contracts\FastWiki.Service.Contracts.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\FastWiki.Infrastructure.Common\FastWiki.Infrastructure.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
     <UpToDateCheckInput Remove="Pages\Wikis\WikiInfo.razor" />

@@ -1,0 +1,18 @@
+﻿<div style="position: relative;">
+    <InputFile type="file" 
+               id="@Id"
+               webkitdirectory="@Directory" 
+               multiple="@(Multiple || Directory)" 
+               accept="@Accept"
+               OnChange="OnUploadChanged"
+               style="position: absolute;width: 100%;height: 100%;opacity: 0;top: 0;left: 0;z-index:2;"/>
+    <div class="drop-upload-container">
+        @ChildContent
+    </div>
+</div>
+
+<style>
+    .drop-upload-container{
+
+    }
+</style>

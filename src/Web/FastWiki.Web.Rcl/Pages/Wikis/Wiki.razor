@@ -3,7 +3,7 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<MCard Class="mt-6">
+<MCard Style="padding: 8px;">
     <MCardText Class="pa-6">
         <MRow NoGutters>
             <MCol Cols="12"
@@ -39,25 +39,38 @@
         <MRow NoGutters Style="padding: 8px;">
             @foreach (var item in Result.Result)
             {
-                <MCol key="@item.Id" Cols=4 Style="margin: 5px;">
-                    <MCard Elevation="2">
+                <MCol key="@item.Id" Cols=3 Style="margin: 5px;">
+                    <MCard Elevation="1" OnClick="()=>OpenWiki(item)">
                         <MCardTitle>
                             <MAvatar>
                                 <MImage Src="@item.Icon"></MImage>
                             </MAvatar>
-                            <span>
+                            <span style="font-weight:bold;margin-left:8px;font-size:12px;">
                                 @item.Name
                             </span>
+                            <MSpacer></MSpacer>
+                            <MMenu Left
+                                   Bottom>
+                                <ActivatorContent>
+                                    <MButton Icon @attributes="@context.Attrs">
+                                        <MIcon>mdi-dots-vertical</MIcon>
+                                    </MButton>
+                                </ActivatorContent>
+                                <ChildContent>
+                                    <MList>
+                                        <MListItem OnClick="async () => await Remove(item.Id)">
+                                            <MListItemTitle>删除</MListItemTitle>
+                                        </MListItem>
+                                    </MList>
+                                </ChildContent>
+                            </MMenu>
                         </MCardTitle>
                         <MCardActions>
-                            <MChip>@item.Model</MChip>
+                            <span style="font-size:16px;">
+                                @item.Model
+                            </span>
                             <MSpacer></MSpacer>
-                            <MButton Text OnClick="() => OpenWiki(item)">
-                                打开
-                            </MButton>
-                            <MButton Icon OnClick="async () => await Remove(item.Id)">
-                                <MIcon>mdi-delete</MIcon>
-                            </MButton>
+                            
                         </MCardActions>
                     </MCard>
                 </MCol>
@@ -67,7 +80,7 @@
 
     <MCardText>
         <div class="d-flex">
-            <div class="mr-auto pt-3 text-btn neutral-lighten-1--text">Showing @((page - 1) * pageSize + 1) to @(page * pageSize) of @(page) entries</div>
+            <div class="mr-auto pt-3 text-btn neutral-lighten-1--text"> @((page - 1) * pageSize + 1) - @(page * pageSize) 当前页： @(page)</div>
             @if (Result?.Total > 0)
             {
                 <MPagination @bind-Value="page" Color="primary" Circle Length=@((int)(Result?.Total??0))></MPagination>

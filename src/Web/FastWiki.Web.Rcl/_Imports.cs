@@ -28,3 +28,5 @@ global using System.Net.Http.Json;
 global using BlazorComponent.JSInterop;
 global using Microsoft.JSInterop;
 global using Microsoft.Extensions.DependencyInjection;
+global using FastWiki.Service.Contracts;
+global using Microsoft.AspNetCore.Components.Forms;
