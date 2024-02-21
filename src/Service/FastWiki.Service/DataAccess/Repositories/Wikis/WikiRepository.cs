@@ -30,29 +30,39 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
         return await query.LongCountAsync();
     }
 
+    /// <inheritdoc />
+    public async Task<WikiDetail> AddDetailsAsync(WikiDetail wikiDetail)
+    {
+        var result = await Context.WikiDetails.AddAsync(wikiDetail);
+
+        await Context.SaveChangesAsync();
+
+        return result.Entity;
+    }
+
     private IQueryable<Wiki> CreateQuery(string? keyword)
     {
         var query = Context.Wikis.AsNoTracking();
-        
-        if(!string.IsNullOrWhiteSpace(keyword))
+
+        if (!string.IsNullOrWhiteSpace(keyword))
         {
             query = query.Where(x => x.Name.Contains(keyword));
         }
-        
+
         return query;
     }
-    
+
     private IQueryable<WikiDetail> CreateDetailsQuery(long wikiId, string? keyword)
     {
         var query = Context.WikiDetails.AsNoTracking();
-        
-        if(!string.IsNullOrWhiteSpace(keyword))
+
+        if (!string.IsNullOrWhiteSpace(keyword))
         {
             query = query.Where(x => x.FileName.Contains(keyword));
         }
-        
+
         query = query.Where(x => x.WikiId == wikiId);
-        
+
         return query;
     }
 }

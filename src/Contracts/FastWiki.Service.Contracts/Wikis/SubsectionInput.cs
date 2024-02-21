@@ -1,15 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿namespace FastWiki.Service.Contracts.Wikis;
 
-namespace FastWiki.Service.Contracts.Wikis;
-
-public class SubsectionInput
+public class SubsectionInput(string content, string fileId, string name)
 {
-    public string FileId { get; set; } = string.Empty;
+    public string FileId { get; set; } = fileId;
 
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; } = name;
 
-    public List<string> Lins { get; set; } = new();
-
-    [JsonIgnore]
-    public object Data { get; set; }
+    public string Content { get; set; } = content;
 }

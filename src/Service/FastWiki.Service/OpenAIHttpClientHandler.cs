@@ -14,7 +14,7 @@ public sealed class OpenAIHttpClientHandler : HttpClientHandler
             uriBuilder = new UriBuilder(OpenAIOption.ChatEndpoint.TrimEnd('/') + "/v1/chat/completions");
             request.RequestUri = uriBuilder.Uri;
         }
-        else if (OpenAIOption.EmbeddingEndpoint.IsNullOrWhiteSpace() &&
+        else if (!OpenAIOption.EmbeddingEndpoint.IsNullOrWhiteSpace() &&
                  request.RequestUri?.LocalPath == "/v1/embeddings")
         {
             uriBuilder = new UriBuilder(OpenAIOption.EmbeddingEndpoint.TrimEnd('/') + "/v1/embeddings");

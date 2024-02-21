@@ -1,5 +1,8 @@
 ﻿using FastWiki.Service.Contracts.Wikis;
 using Microsoft.SemanticKernel.Text;
+using System.Collections.Generic;
+using FastWiki.Service.Contracts.Wikis.Dto;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace FastWiki.Web.Rcl.Pages.Wikis;
 
@@ -21,6 +24,13 @@ public partial class WikiUploadLocalFile
         "text/markdown"
     ];
 
+    private static readonly List<string> NameSuffix =
+        [
+            ".md",
+            ".txt",
+            ".pdf"
+        ];
+
     /// <summary>
     /// 最多支持文件数量
     /// </summary>
@@ -28,13 +38,39 @@ public partial class WikiUploadLocalFile
 
     private int _step = 1;
 
-    private List<IBrowserFile> _files = [];
+    private readonly Dictionary<IBrowserFile, List<SubsectionInput>> _files = [];
+
+    public List<UploadSubsectionInput> BrowserFiles = new();
 
     private TrainingPattern _trainingPattern = TrainingPattern.Subsection;
 
     private ProcessMode _processMode = ProcessMode.Auto;
 
-    private List<SubsectionInput> _inputs = new();
+
+    private readonly List<DataTableHeader<UploadSubsectionInput>> _headers =
+    [
+        new()
+        {
+            Text = "文件名",
+            Sortable = false,
+            Value = nameof(UploadSubsectionInput.Name)
+        },
+        new() {
+            Text = "分段数量",
+            Sortable = false,
+            Value = nameof(UploadSubsectionInput.Count)
+        },
+        new() {
+            Text = "文件上传进度",
+            Sortable = false,
+            Value = nameof(UploadSubsectionInput.FileProgress)
+        },
+        new() {
+            Text = "数据上传进度",
+            Sortable = false,
+            Value = nameof(UploadSubsectionInput.DataProgress)
+        }
+    ];
 
     /// <summary>
     /// 分段长度
@@ -43,7 +79,10 @@ public partial class WikiUploadLocalFile
 
     private void UploadChanged(InputFileChangeEventArgs args)
     {
-        _files.AddRange(args.GetMultipleFiles(MaxFilesCount).Where(x => _types.Contains(x.ContentType)).ToList());
+        foreach (var item in args.GetMultipleFiles(MaxFilesCount).Where(x => _types.Contains(x.ContentType) || NameSuffix.Any(n => x.Name.EndsWith(n))).ToList())
+        {
+            _files.Add(item, []);
+        }
         InvokeAsync(StateHasChanged);
     }
 
@@ -52,27 +91,62 @@ public partial class WikiUploadLocalFile
         _files.Remove(file);
     }
 
+    private async Task SelectFileHandle()
+    {
+        _step = 2;
+        await Preview();
+    }
+
     private async Task Preview()
     {
+        if (_processMode == ProcessMode.Auto)
+            subsection = 512;
+
         if (_trainingPattern == TrainingPattern.Subsection)
         {
-            foreach (IBrowserFile file in _files)
+            BrowserFiles.Clear();
+            foreach (var item in _files)
             {
-                var read = new StreamReader(file.OpenReadStream());
-
+                var read = new StreamReader(item.Key.OpenReadStream());
+                item.Value.Clear();
 #pragma warning disable SKEXP0055 // 类型仅用于评估，在将来的更新中可能会被更改或删除。取消此诊断以继续。
                 var lines = TextChunker.SplitPlainTextLines(await read.ReadToEndAsync(), subsection);
 #pragma warning restore SKEXP0055 // 类型仅用于评估，在将来的更新中可能会被更改或删除。取消此诊断以继续。
-                _inputs.Add(new SubsectionInput()
+                item.Value.AddRange(lines.Select(x => new SubsectionInput(x, string.Empty, item.Key.Name)));
+
+                BrowserFiles.Add(new UploadSubsectionInput()
                 {
-                    Name = file.Name,
-                    Lins = lines,
-                    Data = file
+                    Count = item.Value.Count,
+                    Name = item.Key.Name,
                 });
-
             }
+        }
+    }
 
+    private async Task Upload()
+    {
+        foreach (var file in _files)
+        {
+            var fileInfo = await StorageService.UploadFile(file.Key.OpenReadStream(), file.Key.Name);
+            var input = new CreateWikiDetailsInput()
+            {
+                Name = file.Key.Name,
+                WikiId = 1,
+                FileId = fileInfo.Id,
+                FilePath = fileInfo.Path,
+                Lins = file.Value.Select(x => x.Content)
+            };
 
+            var fileItem = BrowserFiles.FirstOrDefault(x => x.Name == file.Key.Name);
+            fileItem!.FileProgress = 100;
+
+            _ = InvokeAsync(StateHasChanged);
+
+            await WikiService.CreateWikiDetailsAsync(input);
+
+            fileItem.DataProgress = 100;
+
+            _ = InvokeAsync(StateHasChanged);
         }
     }
 }

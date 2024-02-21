@@ -5,10 +5,7 @@
 /// </summary>
 public sealed class WikiService : ApplicationService<WikiService>, IWikiService
 {
-    /// <summary>
-    /// 创建知识库
-    /// </summary>
-    /// <param name="input"></param>
+    /// <inheritdoc />
     public async Task CreateAsync(CreateWikiInput input)
     {
         var command = new CreateWikiCommand(input);
@@ -16,11 +13,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         await EventBus.PublishAsync(command);
     }
 
-    /// <summary>
-    /// 获取知识库
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    /// <inheritdoc />
     public async Task<WikiDto> GetAsync(long id)
     {
         var query = new WikiQuery(id);
@@ -30,13 +23,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         return query.Result;
     }
 
-    /// <summary>
-    /// 获取知识库列表
-    /// </summary>
-    /// <param name="keyword"></param>
-    /// <param name="page"></param>
-    /// <param name="pageSize"></param>
-    /// <returns></returns>
+    /// <inheritdoc />
     public async Task<PaginatedListBase<WikiDto>> GetWikiListAsync(string? keyword, int page, int pageSize)
     {
         var query = new WikiListQuery(keyword, page, pageSize);
@@ -45,11 +32,8 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
 
         return query.Result;
     }
-    
-    /// <summary>
-    /// 删除知识库
-    /// </summary>
-    /// <param name="id"></param>
+
+    /// <inheritdoc />
     public async Task RemoveAsync(long id)
     {
         var command = new RemoveWikiCommand(id);
@@ -57,20 +41,20 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         await EventBus.PublishAsync(command);
     }
 
-    /// <summary>
-    /// 获取知识库详情列表
-    /// </summary>
-    /// <param name="wikiId"></param>
-    /// <param name="keyword"></param>
-    /// <param name="page"></param>
-    /// <param name="pageSize"></param>
-    /// <returns></returns>
+    /// <inheritdoc />
+    public async Task CreateWikiDetailsAsync(CreateWikiDetailsInput input)
+    {
+        var command = new CreateWikiDetailsCommand(input);
+
+        await EventBus.PublishAsync(command);
+    }
+
     public async Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId, string? keyword, int page, int pageSize)
     {
         var query = new WikiDetailsQuery(wikiId, keyword, page, pageSize);
 
         await EventBus.PublishAsync(query);
-        
+
         return query.Result;
     }
 }
