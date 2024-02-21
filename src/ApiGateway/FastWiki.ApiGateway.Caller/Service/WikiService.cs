@@ -38,14 +38,21 @@ public sealed class WikiService(ICaller caller) : ServiceBase(caller), IWikiServ
         await PostAsync(nameof(CreateWikiDetailsAsync), input);
     }
 
-    public async Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId, string keyword, int page, int pageSize)
+    public async Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId, string keyword, int page,
+        int pageSize)
     {
-        return await GetAsync<PaginatedListBase<WikiDetailDto>>(nameof(GetWikiDetailsAsync), new Dictionary<string, string>()
-        {
-            { "wikiId", wikiId.ToString() },
-            { "keyword", keyword },
-            { "page", page.ToString() },
-            { "pageSize", pageSize.ToString() }
-        });
+        return await GetAsync<PaginatedListBase<WikiDetailDto>>(nameof(GetWikiDetailsAsync),
+            new Dictionary<string, string>()
+            {
+                { "wikiId", wikiId.ToString() },
+                { "keyword", keyword },
+                { "page", page.ToString() },
+                { "pageSize", pageSize.ToString() }
+            });
+    }
+
+    public async Task RemoveDetailsAsync(long id)
+    {
+        await DeleteAsync(nameof(RemoveDetailsAsync) + "/" + id);
     }
 }

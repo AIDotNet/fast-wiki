@@ -18,6 +18,13 @@ public partial class WikiInfo
     [
         new()
         {
+            Text = "#",
+            Sortable = false,
+            Value = nameof(WikiDetailDto.Id)
+        },
+
+        new()
+        {
             Text = "文件名",
             Sortable = false,
             Value = nameof(WikiDetailDto.FileName)
@@ -56,5 +63,10 @@ public partial class WikiInfo
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
+    }
+
+    private async Task Remove(long id)
+    {
+        await WikiService.RemoveDetailsAsync(id);
     }
 }

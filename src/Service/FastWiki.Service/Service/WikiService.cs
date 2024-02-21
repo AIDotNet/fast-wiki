@@ -57,4 +57,11 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
 
         return query.Result;
     }
+
+    public async Task RemoveDetailsAsync(long id)
+    {
+        var command = new RemoveWikiDetailsCommand(id);
+
+        await EventBus.PublishAsync(command);
+    }
 }

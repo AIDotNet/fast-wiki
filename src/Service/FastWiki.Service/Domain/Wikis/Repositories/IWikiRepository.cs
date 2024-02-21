@@ -45,4 +45,11 @@ public interface IWikiRepository : IRepository<Wiki, long>
     /// <param name="wikiDetail"></param>
     /// <returns></returns>
     Task<WikiDetail> AddDetailsAsync(WikiDetail wikiDetail);
+
+    /// <summary>
+    /// 删除知识库详情
+    /// </summary>
+    /// <param name="wikiDetailId"></param>
+    /// <returns></returns>
+    Task RemoveDetailsAsync(long wikiDetailId);
 }

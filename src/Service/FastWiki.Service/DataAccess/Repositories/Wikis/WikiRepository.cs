@@ -40,6 +40,14 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
         return result.Entity;
     }
 
+    public async Task RemoveDetailsAsync(long wikiDetailId)
+    {
+        var entity = await Context.WikiDetails.FindAsync(wikiDetailId);
+
+        if (entity != null)
+            Context.WikiDetails.Remove(entity);
+    }
+
     private IQueryable<Wiki> CreateQuery(string? keyword)
     {
         var query = Context.Wikis.AsNoTracking();

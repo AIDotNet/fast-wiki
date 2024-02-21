@@ -27,7 +27,7 @@ public sealed class WikiCommandHandler(IWikiRepository wikiRepository, MemorySer
 
         foreach (var item in command.Input.Lins)
         {
-            var memoryResult = await memoryServerless.ImportTextAsync(item, wikiDetails.FileId.ToString(),
+            var memoryResult = await memoryServerless.ImportTextAsync(item, wikiDetails.Id.ToString(),
                 new TagCollection()
                 {
                     {
@@ -35,5 +35,13 @@ public sealed class WikiCommandHandler(IWikiRepository wikiRepository, MemorySer
                     }
                 }, "wiki");
         }
+    }
+
+    [EventHandler]
+    public async Task RemoveWikiDetailsCommand(RemoveWikiDetailsCommand command)
+    {
+        await wikiRepository.RemoveDetailsAsync(command.Id);
+
+        await memoryServerless.DeleteDocumentAsync(command.Id.ToString(), "wiki");
     }
 }

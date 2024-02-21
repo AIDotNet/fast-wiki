@@ -48,4 +48,11 @@ public interface IWikiService
     /// <param name="pageSize"></param>
     /// <returns></returns>
     Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId, string? keyword, int page, int pageSize);
+
+    /// <summary>
+    /// 删除知识库详情列表
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RemoveDetailsAsync(long id);
 }

@@ -1,5 +1,4 @@
 ﻿@page "/wiki/{id:long}"
-
 @inject IWikiService WikiService
 
 <MCard Class="mt-6" Style="padding: 8px;height:85vh">
@@ -60,11 +59,50 @@
                     </MMenu>
                 </MCardTitle>
                 <MCardText>
-                  @*   <MDataTable Stripe
-                                Headers="_headers"
+                    <MDataTable Headers="_headers"
                                 Items="_wikiDetails.Result"
-                                ItemKey="r=>r.Id.ToString()"
-                                Class="elevation-1"></MDataTable> *@
+                                Style="width:100%;"
+                                Class="elevation-1">
+                        <ItemColContent>
+                            @if (context.Header.Value == nameof(WikiDetailDto.Id))
+                            {
+                            <span>@_wikiDetails.Result.IndexOf(context.Item)</span>
+                            }else if (context.Header.Value == nameof(WikiDetailDto.FileName))
+                            {
+                                <span>@context.Value</span>
+                            }
+                            else if (context.Header.Value == nameof(WikiDetailDto.DataCount))
+                            {
+                                <span>@context.Value</span>
+                            }
+                            else if (context.Header.Value == nameof(WikiDetailDto.Type))
+                            {
+                                <span>@context.Value</span>
+                            }
+                            else if (context.Header.Value == nameof(WikiDetailDto.CreationTime))
+                            {
+                                <span>@context.Value</span>
+                            }
+                            else
+                            {
+                                <MMenu Left
+                                       Bottom>
+                                    <ActivatorContent>
+                                        <MButton Icon @attributes="@context.Attrs">
+                                            <MIcon>mdi-dots-vertical</MIcon>
+                                        </MButton>
+                                    </ActivatorContent>
+                                    <ChildContent>
+                                        <MList>
+                                            <MListItem OnClick="async () => await Remove(context.Item.Id)">
+                                                <MListItemTitle>删除</MListItemTitle>
+                                            </MListItem>
+                                        </MList>
+                                    </ChildContent>
+                                </MMenu>
+                            }
+                        </ItemColContent>
+                    </MDataTable>
 
                 </MCardText>
             </MCard>
