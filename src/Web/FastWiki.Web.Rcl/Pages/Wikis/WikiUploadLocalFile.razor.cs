@@ -1,13 +1,14 @@
 ﻿using FastWiki.Service.Contracts.Wikis;
-using Microsoft.SemanticKernel.Text;
-using System.Collections.Generic;
 using FastWiki.Service.Contracts.Wikis.Dto;
-using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.SemanticKernel.Text;
 
 namespace FastWiki.Web.Rcl.Pages.Wikis;
 
 public partial class WikiUploadLocalFile
 {
+    [Parameter]
+    public long Value { get; set; }
+
     private bool _visible;
 
     private static readonly List<string> _types =
@@ -131,7 +132,7 @@ public partial class WikiUploadLocalFile
             var input = new CreateWikiDetailsInput()
             {
                 Name = file.Key.Name,
-                WikiId = 1,
+                WikiId = Value,
                 FileId = fileInfo.Id,
                 FilePath = fileInfo.Path,
                 Lins = file.Value.Select(x => x.Content)

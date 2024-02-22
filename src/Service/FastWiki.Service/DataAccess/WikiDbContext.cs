@@ -13,6 +13,8 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
     public DbSet<WikiDetail> WikiDetails { get; set; }
 
+    public DbSet<WikiDetailsDocument> WikiDetailsDocuments { get; set; }
+
     protected override void OnModelCreatingExecuting(ModelBuilder modelBuilder)
     {
         base.OnModelCreatingExecuting(modelBuilder);
@@ -64,6 +66,14 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.Property(e => e.Password).HasMaxLength(100);
         });
         
+        modelBuilder.Entity<WikiDetailsDocument>(entity =>
+        {
+            entity.ToTable("wiki-wiki_details_documents");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+            entity.HasIndex(x => x.WikiDetailsId);
+        });
 
         var user = new User("admin", "admin", "Aa123456",
             "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", "239573049@qq.com", "13049809673", false);

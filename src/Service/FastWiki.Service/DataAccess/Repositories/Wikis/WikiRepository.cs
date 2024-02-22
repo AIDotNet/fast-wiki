@@ -48,6 +48,37 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
             Context.WikiDetails.Remove(entity);
     }
 
+    public async Task<WikiDetail> GetDetailsAsync(long wikiDetailId)
+    {
+        return await Context.WikiDetails.FindAsync(wikiDetailId);
+    }
+
+    public async Task<IEnumerable<WikiDetailsDocument>> GetWikiDetailsDocumentListAsync(long wikiDetailsId, int page, int pageSize)
+    {
+        var query = CreateDetailsDocumentsQuery(wikiDetailsId);
+
+        return  await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+    }
+
+    public async Task<int> GetWikiDetailsDocumentCountAsync(long wikiDetailsId)
+    {
+        var query = CreateDetailsDocumentsQuery(wikiDetailsId);
+
+        return await query.CountAsync();
+    }
+
+    public async Task AddWikiDetailsDocumentAsync(IEnumerable<WikiDetailsDocument> detailsDocuments)
+    {
+        await Context.WikiDetailsDocuments.AddRangeAsync(detailsDocuments);
+    }
+
+    private IQueryable<WikiDetailsDocument> CreateDetailsDocumentsQuery(long wikiDetailsId)
+    {
+        var query = Context.WikiDetailsDocuments.AsNoTracking();
+
+        return query.Where(x => x.WikiDetailsId == wikiDetailsId);
+    }
+
     private IQueryable<Wiki> CreateQuery(string? keyword)
     {
         var query = Context.Wikis.AsNoTracking();

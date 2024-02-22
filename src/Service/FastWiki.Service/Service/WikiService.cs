@@ -64,4 +64,20 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
 
         await EventBus.PublishAsync(command);
     }
+
+    public async Task<PaginatedListBase<WikiDetailVectorQuantityDto>> GetWikiDetailVectorQuantityAsync(string wikiDetailId, int page, int pageSize)
+    {
+        var query = new WikiDetailVectorQuantityQuery(wikiDetailId, page, pageSize);
+
+        await EventBus.PublishAsync(query);
+
+        return query.Result;
+    }
+
+    public async Task RemoveDetailVectorQuantityAsync(string documentId)
+    {
+        var command = new RemoveWikiDetailVectorQuantityCommand(documentId);
+
+        await EventBus.PublishAsync(command);
+    }
 }

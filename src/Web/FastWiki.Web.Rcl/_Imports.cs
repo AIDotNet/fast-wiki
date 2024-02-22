@@ -30,3 +30,5 @@ global using Microsoft.JSInterop;
 global using Microsoft.Extensions.DependencyInjection;
 global using FastWiki.Service.Contracts;
 global using Microsoft.AspNetCore.Components.Forms;
+global using FastWiki.Service.Contracts.Wikis.Dto;
+global using Masa.Utils.Models;

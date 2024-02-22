@@ -24,8 +24,8 @@
         <PackageReference Include="Masa.Contrib.Exceptions" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EFCore" Version="$(MasaFrameworkPackageVersion)" />
-        <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.28.240212.1" />
-        <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Postgres" Version="0.28.240212.1" />
+        <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.29.240219.2" />
+        <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Postgres" Version="0.29.240219.2" />
         <PackageReference Include="Microsoft.SemanticKernel" Version="1.4.0" />
         <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.4.0" />
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.4.0-alpha" />

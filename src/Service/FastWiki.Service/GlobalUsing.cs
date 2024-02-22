@@ -25,3 +25,4 @@ global using FastWiki.Service.Application.Wikis.Queries;
 global using FastWiki.Service.Contracts.Wikis;
 global using System.ComponentModel;
 global using FastWiki.Service.Contracts.Storage.Dto;
+global using Microsoft.KernelMemory;

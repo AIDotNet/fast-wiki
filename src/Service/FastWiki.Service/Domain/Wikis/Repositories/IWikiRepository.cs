@@ -52,4 +52,35 @@ public interface IWikiRepository : IRepository<Wiki, long>
     /// <param name="wikiDetailId"></param>
     /// <returns></returns>
     Task RemoveDetailsAsync(long wikiDetailId);
+    
+    /// <summary>
+    /// 获取知识库详情信息
+    /// </summary>
+    /// <param name="wikiDetailId"></param>
+    /// <returns></returns>
+    Task<WikiDetail> GetDetailsAsync(long wikiDetailId);
+
+    /// <summary>
+    /// 获取知识库详情关联向量数据
+    /// </summary>
+    /// <param name="wikiDetailsId"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    Task<IEnumerable<WikiDetailsDocument>> GetWikiDetailsDocumentListAsync(long wikiDetailsId, int page, int pageSize);
+
+    /// <summary>
+    /// 获取知识库详情关联向量数据数量
+    /// </summary>
+    /// <param name="wikiDetailsId"></param>
+    /// <param name="keyword"></param>
+    /// <returns></returns>
+    Task<int> GetWikiDetailsDocumentCountAsync(long wikiDetailsId);
+
+    /// <summary>
+    /// 添加知识库详情关联向量数据数量
+    /// </summary>
+    /// <param name="detailsDocuments"></param>
+    /// <returns></returns>
+    Task AddWikiDetailsDocumentAsync(IEnumerable<WikiDetailsDocument> detailsDocuments);
 }

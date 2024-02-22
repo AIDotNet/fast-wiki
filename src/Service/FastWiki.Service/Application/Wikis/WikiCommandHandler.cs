@@ -1,6 +1,4 @@
-﻿using Microsoft.KernelMemory;
-
-namespace FastWiki.Service.Application.Wikis;
+﻿namespace FastWiki.Service.Application.Wikis;
 
 public sealed class WikiCommandHandler(IWikiRepository wikiRepository, MemoryServerless memoryServerless)
 {
@@ -25,15 +23,40 @@ public sealed class WikiCommandHandler(IWikiRepository wikiRepository, MemorySer
 
         wikiDetails = await wikiRepository.AddDetailsAsync(wikiDetails);
 
-        foreach (var item in command.Input.Lins)
+        try
         {
-            var memoryResult = await memoryServerless.ImportTextAsync(item, wikiDetails.Id.ToString(),
-                new TagCollection()
+            var documents = new List<WikiDetailsDocument>();
+            foreach (var item in command.Input.Lins)
+            {
+                var documentId = Guid.NewGuid().ToString();
+                documents.Add(new WikiDetailsDocument()
                 {
+                    DocumentId = documentId,
+                    WikiDetailsId = wikiDetails.WikiId
+                });
+                var memoryResult = await memoryServerless.ImportTextAsync(item, documentId,
+                    new TagCollection()
                     {
-                        "wikiId", command.Input.WikiId.ToString()
-                    }
-                }, "wiki");
+                        {
+                            "wikiId", command.Input.WikiId.ToString()
+                        },
+                        {
+                            "documentId", documentId
+                        },
+                        {
+                            "fileId", command.Input.FileId.ToString()
+                        },
+                        {
+                            "wikiDetailId", wikiDetails.Id.ToString()
+                        }
+                    }, "wiki");
+            }
+
+            await wikiRepository.AddWikiDetailsDocumentAsync(documents);
+        }
+        catch (Exception e)
+        {
+            await wikiRepository.RemoveDetailsAsync(wikiDetails.Id);
         }
     }
 
@@ -42,6 +65,21 @@ public sealed class WikiCommandHandler(IWikiRepository wikiRepository, MemorySer
     {
         await wikiRepository.RemoveDetailsAsync(command.Id);
 
-        await memoryServerless.DeleteDocumentAsync(command.Id.ToString(), "wiki");
+        foreach (var wikiDetail in await wikiRepository.GetDetailsListAsync(command.Id, null, 1, int.MaxValue))
+        {
+            await wikiRepository.RemoveDetailsAsync(wikiDetail.Id);
+
+            foreach (var detailsDocument in await wikiRepository.GetWikiDetailsDocumentListAsync(wikiDetail.Id, 1,
+                         int.MaxValue))
+            {
+                await memoryServerless.DeleteDocumentAsync(detailsDocument.DocumentId, "wiki");
+            }
+        }
+    }
+
+    [EventHandler]
+    public async Task RemoveWikiDetailVectorQuantityAsync(RemoveWikiDetailVectorQuantityCommand command)
+    {
+        await memoryServerless.DeleteDocumentAsync(command.DocumentId, "wiki");
     }
 }

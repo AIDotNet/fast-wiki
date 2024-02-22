@@ -55,4 +55,21 @@ public sealed class WikiService(ICaller caller) : ServiceBase(caller), IWikiServ
     {
         await DeleteAsync(nameof(RemoveDetailsAsync) + "/" + id);
     }
+
+    public async Task<PaginatedListBase<WikiDetailVectorQuantityDto>> GetWikiDetailVectorQuantityAsync(
+        string wikiDetailId, int page, int pageSize)
+    {
+        return await GetAsync<PaginatedListBase<WikiDetailVectorQuantityDto>>(nameof(GetWikiDetailVectorQuantityAsync),
+            new Dictionary<string, string>()
+            {
+                { "wikiDetailId", wikiDetailId },
+                { "page", page.ToString() },
+                { "pageSize", pageSize.ToString() }
+            });
+    }
+
+    public Task RemoveDetailVectorQuantityAsync(string documentId)
+    {
+        throw new NotImplementedException();
+    }
 }

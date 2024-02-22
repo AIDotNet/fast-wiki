@@ -1,7 +1,8 @@
 ﻿@page "/wiki/{id:long}"
+@inject NavigationManager NavigationManager
 @inject IWikiService WikiService
 
-<MCard Class="mt-6" Style="padding: 8px;height:85vh">
+<MCard Class="mt-6" Style="padding: 8px;height:80vh">
     <MTabs Vertical>
         <MTab>
             <MIcon Left>
@@ -36,7 +37,7 @@
                         </ActivatorContent>
                         <ChildContent>
                             <MList Nav Dense>
-                                <WikiUploadLocalFile/>
+                                <WikiUploadLocalFile Value="Id"/>
                                 <MListItem Link>
                                     <MListItemIcon>
                                         <MIcon>mdi-web</MIcon>
@@ -61,13 +62,14 @@
                 <MCardText>
                     <MDataTable Headers="_headers"
                                 Items="_wikiDetails.Result"
-                                Style="width:100%;"
-                                Class="elevation-1">
+                                HideDefaultFooter="true"
+                                Style="width:100%;">
                         <ItemColContent>
                             @if (context.Header.Value == nameof(WikiDetailDto.Id))
                             {
-                            <span>@_wikiDetails.Result.IndexOf(context.Item)</span>
-                            }else if (context.Header.Value == nameof(WikiDetailDto.FileName))
+                                <span>@_wikiDetails.Result.IndexOf(context.Item)</span>
+                            }
+                            else if (context.Header.Value == nameof(WikiDetailDto.FileName))
                             {
                                 <span>@context.Value</span>
                             }
@@ -85,10 +87,13 @@
                             }
                             else
                             {
+                                <MButton OnClick="()=>OpenWikiDetailAsync(context.Item)">
+                                    查看
+                                </MButton>
                                 <MMenu Left
                                        Bottom>
-                                    <ActivatorContent>
-                                        <MButton Icon @attributes="@context.Attrs">
+                                    <ActivatorContent Context="menu">
+                                        <MButton Icon @attributes="@menu.Attrs">
                                             <MIcon>mdi-dots-vertical</MIcon>
                                         </MButton>
                                     </ActivatorContent>
@@ -102,6 +107,9 @@
                                 </MMenu>
                             }
                         </ItemColContent>
+                        <FooterContent>
+                            <MPagination Value="page" ValueChanged="OnPageChanged" Class="my-4" Length=@((int)Math.Ceiling((double)_wikiDetails.Total / pageSize))></MPagination>
+                        </FooterContent>
                     </MDataTable>
 
                 </MCardText>

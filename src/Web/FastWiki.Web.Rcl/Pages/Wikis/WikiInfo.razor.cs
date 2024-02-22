@@ -69,4 +69,19 @@ public partial class WikiInfo
     {
         await WikiService.RemoveDetailsAsync(id);
     }
+
+    private async Task OnPageChanged(int page)
+    {
+        if (this.page == page)
+        {
+            return;
+        }
+        this.page = page;
+        await LoadData();
+    }
+
+    private void OpenWikiDetailAsync(WikiDetailDto item)
+    {
+        NavigationManager.NavigateTo("/wiki/wiki-detail/" + item.Id);
+    }
 }

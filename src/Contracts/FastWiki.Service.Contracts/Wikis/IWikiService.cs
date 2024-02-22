@@ -55,4 +55,20 @@ public interface IWikiService
     /// <param name="id"></param>
     /// <returns></returns>
     Task RemoveDetailsAsync(long id);
+
+    /// <summary>
+    /// 获取指定知识库详情的向量数据
+    /// </summary>
+    /// <param name="wikiDetailId"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    Task<PaginatedListBase<WikiDetailVectorQuantityDto>> GetWikiDetailVectorQuantityAsync(string wikiDetailId, int page, int pageSize);
+
+    /// <summary>
+    /// 删除指定知识库详情的向量数据
+    /// </summary>
+    /// <param name="documentId"></param>
+    /// <returns></returns>
+    Task RemoveDetailVectorQuantityAsync(string documentId);
 }
