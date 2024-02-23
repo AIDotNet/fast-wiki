@@ -68,8 +68,20 @@ public sealed class WikiService(ICaller caller) : ServiceBase(caller), IWikiServ
             });
     }
 
-    public Task RemoveDetailVectorQuantityAsync(string documentId)
+    public async Task RemoveDetailVectorQuantityAsync(string documentId)
     {
-        throw new NotImplementedException();
+        await base.DeleteAsync(nameof(RemoveDetailVectorQuantityAsync) + "?documentId=" + documentId);
+    }
+
+    public async Task<SearchVectorQuantityResult> GetSearchVectorQuantityAsync(long wikiId, string search,
+        double minRelevance = 0D)
+    {
+        return await GetAsync<SearchVectorQuantityResult>(nameof(GetSearchVectorQuantityAsync),
+            new Dictionary<string, string>()
+            {
+                { "wikiId", wikiId.ToString() },
+                { "search", search },
+                { "minRelevance",minRelevance.ToString() }
+            });
     }
 }

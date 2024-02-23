@@ -1,6 +1,6 @@
-﻿@page "/wiki"
-@inject IWikiService WikiService
-@inject IPopupService PopupService
+﻿@page "/application"
+
+@inject IChatApplicationService ChatApplicationService
 @inject NavigationManager NavigationManager
 
 <MCardText Class="pa-6">
@@ -22,7 +22,7 @@
         </MCol>
         <MCol Cols="6"
               Md="2">
-            <AddWiki OnSucceed="OnSearch" />
+            <AddChatApplication OnSucceed="OnSearch" />
         </MCol>
     </MRow>
 </MCardText>
@@ -39,12 +39,9 @@ else
         @foreach (var item in Result.Result)
         {
             <MCol key="@item.Id" Cols=3 Style="margin: 5px;user-select:none;">
-                <MCard Outlined OnClick="()=>OpenWiki(item)">
+                <MCard Outlined OnClick="()=>OpenChatApplication(item)">
                     <MCardTitle>
-                        <MAvatar>
-                            <MImage Src="@item.Icon"></MImage>
-                        </MAvatar>
-                        <span style="font-weight:bold;margin-left:8px;font-size:12px;">
+                        <span style="font-weight:bold;margin-left:8px;font-size:16px;">
                             @item.Name
                         </span>
                         <MSpacer></MSpacer>
@@ -65,9 +62,10 @@ else
                         </MMenu>
                     </MCardTitle>
                     <MCardActions>
-                        <span style="font-size:16px;">
-                            @item.Model
-                        </span>
+                        <MChip Class="ma-2"
+                               Label>
+                            @item.ChatModel
+                        </MChip>
                         <MSpacer></MSpacer>
 
                     </MCardActions>

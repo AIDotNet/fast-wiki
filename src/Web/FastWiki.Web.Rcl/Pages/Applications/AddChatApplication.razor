@@ -1,0 +1,43 @@
+﻿@inject IChatApplicationService ChatApplicationService
+@inject IPopupService PopupService
+
+<MDialog Persistent
+         @bind-Value="Visible"
+         MaxWidth="400">
+    <ActivatorContent>
+        <MButton Color="primary"
+                 Dark
+                 @attributes="@context.Attrs">
+            创建应用
+        </MButton>
+    </ActivatorContent>
+    <ChildContent>
+        <MCard>
+            <MCardTitle>
+                <span class="text-h5">添加应用</span>
+            </MCardTitle>
+            <MCardText>
+                <MContainer>
+                    <MRow>
+                        <MTextField Label="应用名称*"
+                                    @bind-Value="input.Name">
+                        </MTextField>
+                    </MRow>
+                </MContainer>
+            </MCardText>
+            <MCardActions>
+                <MSpacer></MSpacer>
+                <MButton Color="blue darken-1"
+                         Text
+                         OnClick="() => Visible = false">
+                    关闭
+                </MButton>
+                <MButton Color="blue darken-1"
+                         OnClick="OnSubmit"
+                         Text>
+                    添加
+                </MButton>
+            </MCardActions>
+        </MCard>
+    </ChildContent>
+</MDialog>

@@ -32,3 +32,5 @@ global using FastWiki.Service.Contracts;
 global using Microsoft.AspNetCore.Components.Forms;
 global using FastWiki.Service.Contracts.Wikis.Dto;
 global using Masa.Utils.Models;
+global using FastWiki.Service.Contracts.ChatApplication.Dto;
+global using Masa.Blazor.Presets;

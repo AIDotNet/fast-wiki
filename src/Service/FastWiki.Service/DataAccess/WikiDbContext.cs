@@ -1,4 +1,6 @@
-﻿using FastWiki.Service.Domain.Storage.Aggregates;
+﻿using System.Text.Json;
+using FastWiki.Service.Domain.ChatApplications.Aggregates;
+using FastWiki.Service.Domain.Storage.Aggregates;
 using FastWiki.Service.Domain.Users.Aggregates;
 
 namespace FastWiki.Service.DataAccess;
@@ -13,7 +15,7 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
     public DbSet<WikiDetail> WikiDetails { get; set; }
 
-    public DbSet<WikiDetailsDocument> WikiDetailsDocuments { get; set; }
+    public DbSet<ChatApplication> ChatApplications { get; set; }
 
     protected override void OnModelCreatingExecuting(ModelBuilder modelBuilder)
     {
@@ -45,7 +47,7 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.Property(e => e.Path).HasMaxLength(200);
             entity.Property(e => e.Type).HasMaxLength(100);
         });
-        
+
         modelBuilder.Entity<FileStorage>(entity =>
         {
             entity.ToTable("wiki-file_storages");
@@ -65,22 +67,30 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.Password).HasMaxLength(100);
         });
-        
-        modelBuilder.Entity<WikiDetailsDocument>(entity =>
-        {
-            entity.ToTable("wiki-wiki_details_documents");
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
-            entity.HasIndex(x => x.WikiDetailsId);
+        modelBuilder.Entity<ChatApplication>(entity =>
+        {
+            entity.ToTable("wiki-chat-application");
+
+            entity.HasKey(e => e.Id);
+
+            entity.HasIndex(x => x.Name);
+
+            entity.Property(x => x.Parameter)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<Dictionary<string, string>>(v, new JsonSerializerOptions()));
+
+            entity.Property(x => x.WikiIds)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<long>>(v, new JsonSerializerOptions()));
         });
 
         var user = new User("admin", "admin", "Aa123456",
             "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", "239573049@qq.com", "13049809673", false);
-        
+
         // 默认初始账号
         modelBuilder.Entity<User>().HasData(user);
-        
-        
     }
 }

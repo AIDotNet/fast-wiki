@@ -26,3 +26,7 @@ global using FastWiki.Service.Contracts.Wikis;
 global using System.ComponentModel;
 global using FastWiki.Service.Contracts.Storage.Dto;
 global using Microsoft.KernelMemory;
+global using FastWiki.Service.Contracts.ChatApplication;
+global using FastWiki.Service.Application.ChatApplications.Commands;
+global using FastWiki.Service.Domain.ChatApplications.Aggregates;
+global using FastWiki.Service.Domain.ChatApplications.Repositories;

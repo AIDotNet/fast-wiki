@@ -71,4 +71,14 @@ public interface IWikiService
     /// <param name="documentId"></param>
     /// <returns></returns>
     Task RemoveDetailVectorQuantityAsync(string documentId);
+
+    /// <summary>
+    /// 获取搜索指定知识库的向量数据
+    /// </summary>
+    /// <param name="wikiId"></param>
+    /// <param name="search"></param>
+    /// <param name="minRelevance"></param>
+    /// <returns></returns>
+    Task<SearchVectorQuantityResult> GetSearchVectorQuantityAsync(long wikiId, string search,
+        double minRelevance = 0D);
 }

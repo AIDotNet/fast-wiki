@@ -22,6 +22,11 @@ public sealed class FileStorage : FullAggregateRoot<long, Guid?>
     /// </summary>
     public bool IsCompression { get; private set; }
 
+    /// <summary>
+    /// 文件存放目录
+    /// </summary>
+    public string FullName { get; set; }
+    
     protected FileStorage()
     {
     }
@@ -32,5 +37,10 @@ public sealed class FileStorage : FullAggregateRoot<long, Guid?>
         Path = path;
         Size = size;
         IsCompression = isCompression;
+    }
+
+    public void SetFullName(string fullName)
+    {
+        FullName = fullName;
     }
 }

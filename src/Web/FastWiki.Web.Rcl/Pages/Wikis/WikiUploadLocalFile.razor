@@ -1,5 +1,6 @@
 ﻿@inject IWikiService WikiService
 @inject IStorageService StorageService
+@inject IPopupService PopupService
 
 <MDialog @bind-Value="_visible"
          Fullscreen
@@ -148,10 +149,11 @@
                         </MCard>
                     </MStepperContent>
                     <MStepperContent Step="3">
-                        <MCard Outlined Class="mb-12" Height="200">
+                        <MCard Class="mb-12" Height="200">
                             <div style="display: flex;">
                                 <MDataTable Headers="_headers"
                                             Items="BrowserFiles"
+                                            HideDefaultFooter="true"
                                             Style="width:100%;"
                                             Class="elevation-1">
                                     <ItemColContent>

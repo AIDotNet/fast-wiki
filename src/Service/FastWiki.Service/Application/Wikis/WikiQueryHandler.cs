@@ -1,6 +1,12 @@
-﻿namespace FastWiki.Service.Application.Wikis;
+﻿using System.Diagnostics;
+using FastWiki.Service.Application.Storage.Queries;
 
-public sealed class WikiQueryHandler(IWikiRepository wikiRepository, MemoryServerless memoryServerless)
+namespace FastWiki.Service.Application.Wikis;
+
+public sealed class WikiQueryHandler(
+    IWikiRepository wikiRepository,
+    MemoryServerless memoryServerless,
+    IEventBus eventBus)
 {
     [EventHandler]
     public async Task GetWiki(WikiQuery query)
@@ -46,7 +52,6 @@ public sealed class WikiQueryHandler(IWikiRepository wikiRepository, MemoryServe
     [EventHandler]
     public async Task WikiDetailVectorQuantityAsync(WikiDetailVectorQuantityQuery query)
     {
-
         var memoryDbs = memoryServerless.Orchestrator.GetMemoryDbs();
 
         var result = new PaginatedListBase<WikiDetailVectorQuantityDto>();
@@ -66,8 +71,7 @@ public sealed class WikiQueryHandler(IWikiRepository wikiRepository, MemoryServe
                 limit = 10;
             }
 
-            var filter = new MemoryFilter();
-            filter.Add("wikiDetailId", query.WikiDetailId);
+            var filter = new MemoryFilter().ByDocument(query.WikiDetailId);
 
             int size = 0;
             await foreach (var item in memoryDb.GetListAsync("wiki", new List<MemoryFilter>()
@@ -76,9 +80,14 @@ public sealed class WikiQueryHandler(IWikiRepository wikiRepository, MemoryServe
                            }, limit, true))
             {
                 size++;
-                if (size > query.PageSize * query.Page)
+                if (size < query.PageSize * (query.Page - 1))
                 {
                     continue;
+                }
+
+                if (size > query.PageSize * query.Page)
+                {
+                    break;
                 }
 
                 dto.Add(new WikiDetailVectorQuantityDto()
@@ -91,9 +100,60 @@ public sealed class WikiQueryHandler(IWikiRepository wikiRepository, MemoryServe
                 });
             }
         }
-        
+
         result.Result = dto;
 
         query.Result = result;
+    }
+
+    [EventHandler]
+    public async Task SearchVectorQuantityAsync(SearchVectorQuantityQuery query)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        var searchResult = await memoryServerless.SearchAsync(query.Search, "wiki",
+            new MemoryFilter().ByTag("wikiId", query.WikiId.ToString()), minRelevance: query.MinRelevance, limit: 5);
+
+        stopwatch.Stop();
+
+        var searchVectorQuantityResult = new SearchVectorQuantityResult();
+
+        searchVectorQuantityResult.ElapsedTime = stopwatch.ElapsedMilliseconds;
+
+        searchVectorQuantityResult.Result = new List<SearchVectorQuantityDto>();
+
+        foreach (var resultResult in searchResult.Results)
+        {
+            searchVectorQuantityResult.Result.AddRange(resultResult.Partitions.Select(partition =>
+                new SearchVectorQuantityDto()
+                {
+                    Content = partition.Text, DocumentId = resultResult.DocumentId,
+                    Relevance = partition.Relevance,
+                    FileId = partition.Tags["fileId"].FirstOrDefault() ?? string.Empty
+                }));
+        }
+
+        var fileIds = new List<long>();
+        fileIds.AddRange(searchVectorQuantityResult.Result.Select(x =>
+        {
+            if (long.TryParse(x.FileId, out var i))
+            {
+                return i;
+            }
+
+            return -1;
+        }).Where(x => x > 0));
+
+        var files = new StorageInfosQuery(fileIds);
+        await eventBus.PublishAsync(files);
+
+        foreach (var quantityDto in searchVectorQuantityResult.Result)
+        {
+            var file = files.Result.FirstOrDefault(x => x.Id.ToString() == quantityDto.FileId);
+            quantityDto.FullPath = file?.Path;
+
+            quantityDto.FileName = file?.Name;
+        }
+
+        query.Result = searchVectorQuantityResult;
     }
 }

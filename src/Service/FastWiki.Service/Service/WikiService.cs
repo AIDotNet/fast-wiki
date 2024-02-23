@@ -80,4 +80,14 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
 
         await EventBus.PublishAsync(command);
     }
+
+    public async Task<SearchVectorQuantityResult> GetSearchVectorQuantityAsync(long wikiId, string search,
+        double minRelevance = 0D)
+    {
+        var query = new SearchVectorQuantityQuery(wikiId, search, minRelevance);
+
+        await EventBus.PublishAsync(query);
+
+        return query.Result;
+    }
 }

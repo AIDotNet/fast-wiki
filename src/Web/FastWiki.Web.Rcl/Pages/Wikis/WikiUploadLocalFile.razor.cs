@@ -1,5 +1,6 @@
 ﻿using FastWiki.Service.Contracts.Wikis;
 using FastWiki.Service.Contracts.Wikis.Dto;
+using Masa.Blazor;
 using Microsoft.SemanticKernel.Text;
 
 namespace FastWiki.Web.Rcl.Pages.Wikis;
@@ -128,6 +129,10 @@ public partial class WikiUploadLocalFile
     {
         foreach (var file in _files)
         {
+            var fileItem = BrowserFiles.FirstOrDefault(x => x.Name == file.Key.Name);
+
+            fileItem!.FileProgress = 1;
+
             var fileInfo = await StorageService.UploadFile(file.Key.OpenReadStream(), file.Key.Name);
             var input = new CreateWikiDetailsInput()
             {
@@ -135,13 +140,16 @@ public partial class WikiUploadLocalFile
                 WikiId = Value,
                 FileId = fileInfo.Id,
                 FilePath = fileInfo.Path,
-                Lins = file.Value.Select(x => x.Content)
+                Subsection = subsection,
+                Mode = _processMode,
+                TrainingPattern = _trainingPattern
             };
 
-            var fileItem = BrowserFiles.FirstOrDefault(x => x.Name == file.Key.Name);
             fileItem!.FileProgress = 100;
 
             _ = InvokeAsync(StateHasChanged);
+
+            fileItem.DataProgress = 1;
 
             await WikiService.CreateWikiDetailsAsync(input);
 
@@ -149,5 +157,7 @@ public partial class WikiUploadLocalFile
 
             _ = InvokeAsync(StateHasChanged);
         }
+
+        await PopupService.ConfirmAsync("成功", "上传完成", AlertTypes.Success);
     }
 }

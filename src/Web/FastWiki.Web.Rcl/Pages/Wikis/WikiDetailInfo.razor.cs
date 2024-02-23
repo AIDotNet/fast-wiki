@@ -14,6 +14,8 @@ public partial class WikiDetailInfo
     private async Task Loading()
     {
         _wikiDetails = await WikiService.GetWikiDetailVectorQuantityAsync(Id.ToString(), page, pageSize);
+
+        _ = InvokeAsync(StateHasChanged);
     }
 
     protected override async Task OnInitializedAsync()

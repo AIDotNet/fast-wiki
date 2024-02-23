@@ -1,5 +1,4 @@
 ﻿using FastWiki.Service;
-using Microsoft.KernelMemory;
 using Microsoft.KernelMemory.ContentStorage.DevTools;
 using Microsoft.KernelMemory.FileSystem.DevTools;
 using Microsoft.KernelMemory.Postgres;

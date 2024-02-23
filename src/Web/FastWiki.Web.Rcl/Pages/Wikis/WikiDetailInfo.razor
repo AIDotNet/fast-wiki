@@ -9,21 +9,30 @@
         @foreach (var item in _wikiDetails.Result)
         {
             <MCol key="@item.Id" Cols=3 Style="margin: 5px;">
-                <MCard Elevation="1" OnClick="() => { }">
-                    <MCardTitle>
-                        <span style="font-weight:bold;margin-left:8px;font-size:12px;">
-                            @item.Document_Id
-                        </span>
-                    </MCardTitle>
-                    
-                    <div style="font-size:16px;white-space: pre-line;overflow: hidden;text-overflow: ellipsis;height:60px;font-size:12px;padding:5px;">
-                        @item.Content
-                    </div>
-                    <MCardActions>
-                        <MSpacer></MSpacer>
-                        <MButton Right Text>删除</MButton>
-                    </MCardActions>
-                </MCard>
+                
+                <PModal Title="@item.Document_Id"
+                        Width="950">
+                    <ActivatorContent>
+                        <MCard Elevation="1">
+                            <div style="font-weight:bold;margin-left:8px;font-size:12px;padding:8px;">
+                                @item.Document_Id
+                            </div>
+                            <div style="font-size:16px;white-space: pre-line;overflow: hidden;text-overflow: ellipsis;height:120px;font-size:12px;padding:5px;">
+                                @item.Content
+                            </div>
+                            <MCardActions>
+                                <MSpacer></MSpacer>
+                                <MButton Small @attributes="@context.Attrs" Text>查看详情</MButton>
+                                <MButton Small OnClick="()=>{}" Text>删除</MButton>
+                            </MCardActions>
+                        </MCard>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <div style="font-size:16px;white-space: pre-line;overflow:auto;text-overflow: ellipsis;height:70vh;font-size:14px;padding:5px;">
+                            @item.Content
+                        </div>
+                    </ChildContent>
+                </PModal>
             </MCol>
         }
     }

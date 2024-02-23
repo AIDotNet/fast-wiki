@@ -1,7 +1,4 @@
-﻿using FastWiki.Service.Contracts.Wikis.Dto;
-using Masa.Utils.Models;
-
-namespace FastWiki.Web.Rcl.Pages.Wikis;
+﻿namespace FastWiki.Web.Rcl.Pages.Wikis;
 
 public partial class WikiInfo
 {
