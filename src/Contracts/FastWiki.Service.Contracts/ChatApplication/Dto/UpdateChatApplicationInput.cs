@@ -5,7 +5,7 @@ public class UpdateChatApplicationInput
     public string Id { get; set; }
 
     public string Name { get; set; }
-    
+
     /// <summary>
     /// 提示词
     /// </summary>
@@ -19,7 +19,7 @@ public class UpdateChatApplicationInput
     /// <summary>
     /// 温度
     /// </summary>
-    public int Temperature { get; set; }
+    public double Temperature { get; set; }
 
     /// <summary>
     /// 最大响应Token数量
@@ -34,7 +34,7 @@ public class UpdateChatApplicationInput
     /// <summary>
     /// 参数
     /// </summary>
-    public Dictionary<string,string> Parameter { get; set; }
+    public Dictionary<string, string> Parameter { get; set; }
 
     public string Opener { get; set; }
 

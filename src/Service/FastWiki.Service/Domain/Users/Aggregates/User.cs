@@ -1,5 +1,5 @@
-﻿using System.Text.RegularExpressions;
-using FastWiki.Infrastructure.Common.Helper;
+﻿using FastWiki.Infrastructure.Common.Helper;
+using System.Text.RegularExpressions;
 
 namespace FastWiki.Service.Domain.Users.Aggregates;
 

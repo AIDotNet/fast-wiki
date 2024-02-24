@@ -9,7 +9,6 @@ public class ChatApplicationService(ICaller caller) : ServiceBase(caller), IChat
 {
     protected override string BaseUrl { get; set; } = "ChatApplications";
 
-
     public async Task CreateAsync(CreateChatApplicationInput input)
     {
         await PostAsync(nameof(CreateAsync), input);
@@ -27,10 +26,15 @@ public class ChatApplicationService(ICaller caller) : ServiceBase(caller), IChat
 
     public async Task<PaginatedListBase<ChatApplicationDto>> GetListAsync(int page, int pageSize)
     {
-        return await GetAsync<PaginatedListBase<ChatApplicationDto>>(nameof(GetListAsync),new Dictionary<string, string>()
+        return await GetAsync<PaginatedListBase<ChatApplicationDto>>(nameof(GetListAsync), new Dictionary<string, string>()
         {
             { "page", page.ToString() },
             { "pageSize", pageSize.ToString() }
         });
+    }
+
+    public Task<ChatApplicationDto> GetAsync(string id)
+    {
+        return GetAsync<ChatApplicationDto>(nameof(GetAsync) + "/" + id);
     }
 }

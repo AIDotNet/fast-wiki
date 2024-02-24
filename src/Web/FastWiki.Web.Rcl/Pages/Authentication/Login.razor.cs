@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Web;
 
-namespace FastWiki.Web.Rcl.Pages.Authentication.Components;
+namespace FastWiki.Web.Rcl.Pages.Authentication;
 
 public partial class Login
 {
@@ -27,4 +27,3 @@ public partial class Login
     [Parameter]
     public EventCallback<MouseEventArgs> OnLogin { get; set; }
 }
-

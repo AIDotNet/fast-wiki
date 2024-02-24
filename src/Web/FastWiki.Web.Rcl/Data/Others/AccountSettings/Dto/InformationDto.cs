@@ -10,7 +10,7 @@
 
         public string Website { get; set; }
 
-        public long Phone { get; set; } 
+        public long Phone { get; set; }
 
         public InformationDto(string bio, DateOnly birthDate, string country, string website, long phone)
         {

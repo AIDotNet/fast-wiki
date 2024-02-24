@@ -12,7 +12,7 @@ public class SearchVectorQuantityDto
     /// 语义检索
     /// </summary>
     public double Relevance { get; set; }
-    
+
     public string DocumentId { get; set; }
 
     /// <summary>

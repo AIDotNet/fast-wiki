@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-
-namespace FastWiki.Web.Rcl.Components.Upload;
+﻿namespace FastWiki.Web.Rcl.Components.Upload;
 
 public partial class DropUpload
 {

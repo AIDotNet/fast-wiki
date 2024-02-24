@@ -1,4 +1,4 @@
-﻿namespace Masa.Blazor.Pro.Data.Shared.Favorite
+﻿namespace FastWiki.Web.Rcl.Data.Shared.Favorite
 {
     public static class FavoriteService
     {

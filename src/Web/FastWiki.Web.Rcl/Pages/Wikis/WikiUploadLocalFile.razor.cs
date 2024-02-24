@@ -1,5 +1,4 @@
 ﻿using FastWiki.Service.Contracts.Wikis;
-using FastWiki.Service.Contracts.Wikis.Dto;
 using Masa.Blazor;
 using Microsoft.SemanticKernel.Text;
 

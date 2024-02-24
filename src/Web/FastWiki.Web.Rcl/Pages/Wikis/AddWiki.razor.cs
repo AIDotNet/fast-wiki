@@ -1,8 +1,4 @@
-﻿using FastWiki.Service.Contracts.Wikis.Dto;
-using Masa.Blazor.Presets;
-using Microsoft.AspNetCore.Components.Forms;
-
-namespace FastWiki.Web.Rcl.Pages.Wikis;
+﻿namespace FastWiki.Web.Rcl.Pages.Wikis;
 
 public partial class AddWiki
 {

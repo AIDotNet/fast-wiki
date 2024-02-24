@@ -3,7 +3,7 @@ namespace FastWiki.Service.Domain.ChatApplications.Aggregates;
 /// <summary>
 /// 对话应用
 /// </summary>
-public sealed class ChatApplication : FullAggregateRoot<string,Guid?>
+public sealed class ChatApplication : FullAggregateRoot<string, Guid?>
 {
     protected ChatApplication()
     {
@@ -11,7 +11,7 @@ public sealed class ChatApplication : FullAggregateRoot<string,Guid?>
 
     public ChatApplication(string id) : base(id)
     {
-        Opener = 
+        Opener =
 """
 您好，欢迎使用FastWiki知识库，我可以帮助您查找知识库中的内容，您可以输入您的问题，我会尽力帮您解答。
 来自FastWiki知识库的问候。                 
@@ -33,7 +33,7 @@ public sealed class ChatApplication : FullAggregateRoot<string,Guid?>
     /// <summary>
     /// 温度
     /// </summary>
-    public int Temperature { get; set; } = 0;
+    public double Temperature { get; set; } = 0;
 
     /// <summary>
     /// 最大响应Token数量
@@ -48,7 +48,7 @@ public sealed class ChatApplication : FullAggregateRoot<string,Guid?>
     /// <summary>
     /// 参数
     /// </summary>
-    public Dictionary<string,string> Parameter { get; set; } = new();
+    public Dictionary<string, string> Parameter { get; set; } = new();
 
     public string Opener { get; set; }
 

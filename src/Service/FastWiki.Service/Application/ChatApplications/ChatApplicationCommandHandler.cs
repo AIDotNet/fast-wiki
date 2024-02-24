@@ -2,7 +2,7 @@ using Masa.BuildingBlocks.Data.Mapping;
 
 namespace FastWiki.Service.Application.ChatApplications;
 
-public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplicationRepository,IMapper mapper)
+public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplicationRepository, IMapper mapper)
 {
     [EventHandler]
     public async Task CreateChatApplicationAsync(CreateChatApplicationCommand command)
@@ -11,7 +11,7 @@ public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplic
         {
             Name = command.Input.Name,
         };
-        
+
         await chatApplicationRepository.AddAsync(chatApplication);
     }
 
@@ -20,14 +20,15 @@ public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplic
     {
         await chatApplicationRepository.RemoveAsync(command.Id);
     }
-    
+
     [EventHandler]
     public async Task UpdateChatApplicationAsync(UpdateChatApplicationCommand command)
     {
         var chatApplication = await chatApplicationRepository.FindAsync(command.Input.Id);
-        
+
+        command.Input.Name = chatApplication?.Name;
         mapper.Map(command.Input, chatApplication);
-        
+
         await chatApplicationRepository.UpdateAsync(chatApplication);
     }
 }

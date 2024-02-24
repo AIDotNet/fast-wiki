@@ -1,6 +1,6 @@
 ﻿namespace FastWiki.ApiGateway.caller.Service;
 
-public abstract class ServiceBase(ICaller caller) 
+public abstract class ServiceBase(ICaller caller)
 {
     protected abstract string BaseUrl { get; set; }
 

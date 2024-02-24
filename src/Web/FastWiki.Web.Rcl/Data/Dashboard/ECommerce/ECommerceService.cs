@@ -1,4 +1,6 @@
-﻿namespace Masa.Blazor.Pro.Data.Dashboard.ECommerce;
+﻿using FastWiki.Web.Rcl.Data.Dashboard.ECommerce.Dto;
+
+namespace FastWiki.Web.Rcl.Data.Dashboard.ECommerce;
 
 public static class ECommerceService
 {

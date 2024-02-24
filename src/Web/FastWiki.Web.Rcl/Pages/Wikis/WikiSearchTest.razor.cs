@@ -9,7 +9,7 @@ public partial class WikiSearchTest
 
     private bool overlay;
 
-    private SearchVectorQuantityResult _quantity = new ();
+    private SearchVectorQuantityResult _quantity = new();
 
     private async Task SearchAsync()
     {

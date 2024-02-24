@@ -17,7 +17,8 @@ var app = builder.Services
         options.SwaggerDoc("v1",
             new OpenApiInfo
             {
-                Title = "FastWiki.ServiceApp", Version = "v1",
+                Title = "FastWiki.ServiceApp",
+                Version = "v1",
                 Contact = new OpenApiContact { Name = "FastWiki.ServiceApp", }
             });
         foreach (var item in Directory.GetFiles(Directory.GetCurrentDirectory(), "*.xml"))

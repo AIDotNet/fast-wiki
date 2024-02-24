@@ -4,5 +4,5 @@ namespace FastWiki.Service.Contracts.Storage;
 
 public interface IStorageService
 {
-    Task<UploadFileResult> UploadFile(Stream stream,string name);
+    Task<UploadFileResult> UploadFile(Stream stream, string name);
 }

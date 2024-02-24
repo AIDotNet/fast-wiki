@@ -1,6 +1,4 @@
-﻿using Microsoft.JSInterop;
-
-namespace FastWiki.Web.Rcl.Global;
+﻿namespace FastWiki.Web.Rcl.Global;
 
 public class CookieStorage
 {

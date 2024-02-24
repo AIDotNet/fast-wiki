@@ -1,8 +1,4 @@
-﻿using FastWiki.Service.Contracts.Wikis.Dto;
-using Masa.Blazor.Presets;
-using Masa.Utils.Models;
-
-namespace FastWiki.Web.Rcl.Pages.Wikis;
+﻿namespace FastWiki.Web.Rcl.Pages.Wikis;
 
 public partial class Wiki
 {
@@ -34,9 +30,9 @@ public partial class Wiki
     {
         await WikiService.RemoveAsync(id);
 
-       await PopupService.EnqueueSnackbarAsync(new SnackbarOptions("删除成功", AlertTypes.Info));
+        await PopupService.EnqueueSnackbarAsync(new SnackbarOptions("删除成功", AlertTypes.Info));
 
-       await LoadingData();
+        await LoadingData();
     }
 
     public void OpenWiki(WikiDto wiki)

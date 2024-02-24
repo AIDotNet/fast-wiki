@@ -10,7 +10,7 @@ public class FileStorageRepository(WikiDbContext context, IUnitOfWork unitOfWork
         var entity = await Context.FileStorages.AddAsync(fileStorage);
 
         await Context.SaveChangesAsync();
-        
+
         return entity.Entity;
     }
 }

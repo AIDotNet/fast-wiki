@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IWikiService, WikiService>();
         services.AddScoped<IChatApplicationService, ChatApplicationService>();
         services.AddScoped<IStorageService, StorageService>();
-        
+
         services.AddCaller(callerBuilder =>
         {
             callerBuilder.UseHttpClient(httpClient => { clientBuilder?.Invoke(httpClient); });

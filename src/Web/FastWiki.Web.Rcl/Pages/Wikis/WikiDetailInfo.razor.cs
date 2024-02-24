@@ -25,7 +25,7 @@ public partial class WikiDetailInfo
 
     private async Task OnPageChanged(int page)
     {
-        if(this.page == page)
+        if (this.page == page)
             return;
 
         this.page = page;

@@ -26,7 +26,7 @@ public sealed class FileStorage : FullAggregateRoot<long, Guid?>
     /// 文件存放目录
     /// </summary>
     public string FullName { get; set; }
-    
+
     protected FileStorage()
     {
     }

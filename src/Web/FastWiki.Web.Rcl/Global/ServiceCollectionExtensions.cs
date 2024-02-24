@@ -1,4 +1,6 @@
 ﻿using FastWiki.Web.Rcl.Global;
+using FastWiki.Web.Rcl.Global.Config;
+using FastWiki.Web.Rcl.JsModules;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -23,6 +25,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<GlobalConfig>();
 
             return services;
+        }
+
+        public static void AddFastWikiWebRcl(this IServiceCollection services)
+        {
+            services.AddScoped<JsHelperModule>();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Masa.Blazor;
+﻿using FastWiki.Web.Rcl.Data.Dashboard.ECommerce;
+using FastWiki.Web.Rcl.Data.Dashboard.ECommerce.Dto;
+using Masa.Blazor;
 
 namespace FastWiki.Web.Rcl.Pages.Dashboard
 {
@@ -9,7 +11,7 @@ namespace FastWiki.Web.Rcl.Pages.Dashboard
         private object? _earningsChart;
         private object? _revenueReportChart;
         private object? _budgetChart;
-        
+
         private List<DataTableHeader<CompanyDto>> _headers = new List<DataTableHeader<CompanyDto>>
         {
             new () {Text= "COMPANY", Value= nameof(CompanyDto.CompanyName)},

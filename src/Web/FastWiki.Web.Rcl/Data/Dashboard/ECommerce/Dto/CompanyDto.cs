@@ -1,4 +1,4 @@
-﻿namespace Masa.Blazor.Pro.Data.Dashboard.ECommerce.Dto;
+﻿namespace FastWiki.Web.Rcl.Data.Dashboard.ECommerce.Dto;
 
 public class CompanyDto
 {

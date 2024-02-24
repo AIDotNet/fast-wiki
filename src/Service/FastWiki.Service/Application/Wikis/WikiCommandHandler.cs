@@ -71,11 +71,13 @@ public sealed class WikiCommandHandler(
     {
         var wiki = await wikiRepository.RemoveDetailsAsync(command.Id);
 
-        foreach (var wikiDetail in await wikiRepository.GetDetailsListAsync(command.Id, null, 1, int.MaxValue))
+        try
         {
-            await wikiRepository.RemoveDetailsAsync(wikiDetail.Id);
-
             await memoryServerless.DeleteDocumentAsync(wiki.Id.ToString(), "wiki");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
         }
     }
 

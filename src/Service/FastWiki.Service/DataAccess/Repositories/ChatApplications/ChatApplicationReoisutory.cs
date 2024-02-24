@@ -6,7 +6,7 @@ public class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork unitOf
     public Task<List<ChatApplication>> GetListAsync(int page, int pageSize)
     {
         var query = CreateQueryable();
-        
+
         return query
             .OrderByDescending(x => x.CreationTime)
             .Skip((page - 1) * pageSize)
@@ -17,7 +17,7 @@ public class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork unitOf
     public Task<long> GetCountAsync()
     {
         var query = CreateQueryable();
-        
+
         return query.LongCountAsync();
     }
 

@@ -3,7 +3,7 @@
 public class WikiDto
 {
     public long Id { get; set; }
-    
+
     /// <summary>
     /// 图标
     /// </summary>

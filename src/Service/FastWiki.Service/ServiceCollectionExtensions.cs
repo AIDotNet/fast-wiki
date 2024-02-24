@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
     public static void AddFastSemanticKernel(this WebApplicationBuilder builder)
     {
         var handler = new OpenAIHttpClientHandler();
-        
+
         builder.Services.AddScoped<Kernel>(_ =>
         {
             var kernel = Kernel.CreateBuilder()
@@ -33,7 +33,7 @@ public static class ServiceCollectionExtensions
 #pragma warning restore SKEXP0050 // 类型仅用于评估，在将来的更新中可能会被更改或删除。取消此诊断以继续。
             return kernel;
         });
-        
+
         //Kernel Memory
         var searchClientConfig = new SearchClientConfig
         {
@@ -42,7 +42,7 @@ public static class ServiceCollectionExtensions
             AnswerTokens = 2000,
             EmptyAnswer = "知识库未搜索到相关内容"
         };
-        
+
         builder.Services.AddScoped<MemoryServerless>(_ =>
         {
             var memory = new KernelMemoryBuilder()

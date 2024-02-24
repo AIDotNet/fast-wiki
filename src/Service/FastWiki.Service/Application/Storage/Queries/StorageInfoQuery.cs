@@ -6,7 +6,7 @@ namespace FastWiki.Service.Application.Storage.Queries;
 /// 获取存储详情
 /// </summary>
 /// <param name="FileId"></param>
-public record StorageInfoQuery(long FileId):Query<FileStorage>
+public record StorageInfoQuery(long FileId) : Query<FileStorage>
 {
     public override FileStorage Result { get; set; }
 }

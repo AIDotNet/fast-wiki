@@ -10,7 +10,7 @@ public sealed class WikiDetailVectorQuantityDto
     public string Content { get; set; }
 
     public string Document_Id { get; set; }
-    
+
     /// <summary>
     /// 关联知识库文件Id
     /// </summary>

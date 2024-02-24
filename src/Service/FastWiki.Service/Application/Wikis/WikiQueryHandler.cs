@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-using FastWiki.Service.Application.Storage.Queries;
+﻿using FastWiki.Service.Application.Storage.Queries;
+using System.Diagnostics;
 
 namespace FastWiki.Service.Application.Wikis;
 
@@ -126,7 +126,8 @@ public sealed class WikiQueryHandler(
             searchVectorQuantityResult.Result.AddRange(resultResult.Partitions.Select(partition =>
                 new SearchVectorQuantityDto()
                 {
-                    Content = partition.Text, DocumentId = resultResult.DocumentId,
+                    Content = partition.Text,
+                    DocumentId = resultResult.DocumentId,
                     Relevance = partition.Relevance,
                     FileId = partition.Tags["fileId"].FirstOrDefault() ?? string.Empty
                 }));

@@ -52,7 +52,7 @@ public interface IWikiRepository : IRepository<Wiki, long>
     /// <param name="wikiDetailId"></param>
     /// <returns></returns>
     Task<WikiDetail> RemoveDetailsAsync(long wikiDetailId);
-    
+
     /// <summary>
     /// 获取知识库详情信息
     /// </summary>

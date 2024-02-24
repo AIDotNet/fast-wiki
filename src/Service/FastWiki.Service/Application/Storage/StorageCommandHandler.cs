@@ -30,7 +30,7 @@ public class StorageCommandHandler(IFileStorageRepository fileStorageRepository,
         var fileStorage = new FileStorage(command.File.FileName, host + "/" + filePath, command.File.Length, false);
 
         fileStorage.SetFullName(fileInfo.FullName);
-        
+
         fileStorage = await fileStorageRepository.AddAsync(fileStorage);
 
         command.Path = fileStorage.Path;

@@ -4,4 +4,4 @@
 /// 移除知识库命令
 /// </summary>
 /// <param name="Id"></param>
-public record RemoveWikiCommand(long Id): Command;
+public record RemoveWikiCommand(long Id) : Command;

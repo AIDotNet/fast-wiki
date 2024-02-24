@@ -20,7 +20,8 @@ public class WikiMemoryService(IConfiguration configuration) : ISingletonDepende
             .WithPostgresMemoryDb(configuration.GetConnectionString("DefaultConnection"))
             .WithSimpleFileStorage(new SimpleFileStorageConfig
             {
-                StorageType = FileSystemTypes.Volatile, Directory = "_files"
+                StorageType = FileSystemTypes.Volatile,
+                Directory = "_files"
             })
             .WithSearchClientConfig(searchClientConfig)
             .WithCustomTextPartitioningOptions(new TextPartitioningOptions()

@@ -3,29 +3,31 @@
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
-<MCardText Class="pa-6">
-    <MRow NoGutters>
-        <MCol Cols="12"
-              Sm="6"
-              Md="8">
-            <MTextField @bind-Value="Search" Color="primary" Class="rounded-2" HideDetails="@("auto")" Flat Dense Solo BackgroundColor="fill-lighten-1" Placeholder="Search">
-                <PrependInnerContent>
-                    <MIcon Size=16 Class="mr-2 neutral-lighten-1--text">mdi-magnify</MIcon>
-                </PrependInnerContent>
-            </MTextField>
-        </MCol>
-        <MCol Cols="6"
-              Md="2">
-            <MButton Right Color="primary" MinWidth=80 Height=32 Class="ml-6 rounded-pill" OnClick="OnSearch">
-                搜索
-            </MButton>
-        </MCol>
-        <MCol Cols="6"
-              Md="2">
-            <AddWiki OnSucceed="OnSearch" />
-        </MCol>
-    </MRow>
-</MCardText>
+<MCard>
+    <MCardText Class="pa-6">
+        <MRow NoGutters>
+            <MCol Cols="12"
+                  Sm="6"
+                  Md="8">
+                <MTextField @bind-Value="Search" Color="primary" Class="rounded-2" HideDetails="@("auto")" Flat Dense Solo BackgroundColor="fill-lighten-1" Placeholder="Search">
+                    <PrependInnerContent>
+                        <MIcon Size=16 Class="mr-2 neutral-lighten-1--text">mdi-magnify</MIcon>
+                    </PrependInnerContent>
+                </MTextField>
+            </MCol>
+            <MCol Cols="6"
+                  Md="2">
+                <MButton Right Color="primary" MinWidth=80 Height=32 Class="ml-6 rounded-pill" OnClick="OnSearch">
+                    搜索
+                </MButton>
+            </MCol>
+            <MCol Cols="6"
+                  Md="2">
+                <AddWiki OnSucceed="OnSearch" />
+            </MCol>
+        </MRow>
+    </MCardText>
+</MCard>
 
 @if (Result?.Result == null || Result.Result.Count == 0)
 {

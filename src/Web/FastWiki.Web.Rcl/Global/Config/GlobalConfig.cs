@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
-using FastWiki.Web.Rcl.Global;
 
-namespace Masa.Blazor.Pro.Global;
+namespace FastWiki.Web.Rcl.Global.Config;
 
 public class GlobalConfig
 {

@@ -1,4 +1,4 @@
-﻿namespace Masa.Blazor.Pro.Global.Config;
+﻿namespace FastWiki.Web.Rcl.Global.Config;
 
 public static class PageModes
 {

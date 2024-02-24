@@ -1,9 +1,9 @@
 ﻿namespace FastWiki.Service.Contracts.Wikis.Dto;
 
-public sealed class WikiDetailDto 
+public sealed class WikiDetailDto
 {
     public long Id { get; set; }
-    
+
     /// <summary>
     /// 知识库Id
     /// </summary>
@@ -18,7 +18,7 @@ public sealed class WikiDetailDto
     /// 文件路径 如果文件类型是链接，则为链接地址，否则为文件路径
     /// </summary>
     public string Path { get; set; }
-    
+
     /// <summary>
     /// 数据数量
     /// </summary>

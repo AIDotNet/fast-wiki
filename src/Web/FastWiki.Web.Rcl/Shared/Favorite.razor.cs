@@ -1,4 +1,6 @@
-﻿namespace FastWiki.Web.Rcl.Shared;
+﻿using FastWiki.Web.Rcl.Data.Shared.Favorite;
+
+namespace FastWiki.Web.Rcl.Shared;
 
 public partial class Favorite
 {

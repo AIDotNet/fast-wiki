@@ -45,7 +45,10 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
         var entity = await Context.WikiDetails.FindAsync(wikiDetailId);
 
         if (entity != null)
+        {
             Context.WikiDetails.Remove(entity);
+            await Context.SaveChangesAsync();
+        }
 
         return entity;
     }

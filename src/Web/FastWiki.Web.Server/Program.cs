@@ -1,5 +1,3 @@
-using FastWiki.Web.Rcl;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
