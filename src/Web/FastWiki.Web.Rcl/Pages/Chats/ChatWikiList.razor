@@ -1,0 +1,17 @@
+﻿<MList Nav
+       Dense>
+    <MListItemGroup @bind-Value="SelectedItem"
+                    Color="primary">
+        @if (Wikis?.Result != null)
+        {
+            @foreach (var item in Wikis.Result)
+            {
+                <MListItem Value="item.Id">
+                    <MListItemContent>
+                        <MListItemTitle>@item.Name</MListItemTitle>
+                    </MListItemContent>
+                </MListItem>
+            }
+        }
+    </MListItemGroup>
+</MList>

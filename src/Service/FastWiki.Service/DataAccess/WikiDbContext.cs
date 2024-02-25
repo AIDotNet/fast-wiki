@@ -16,6 +16,8 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
     public DbSet<ChatApplication> ChatApplications { get; set; }
 
+    public DbSet<ChatDialog> ChatDialogs { get; set; } 
+
     protected override void OnModelCreatingExecuting(ModelBuilder modelBuilder)
     {
         base.OnModelCreatingExecuting(modelBuilder);
@@ -84,6 +86,16 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
                     v => JsonSerializer.Deserialize<List<long>>(v, new JsonSerializerOptions()));
+        });
+
+        modelBuilder.Entity<ChatDialog>(entity =>
+        {
+            entity.ToTable("wiki-chat-dialog");
+
+            entity.HasKey(x => x.Id);
+
+            entity.HasIndex(x => x.WikiId);
+
         });
 
         var user = new User("admin", "admin", "Aa123456",

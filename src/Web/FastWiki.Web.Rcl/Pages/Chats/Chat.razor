@@ -1,0 +1,71 @@
+﻿@page "/chat"
+
+@layout EmptyLayout
+@inject NavigationManager NavigationManager
+@inject IWikiService WikiService
+
+<style>
+  .content-container {
+    display: flex;
+  }
+
+  .left-column {
+    width: 160px;
+    background-color: #f8d7da;
+  }
+
+  .middle-column {
+    width: 220px;
+    background-color: #d1ecf1;
+  }
+
+  .right-column {
+    flex-grow: 1; /* This will make the right column take the remaining space */
+    background-color: #d4edda;
+  }
+</style>
+
+<MAppBar Color="deep-purple accent-4"
+         Dense
+         Dark>
+    <MButton Icon OnClick="ArrowLeft">
+        <MIcon>mdi-arrow-left</MIcon>
+    </MButton>
+
+    <MToolbarTitle>对话</MToolbarTitle>
+
+    <MSpacer></MSpacer>
+
+    <MMenu Left
+           Bottom>
+        <ActivatorContent>
+            <MButton Icon @attributes="@context.Attrs">
+                <MIcon>mdi-dots-vertical</MIcon>
+            </MButton>
+        </ActivatorContent>
+        <ChildContent>
+            <MList>
+                @for (var i = 0; i < 5; i++)
+                {
+                    var n = i + 1;
+                    <MListItem @key="n"
+                               OnClick="() => { }">
+                        <MListItemTitle>Option @n</MListItemTitle>
+                    </MListItem>
+                }
+            </MList>
+        </ChildContent>
+    </MMenu>
+</MAppBar>
+
+<div class="content-container ">
+    <div class="left-column">
+        <ChatWikiList @bind-Value="Wiki" Wikis="Wikis" />
+    </div>
+    <div class="middle-column">
+        Middle (220px)
+    </div>
+    <div class="right-column">
+        Right (remaining)
+    </div>
+</div>

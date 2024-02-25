@@ -21,6 +21,11 @@ public class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork unitOf
         return query.LongCountAsync();
     }
 
+    public async Task CreateChatDialogAsync(ChatDialog chatDialog)
+    {
+        await Context.ChatDialogs.AddAsync(chatDialog);
+    }
+
     private IQueryable<ChatApplication> CreateQueryable()
     {
         return Context.ChatApplications;
