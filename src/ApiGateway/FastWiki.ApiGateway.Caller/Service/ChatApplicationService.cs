@@ -47,4 +47,9 @@ public class ChatApplicationService(ICaller caller) : ServiceBase(caller), IChat
     {
         return await GetAsync<List<ChatDialogDto>>(nameof(GetChatDialogAsync));
     }
+
+    public IAsyncEnumerable<CompletionsDto> CompletionsAsync(CompletionsInput input)
+    {
+        throw new NotImplementedException();
+    }
 }

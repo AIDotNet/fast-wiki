@@ -52,4 +52,11 @@ public interface IChatApplicationService
     /// </summary>
     /// <returns></returns>
     Task<List<ChatDialogDto>> GetChatDialogAsync();
+
+    /// <summary>
+    /// 智能对话
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    IAsyncEnumerable<CompletionsDto> CompletionsAsync(CompletionsInput input);
 }

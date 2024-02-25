@@ -36,6 +36,9 @@ public class ChatApplicationDto
     /// </summary>
     public Dictionary<string, string> Parameter { get; set; }
 
+    /// <summary>
+    /// 开场白
+    /// </summary>
     public string Opener { get; set; }
 
     /// <summary>

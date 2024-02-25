@@ -16,6 +16,24 @@ public sealed class ChatApplication : FullAggregateRoot<string, Guid?>
 您好，欢迎使用FastWiki知识库，我可以帮助您查找知识库中的内容，您可以输入您的问题，我会尽力帮您解答。
 来自FastWiki知识库的问候。                 
 """;
+
+        Template =
+""""
+使用 <data></data> 标记中的内容作为你的知识:
+
+    <data>
+    {{quote}}
+    </data>
+
+回答要求：
+- 如果你不清楚答案，你需要澄清。
+- 避免提及你是从 <data></data> 获取的知识。
+- 保持答案与 <data></data> 中描述的一致。
+- 使用 Markdown 语法优化回答格式。
+- 使用与问题相同的语言回答。
+
+问题:"""{{question}}"""
+"""";
     }
 
     public string Name { get; set; }

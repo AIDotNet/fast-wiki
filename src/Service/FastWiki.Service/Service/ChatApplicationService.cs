@@ -1,7 +1,9 @@
+using Microsoft.SemanticKernel.ChatCompletion;
+
 namespace FastWiki.Service.Service;
 
 /// <inheritdoc />
-public class ChatApplicationService : ApplicationService<ChatApplicationService>, IChatApplicationService
+public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService) : ApplicationService<ChatApplicationService>, IChatApplicationService
 {
     /// <inheritdoc />
     public async Task CreateAsync(CreateChatApplicationInput input)
@@ -63,5 +65,76 @@ public class ChatApplicationService : ApplicationService<ChatApplicationService>
         await EventBus.PublishAsync(query);
 
         return query.Result;
+    }
+
+    public async IAsyncEnumerable<CompletionsDto> CompletionsAsync(CompletionsInput input)
+    {
+        var chatApplicationQuery = new ChatApplicationInfoQuery(input.ChatApplicationId);
+
+        await EventBus.PublishAsync(chatApplicationQuery);
+
+        if (chatApplicationQuery.Result == null)
+        {
+            throw new UserFriendlyException("应用Id不存在");
+        }
+
+        if (!chatApplicationQuery.Result.WikiIds.Any())
+        {
+            throw new UserFriendlyException("应用并未选择知识库");
+        }
+
+        var content = input.Messages.Last();
+
+        var memoryServerless = GetRequiredService<MemoryServerless>();
+
+        var filters = chatApplicationQuery.Result.WikiIds.Select(chatApplication => new MemoryFilter().ByTag("wikiId", chatApplication.ToString())).ToList();
+
+
+        var result = await memoryServerless.SearchAsync(content.Content, "wiki", filters: filters, limit: 3);
+
+        var prompt = string.Empty;
+
+        result.Results.ForEach(x =>
+        {
+            prompt += string.Join(Environment.NewLine, x.Partitions.Select(x => x.Text));
+        });
+
+        var chatStream = wikiMemoryService.CreateOpenAIChatCompletionService(chatApplicationQuery.Result.ChatModel);
+
+        var chatHistory = new ChatHistory();
+
+        if (!chatApplicationQuery.Result.Prompt.IsNullOrWhiteSpace())
+        {
+            chatHistory.AddSystemMessage(chatApplicationQuery.Result.Prompt);
+        }
+
+        input.Messages.Remove(input.Messages.Last());
+
+        foreach (var message in input.Messages)
+        {
+            if (message.Role == "user")
+            {
+                chatHistory.AddUserMessage(message.Content);
+            }
+            else if (message.Role == "system")
+            {
+                chatHistory.AddAssistantMessage(message.Content);
+            }
+            else
+            {
+                chatHistory.AddSystemMessage(message.Content);
+            }
+        }
+
+        chatHistory.AddUserMessage(chatApplicationQuery.Result.Template.Replace("{{quote}}", prompt)
+            .Replace("{{question}}", content.Content));
+
+        await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory))
+        {
+            yield return new CompletionsDto()
+            {
+                Content = item.Content??string.Empty
+            };
+        }
     }
 }

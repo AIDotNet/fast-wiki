@@ -2,6 +2,7 @@ using Microsoft.KernelMemory.Configuration;
 using Microsoft.KernelMemory.ContentStorage.DevTools;
 using Microsoft.KernelMemory.FileSystem.DevTools;
 using Microsoft.KernelMemory.Postgres;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 namespace FastWiki.Service.Service;
 
@@ -12,7 +13,7 @@ namespace FastWiki.Service.Service;
 public class WikiMemoryService(IConfiguration configuration) : ISingletonDependency
 {
     private static readonly OpenAIHttpClientHandler HttpClientHandler = new();
-
+    
     public MemoryServerless CreateMemoryServerless(SearchClientConfig searchClientConfig,
         int maxTokensPerLine)
     {
@@ -41,5 +42,12 @@ public class WikiMemoryService(IConfiguration configuration) : ISingletonDepende
             .Build<MemoryServerless>();
 
         return memory;
+    }
+
+    public OpenAIChatCompletionService CreateOpenAIChatCompletionService(
+        string modelId,
+        string? organization = null)
+    {
+        return new OpenAIChatCompletionService(modelId, OpenAIOption.ChatToken, organization, new HttpClient(HttpClientHandler));
     }
 }
