@@ -24,6 +24,22 @@ public class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork unitOf
     public async Task CreateChatDialogAsync(ChatDialog chatDialog)
     {
         await Context.ChatDialogs.AddAsync(chatDialog);
+        await Context.SaveChangesAsync();
+    }
+
+    public async Task RemoveChatDialogAsync(string id)
+    {
+        var entity =  await Context.ChatDialogs.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (entity != null)
+        {
+            Context.ChatDialogs.Remove(entity);
+        }
+    }
+
+    public async Task<List<ChatDialog>> GetChatDialogListAsync()
+    {
+        return await Context.ChatDialogs.ToListAsync();
     }
 
     private IQueryable<ChatApplication> CreateQueryable()

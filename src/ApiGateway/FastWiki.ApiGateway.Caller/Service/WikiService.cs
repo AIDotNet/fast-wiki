@@ -38,7 +38,7 @@ public sealed class WikiService(ICaller caller) : ServiceBase(caller), IWikiServ
         await PostAsync(nameof(CreateWikiDetailsAsync), input);
     }
 
-    public async Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId, string keyword, int page,
+    public async Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId, string? keyword, int page,
         int pageSize)
     {
         return await GetAsync<PaginatedListBase<WikiDetailDto>>(nameof(GetWikiDetailsAsync),

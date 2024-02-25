@@ -37,4 +37,14 @@ public class ChatApplicationService(ICaller caller) : ServiceBase(caller), IChat
     {
         return GetAsync<ChatApplicationDto>(nameof(GetAsync) + "/" + id);
     }
+
+    public async Task CreateChatDialogAsync(CreateChatDialogInput input)
+    {
+        await PostAsync(nameof(CreateChatDialogAsync), input);
+    }
+
+    public async Task<List<ChatDialogDto>> GetChatDialogAsync()
+    {
+        return await GetAsync<List<ChatDialogDto>>(nameof(GetChatDialogAsync));
+    }
 }

@@ -1,0 +1,77 @@
+﻿<div class="chat-container">
+    <!-- 非当前用户的消息 -->
+    <div class="message not-current-user">
+        你好！这是一个对话框示例。
+    </div>
+  
+    <!-- 当前用户的消息 -->
+    <div class="message current-user">
+        嗨！我是当前用户。
+    </div>
+  
+    <!-- 更多消息... -->
+</div>
+
+<MDivider></MDivider>
+<!-- 输入框区域 -->
+<div class="input-area">
+    <ChatInputArea Height="@("90px")">
+        <FuntionContent>
+            <MButton Class="ma-2"
+                     Text
+                     Icon>
+                <MIcon>mdi-arrow-up-bold-box-outline</MIcon>
+            </MButton>
+        </FuntionContent>
+    </ChatInputArea>
+</div>
+
+<style>
+/* 基础样式 */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  padding: 10px;
+  height: 80%;
+  overflow: auto;
+}
+
+.message {
+  padding: 5px 10px;
+  margin: 5px;
+  border-radius: 10px;
+  max-width: 70%;
+}
+
+/* 非当前用户的消息样式 */
+.message.not-current-user {
+  background-color: #f0f0f0;
+  align-self: flex-start;
+}
+
+/* 当前用户的消息样式 */
+.message.current-user {
+  background-color: #9fdf9f;
+  align-self: flex-end;
+}
+
+/* 输入框和发送按钮的样式 */
+.input-area {
+  display: flex;
+  margin-top: auto;
+}
+
+.input-area input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-right: none;
+}
+
+.input-area button {
+  padding: 10px;
+  color: white;
+  border: none;
+}
+</style>

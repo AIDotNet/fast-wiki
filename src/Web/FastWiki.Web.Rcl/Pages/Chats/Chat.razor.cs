@@ -2,9 +2,11 @@
 
 public partial class Chat
 {
-    private PaginatedListBase<WikiDto> Wikis = new();
+    private PaginatedListBase<ChatApplicationDto> ChatApplications = new();
 
-    private WikiDto Wiki;
+    private ChatApplicationDto chatApplication = new();
+
+    private ChatDialogDto ChatDialog = new();
 
     private void ArrowLeft()
     {
@@ -14,7 +16,7 @@ public partial class Chat
 
     private async Task LoadingWiki()
     {
-        Wikis =await WikiService.GetWikiListAsync(string.Empty, 1, int.MaxValue);
+        ChatApplications = await ChatApplicationService.GetListAsync(1, int.MaxValue);
     }
 
     protected override async Task OnInitializedAsync()

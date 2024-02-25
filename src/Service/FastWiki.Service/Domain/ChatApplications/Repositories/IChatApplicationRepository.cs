@@ -7,9 +7,22 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     Task<long> GetCountAsync();
 
     /// <summary>
-    /// 创建对话
+    /// 鍒涘缓瀵硅瘽
     /// </summary>
     /// <param name="chatDialog"></param>
     /// <returns></returns>
     Task CreateChatDialogAsync(ChatDialog  chatDialog);
+
+    /// <summary>
+    /// 鍒犻櫎瀵硅瘽
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RemoveChatDialogAsync(string id);
+
+    /// <summary>
+    /// 鑾峰彇瀵硅瘽鍒楄〃
+    /// </summary>
+    /// <returns></returns>
+    Task<List<ChatDialog>> GetChatDialogListAsync();
 }

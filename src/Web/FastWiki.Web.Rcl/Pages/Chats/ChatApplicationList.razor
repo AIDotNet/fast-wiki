@@ -2,9 +2,9 @@
        Dense>
     <MListItemGroup @bind-Value="SelectedItem"
                     Color="primary">
-        @if (Wikis?.Result != null)
+        @if (ChatApplication?.Result != null)
         {
-            @foreach (var item in Wikis.Result)
+            @foreach (var item in ChatApplication.Result)
             {
                 <MListItem Value="item.Id">
                     <MListItemContent>

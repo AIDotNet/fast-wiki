@@ -1,5 +1,21 @@
-﻿<h3>ChatDialog</h3>
+﻿@inject IChatApplicationService ChatApplicationService
 
-@code {
 
-}
+
+<MList Nav
+       Dense>
+    <MListItemGroup @bind-Value="SelectedItem"
+                    Color="primary">
+        
+        <MButton Block Style="margin-bottom:8px;">新建对话</MButton>
+
+        @foreach (var item in _chatDialogs)
+        {
+            <MListItem Value="item.Id">
+                <MListItemContent>
+                    <MListItemTitle>@item.Name</MListItemTitle>
+                </MListItemContent>
+            </MListItem>
+        }
+    </MListItemGroup>
+</MList>

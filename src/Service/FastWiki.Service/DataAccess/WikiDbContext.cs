@@ -94,7 +94,7 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
             entity.HasKey(x => x.Id);
 
-            entity.HasIndex(x => x.WikiId);
+            entity.HasIndex(x => x.ChatApplicationId);
 
         });
 

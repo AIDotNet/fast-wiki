@@ -1,5 +1,3 @@
-using FastWiki.Service.Application.ChatApplications.Queries;
-using FastWiki.Service.Contracts.ChatApplication.Dto;
 using Masa.BuildingBlocks.Data.Mapping;
 
 namespace FastWiki.Service.Application.ChatApplications;
@@ -27,5 +25,13 @@ public class ChatApplicationQueryHandler(IChatApplicationRepository chatApplicat
         var result = await chatApplicationRepository.FindAsync(query.Id);
 
         query.Result = mapper.Map<ChatApplicationDto>(result);
+    }
+
+    [EventHandler]
+    public async Task ChatDialogAsync(ChatDialogQuery query)
+    {
+        var result = await chatApplicationRepository.GetChatDialogListAsync();
+
+        query.Result = mapper.Map<List<ChatDialogDto>>(result);
     }
 }

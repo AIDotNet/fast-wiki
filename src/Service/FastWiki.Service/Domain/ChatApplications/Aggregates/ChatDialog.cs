@@ -4,7 +4,7 @@ public sealed class ChatDialog : Entity<string> , IFullAggregateRoot<Guid>
 {
     public string Name { get; set; }
 
-    public long WikiId { get; set; }
+    public string ChatApplicationId { get; set; }
 
     public string Description { get; set; }
 
@@ -23,10 +23,11 @@ public sealed class ChatDialog : Entity<string> , IFullAggregateRoot<Guid>
 
     }
 
-    public ChatDialog(string name, long wikiId, string description)
+    public ChatDialog(string name, string chatApplicationId, string description)
     {
+        Id = Guid.NewGuid().ToString("N");
         Name = name;
-        WikiId = wikiId;
+        ChatApplicationId = chatApplicationId;
         Description = description;
     }
 }

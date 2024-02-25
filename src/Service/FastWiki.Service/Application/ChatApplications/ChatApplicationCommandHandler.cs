@@ -35,6 +35,14 @@ public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplic
     [EventHandler]
     public async Task CreateChatDialogAsync(CreateChatDialogCommand command)
     {
-        await chatApplicationRepository.CreateChatDialogAsync(mapper.Map<ChatDialog>(command.Input));
+        var entity = new ChatDialog(command.Input.Name,command.Input.ChatApplicationId,command.Input.Description);
+        
+        await chatApplicationRepository.CreateChatDialogAsync(entity);
+    }
+
+    [EventHandler]
+    public async Task RemoveChatDialogAsync(RemoveChatDialogCommand command)
+    {
+        await chatApplicationRepository.RemoveChatDialogAsync(command.Id);
     }
 }

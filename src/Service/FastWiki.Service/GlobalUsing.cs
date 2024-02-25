@@ -28,3 +28,5 @@ global using Microsoft.EntityFrameworkCore.Infrastructure;
 global using Microsoft.KernelMemory;
 global using Microsoft.OpenApi.Models;
 global using FastWiki.Service.Contracts.ChatApplication.Dto;
+global using FastWiki.Service.Application.ChatApplications.Queries;
+

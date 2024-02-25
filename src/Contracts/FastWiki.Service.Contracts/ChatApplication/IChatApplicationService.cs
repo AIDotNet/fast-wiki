@@ -39,4 +39,17 @@ public interface IChatApplicationService
     /// <param name="id"></param>
     /// <returns></returns>
     Task<ChatApplicationDto> GetAsync(string id);
+
+    /// <summary>
+    /// 创建对话
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    Task CreateChatDialogAsync(CreateChatDialogInput input);
+
+    /// <summary>
+    /// 获取对话列表
+    /// </summary>
+    /// <returns></returns>
+    Task<List<ChatDialogDto>> GetChatDialogAsync();
 }
