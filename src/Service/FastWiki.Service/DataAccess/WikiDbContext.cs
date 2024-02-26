@@ -16,7 +16,9 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
     public DbSet<ChatApplication> ChatApplications { get; set; }
 
-    public DbSet<ChatDialog> ChatDialogs { get; set; } 
+    public DbSet<ChatDialog> ChatDialogs { get; set; }
+
+    public DbSet<ChatDialogHistory> ChatDialogHistorys { get; set; }
 
     protected override void OnModelCreatingExecuting(ModelBuilder modelBuilder)
     {
@@ -95,6 +97,18 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.HasKey(x => x.Id);
 
             entity.HasIndex(x => x.ChatApplicationId);
+        });
+
+        modelBuilder.Entity<ChatDialogHistory>(entity =>
+        {
+            entity.ToTable("wiki-chat-dialog-history");
+
+            entity.HasKey(x => x.Id);
+
+            entity.HasIndex(x => x.ChatApplicationId);
+            entity.HasIndex(x => x.ChatDialogId);
+            entity.HasIndex(x => x.Creator);
+            entity.Property(x => x.Content).HasMaxLength(-1);
 
         });
 

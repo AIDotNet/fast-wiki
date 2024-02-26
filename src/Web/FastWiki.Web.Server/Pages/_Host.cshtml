@@ -7,35 +7,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <base href="~/"/>
-    <link href="_content/Masa.Blazor/css/masa-blazor.min.css" rel="stylesheet"/>
-    <link href="css/site.css" rel="stylesheet"/>
-    <link href="FastWiki.Web.WebAssembly.styles.css" rel="stylesheet"/>
+    <base href="~/" />
+    <link href="_content/Masa.Blazor/css/masa-blazor.min.css" rel="stylesheet" />
+    <link href="css/site.css" rel="stylesheet" />
+    <link href="FastWiki.Web.WebAssembly.styles.css" rel="stylesheet" />
     <link href="css/materialdesign/v7.1.96/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="https://cdn.masastack.com/npm/materialicons/materialicons.css" rel="stylesheet">
     <link href="https://cdn.masastack.com/npm/fontawesome/v5.0.13/css/all.css" rel="stylesheet">
     <link href="_content/FastWiki.Web.Rcl/css/masa-blazor-pro.css" rel="stylesheet" />
     <link href="_content/FastWiki.Web.Rcl/css/fast-wiki-web-rcl.css" rel="stylesheet" />
-    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered"/>
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
 </head>
 <body>
-<component type="typeof(App)" render-mode="ServerPrerendered"/>
+    <component type="typeof(App)" render-mode="ServerPrerendered" />
 
-<div id="blazor-error-ui">
-    <environment include="Staging,Production">
-        An error has occurred. This application may no longer respond until reloaded.
-    </environment>
-    <environment include="Development">
-        An unhandled exception has occurred. See browser dev tools for details.
-    </environment>
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
-
-<script src="_framework/blazor.server.js"></script>
-<script src="_content/BlazorComponent/js/blazor-component.js"></script>
-<script src="https://cdn.masastack.com/npm/echarts/5.1.1/echarts.min.js"></script>
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.server.js"></script>
+    <script src="_content/BlazorComponent/js/blazor-component.js"></script>
+    <script src="_content/FastWiki.Web.Rcl/js/markdow.js"></script>
+    <script src="https://cdn.masastack.com/npm/echarts/5.1.1/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.7.0/languages/csharp.min.js"></script>
 </body>
 </html>

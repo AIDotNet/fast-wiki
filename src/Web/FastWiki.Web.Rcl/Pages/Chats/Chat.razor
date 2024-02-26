@@ -5,21 +5,23 @@
 @inject IChatApplicationService ChatApplicationService
 
 <style>
-  .content-container {
-    display: flex;
-  }
+    .content-container {
+        display: flex;
+    }
 
-  .left-column {
-    width: 160px;
-  }
+    .left-column {
+        width: 160px;
+        min-width: 160px;
+    }
 
-  .middle-column {
-    width: 220px;
-  }
+    .middle-column {
+        width: 220px;
+        min-width:220px;
+    }
 
-  .right-column {
-    flex-grow: 1;
-  }
+    .right-column {
+        flex-grow: 1;
+    }
 
     .vertical-divider {
         width: 1px; /* 设置宽度为1px */
@@ -75,10 +77,10 @@
             <MDivider></MDivider>
             <ChatDialog ChatApplicationId="@chatApplication.Id" @bind-Value="ChatDialog"></ChatDialog>
         </div>
-        
-        <div class="vertical-divider"></div> <!-- 垂直分割线 -->
+
+        <div class="vertical-divider"></div>
         <div class="right-column">
-            <ChatDialogue></ChatDialogue>
+            <ChatDialogue ChatDialogId="@ChatDialog.Id" ChatApplication="@chatApplication"></ChatDialogue>
         </div>
     </MCard>
 </div>

@@ -12,12 +12,5 @@ public sealed class CompletionsInput
     /// </summary>
     public string ChatApplicationId { get; set; }
 
-    public List<ChatMessagesInput> Messages { get; set; }
-}
-
-public class ChatMessagesInput
-{
-    public string Role { get; set; }
-
     public string Content { get; set; }
 }

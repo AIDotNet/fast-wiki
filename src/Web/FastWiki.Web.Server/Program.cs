@@ -16,8 +16,7 @@ builder.Services.AddFastWikiApiGateways(options =>
 {
     options.BaseAddress = "http://localhost:5124";
     options.Prefix = "/api/v1/";
-});
-builder.Services.AddFastWikiWebRcl();
+}, options => { options.BaseAddress = new Uri("http://localhost:5124/api/v1/"); }).AddFastWikiWebRcl();
 
 builder.Services.AddGlobalForServer();
 

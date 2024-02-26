@@ -20,6 +20,8 @@ public partial class ChatInputArea
     [Parameter] public StringNumber Height { get; set; }
     [Parameter] public string Placeholder { get; set; }
 
+    [Parameter] public EventCallback<string> OnSubmit { get; set; }
+
     private void OnFocus(FocusEventArgs args)
     {
         Class = "input-affix-wrapper-focused";
@@ -29,5 +31,11 @@ public partial class ChatInputArea
     private void OnBlur(FocusEventArgs obj)
     {
         Class = string.Empty;
+    }
+
+    private async Task Submit()
+    {
+        await OnSubmit.InvokeAsync(Value);
+        Value = string.Empty;
     }
 }

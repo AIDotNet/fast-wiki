@@ -16,7 +16,6 @@ public class ChatApplicationQueryHandler(IChatApplicationRepository chatApplicat
             Result = mapper.Map<List<ChatApplicationDto>>(result),
             Total = total
         };
-
     }
 
     [EventHandler]
@@ -33,5 +32,21 @@ public class ChatApplicationQueryHandler(IChatApplicationRepository chatApplicat
         var result = await chatApplicationRepository.GetChatDialogListAsync();
 
         query.Result = mapper.Map<List<ChatDialogDto>>(result);
+    }
+
+    [EventHandler]
+    public async Task ChatDialogHistoryAsync(ChatDialogHistoryQuery query)
+    {
+        var result =
+            await chatApplicationRepository.GetChatDialogHistoryListAsync(query.ChatDialogId, query.Page,
+                query.PageSize);
+
+        var total = await chatApplicationRepository.GetChatDialogHistoryCountAsync(query.ChatDialogId);
+
+        query.Result = new PaginatedListBase<ChatDialogHistoryDto>()
+        {
+            Result = mapper.Map<List<ChatDialogHistoryDto>>(result),
+            Total = total
+        };
     }
 }

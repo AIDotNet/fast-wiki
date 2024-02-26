@@ -4,7 +4,8 @@ using System.Net.Http.Json;
 
 namespace FastWiki.ApiGateway.Caller.Service;
 
-public sealed class StorageService(ICaller caller) : ServiceBase(caller), IStorageService
+public sealed class StorageService(ICaller caller, IHttpClientFactory httpClientFactory)
+    : ServiceBase(caller, httpClientFactory), IStorageService
 {
     protected override string BaseUrl { get; set; } = "Storages";
 

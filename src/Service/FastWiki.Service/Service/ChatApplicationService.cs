@@ -3,7 +3,8 @@ using Microsoft.SemanticKernel.ChatCompletion;
 namespace FastWiki.Service.Service;
 
 /// <inheritdoc />
-public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService) : ApplicationService<ChatApplicationService>, IChatApplicationService
+public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService)
+    : ApplicationService<ChatApplicationService>, IChatApplicationService
 {
     /// <inheritdoc />
     public async Task CreateAsync(CreateChatApplicationInput input)
@@ -67,6 +68,7 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService) 
         return query.Result;
     }
 
+    /// <inheritdoc />
     public async IAsyncEnumerable<CompletionsDto> CompletionsAsync(CompletionsInput input)
     {
         var chatApplicationQuery = new ChatApplicationInfoQuery(input.ChatApplicationId);
@@ -78,26 +80,24 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService) 
             throw new UserFriendlyException("应用Id不存在");
         }
 
-        if (!chatApplicationQuery.Result.WikiIds.Any())
-        {
-            throw new UserFriendlyException("应用并未选择知识库");
-        }
-
-        var content = input.Messages.Last();
-
-        var memoryServerless = GetRequiredService<MemoryServerless>();
-
-        var filters = chatApplicationQuery.Result.WikiIds.Select(chatApplication => new MemoryFilter().ByTag("wikiId", chatApplication.ToString())).ToList();
-
-
-        var result = await memoryServerless.SearchAsync(content.Content, "wiki", filters: filters, limit: 3);
-
         var prompt = string.Empty;
 
-        result.Results.ForEach(x =>
+        // 如果为空则不使用知识库
+        if (chatApplicationQuery.Result.WikiIds.Count != 0)
         {
-            prompt += string.Join(Environment.NewLine, x.Partitions.Select(x => x.Text));
-        });
+            var memoryServerless = GetRequiredService<MemoryServerless>();
+
+            var filters = chatApplicationQuery.Result.WikiIds
+                .Select(chatApplication => new MemoryFilter().ByTag("wikiId", chatApplication.ToString())).ToList();
+
+
+            var result = await memoryServerless.SearchAsync(input.Content, "wiki", filters: filters, limit: 3);
+
+            result.Results.ForEach(x =>
+            {
+                prompt += string.Join(Environment.NewLine, x.Partitions.Select(x => x.Text));
+            });
+        }
 
         var chatStream = wikiMemoryService.CreateOpenAIChatCompletionService(chatApplicationQuery.Result.ChatModel);
 
@@ -108,33 +108,50 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService) 
             chatHistory.AddSystemMessage(chatApplicationQuery.Result.Prompt);
         }
 
-        input.Messages.Remove(input.Messages.Last());
+        // TODO: 后期可修改为可配置
+        var historyQuery = new ChatDialogHistoryQuery(input.ChatDialogId, 1, 3);
 
-        foreach (var message in input.Messages)
+        await EventBus.PublishAsync(historyQuery);
+
+        foreach (var message in historyQuery.Result.Result)
         {
-            if (message.Role == "user")
+            if (message.Current)
             {
                 chatHistory.AddUserMessage(message.Content);
             }
-            else if (message.Role == "system")
-            {
-                chatHistory.AddAssistantMessage(message.Content);
-            }
             else
             {
-                chatHistory.AddSystemMessage(message.Content);
+                chatHistory.AddAssistantMessage(message.Content);
             }
         }
 
         chatHistory.AddUserMessage(chatApplicationQuery.Result.Template.Replace("{{quote}}", prompt)
-            .Replace("{{question}}", content.Content));
+            .Replace("{{question}}", input.Content));
 
         await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory))
         {
             yield return new CompletionsDto()
             {
-                Content = item.Content??string.Empty
+                Content = item.Content ?? string.Empty
             };
+            await Task.Delay(1);
         }
+    }
+
+    public async Task CreateChatDialogHistoryAsync(CreateChatDialogHistoryInput input)
+    {
+        var command = new CreateChatDialogHistoryCommand(input);
+
+        await EventBus.PublishAsync(command);
+    }
+
+    public async Task<PaginatedListBase<ChatDialogHistoryDto>> GetChatDialogHistoryAsync(string chatDialogId, int page,
+        int pageSize)
+    {
+        var query = new ChatDialogHistoryQuery(chatDialogId, page, pageSize);
+
+        await EventBus.PublishAsync(query);
+
+        return query.Result;
     }
 }

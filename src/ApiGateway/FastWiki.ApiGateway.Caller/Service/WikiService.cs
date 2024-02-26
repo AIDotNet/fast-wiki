@@ -4,7 +4,7 @@ using Masa.Utils.Models;
 
 namespace FastWiki.ApiGateway.Caller.Service;
 
-public sealed class WikiService(ICaller caller) : ServiceBase(caller), IWikiService
+public sealed class WikiService(ICaller caller, IHttpClientFactory httpClientFactory) : ServiceBase(caller,httpClientFactory), IWikiService
 {
     protected override string BaseUrl { get; set; } = "Wikis";
 

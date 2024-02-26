@@ -1,11 +1,12 @@
-﻿using FastWiki.Service.Contracts.ChatApplication;
+﻿using FastWiki.Service.Contracts;
+using FastWiki.Service.Contracts.ChatApplication;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddFastWikiApiGateways(this IServiceCollection services,
-        Action<MasaHttpClient>? clientBuilder)
+        Action<MasaHttpClient> clientBuilder, Action<HttpClient> httpClientBuilder)
     {
         services.AddScoped<IWikiService, WikiService>();
         services.AddScoped<IChatApplicationService, ChatApplicationService>();
@@ -13,8 +14,10 @@ public static class ServiceCollectionExtensions
 
         services.AddCaller(callerBuilder =>
         {
-            callerBuilder.UseHttpClient(httpClient => { clientBuilder?.Invoke(httpClient); });
+            callerBuilder.UseHttpClient(clientBuilder!.Invoke);
         });
+
+        services.AddHttpClient(Constant.ApiGatewayHttpClient, httpClientBuilder.Invoke);
 
         return services;
     }

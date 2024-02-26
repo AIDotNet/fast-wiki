@@ -52,6 +52,13 @@ public interface IChatApplicationService
     /// </summary>
     /// <returns></returns>
     Task<List<ChatDialogDto>> GetChatDialogAsync();
+    
+    /// <summary>
+    /// 创建对话
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    Task CreateChatDialogHistoryAsync(CreateChatDialogHistoryInput input);
 
     /// <summary>
     /// 智能对话
@@ -59,4 +66,14 @@ public interface IChatApplicationService
     /// <param name="input"></param>
     /// <returns></returns>
     IAsyncEnumerable<CompletionsDto> CompletionsAsync(CompletionsInput input);
+
+    /// <summary>
+    /// 获取对话记录
+    /// </summary>
+    /// <param name="chatDialogId"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    Task<PaginatedListBase<ChatDialogHistoryDto>>
+        GetChatDialogHistoryAsync(string chatDialogId, int page, int pageSize);
 }

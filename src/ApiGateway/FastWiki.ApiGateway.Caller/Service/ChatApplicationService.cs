@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using FastWiki.ApiGateway.caller.Service;
 using FastWiki.Service.Contracts.ChatApplication;
 using FastWiki.Service.Contracts.ChatApplication.Dto;
@@ -5,7 +6,8 @@ using Masa.Utils.Models;
 
 namespace FastWiki.ApiGateway.Caller.Service;
 
-public class ChatApplicationService(ICaller caller) : ServiceBase(caller), IChatApplicationService
+public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory httpClientFactory)
+    : ServiceBase(caller, httpClientFactory), IChatApplicationService
 {
     protected override string BaseUrl { get; set; } = "ChatApplications";
 
@@ -26,11 +28,12 @@ public class ChatApplicationService(ICaller caller) : ServiceBase(caller), IChat
 
     public async Task<PaginatedListBase<ChatApplicationDto>> GetListAsync(int page, int pageSize)
     {
-        return await GetAsync<PaginatedListBase<ChatApplicationDto>>(nameof(GetListAsync), new Dictionary<string, string>()
-        {
-            { "page", page.ToString() },
-            { "pageSize", pageSize.ToString() }
-        });
+        return await GetAsync<PaginatedListBase<ChatApplicationDto>>(nameof(GetListAsync),
+            new Dictionary<string, string>()
+            {
+                { "page", page.ToString() },
+                { "pageSize", pageSize.ToString() }
+            });
     }
 
     public Task<ChatApplicationDto> GetAsync(string id)
@@ -48,8 +51,45 @@ public class ChatApplicationService(ICaller caller) : ServiceBase(caller), IChat
         return await GetAsync<List<ChatDialogDto>>(nameof(GetChatDialogAsync));
     }
 
-    public IAsyncEnumerable<CompletionsDto> CompletionsAsync(CompletionsInput input)
+    public async IAsyncEnumerable<CompletionsDto> CompletionsAsync(CompletionsInput input)
     {
-        throw new NotImplementedException();
+        var response = await SendAsync(HttpMethod.Post, nameof(CompletionsAsync), input,
+            HttpCompletionOption.ResponseHeadersRead);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await foreach (var item in response.Content.ReadFromJsonAsAsyncEnumerable<CompletionsDto>())
+            {
+                yield return item;
+            }
+
+            yield break;
+        }
+
+        throw new UserFriendlyException("«Î«Û“Ï≥£");
+    }
+
+    public async Task CreateChatDialogHistoryAsync(CreateChatDialogHistoryInput input)
+    {
+        await PostAsync(nameof(CreateChatDialogHistoryAsync), input);
+    }
+
+    public async Task<PaginatedListBase<ChatDialogHistoryDto>> GetChatDialogHistoryAsync(string chatDialogId, int page,
+        int pageSize)
+    {
+        return await GetAsync<PaginatedListBase<ChatDialogHistoryDto>>(nameof(GetChatDialogHistoryAsync),
+            new Dictionary<string, string>()
+            {
+                {
+                    "chatDialogId", chatDialogId
+                },
+                {
+                    nameof(page), page.ToString()
+                },
+                {
+                    nameof(pageSize),
+                    pageSize.ToString()
+                }
+            });
     }
 }

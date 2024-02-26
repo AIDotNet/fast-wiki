@@ -35,8 +35,8 @@ public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplic
     [EventHandler]
     public async Task CreateChatDialogAsync(CreateChatDialogCommand command)
     {
-        var entity = new ChatDialog(command.Input.Name,command.Input.ChatApplicationId,command.Input.Description);
-        
+        var entity = new ChatDialog(command.Input.Name, command.Input.ChatApplicationId, command.Input.Description);
+
         await chatApplicationRepository.CreateChatDialogAsync(entity);
     }
 
@@ -44,5 +44,14 @@ public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplic
     public async Task RemoveChatDialogAsync(RemoveChatDialogCommand command)
     {
         await chatApplicationRepository.RemoveChatDialogAsync(command.Id);
+    }
+
+    [EventHandler]
+    public async Task CreateChatDialogHistoryAsync(CreateChatDialogHistoryCommand command)
+    {
+        var chatDialogHistory = new ChatDialogHistory(command.Input.ChatApplicationId, command.Input.ChatDialogId,
+            command.Input.Content, 0, command.Input.Current, command.Input.Type);
+
+        await chatApplicationRepository.CreateChatDialogHistoryAsync(chatDialogHistory);
     }
 }

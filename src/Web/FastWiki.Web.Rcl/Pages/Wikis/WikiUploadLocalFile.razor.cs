@@ -80,6 +80,7 @@ public partial class WikiUploadLocalFile
 
     private void UploadChanged(InputFileChangeEventArgs args)
     {
+        _files.Clear();
         foreach (var item in args.GetMultipleFiles(MaxFilesCount).Where(x => _types.Contains(x.ContentType) || NameSuffix.Any(n => x.Name.EndsWith(n))).ToList())
         {
             _files.Add(item, []);

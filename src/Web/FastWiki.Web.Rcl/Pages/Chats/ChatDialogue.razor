@@ -1,21 +1,54 @@
-﻿<div class="chat-container">
-    <!-- 非当前用户的消息 -->
-    <div class="message not-current-user">
-        你好！这是一个对话框示例。
-    </div>
-  
-    <!-- 当前用户的消息 -->
-    <div class="message current-user">
-        嗨！我是当前用户。
-    </div>
-  
-    <!-- 更多消息... -->
+﻿@inject IChatApplicationService ChatApplicationService
+
+
+
+<div class="chat-container">
+    @if (ChatDialogHistory?.Result == null || ChatDialogHistory.Result.Count == 0)
+    {
+        <div class="message not-current-user">
+            <MMarkdownIt Source="@ChatApplication.Opener"
+                         Html="true"
+                         Breaks="true"
+                         Linkify="true"
+                         Typographer="true"
+                         Class="mt-4 pa-1" />
+        </div>
+    }
+    else
+    {
+        @foreach (var item in ChatDialogHistory.Result)
+        {
+            @if (item.Current)
+            {
+                <div class="message current-user">
+                    <MMarkdownIt Source="@item.Content"
+                                 Html="true"
+                                 Breaks="true"
+                                 Linkify="true"
+                                 Typographer="true"
+                                 Class="mt-4 pa-1" />
+                </div>
+            }
+            else
+            {
+
+                <div class="message not-current-user">
+                    <MMarkdownIt Source="@item.Content"
+                                 Html="true"
+                                 Breaks="true"
+                                 Linkify="true"
+                                 Typographer="true"
+                                 Class="mt-4 pa-1" />
+                </div>
+            }
+        }
+    }
 </div>
 
 <MDivider></MDivider>
 <!-- 输入框区域 -->
 <div class="input-area">
-    <ChatInputArea Height="@("90px")">
+    <ChatInputArea Height="@("90px")" OnSubmit="Submit">
         <FuntionContent>
             <MButton Class="ma-2"
                      Text
@@ -74,4 +107,8 @@
   color: white;
   border: none;
 }
+
+    .theme--light.m-application code {
+        background-color: #d1d1d1 !important;
+    }
 </style>

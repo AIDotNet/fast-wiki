@@ -10,6 +10,10 @@ public partial class ChatDialog
         get => _chatApplicationId;
         set
         {
+            if (value == ChatApplicationId)
+            {
+                return;
+            }
             _chatApplicationId = value;
             _ = LoadingDialogAsync();
         }
@@ -26,7 +30,7 @@ public partial class ChatDialog
         get => _selectedItem;
         set
         {
-            if (value == null)
+            if (value == null || value == _selectedItem)
             {
                 return;
             }
@@ -44,15 +48,17 @@ public partial class ChatDialog
 
         if (_chatDialogs.Count == 0 && _chatApplicationId != null)
         {
-            await ChatApplicationService.CreateChatDialogAsync(new ()
+            await ChatApplicationService.CreateChatDialogAsync(new()
             {
                 Name = "默认对话",
                 ChatApplicationId = _chatApplicationId,
                 Description = "默认创建的对话"
             });
-            
+
             _chatDialogs = await ChatApplicationService.GetChatDialogAsync();
         }
+
+        SelectedItem = _chatDialogs.First().Id;
 
         _ = InvokeAsync(StateHasChanged);
     }
