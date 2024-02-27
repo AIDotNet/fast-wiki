@@ -62,4 +62,16 @@ public partial class ChatDialog
 
         _ = InvokeAsync(StateHasChanged);
     }
+
+    private async Task CreateDialogAsync()
+    {
+        await ChatApplicationService.CreateChatDialogAsync(new()
+        {
+            Name = "新建对话",
+            ChatApplicationId = _chatApplicationId,
+            Description = "新建的对话"
+        });
+
+        _chatDialogs = await ChatApplicationService.GetChatDialogAsync();
+    }
 }

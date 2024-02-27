@@ -54,4 +54,10 @@ public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplic
 
         await chatApplicationRepository.CreateChatDialogHistoryAsync(chatDialogHistory);
     }
+
+    [EventHandler]
+    public async Task RemoveChatDialogHistoryAsync(RemoveChatDialogHistoryCommand command)
+    {
+        await chatApplicationRepository.RemoveChatDialogHistoryByIdAsync(command.Id);
+    }
 }

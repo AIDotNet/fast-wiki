@@ -35,6 +35,7 @@ public partial class ChatDialogue
     private async Task LoadingChatDialogHistoryAsync()
     {
         ChatDialogHistory = await ChatApplicationService.GetChatDialogHistoryAsync(ChatDialogId, page, pageSize);
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task Submit(string value)
@@ -99,5 +100,12 @@ public partial class ChatDialogue
             Current = chat.Current,
             Type = chat.Type
         });
+    }
+
+    private async Task RemoveHistoryAsync(string id)
+    {
+        await ChatApplicationService.RemoveDialogHistoryAsync(id);
+
+        await LoadingChatDialogHistoryAsync();
     }
 }

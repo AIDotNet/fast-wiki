@@ -45,7 +45,7 @@ public class ChatApplicationQueryHandler(IChatApplicationRepository chatApplicat
 
         query.Result = new PaginatedListBase<ChatDialogHistoryDto>()
         {
-            Result = mapper.Map<List<ChatDialogHistoryDto>>(result),
+            Result = mapper.Map<List<ChatDialogHistoryDto>>(result.OrderBy(x=>x.CreationTime)),
             Total = total
         };
     }

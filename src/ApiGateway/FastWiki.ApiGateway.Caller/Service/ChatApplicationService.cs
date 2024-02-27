@@ -92,4 +92,9 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
                 }
             });
     }
+
+    public async Task RemoveDialogHistoryAsync(string id)
+    {
+        await DeleteAsync(nameof(RemoveDialogHistoryAsync) + "/"+id);
+    }
 }

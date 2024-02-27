@@ -76,4 +76,11 @@ public interface IChatApplicationService
     /// <returns></returns>
     Task<PaginatedListBase<ChatDialogHistoryDto>>
         GetChatDialogHistoryAsync(string chatDialogId, int page, int pageSize);
+
+    /// <summary>
+    /// 删除指定记录
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RemoveDialogHistoryAsync(string id);
 }

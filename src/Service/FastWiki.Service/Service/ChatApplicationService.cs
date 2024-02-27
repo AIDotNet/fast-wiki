@@ -154,4 +154,11 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService)
 
         return query.Result;
     }
+
+    public async Task RemoveDialogHistoryAsync(string id)
+    {
+        var command = new RemoveChatDialogHistoryCommand(id);
+
+        await EventBus.PublishAsync(command);
+    }
 }

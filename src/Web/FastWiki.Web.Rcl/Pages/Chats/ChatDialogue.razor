@@ -5,42 +5,63 @@
 <div class="chat-container">
     @if (ChatDialogHistory?.Result == null || ChatDialogHistory.Result.Count == 0)
     {
-        <div class="message not-current-user">
-            <MMarkdownIt Source="@ChatApplication.Opener"
-                         Html="true"
-                         Breaks="true"
-                         Linkify="true"
-                         Typographer="true"
-                         Class="mt-4 pa-1" />
+        <div class="message  not-current-user">
+            <div class="function-container ">
+                <MAvatar>
+                    <MImage Src="https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg"></MImage>
+                </MAvatar>
+                <MButton Icon>复制</MButton>
+            </div>
+            <div class="message not-current-user-item">
+                <MMarkdownIt Source="@ChatApplication.Opener"
+                             Html="true"
+                             Breaks="true"
+                             Linkify="true"
+                             Typographer="true"
+                             Class="mt-4 pa-1" />
+            </div>
         </div>
     }
     else
     {
         @foreach (var item in ChatDialogHistory.Result)
         {
-            @if (item.Current)
-            {
-                <div class="message current-user">
+            <div class="message @(item.Current?"current-user":"not-current-user")">
+                <div class="function-container ">
+                    @if (item.Current)
+                    {
+                        <MButton OnClick="async () => await RemoveHistoryAsync(item.Id)" Small Icon>
+                            <MIcon>mdi-delete</MIcon>
+                        </MButton>
+                        <MButton Small Icon>
+                            <MIcon>mdi-content-copy</MIcon>
+                        </MButton>
+                        <MAvatar>
+                            <MImage Src="https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg"></MImage>
+                        </MAvatar>
+                    }
+                    else
+                    {
+                        <MAvatar>
+                            <MImage Src="https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg"></MImage>
+                        </MAvatar>
+                        <MButton Small Icon>
+                            <MIcon>mdi-content-copy</MIcon>
+                        </MButton>
+                        <MButton OnClick="async () => await RemoveHistoryAsync(item.Id)" Small Icon>
+                            <MIcon>mdi-delete</MIcon>
+                        </MButton>
+                    }
+                </div>
+                <div class="message @(item.Current?"current-user-item":"not-current-user-item")">
                     <MMarkdownIt Source="@item.Content"
                                  Html="true"
                                  Breaks="true"
                                  Linkify="true"
                                  Typographer="true"
-                                 Class="mt-4 pa-1" />
+                                 Class="mt-4 pa-1"/>
                 </div>
-            }
-            else
-            {
-
-                <div class="message not-current-user">
-                    <MMarkdownIt Source="@item.Content"
-                                 Html="true"
-                                 Breaks="true"
-                                 Linkify="true"
-                                 Typographer="true"
-                                 Class="mt-4 pa-1" />
-                </div>
-            }
+            </div>
         }
     }
 </div>
@@ -60,55 +81,68 @@
 </div>
 
 <style>
-/* 基础样式 */
-.chat-container {
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
-  padding: 10px;
-  height: 80%;
-  overflow: auto;
-}
+    /* 基础样式 */
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        margin: 0 auto;
+        padding: 10px;
+        height: 82%;
+        overflow: auto;
+    }
 
-.message {
-  padding: 5px 10px;
-  margin: 5px;
-  border-radius: 10px;
-  max-width: 70%;
-}
+    .message {
+        padding: 5px 10px;
+        margin: 5px;
+        border-radius: 10px;
+    }
 
-/* 非当前用户的消息样式 */
-.message.not-current-user {
-  background-color: #f0f0f0;
-  align-self: flex-start;
-}
+        /* 非当前用户的消息样式 */
+        .message.not-current-user {
+            align-self: flex-start;
+        }
 
-/* 当前用户的消息样式 */
-.message.current-user {
-  background-color: #9fdf9f;
-  align-self: flex-end;
-}
+        /* 当前用户的消息样式 */
+        .message.current-user {
+            align-self: flex-end;
+        }
 
-/* 输入框和发送按钮的样式 */
-.input-area {
-  display: flex;
-  margin-top: auto;
-}
+        /* 非当前用户的消息样式 */
+        .message.not-current-user-item {
+            background-color: #f0f0f0;
+            width: 70%;
+        }
 
-.input-area input {
-  flex-grow: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-right: none;
-}
+        /* 当前用户的消息样式 */
+        .message.current-user-item {
+            background-color: #9fdf9f;
+            width: 70%;
+        }
+    /* 输入框和发送按钮的样式 */
+    .input-area {
+        display: flex;
+        margin-top: auto;
+    }
 
-.input-area button {
-  padding: 10px;
-  color: white;
-  border: none;
-}
+        .input-area input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-right: none;
+        }
+
+        .input-area button {
+            padding: 10px;
+            color: white;
+            border: none;
+        }
 
     .theme--light.m-application code {
         background-color: #d1d1d1 !important;
     }
+
+
+    .function-container {
+    }
+
 </style>

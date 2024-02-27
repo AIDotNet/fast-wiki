@@ -45,6 +45,8 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
     public async Task CreateChatDialogHistoryAsync(ChatDialogHistory chatDialogHistory)
     {
         await Context.ChatDialogHistorys.AddAsync(chatDialogHistory);
+
+        await Context.SaveChangesAsync();
     }
 
     public async Task<List<ChatDialogHistory>> GetChatDialogHistoryListAsync(string chatDialogId, int page,
@@ -69,6 +71,11 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
     public async Task RemoveChatDialogHistoryAsync(string chatDialogId)
     {
         await Context.ChatDialogHistorys.Where(x => x.ChatDialogId == chatDialogId).ExecuteDeleteAsync();
+    }
+
+    public async Task RemoveChatDialogHistoryByIdAsync(string id)
+    {
+        await Context.ChatDialogHistorys.Where(x => x.Id == id).ExecuteDeleteAsync();
     }
 
     private IQueryable<ChatDialogHistory> CreateChatDialogHistoriesQueryable(string chatDialogId)

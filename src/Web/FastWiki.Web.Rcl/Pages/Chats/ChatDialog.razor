@@ -6,8 +6,8 @@
        Dense>
     <MListItemGroup @bind-Value="SelectedItem"
                     Color="primary">
-        
-        <MButton Block Style="margin-bottom:8px;">新建对话</MButton>
+        <MButton
+            OnClick="CreateDialogAsync" Block Style="margin-bottom:8px;">新建对话</MButton>
 
         @foreach (var item in _chatDialogs)
         {

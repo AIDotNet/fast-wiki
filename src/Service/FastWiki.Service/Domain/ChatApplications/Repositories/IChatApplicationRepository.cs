@@ -11,7 +11,7 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// </summary>
     /// <param name="chatDialog"></param>
     /// <returns></returns>
-    Task CreateChatDialogAsync(ChatDialog  chatDialog);
+    Task CreateChatDialogAsync(ChatDialog chatDialog);
 
     /// <summary>
     /// 删除对话
@@ -39,7 +39,7 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <param name="page"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<List<ChatDialogHistory>> GetChatDialogHistoryListAsync(string chatDialogId,int page,int pageSize);
+    Task<List<ChatDialogHistory>> GetChatDialogHistoryListAsync(string chatDialogId, int page, int pageSize);
 
     /// <summary>
     /// 获取对话记录数量
@@ -54,4 +54,11 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <param name="chatDialogId"></param>
     /// <returns></returns>
     Task RemoveChatDialogHistoryAsync(string chatDialogId);
+
+    /// <summary>
+    /// 删除指定id的数据
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RemoveChatDialogHistoryByIdAsync(string id);
 }
