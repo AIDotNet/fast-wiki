@@ -30,7 +30,7 @@
 1. 克隆仓库：
 
 ```
-git clone [项目仓库URL]
+git clone https://github.com/239573049/fast-wiki.git
 ```
 
 2. 安装依赖项：
