@@ -1,5 +1,8 @@
 ﻿@inherits LayoutComponentBase
 @inject GlobalConfig GlobalConfig
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject LocalStorageJsInterop LocalStorageJsInterop
 
 <MApp>
     <PPageTabsProvider>
@@ -28,16 +31,33 @@
     </PPageTabsProvider>
 </MApp>
 
+<MButton Dark Fab Fixed Bottom Right Href="https://github.com/239573049/fast-wiki" >
+    <MIcon>mdi-github</MIcon>
+</MButton>
+
 @code {
 
     private PageTabs? _pageTabs;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnAfterRenderAsync(firstRender);
-
         if (firstRender)
         {
+            var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+            if (state.User.Identity?.IsAuthenticated == false)
+            {
+                NavigationManager.NavigateTo("/pages/authentication/Login",true);
+
+                return;
+            }
+            else
+            {
+                var token = await LocalStorageJsInterop.GetLocalStorageAsync(Constant.Token);
+                ((WikiAuthenticationStateProvider)AuthenticationStateProvider)
+                    .AuthenticateUser(token);
+            }
+
             await GlobalConfig.InitFromStorage();
         }
     }

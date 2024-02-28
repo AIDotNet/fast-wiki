@@ -1,16 +1,14 @@
 ﻿@inject IChatApplicationService ChatApplicationService
-
-
+@inject IUserContext UserContext
 
 <div class="chat-container">
     @if (ChatDialogHistory?.Result == null || ChatDialogHistory.Result.Count == 0)
     {
         <div class="message  not-current-user">
             <div class="function-container ">
-                <MAvatar>
+                <MAvatar >
                     <MImage Src="https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg"></MImage>
                 </MAvatar>
-                <MButton Icon>复制</MButton>
             </div>
             <div class="message not-current-user-item">
                 <MMarkdownIt Source="@ChatApplication.Opener"
@@ -31,10 +29,10 @@
                     @if (item.Current)
                     {
                         <MButton OnClick="async () => await RemoveHistoryAsync(item.Id)" Small Icon>
-                            <MIcon>mdi-delete</MIcon>
+                            <MIcon Small>mdi-delete</MIcon>
                         </MButton>
                         <MButton Small Icon>
-                            <MIcon>mdi-content-copy</MIcon>
+                            <MIcon Small>mdi-content-copy</MIcon>
                         </MButton>
                         <MAvatar>
                             <MImage Src="https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg"></MImage>
@@ -46,10 +44,10 @@
                             <MImage Src="https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg"></MImage>
                         </MAvatar>
                         <MButton Small Icon>
-                            <MIcon>mdi-content-copy</MIcon>
+                            <MIcon Small>mdi-content-copy</MIcon>
                         </MButton>
                         <MButton OnClick="async () => await RemoveHistoryAsync(item.Id)" Small Icon>
-                            <MIcon>mdi-delete</MIcon>
+                            <MIcon Small>mdi-delete</MIcon>
                         </MButton>
                     }
                 </div>
@@ -105,6 +103,9 @@
         /* 当前用户的消息样式 */
         .message.current-user {
             align-self: flex-end;
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
         }
 
         /* 非当前用户的消息样式 */

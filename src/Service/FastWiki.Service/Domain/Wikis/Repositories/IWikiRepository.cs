@@ -51,7 +51,7 @@ public interface IWikiRepository : IRepository<Wiki, long>
     /// </summary>
     /// <param name="wikiDetailId"></param>
     /// <returns></returns>
-    Task<WikiDetail> RemoveDetailsAsync(long wikiDetailId);
+    Task RemoveDetailsAsync(long wikiDetailId);
 
     /// <summary>
     /// 获取知识库详情信息
@@ -59,4 +59,11 @@ public interface IWikiRepository : IRepository<Wiki, long>
     /// <param name="wikiDetailId"></param>
     /// <returns></returns>
     Task<WikiDetail> GetDetailsAsync(long wikiDetailId);
+
+    /// <summary>
+    /// 批量删除详情
+    /// </summary>
+    /// <param name="wikiDetailIds"></param>
+    /// <returns></returns>
+    Task RemoveDetailsAsync(List<long> wikiDetailIds);
 }

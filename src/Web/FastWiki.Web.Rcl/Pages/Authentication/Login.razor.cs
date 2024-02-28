@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Web;
+﻿using Microsoft.IdentityModel.Tokens;
 
 namespace FastWiki.Web.Rcl.Pages.Authentication;
 
@@ -24,6 +24,28 @@ public partial class Login
     [Parameter]
     public string ForgotPasswordRoute { get; set; } = $"pages/authentication/forgot-password-v1";
 
-    [Parameter]
-    public EventCallback<MouseEventArgs> OnLogin { get; set; }
+    private string account;
+    private string pass;
+
+    private async Task OnLogin()
+    {
+        try
+        {
+
+            var token = await AuthorizeService.TokenAsync(account, pass);
+
+            if (!string.IsNullOrEmpty(token.Token))
+            {
+                ((WikiAuthenticationStateProvider)AuthenticationStateProvider)
+                    .AuthenticateUser(token.Token);
+                await LocalStorageJsInterop.SetLocalStorageAsync(Constant.Token, token.Token);
+
+                Navigation.NavigateTo("/");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
 }

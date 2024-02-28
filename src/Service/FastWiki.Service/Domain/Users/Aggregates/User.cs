@@ -89,4 +89,19 @@ public sealed class User : FullAggregateRoot<Guid, Guid?>
 
         Email = email;
     }
+
+    /// <summary>
+    /// 校验密码
+    /// </summary>
+    /// <param name="password"></param>
+    /// <returns></returns>
+    public bool CheckCipher(string password)
+    {
+        if (Password == Md5Helper.HashPassword(password, Salt))
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

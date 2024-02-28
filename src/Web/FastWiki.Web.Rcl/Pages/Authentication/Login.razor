@@ -1,4 +1,7 @@
 ﻿@page "/pages/authentication/Login"
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuthorizeService AuthorizeService
+@inject LocalStorageJsInterop LocalStorageJsInterop
 
 @layout EmptyLayout
 
@@ -14,6 +17,7 @@
 
             <MTextField TValue="string"
                         Label="Email"
+                        @bind-Value="account"
                         Placeholder="239573049@qq.com"
                         Outlined
                         HideDetails="@("auto")">
@@ -21,6 +25,7 @@
             <MTextField TValue="string"
                         Class="mt-10"
                         Label="Password"
+                        @bind-Value="pass"
                         Type="@(_show ? "text" : "password")"
                         Placeholder="请输入您的密码"
                         AppendIcon="@(_show ? "mdi-eye" : "mdi-eye-off")"

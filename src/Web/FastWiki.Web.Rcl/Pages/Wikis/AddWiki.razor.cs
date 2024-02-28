@@ -24,6 +24,12 @@ public partial class AddWiki
 
     public async Task OnSubmit()
     {
+        if (_avatarBrowserFile == null)
+        {
+            await PopupService.EnqueueSnackbarAsync(new SnackbarOptions("知识库头像不能为空", AlertTypes.Warning));
+            return;
+        }
+
         if (string.IsNullOrEmpty(input.Name))
         {
             await PopupService.EnqueueSnackbarAsync(new SnackbarOptions("知识库名称不能为空", AlertTypes.Warning));

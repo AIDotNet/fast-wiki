@@ -29,4 +29,8 @@ global using Microsoft.KernelMemory;
 global using Microsoft.OpenApi.Models;
 global using FastWiki.Service.Contracts.ChatApplication.Dto;
 global using FastWiki.Service.Application.ChatApplications.Queries;
+global using FastWiki.Service.Contracts;
+global using FastWiki.Service.Domain.Users.Aggregates;
+global using Masa.BuildingBlocks.Data.Mapping;
+
 

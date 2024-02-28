@@ -32,6 +32,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastWiki.Infrastructure.Common", "src\Infrastructure\FastWiki.Infrastructure.Common\FastWiki.Infrastructure.Common.csproj", "{0C90BE14-96EC-4E1B-A017-258E36ED6B1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastWiki.Infrastructure.Rcl.Command", "src\Infrastructure\FastWiki.Infrastructure.Rcl.Command\FastWiki.Infrastructure.Rcl.Command.csproj", "{47165417-808A-4AE5-AC38-71DE57C7A98A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,10 @@ Global
 		{0C90BE14-96EC-4E1B-A017-258E36ED6B1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C90BE14-96EC-4E1B-A017-258E36ED6B1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C90BE14-96EC-4E1B-A017-258E36ED6B1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47165417-808A-4AE5-AC38-71DE57C7A98A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47165417-808A-4AE5-AC38-71DE57C7A98A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47165417-808A-4AE5-AC38-71DE57C7A98A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47165417-808A-4AE5-AC38-71DE57C7A98A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,6 +84,7 @@ Global
 		{EF8AE318-7534-4687-8663-BB6B5F5DE5F2} = {789CE025-90BF-4A37-B13A-9E6CFE9F7F4C}
 		{D6D3A051-B8FE-4356-B582-921A6726ED40} = {2A86D1DF-3A54-483F-9F59-0F2F82ED7834}
 		{0C90BE14-96EC-4E1B-A017-258E36ED6B1C} = {D6D3A051-B8FE-4356-B582-921A6726ED40}
+		{47165417-808A-4AE5-AC38-71DE57C7A98A} = {D6D3A051-B8FE-4356-B582-921A6726ED40}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C6848D28-988E-4785-AF4D-2554B6E6F9E4}

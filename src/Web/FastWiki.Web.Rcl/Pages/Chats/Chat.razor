@@ -1,5 +1,5 @@
 ﻿@page "/chat"
-
+@attribute [Authorize]
 @layout EmptyLayout
 @inject NavigationManager NavigationManager
 @inject IChatApplicationService ChatApplicationService
@@ -43,26 +43,6 @@
 
     <MSpacer></MSpacer>
 
-    <MMenu Left
-           Bottom>
-        <ActivatorContent>
-            <MButton Icon @attributes="@context.Attrs">
-                <MIcon>mdi-dots-vertical</MIcon>
-            </MButton>
-        </ActivatorContent>
-        <ChildContent>
-            <MList>
-                @for (var i = 0; i < 5; i++)
-                {
-                    var n = i + 1;
-                    <MListItem @key="n"
-                               OnClick="() => { }">
-                        <MListItemTitle>Option @n</MListItemTitle>
-                    </MListItem>
-                }
-            </MList>
-        </ChildContent>
-    </MMenu>
 </MAppBar>
 
 <div class="content-container ">

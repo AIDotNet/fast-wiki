@@ -1,4 +1,6 @@
 ﻿@page "/wiki/{id:long}"
+@attribute [Authorize]
+
 @inject NavigationManager NavigationManager
 @inject IWikiService WikiService
 

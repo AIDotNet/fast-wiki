@@ -5,10 +5,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.GetSection(OpenAIOption.Name)
     .Get<OpenAIOption>();
 
+builder.Configuration.GetSection(JwtOptions.Name)
+    .Get<JwtOptions>();
+
+builder.AddLoadEnvironment();
+
 builder
     .AddFastSemanticKernel();
 
 var app = builder.Services
+    .AddJwtBearerAuthentication()
     .AddEndpointsApiExplorer()
     .AddMapster()
     .AddHttpContextAccessor()
@@ -50,6 +56,9 @@ if (app.Environment.IsDevelopment())
     using var context = app.Services.CreateScope().ServiceProvider.GetService<WikiDbContext>();
     {
         context!.Database.EnsureCreated();
+
+        // TODO: 创建vector插件如果数据库没有则需要提供支持向量的数据库。
+        context.Database.ExecuteSqlInterpolated($"CREATE EXTENSION IF NOT EXISTS vector;");
     }
 
     #endregion

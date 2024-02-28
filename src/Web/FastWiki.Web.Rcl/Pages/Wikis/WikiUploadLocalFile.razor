@@ -1,6 +1,7 @@
 ﻿@inject IWikiService WikiService
 @inject IStorageService StorageService
 @inject IPopupService PopupService
+@attribute [Authorize]
 
 <MDialog @bind-Value="_visible"
          Fullscreen

@@ -1,4 +1,6 @@
-﻿namespace FastWiki.Web.Rcl.Pages.Chats;
+﻿using FastWiki.Service.Contracts.Users.Dto;
+
+namespace FastWiki.Web.Rcl.Pages.Chats;
 
 public partial class ChatDialogue
 {
@@ -107,5 +109,13 @@ public partial class ChatDialogue
         await ChatApplicationService.RemoveDialogHistoryAsync(id);
 
         await LoadingChatDialogHistoryAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.CompletedTask;
+        }
     }
 }

@@ -1,7 +1,4 @@
-﻿using FastWiki.Service.Contracts;
-using FastWiki.Service.Contracts.ChatApplication;
-
-namespace Microsoft.Extensions.DependencyInjection;
+﻿namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
@@ -10,6 +7,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IWikiService, WikiService>();
         services.AddScoped<IChatApplicationService, ChatApplicationService>();
+        services.AddScoped<IAuthorizeService, AuthorizeService>();
         services.AddScoped<IStorageService, StorageService>();
 
         services.AddCaller(callerBuilder =>

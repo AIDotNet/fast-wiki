@@ -13,14 +13,10 @@
 
   <ItemGroup>
     <PackageReference Include="Masa.Blazor" Version="$(MASABlazorVersion)" />
+    <PackageReference Include="Masa.Contrib.Authentication.Identity.BlazorServer" Version="$(MasaFrameworkPackageVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.4.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="wwwroot\i18n\*.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,13 +31,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Update="wwwroot\nav\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Contracts\FastWiki.Service.Contracts\FastWiki.Service.Contracts.csproj" />
     <ProjectReference Include="..\..\Infrastructure\FastWiki.Infrastructure.Common\FastWiki.Infrastructure.Common.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\FastWiki.Infrastructure.Rcl.Command\FastWiki.Infrastructure.Rcl.Command.csproj" />
   </ItemGroup>
   <ItemGroup>
     <UpToDateCheckInput Remove="Pages\Wikis\WikiInfo.razor" />

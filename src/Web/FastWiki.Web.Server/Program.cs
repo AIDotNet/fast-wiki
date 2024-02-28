@@ -1,3 +1,9 @@
+using FastWiki.Web.Rcl;
+using Microsoft.AspNetCore.Components.Authorization;
+
+
+var FAST_WIKI_SERVICE = Environment.GetEnvironmentVariable("FAST_WIKI_SERVICE");
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
@@ -12,11 +18,32 @@ builder.Services
         });
     }).AddI18nForServer(Path.Combine("wwwroot", "i18n"));
 
+builder.Services.AddCascadingAuthenticationState()
+    .AddRclCommand();
+
+builder.Services.AddMasaIdentity();
+
+builder.Services.AddScoped<AuthenticationStateProvider,
+    WikiAuthenticationStateProvider>();
+
+builder.Services.AddOptions();
+builder.Services.AddAuthorizationCore();
+
+if (FAST_WIKI_SERVICE.IsNullOrWhiteSpace())
+{
+    FAST_WIKI_SERVICE = "http://localhost:5124";
+}
+
+if (!FAST_WIKI_SERVICE.StartsWith("http://") && !FAST_WIKI_SERVICE.StartsWith("https://"))
+{
+    FAST_WIKI_SERVICE = "http://" + FAST_WIKI_SERVICE;
+}
+
 builder.Services.AddFastWikiApiGateways(options =>
 {
-    options.BaseAddress = "http://localhost:5124";
+    options.BaseAddress = FAST_WIKI_SERVICE.TrimEnd('/');
     options.Prefix = "/api/v1/";
-}, options => { options.BaseAddress = new Uri("http://localhost:5124/api/v1/"); }).AddFastWikiWebRcl();
+}, options => { options.BaseAddress = new Uri(FAST_WIKI_SERVICE.TrimEnd('/') + "/api/v1/"); }).AddFastWikiWebRcl();
 
 builder.Services.AddGlobalForServer();
 

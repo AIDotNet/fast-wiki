@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Json;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using FastWiki.Service.Contracts;
 
@@ -56,6 +55,10 @@ public abstract class ServiceBase(ICaller caller, IHttpClientFactory httpClientF
         {
             await DeleteAsync(methodName, data);
         }
+        else
+        {
+            await PostAsync(methodName, data);
+        }
     }
 
     protected async Task<TResponse> SendAsync<TRequest, TResponse>(string methodName, TRequest data)
@@ -84,8 +87,24 @@ public abstract class ServiceBase(ICaller caller, IHttpClientFactory httpClientF
         return await client.SendAsync(new HttpRequestMessage()
             {
                 Method = method,
-                RequestUri = new Uri(client.BaseAddress?.AbsoluteUri+BuildAddress(methodName)),
+                RequestUri = new Uri(client.BaseAddress?.AbsoluteUri + BuildAddress(methodName)),
                 Content = new StringContent(JsonSerializer.Serialize(data), Encoding.UTF8, "application/json"),
+            }
+            , option);
+    }
+
+    protected async Task<HttpResponseMessage> SendAsync(HttpMethod method, string methodName, object data,
+        HttpCompletionOption option)
+    {
+        var client = httpClientFactory.CreateClient(Constant.ApiGatewayHttpClient);
+
+        return await client.SendAsync(new HttpRequestMessage()
+            {
+                Method = method,
+                RequestUri = new Uri(client.BaseAddress?.AbsoluteUri + BuildAddress(methodName)),
+                Content = data == null
+                    ? null
+                    : new StringContent(JsonSerializer.Serialize(data), Encoding.UTF8, "application/json"),
             }
             , option);
     }

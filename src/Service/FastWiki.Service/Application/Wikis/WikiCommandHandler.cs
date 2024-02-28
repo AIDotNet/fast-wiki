@@ -1,5 +1,4 @@
 ﻿using FastWiki.Service.Application.Storage.Queries;
-using FastWiki.Service.Contracts;
 using FastWiki.Service.Service;
 
 namespace FastWiki.Service.Application.Wikis;
@@ -20,7 +19,27 @@ public sealed class WikiCommandHandler(
     [EventHandler]
     public async Task RemoveWiki(RemoveWikiCommand command)
     {
+        var wikiDetailsQuery = new WikiDetailsQuery(command.Id, string.Empty, 1, int.MaxValue);
+
+        await eventBus.PublishAsync(wikiDetailsQuery);
+
         await wikiRepository.RemoveAsync(command.Id);
+
+        var ids = wikiDetailsQuery.Result.Result.Select(x => x.Id).ToList();
+
+        await wikiRepository.RemoveDetailsAsync(ids);
+
+        foreach (var id in ids)
+        {
+            try
+            {
+                await memoryServerless.DeleteDocumentAsync(id.ToString(), "wiki");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
     }
 
     [EventHandler]
@@ -69,11 +88,11 @@ public sealed class WikiCommandHandler(
     [EventHandler]
     public async Task RemoveWikiDetailsCommand(RemoveWikiDetailsCommand command)
     {
-        var wiki = await wikiRepository.RemoveDetailsAsync(command.Id);
+        await wikiRepository.RemoveDetailsAsync(command.Id);
 
         try
         {
-            await memoryServerless.DeleteDocumentAsync(wiki.Id.ToString(), "wiki");
+            await memoryServerless.DeleteDocumentAsync(command.Id.ToString(), "wiki");
         }
         catch (Exception e)
         {

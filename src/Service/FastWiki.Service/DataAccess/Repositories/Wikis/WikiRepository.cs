@@ -40,22 +40,19 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
         return result.Entity;
     }
 
-    public async Task<WikiDetail> RemoveDetailsAsync(long wikiDetailId)
+    public async Task RemoveDetailsAsync(long wikiDetailId)
     {
-        var entity = await Context.WikiDetails.FindAsync(wikiDetailId);
-
-        if (entity != null)
-        {
-            Context.WikiDetails.Remove(entity);
-            await Context.SaveChangesAsync();
-        }
-
-        return entity;
+        await Context.WikiDetails.Where(x => x.Id == wikiDetailId).ExecuteDeleteAsync();
     }
 
     public async Task<WikiDetail> GetDetailsAsync(long wikiDetailId)
     {
         return await Context.WikiDetails.FindAsync(wikiDetailId);
+    }
+
+    public async Task RemoveDetailsAsync(List<long> wikiDetailIds)
+    {
+        await Context.WikiDetails.Where(x => wikiDetailIds.Contains(x.Id)).ExecuteDeleteAsync();
     }
 
 

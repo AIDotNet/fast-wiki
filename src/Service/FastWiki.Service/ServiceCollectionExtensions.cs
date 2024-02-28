@@ -1,4 +1,7 @@
-﻿using FastWiki.Service;
+﻿using System.Text;
+using FastWiki.Service;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.KernelMemory.ContentStorage.DevTools;
 using Microsoft.KernelMemory.FileSystem.DevTools;
 using Microsoft.KernelMemory.Postgres;
@@ -62,5 +65,71 @@ public static class ServiceCollectionExtensions
                 .Build<MemoryServerless>();
             return memory;
         });
+    }
+    
+    
+    /// <summary>
+    /// 注册JWT Bearer认证服务的静态扩展方法
+    /// </summary>
+    /// <param name="services"></param>
+    public static IServiceCollection AddJwtBearerAuthentication(this IServiceCollection services)
+    {
+        //使用应用密钥得到一个加密密钥字节数组
+        services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddCookie(cfg => cfg.SlidingExpiration = true)
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = true;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(JwtOptions.Secret)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
+        return services;
+    }
+
+    public static void AddLoadEnvironment(this WebApplicationBuilder builder)
+    {
+        var OPENAI_CHAT_ENDPOINT = Environment.GetEnvironmentVariable("OPENAI_CHAT_ENDPOINT");
+        var OPENAI_CHAT_EMBEDDING_ENDPOINT = Environment.GetEnvironmentVariable("OPENAI_CHAT_EMBEDDING_ENDPOINT");
+        var OPENAI_CHAT_TOKEN = Environment.GetEnvironmentVariable("OPENAI_CHAT_TOKEN");
+        var OPENAI_CHAT_MODEL = Environment.GetEnvironmentVariable("OPENAI_CHAT_MODEL");
+        var OPENAI_EMBEDDING_MODEL = Environment.GetEnvironmentVariable("OPENAI_EMBEDDING_MODEL");
+
+        if (OPENAI_CHAT_ENDPOINT.IsNullOrWhiteSpace())
+        {
+            OpenAIOption.ChatEndpoint = OPENAI_CHAT_ENDPOINT;
+        }
+
+        if (OPENAI_CHAT_EMBEDDING_ENDPOINT.IsNullOrWhiteSpace())
+        {
+            OpenAIOption.EmbeddingEndpoint = OPENAI_CHAT_EMBEDDING_ENDPOINT;
+        }
+
+        if (OPENAI_CHAT_TOKEN.IsNullOrWhiteSpace())
+        {
+            OpenAIOption.ChatToken = OPENAI_CHAT_TOKEN;
+        }
+
+        if (OPENAI_CHAT_MODEL.IsNullOrWhiteSpace())
+        {
+            OpenAIOption.ChatModel = OPENAI_CHAT_MODEL;
+        }
+
+        if (OPENAI_EMBEDDING_MODEL.IsNullOrWhiteSpace())
+        {
+            OpenAIOption.EmbeddingEndpoint = OPENAI_EMBEDDING_MODEL;
+        }
+
+
     }
 }

@@ -1,5 +1,3 @@
-using Masa.BuildingBlocks.Data.Mapping;
-
 namespace FastWiki.Service.Application.ChatApplications;
 
 public class ChatApplicationQueryHandler(IChatApplicationRepository chatApplicationRepository, IMapper mapper)
