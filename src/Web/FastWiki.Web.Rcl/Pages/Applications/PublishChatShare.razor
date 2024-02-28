@@ -1,0 +1,50 @@
+﻿@inject IChatApplicationService ChatApplicationService
+@inject NavigationManager NavigationManager
+@inject JsHelperModule JsHelperModule
+@inject IPopupService PopupService
+
+<MCardTitle>
+    <MSpacer></MSpacer>
+    <AddChatShare OnSubmit="CreateChatShareAsync">
+
+    </AddChatShare>
+</MCardTitle>
+<MCardText>
+
+    <MDataTable Headers="_headers"
+                Items="chatShares.Result"
+                HideDefaultFooter="true"
+                Style="width:100%;">
+        <ItemColContent>
+            @if (context.Header.Value == nameof(ChatShareDto.Id))
+            {
+                <span>@chatShares.Result.IndexOf(context.Item)</span>
+            }
+            else if (context.Header.Value == nameof(ChatShareDto.Name))
+            {
+                <span>@context.Value</span>
+            }
+            else if (context.Header.Value == nameof(ChatShareDto.Expires))
+            {
+                <span>@context.Value</span>
+            }
+            else if (context.Header.Value == nameof(ChatShareDto.AvailableToken))
+            {
+                <span>@context.Value</span>
+            }
+            else if (context.Header.Value == nameof(ChatShareDto.AvailableQuantity))
+            {
+                <span>@context.Value</span>
+            }
+            else
+            {
+                <MButton OnClick="async ()=>await ShareAsync(context.Item)">
+                    分享
+                </MButton>
+            }
+        </ItemColContent>
+        <FooterContent>
+            <MPagination Value="page" ValueChanged="OnPageChanged" Class="my-4" Length=@((int)Math.Ceiling((double)chatShares.Total / pageSize))></MPagination>
+        </FooterContent>
+    </MDataTable>
+</MCardText>

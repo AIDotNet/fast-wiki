@@ -1,5 +1,8 @@
 using FastWiki.Service;
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.GetSection(OpenAIOption.Name)
@@ -16,6 +19,7 @@ builder
 var app = builder.Services
     .AddJwtBearerAuthentication()
     .AddEndpointsApiExplorer()
+    .AddMasaIdentity()
     .AddMapster()
     .AddHttpContextAccessor()
     .AddSwaggerGen(options =>
