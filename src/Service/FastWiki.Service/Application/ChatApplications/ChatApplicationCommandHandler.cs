@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Wordprocessing;
 using Masa.BuildingBlocks.Data.Mapping;
 
 namespace FastWiki.Service.Application.ChatApplications;
@@ -59,5 +60,13 @@ public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplic
     public async Task RemoveChatDialogHistoryAsync(RemoveChatDialogHistoryCommand command)
     {
         await chatApplicationRepository.RemoveChatDialogHistoryByIdAsync(command.Id);
+    }
+
+    [EventHandler]
+    public async Task CreateChatShareAsync(CreateChatShareCommand command)
+    {
+        var share = new ChatShare(command.Input.Name, command.Input.ChatApplicationId, command.Input.Expires,
+            command.Input.AvailableToken, command.Input.AvailableQuantity);
+        await chatApplicationRepository.CreateChatShareAsync(share);
     }
 }

@@ -78,6 +78,35 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
         await Context.ChatDialogHistorys.Where(x => x.Id == id).ExecuteDeleteAsync();
     }
 
+    public async Task CreateChatShareAsync(ChatShare share)
+    {
+        await Context.ChatShares.AddAsync(share);
+        await Context.SaveChangesAsync();
+    }
+
+    public async Task<List<ChatShare>> GetChatShareListAsync(Guid userId, string chatApplicationId, int page, int pageSize)
+    {
+        var query = CreateChatShareQueryable(userId, chatApplicationId);
+
+        return await query
+            .OrderByDescending(x => x.CreationTime)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    public async Task<long> GetChatShareCountAsync(Guid userId, string chatApplicationId)
+    {
+        var query = CreateChatShareQueryable(userId, chatApplicationId);
+
+        return await query.LongCountAsync();
+    }
+
+    private IQueryable<ChatShare> CreateChatShareQueryable(Guid userId, string chatApplicationId)
+    {
+        return Context.ChatShares.AsNoTracking().Where(x => x.ChatApplicationId == chatApplicationId && x.Creator == userId);
+    }
+
     private IQueryable<ChatDialogHistory> CreateChatDialogHistoriesQueryable(string chatDialogId)
     {
         return Context.ChatDialogHistorys.Where(x => x.ChatDialogId == chatDialogId);

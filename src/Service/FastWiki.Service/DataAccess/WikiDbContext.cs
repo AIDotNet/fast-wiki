@@ -1,5 +1,4 @@
 ﻿using FastWiki.Service.Domain.Storage.Aggregates;
-using FastWiki.Service.Domain.Users.Aggregates;
 using System.Text.Json;
 
 namespace FastWiki.Service.DataAccess;
@@ -19,6 +18,8 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
     public DbSet<ChatDialog> ChatDialogs { get; set; }
 
     public DbSet<ChatDialogHistory> ChatDialogHistorys { get; set; }
+
+    public DbSet<ChatShare> ChatShares { get; set; }
 
     protected override void OnModelCreatingExecuting(ModelBuilder modelBuilder)
     {
@@ -109,6 +110,17 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.HasIndex(x => x.ChatDialogId);
             entity.HasIndex(x => x.Creator);
             entity.Property(x => x.Content).HasMaxLength(-1);
+
+        });
+
+        modelBuilder.Entity<ChatShare>(entity =>
+        {
+            entity.ToTable("wiki-chat-share");
+
+
+            entity.HasKey(x => x.Id);
+
+            entity.HasIndex(x => x.ChatApplicationId);
 
         });
 

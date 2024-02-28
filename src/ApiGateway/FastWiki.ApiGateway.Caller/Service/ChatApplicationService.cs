@@ -1,8 +1,7 @@
-using System.Net.Http.Json;
 using FastWiki.ApiGateway.caller.Service;
-using FastWiki.Service.Contracts.ChatApplication;
 using FastWiki.Service.Contracts.ChatApplication.Dto;
 using Masa.Utils.Models;
+using System.Net.Http.Json;
 
 namespace FastWiki.ApiGateway.Caller.Service;
 
@@ -95,6 +94,27 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
 
     public async Task RemoveDialogHistoryAsync(string id)
     {
-        await DeleteAsync(nameof(RemoveDialogHistoryAsync) + "/"+id);
+        await DeleteAsync(nameof(RemoveDialogHistoryAsync) + "/" + id);
+    }
+
+    public async Task CreateShareAsync(CreateChatShareInput input)
+    {
+        await PostAsync(nameof(CreateShareAsync), input);
+    }
+
+    public async Task<PaginatedListBase<ChatShareDto>> GetChatShareListAsync(string chatApplicationId, int page, int pageSize)
+    {
+        return await GetAsync<PaginatedListBase<ChatShareDto>>(nameof(GetChatShareListAsync), new Dictionary<string, string>()
+        {
+            {
+                "chatApplicationId", chatApplicationId
+            },
+            {
+                "page", page.ToString()
+            },
+            {
+                "pageSize", pageSize.ToString()
+            }
+        });
     }
 }

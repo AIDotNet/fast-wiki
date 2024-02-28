@@ -1,6 +1,9 @@
+using FastWiki.ApiGateway.Caller.Service;
+using Masa.BuildingBlocks.Authentication.Identity;
+
 namespace FastWiki.Service.Application.ChatApplications;
 
-public class ChatApplicationQueryHandler(IChatApplicationRepository chatApplicationRepository, IMapper mapper)
+public class ChatApplicationQueryHandler(IChatApplicationRepository chatApplicationRepository, IMapper mapper,IUserContext userContext)
 {
     [EventHandler]
     public async Task ChatApplicationAsync(ChatApplicationQuery query)
@@ -44,6 +47,23 @@ public class ChatApplicationQueryHandler(IChatApplicationRepository chatApplicat
         query.Result = new PaginatedListBase<ChatDialogHistoryDto>()
         {
             Result = mapper.Map<List<ChatDialogHistoryDto>>(result.OrderBy(x=>x.CreationTime)),
+            Total = total
+        };
+    }
+
+    [EventHandler]
+    public async Task ChatShareAsync(ChatShareQuery query)
+    {
+        var result = await chatApplicationRepository.GetChatShareListAsync(userContext.GetUserId<Guid>(),
+            query.chatApplicationId, query.page, query.pageSize);
+
+        var total = await chatApplicationRepository.GetChatShareCountAsync(userContext.GetUserId<Guid>(),
+            query.chatApplicationId);
+
+
+        query.Result = new PaginatedListBase<ChatShareDto>()
+        {
+            Result = mapper.Map<List<ChatShareDto>>(result),
             Total = total
         };
     }

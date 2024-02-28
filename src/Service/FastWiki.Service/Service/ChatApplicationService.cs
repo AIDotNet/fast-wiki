@@ -1,3 +1,4 @@
+using FastWiki.ApiGateway.Caller.Service;
 using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace FastWiki.Service.Service;
@@ -160,5 +161,22 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService)
         var command = new RemoveChatDialogHistoryCommand(id);
 
         await EventBus.PublishAsync(command);
+    }
+
+    public async Task CreateShareAsync(CreateChatShareInput input)
+    {
+        var command = new CreateChatShareCommand(input);
+
+        await EventBus.PublishAsync(command);
+
+    }
+
+    public async Task<PaginatedListBase<ChatShareDto>> GetChatShareListAsync(string chatApplicationId, int page, int pageSize)
+    {
+        var query = new ChatShareQuery(chatApplicationId, page, pageSize);
+
+        await EventBus.PublishAsync(query);
+
+        return query.Result;
     }
 }

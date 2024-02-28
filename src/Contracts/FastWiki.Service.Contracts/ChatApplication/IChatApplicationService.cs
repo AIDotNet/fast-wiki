@@ -1,3 +1,4 @@
+using FastWiki.ApiGateway.Caller.Service;
 using FastWiki.Service.Contracts.ChatApplication.Dto;
 
 namespace FastWiki.Service.Contracts.ChatApplication;
@@ -83,4 +84,20 @@ public interface IChatApplicationService
     /// <param name="id"></param>
     /// <returns></returns>
     Task RemoveDialogHistoryAsync(string id);
+
+    /// <summary>
+    /// 分享指定应用
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    Task CreateShareAsync(CreateChatShareInput input);
+
+    /// <summary>
+    /// 获取对话列表
+    /// </summary>
+    /// <param name="chatApplicationId"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    Task<PaginatedListBase<ChatShareDto>> GetChatShareListAsync(string chatApplicationId, int page, int pageSize);
 }
