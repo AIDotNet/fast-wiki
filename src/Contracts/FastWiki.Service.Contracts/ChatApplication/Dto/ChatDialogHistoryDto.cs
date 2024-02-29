@@ -10,11 +10,6 @@ public sealed class ChatDialogHistoryDto
     public string ChatDialogId { get; set; }
 
     /// <summary>
-    /// 应用Id
-    /// </summary>
-    public string ChatApplicationId { get; set; }
-
-    /// <summary>
     /// 对话内容
     /// </summary>
     public string Content { get; set; }

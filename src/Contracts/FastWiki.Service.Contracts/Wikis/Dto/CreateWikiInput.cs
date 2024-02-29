@@ -15,5 +15,5 @@ public sealed class CreateWikiInput
     /// <summary>
     /// 知识库模型
     /// </summary>
-    public string Model { get; set; }
+    public string Model { get; set; } = "gpt-3.5-turbo";
 }

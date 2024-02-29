@@ -74,4 +74,15 @@ public sealed class ChatApplication : FullAggregateRoot<string, Guid?>
     /// 关联的知识库
     /// </summary>
     public List<long> WikiIds { get; set; } = new();
+    
+    /// <summary>
+    /// 引用上限
+    /// </summary>
+    public int ReferenceUpperLimit { get; set; } = 1500;
+
+    /// <summary>
+    /// 匹配相似度
+    /// </summary>
+    public double Relevancy { get; set; } = 0.4;
+
 }

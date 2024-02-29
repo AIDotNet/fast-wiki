@@ -37,9 +37,11 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
         }
     }
 
-    public async Task<List<ChatDialog>> GetChatDialogListAsync()
+    public async Task<List<ChatDialog>> GetChatDialogListAsync(string queryChatId)
     {
-        return await Context.ChatDialogs.ToListAsync();
+        return await Context.ChatDialogs.Where(x => x.ChatId == queryChatId)
+            .OrderByDescending(x => x.CreationTime)
+            .ToListAsync();
     }
 
     public async Task CreateChatDialogHistoryAsync(ChatDialogHistory chatDialogHistory)
@@ -84,7 +86,8 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
         await Context.SaveChangesAsync();
     }
 
-    public async Task<List<ChatShare>> GetChatShareListAsync(Guid userId, string chatApplicationId, int page, int pageSize)
+    public async Task<List<ChatShare>> GetChatShareListAsync(Guid userId, string chatApplicationId, int page,
+        int pageSize)
     {
         var query = CreateChatShareQueryable(userId, chatApplicationId);
 
@@ -102,9 +105,27 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
         return await query.LongCountAsync();
     }
 
+    public async Task<ChatShare> GetChatShareAsync(string id)
+    {
+        return await Context.ChatShares.AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task<ChatApplication> ChatShareApplicationAsync(string chatShareId)
+    {
+        var query =
+            from share in Context.ChatShares
+            join application in Context.ChatApplications on share.ChatApplicationId equals application.Id
+            where share.Id == chatShareId
+            select application;
+
+        return await query.AsNoTracking().FirstOrDefaultAsync();
+    }
+
     private IQueryable<ChatShare> CreateChatShareQueryable(Guid userId, string chatApplicationId)
     {
-        return Context.ChatShares.AsNoTracking().Where(x => x.ChatApplicationId == chatApplicationId && x.Creator == userId);
+        return Context.ChatShares.AsNoTracking()
+            .Where(x => x.ChatApplicationId == chatApplicationId && x.Creator == userId);
     }
 
     private IQueryable<ChatDialogHistory> CreateChatDialogHistoriesQueryable(string chatDialogId)

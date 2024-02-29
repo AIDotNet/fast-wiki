@@ -1,6 +1,4 @@
-﻿using FastWiki.ApiGateway.Caller.Service;
-
-namespace FastWiki.Service.Application.ChatApplications.Queries;
+﻿namespace FastWiki.Service.Application.ChatApplications.Queries;
 
 public record ChatShareQuery(string chatApplicationId,int page,int pageSize):Query<PaginatedListBase<ChatShareDto>>
 {

@@ -23,8 +23,9 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <summary>
     /// 获取对话列表
     /// </summary>
+    /// <param name="queryChatId"></param>
     /// <returns></returns>
-    Task<List<ChatDialog>> GetChatDialogListAsync();
+    Task<List<ChatDialog>> GetChatDialogListAsync(string queryChatId);
 
     /// <summary>
     /// 创建对话记录
@@ -86,4 +87,18 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <param name="chatApplicationId"></param>
     /// <returns></returns>
     Task<long> GetChatShareCountAsync(Guid userId, string chatApplicationId);
+
+    /// <summary>
+    /// 获取分享对话
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<ChatShare> GetChatShareAsync(string id);
+
+    /// <summary>
+    /// 通过分享对话获取应用
+    /// </summary>
+    /// <param name="chatShareId"></param>
+    /// <returns></returns>
+    Task<ChatApplication> ChatShareApplicationAsync(string chatShareId);
 }

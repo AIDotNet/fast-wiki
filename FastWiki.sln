@@ -32,7 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastWiki.Infrastructure.Common", "src\Infrastructure\FastWiki.Infrastructure.Common\FastWiki.Infrastructure.Common.csproj", "{0C90BE14-96EC-4E1B-A017-258E36ED6B1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastWiki.Infrastructure.Rcl.Command", "src\Infrastructure\FastWiki.Infrastructure.Rcl.Command\FastWiki.Infrastructure.Rcl.Command.csproj", "{47165417-808A-4AE5-AC38-71DE57C7A98A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastWiki.Infrastructure.Rcl.Command", "src\Infrastructure\FastWiki.Infrastructure.Rcl.Command\FastWiki.Infrastructure.Rcl.Command.csproj", "{47165417-808A-4AE5-AC38-71DE57C7A98A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

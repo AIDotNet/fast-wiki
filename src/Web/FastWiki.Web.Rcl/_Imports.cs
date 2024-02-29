@@ -18,3 +18,5 @@ global using System.ComponentModel;
 global using System.Net.Http.Json;
 global using System.Reflection;
 global using System.Text.Json;
+global using FastWiki.Service.Contracts.ChatApplication;
+global using FastWiki.Infrastructure.Common.Helper;

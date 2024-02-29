@@ -1,5 +1,4 @@
-﻿using FastWiki.ApiGateway.Caller.Service;
-using Masa.Blazor;
+﻿using Masa.Blazor;
 
 namespace FastWiki.Web.Rcl.Pages.Applications;
 

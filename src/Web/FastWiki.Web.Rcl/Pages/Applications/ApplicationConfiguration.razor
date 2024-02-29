@@ -40,6 +40,17 @@
              Step="100"
              ThumbLabel="@("always")"></MSlider>
 
+    <MTextField Label="引用上限"
+                @bind-Value="Value.ReferenceUpperLimit"
+                Outlined
+                Placeholder="引用上限知识库引用最大上文token数。">
+    </MTextField>
+    <MSlider @bind-Value="Value.Relevancy"
+             Label="匹配相似度"
+             Min="0"
+             Max="1"
+             Step="0.05"
+             ThumbLabel="@("always")"></MSlider>
     <MDialog Width="800">
         <ActivatorContent>
             <MButton Style="margin-top:10px;" @attributes="@context.Attrs" Block>选择知识库</MButton>

@@ -1,4 +1,3 @@
-using FastWiki.ApiGateway.Caller.Service;
 using FastWiki.Service.Contracts.ChatApplication.Dto;
 
 namespace FastWiki.Service.Contracts.ChatApplication;
@@ -42,6 +41,13 @@ public interface IChatApplicationService
     Task<ChatApplicationDto> GetAsync(string id);
 
     /// <summary>
+    /// 使用分享对话id获取应用
+    /// </summary>
+    /// <param name="chatShareId"></param>
+    /// <returns></returns>
+    Task<ChatApplicationDto> GetChatShareApplicationAsync(string chatShareId);
+
+    /// <summary>
     /// 创建对话
     /// </summary>
     /// <param name="input"></param>
@@ -51,11 +57,12 @@ public interface IChatApplicationService
     /// <summary>
     /// 获取对话列表
     /// </summary>
+    /// <param name="chatId"></param>
     /// <returns></returns>
-    Task<List<ChatDialogDto>> GetChatDialogAsync();
+    Task<List<ChatDialogDto>> GetChatDialogAsync(string chatId);
     
     /// <summary>
-    /// 创建对话
+    /// 创建对话记录
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
@@ -67,6 +74,13 @@ public interface IChatApplicationService
     /// <param name="input"></param>
     /// <returns></returns>
     IAsyncEnumerable<CompletionsDto> CompletionsAsync(CompletionsInput input);
+
+    /// <summary>
+    /// 对话分享
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    IAsyncEnumerable<CompletionsDto> ChatShareCompletionsAsync(ChatShareCompletionsInput input);
 
     /// <summary>
     /// 获取对话记录

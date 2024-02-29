@@ -1,0 +1,23 @@
+﻿@inject IWikiService WikiService
+@inject IPopupService PopupService
+
+@if (Value != null)
+{
+    <MTextarea Label="知识库名称"
+               @bind-Value="Value.Name"
+               Outlined
+               Placeholder="知识库名称"
+               Rows="5"
+               RowHeight="15">
+    </MTextarea>
+
+    <MSelect Items="Models"
+             @bind-Value="@Value.Model"
+             ItemText="u => u.Item1"
+             ItemValue="u => u.Item2"
+             Label="选择对话基础模型"
+             Dense
+             Outlined></MSelect>
+
+    <MButton Style="margin-top:10px;" Color="#3370FF" OnClick="SubmitAsync" Block>保存修改</MButton>
+}

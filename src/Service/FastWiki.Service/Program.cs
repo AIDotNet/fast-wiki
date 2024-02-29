@@ -18,6 +18,7 @@ builder
 
 var app = builder.Services
     .AddJwtBearerAuthentication()
+    .AddMemoryCache()
     .AddEndpointsApiExplorer()
     .AddMasaIdentity()
     .AddMapster()
@@ -49,7 +50,9 @@ var app = builder.Services
 app.UseMasaExceptionHandler();
 
 app.UseStaticFiles();
-
+app.UseRouting();
+app.UseAuthorization();
+app.UseAuthentication();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger()

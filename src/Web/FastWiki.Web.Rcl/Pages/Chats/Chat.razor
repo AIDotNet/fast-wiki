@@ -55,7 +55,7 @@
                 @chatApplication.Name
             </MCardTitle>
             <MDivider></MDivider>
-            <ChatDialog ChatApplicationId="@chatApplication.Id" @bind-Value="ChatDialog"></ChatDialog>
+            <ChatDialog Type="ChatDialogType.ChatApplication" ChatId="@chatApplication.Id" @bind-Value="ChatDialog"></ChatDialog>
         </div>
 
         <div class="vertical-divider"></div>

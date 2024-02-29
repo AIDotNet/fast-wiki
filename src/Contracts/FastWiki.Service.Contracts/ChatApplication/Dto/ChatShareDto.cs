@@ -1,4 +1,4 @@
-﻿namespace FastWiki.ApiGateway.Caller.Service;
+﻿namespace FastWiki.Service.Contracts.ChatApplication.Dto;
 
 public class ChatShareDto
 {
@@ -20,9 +20,10 @@ public class ChatShareDto
     /// 可用Token -1则是无限
     /// </summary>
     public long AvailableToken { get; set; }
-
+    
     /// <summary>
     /// 可用数量
     /// </summary>
     public int AvailableQuantity { get; set; }
+    
 }
