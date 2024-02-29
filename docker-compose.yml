@@ -6,7 +6,7 @@ services:
     user: root
     restart: always
     ports:
-      - 2181:8080
+      - "8080:8080"
     build: 
       context: .
       dockerfile: ./src/Service/FastWiki.Service/Dockerfile
@@ -37,9 +37,9 @@ services:
     container_name: fast-wiki-server
     restart: always 
     ports:
-      - 2180:8080
+      - "2180:8080"
     build: 
       context: .
       dockerfile: ./src/Web/FastWiki.Web.Server/Dockerfile
     environment:
-      - FAST_WIKI_SERVICE=http://知识库api的ip:2181 
+      - FAST_WIKI_SERVICE=http://知识库api的ip:8080 
