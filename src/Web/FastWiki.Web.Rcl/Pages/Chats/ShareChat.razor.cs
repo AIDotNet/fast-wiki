@@ -30,6 +30,8 @@ public partial class ShareChat
 
                 await LocalStorageJsInterop.SetLocalStorageAsync(Constant.ChatShare, GuestId);
             }
+
+            _ = InvokeAsync(StateHasChanged);
         }
     }
 }
