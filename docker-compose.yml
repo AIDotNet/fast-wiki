@@ -7,6 +7,8 @@ services:
     build: 
       context: .
       dockerfile: ./src/Service/FastWiki.Service/Dockerfile
+    volumes:
+      - ./wwwroot:/app/wwwroot/
     environment:
       - OPENAI_CHAT_ENDPOINT=https://api.openai.com
       - OPENAI_CHAT_EMBEDDING_ENDPOINT=https://api.openai.com
@@ -37,4 +39,4 @@ services:
       context: .
       dockerfile: ./src/Web/FastWiki.Web.Server/Dockerfile
     environment:
-      - FAST_WIKI_SERVICE=http://fast-wiki-service:8080
+      - FAST_WIKI_SERVICE=http://能公网服务的地址以便文件使用:8080
