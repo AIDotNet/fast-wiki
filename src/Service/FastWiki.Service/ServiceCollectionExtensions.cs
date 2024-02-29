@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using FastWiki.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -127,7 +127,7 @@ public static class ServiceCollectionExtensions
 
         if (!OPENAI_EMBEDDING_MODEL.IsNullOrWhiteSpace())
         {
-            OpenAIOption.EmbeddingEndpoint = OPENAI_EMBEDDING_MODEL;
+            OpenAIOption.EmbeddingModel = OPENAI_EMBEDDING_MODEL;
         }
 
 
