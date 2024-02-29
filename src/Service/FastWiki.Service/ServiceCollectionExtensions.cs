@@ -77,7 +77,6 @@ public static class ServiceCollectionExtensions
     {
         //使用应用密钥得到一个加密密钥字节数组
         services
-            .AddAuthorization()
             .AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

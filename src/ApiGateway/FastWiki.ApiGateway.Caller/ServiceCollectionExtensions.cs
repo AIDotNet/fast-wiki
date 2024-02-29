@@ -12,7 +12,8 @@ public static class ServiceCollectionExtensions
 
         services.AddCaller(callerBuilder =>
         {
-            callerBuilder.UseHttpClient(clientBuilder!.Invoke);
+            callerBuilder.UseHttpClient(clientBuilder!.Invoke)
+                .AddMiddleware<AuthorizeMiddleware>(ServiceLifetime.Scoped);
         });
 
         services.AddHttpClient(Constant.ApiGatewayHttpClient, httpClientBuilder.Invoke);

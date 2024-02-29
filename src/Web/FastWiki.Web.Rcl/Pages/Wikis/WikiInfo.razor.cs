@@ -57,12 +57,7 @@ public partial class WikiInfo
         _wikiDetails = await WikiService.GetWikiDetailsAsync(Id, keyword, page, pageSize);
         _ = InvokeAsync(StateHasChanged);
     }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadData();
-    }
-
+    
     private async Task Remove(long id)
     {
         await WikiService.RemoveDetailsAsync(id);
@@ -98,6 +93,7 @@ public partial class WikiInfo
     {
         if (firstRender)
         {
+            await LoadData();
             Wiki = await WikiService.GetAsync(Id);
         }
     }

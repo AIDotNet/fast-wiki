@@ -83,6 +83,7 @@ public partial class ChatDialogue
             await foreach (var item in ChatApplicationService.CompletionsAsync(new CompletionsInput()
             {
                 ChatDialogId = ChatDialogId,
+                ChatId = ChatApplication.Id,
                 Content = value,
             }))
             {

@@ -1,24 +1,26 @@
-﻿@inherits LayoutComponentBase
+﻿@using System.Net.Http.Headers
+@inherits LayoutComponentBase
 @inject GlobalConfig GlobalConfig
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject LocalStorageJsInterop LocalStorageJsInterop
+@inject IHttpClientFactory HttpClientFactory
 
 <MApp>
     <PPageTabsProvider>
         <CascadingValue Value="GlobalConfig.Culture.Name" Name="CultureName">
             <MAppBar Elevation=0 App Height="100" Class="default-app-bar mx-6">
                 <div class="default-app-bar__actions page-mode--tab">
-                    <MSpacer />
-                    <Language OnLanguageChanged="OnLanguageChanged" />
-                    <Login />
+                    <MSpacer/>
+                    <Language OnLanguageChanged="OnLanguageChanged"/>
+                    <Login/>
                 </div>
                 <div class="default-app-bar__nav page-mode--tab">
-                    <PageTabs @ref="_pageTabs" />
+                    <PageTabs @ref="_pageTabs"/>
                 </div>
             </MAppBar>
 
-            <Navigation />
+            <Navigation/>
 
             <MMain Class="fill-lighten-1">
                 <div class="pa-6">
@@ -31,7 +33,7 @@
     </PPageTabsProvider>
 </MApp>
 
-<MButton Dark Fab Fixed Bottom Right Href="https://github.com/239573049/fast-wiki" >
+<MButton Dark Fab Fixed Bottom Right Href="https://github.com/239573049/fast-wiki">
     <MIcon>mdi-github</MIcon>
 </MButton>
 
@@ -47,15 +49,19 @@
 
             if (state.User.Identity?.IsAuthenticated == false)
             {
-                NavigationManager.NavigateTo("/pages/authentication/Login",true);
+                NavigationManager.NavigateTo("/pages/authentication/Login", true);
 
                 return;
             }
             else
             {
+                var client = HttpClientFactory.CreateClient(Constant.ApiGatewayHttpClient);
+
                 var token = await LocalStorageJsInterop.GetLocalStorageAsync(Constant.Token);
                 ((WikiAuthenticationStateProvider)AuthenticationStateProvider)
                     .AuthenticateUser(token);
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Trim('"'));
             }
 
             await GlobalConfig.InitFromStorage();
@@ -66,4 +72,5 @@
     {
         GlobalConfig.Culture = culture;
     }
+
 }

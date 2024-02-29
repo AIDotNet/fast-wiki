@@ -2,9 +2,7 @@
 
 public partial class ShareChat
 {
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public string Id { get; set; }
+    [Parameter] [SupplyParameterFromQuery] public string Id { get; set; }
 
     private ChatDialogDto ChatDialog = new();
 
@@ -17,15 +15,13 @@ public partial class ShareChat
         ChatApplication = await ChatApplicationService.GetChatShareApplicationAsync(Id);
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadingChatApplication();
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            await LoadingChatApplication();
+
             GuestId = await LocalStorageJsInterop.GetLocalStorageAsync(Constant.ChatShare);
 
             if (GuestId.IsNullOrWhiteSpace())
@@ -34,9 +30,6 @@ public partial class ShareChat
 
                 await LocalStorageJsInterop.SetLocalStorageAsync(Constant.ChatShare, GuestId);
             }
-
         }
     }
-
-
 }

@@ -1,3 +1,4 @@
+using FastWiki.Service.Contracts;
 using FastWiki.Web.Rcl;
 using Microsoft.AspNetCore.Components.Authorization;
 
@@ -22,6 +23,8 @@ builder.Services.AddCascadingAuthenticationState()
     .AddRclCommand();
 
 builder.Services.AddMasaIdentity();
+
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<AuthenticationStateProvider,
     WikiAuthenticationStateProvider>();

@@ -328,18 +328,18 @@ namespace FastWiki.Service.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("94eaaa85-8dde-40b5-bf80-c7ee250f3687"),
+                            Id = new Guid("62769e54-0b0a-4a28-b3a5-b642c52ce8e5"),
                             Account = "admin",
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                            CreationTime = new DateTime(2024, 2, 29, 17, 8, 18, 870, DateTimeKind.Utc).AddTicks(8146),
+                            CreationTime = new DateTime(2024, 2, 29, 17, 59, 24, 403, DateTimeKind.Utc).AddTicks(1510),
                             Email = "239573049@qq.com",
                             IsDeleted = false,
                             IsDisable = false,
-                            ModificationTime = new DateTime(2024, 2, 29, 17, 8, 18, 870, DateTimeKind.Utc).AddTicks(8147),
+                            ModificationTime = new DateTime(2024, 2, 29, 17, 59, 24, 403, DateTimeKind.Utc).AddTicks(1512),
                             Name = "admin",
-                            Password = "817e84975715a492f78f507c1d453a93",
+                            Password = "a7eeba6911945963ce0eafa6352a7a89",
                             Phone = "13049809673",
-                            Salt = "3315926eb66a4ac9a160bcc9b9f4806f"
+                            Salt = "51111786de5e4809b4f72c9670f2c294"
                         });
                 });
 
@@ -396,6 +396,9 @@ namespace FastWiki.Service.Migrations
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<long>("Creator")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("DataCount")
                         .HasColumnType("integer");

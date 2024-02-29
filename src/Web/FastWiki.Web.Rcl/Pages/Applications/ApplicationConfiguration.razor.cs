@@ -13,9 +13,12 @@ public partial class ApplicationConfiguration
 
     public List<(string, string)> Models = ChatHelper.GetChatModel();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadingAsync();
+        if (firstRender)
+        {
+            await LoadingAsync();
+        }
     }
 
     private async Task LoadingAsync()

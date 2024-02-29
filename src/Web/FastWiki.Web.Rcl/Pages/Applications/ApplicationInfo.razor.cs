@@ -2,13 +2,15 @@
 
 public partial class ApplicationInfo
 {
-    [Parameter]
-    public string Id { get; set; }
+    [Parameter] public string Id { get; set; }
 
     private ChatApplicationDto Application { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        Application = await ChatApplicationService.GetAsync(Id);
+        if (firstRender)
+        {
+            Application = await ChatApplicationService.GetAsync(Id);
+        }
     }
 }

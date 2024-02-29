@@ -158,6 +158,7 @@ namespace FastWiki.Service.Migrations
                     FileId = table.Column<long>(type: "bigint", nullable: false),
                     DataCount = table.Column<int>(type: "integer", nullable: false),
                     Type = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Creator = table.Column<long>(type: "bigint", nullable: false),
                     CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     Modifier = table.Column<long>(type: "bigint", nullable: false),
                     ModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
@@ -190,7 +191,7 @@ namespace FastWiki.Service.Migrations
             migrationBuilder.InsertData(
                 table: "wiki-users",
                 columns: new[] { "Id", "Account", "Avatar", "CreationTime", "Creator", "Email", "IsDeleted", "IsDisable", "ModificationTime", "Modifier", "Name", "Password", "Phone", "Salt" },
-                values: new object[] { new Guid("94eaaa85-8dde-40b5-bf80-c7ee250f3687"), "admin", "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", new DateTime(2024, 2, 29, 17, 8, 18, 870, DateTimeKind.Utc).AddTicks(8146), null, "239573049@qq.com", false, false, new DateTime(2024, 2, 29, 17, 8, 18, 870, DateTimeKind.Utc).AddTicks(8147), null, "admin", "817e84975715a492f78f507c1d453a93", "13049809673", "3315926eb66a4ac9a160bcc9b9f4806f" });
+                values: new object[] { new Guid("62769e54-0b0a-4a28-b3a5-b642c52ce8e5"), "admin", "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", new DateTime(2024, 2, 29, 17, 59, 24, 403, DateTimeKind.Utc).AddTicks(1510), null, "239573049@qq.com", false, false, new DateTime(2024, 2, 29, 17, 59, 24, 403, DateTimeKind.Utc).AddTicks(1512), null, "admin", "a7eeba6911945963ce0eafa6352a7a89", "13049809673", "51111786de5e4809b4f72c9670f2c294" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_wiki-chat-application_Name",

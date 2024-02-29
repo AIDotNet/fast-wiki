@@ -2,8 +2,7 @@
 
 public partial class WikiDetailInfo
 {
-    [Parameter]
-    public long Id { get; set; }
+    [Parameter] public long Id { get; set; }
 
     private int page = 1;
 
@@ -18,9 +17,12 @@ public partial class WikiDetailInfo
         _ = InvokeAsync(StateHasChanged);
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await Loading();
+        if (firstRender)
+        {
+            await Loading();
+        }
     }
 
     private async Task OnPageChanged(int page)

@@ -17,9 +17,12 @@ public partial class Application
         _ = InvokeAsync(StateHasChanged);
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await Loading();
+        if (firstRender)
+        {
+            await Loading();
+        }
     }
 
     private void OpenChatApplication(ChatApplicationDto chatApplication)
