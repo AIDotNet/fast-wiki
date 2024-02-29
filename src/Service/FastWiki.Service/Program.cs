@@ -1,5 +1,8 @@
 using FastWiki.Service;
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.GetSection(OpenAIOption.Name)
@@ -15,7 +18,9 @@ builder
 
 var app = builder.Services
     .AddJwtBearerAuthentication()
+    .AddMemoryCache()
     .AddEndpointsApiExplorer()
+    .AddMasaIdentity()
     .AddMapster()
     .AddHttpContextAccessor()
     .AddSwaggerGen(options =>
@@ -45,7 +50,9 @@ var app = builder.Services
 app.UseMasaExceptionHandler();
 
 app.UseStaticFiles();
-
+app.UseRouting();
+app.UseAuthorization();
+app.UseAuthentication();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger()
@@ -53,12 +60,12 @@ if (app.Environment.IsDevelopment())
 
     #region MigrationDb
 
-    using var context = app.Services.CreateScope().ServiceProvider.GetService<WikiDbContext>();
+    await using var context = app.Services.CreateScope().ServiceProvider.GetService<WikiDbContext>();
     {
-        context!.Database.EnsureCreated();
+        await context!.Database.EnsureCreatedAsync();
 
         // TODO: 创建vector插件如果数据库没有则需要提供支持向量的数据库。
-        context.Database.ExecuteSqlInterpolated($"CREATE EXTENSION IF NOT EXISTS vector;");
+        await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");
     }
 
     #endregion

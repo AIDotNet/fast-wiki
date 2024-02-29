@@ -1,4 +1,4 @@
-﻿using FastWiki.Service.Contracts.Users.Dto;
+﻿using FastWiki.Infrastructure.Rcl.Command.JsInterop;
 
 namespace FastWiki.Web.Rcl.Pages.Chats;
 
@@ -26,7 +26,13 @@ public partial class ChatDialogue
 
     [Parameter] public ChatApplicationDto ChatApplication { get; set; }
 
+    /// <summary>
+    /// 对话分享Id 如果存在则使用分享
+    /// </summary>
+    [Parameter] public string ChatSharedId { get; set; }
+
     private int page = 1;
+
     private int pageSize = 10;
 
     private PaginatedListBase<ChatDialogHistoryDto> ChatDialogHistory = new()
@@ -49,7 +55,6 @@ public partial class ChatDialogue
 
         var user = new ChatDialogHistoryDto()
         {
-            ChatApplicationId = ChatApplication?.Id,
             ChatDialogId = chatDialogId,
             Content = value,
             CreationTime = DateTime.Now,
@@ -62,7 +67,6 @@ public partial class ChatDialogue
 
         var chat = new ChatDialogHistoryDto()
         {
-            ChatApplicationId = ChatApplication?.Id,
             ChatDialogId = chatDialogId,
             Content = string.Empty,
             CreationTime = DateTime.Now,
@@ -73,30 +77,43 @@ public partial class ChatDialogue
 
         ChatDialogHistory.Result.Add(chat);
 
+
+        if (ChatSharedId.IsNullOrWhiteSpace())
+        {
+            await foreach (var item in ChatApplicationService.CompletionsAsync(new CompletionsInput()
+            {
+                ChatDialogId = ChatDialogId,
+                Content = value,
+            }))
+            {
+                chat.Content += item.Content;
+                _ = InvokeAsync(StateHasChanged);
+            }
+        }
+        else
+        {
+            await foreach (var item in ChatApplicationService.ChatShareCompletionsAsync(new()
+            {
+                ChatDialogId = ChatDialogId,
+                ChatShareId = ChatSharedId,
+                Content = value,
+            }))
+            {
+                chat.Content += item.Content;
+                _ = InvokeAsync(StateHasChanged);
+            }
+        }
+
         await ChatApplicationService.CreateChatDialogHistoryAsync(new CreateChatDialogHistoryInput()
         {
-            ChatApplicationId = user.ChatApplicationId,
             ChatDialogId = user.ChatDialogId,
             Content = user.Content,
             Current = user.Current,
             Type = user.Type
         });
 
-        await foreach (var item in ChatApplicationService.CompletionsAsync(new CompletionsInput()
-        {
-            ChatDialogId = ChatDialogId,
-            Content = value,
-            ChatApplicationId = ChatApplication?.Id,
-        }))
-        {
-            Console.Write(item.Content);
-            chat.Content += item.Content;
-            _ = InvokeAsync(StateHasChanged);
-        }
-
         await ChatApplicationService.CreateChatDialogHistoryAsync(new CreateChatDialogHistoryInput()
         {
-            ChatApplicationId = chat.ChatApplicationId,
             ChatDialogId = chat.ChatDialogId,
             Content = chat.Content,
             Current = chat.Current,
@@ -117,5 +134,11 @@ public partial class ChatDialogue
         {
             await Task.CompletedTask;
         }
+    }
+
+    private async Task OnCopy(string text)
+    {
+        await JsHelperModule.CopyText(text);
+        await PopupService.EnqueueSnackbarAsync(new SnackbarOptions("成功", "复制成功"));
     }
 }

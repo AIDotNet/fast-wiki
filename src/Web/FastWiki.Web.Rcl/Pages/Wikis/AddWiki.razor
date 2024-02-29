@@ -31,9 +31,13 @@
                         </MTextField>
                     </MRow>
                     <MRow>
-                        <MTextField Label="知识库模型*"
-                                    @bind-Value="input.Model">
-                        </MTextField>
+                        <MSelect Items="Models"
+                                 @bind-Value="@input.Model"
+                                 ItemText="u => u.Item1"
+                                 ItemValue="u => u.Item2"
+                                 Label="*选择知识库QA模型"
+                                 Dense
+                                 Outlined></MSelect>
                     </MRow>
                 </MContainer>
                 <small>*为必填</small>

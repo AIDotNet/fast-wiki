@@ -5,7 +5,7 @@ public partial class WikiInfo
     [Parameter] public long Id { get; set; }
 
     private PaginatedListBase<WikiDetailDto> _wikiDetails = new();
-
+    private WikiDto Wiki { get; set; }
     private int page = 1;
     private int pageSize = 10;
 
@@ -55,6 +55,7 @@ public partial class WikiInfo
     private async Task LoadData()
     {
         _wikiDetails = await WikiService.GetWikiDetailsAsync(Id, keyword, page, pageSize);
+        _ = InvokeAsync(StateHasChanged);
     }
 
     protected override async Task OnInitializedAsync()
@@ -65,6 +66,8 @@ public partial class WikiInfo
     private async Task Remove(long id)
     {
         await WikiService.RemoveDetailsAsync(id);
+        page = 1;
+        await LoadData();
     }
 
     private async Task OnPageChanged(int page)
@@ -80,5 +83,22 @@ public partial class WikiInfo
     private void OpenWikiDetailAsync(WikiDetailDto item)
     {
         NavigationManager.NavigateTo("/wiki/wiki-detail/" + item.Id);
+    }
+
+    private async Task OnSucceed(bool result)
+    {
+        if (result)
+        {
+            page = 1;
+            await LoadData();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Wiki = await WikiService.GetAsync(Id);
+        }
     }
 }

@@ -1,0 +1,67 @@
+﻿<MDialog Persistent
+         @bind-Value="Visible"
+         MaxWidth="400">
+    <ActivatorContent>
+        <MButton Color="primary"
+                 Dark
+                 Style="margin-bottom: 18px;margin-left: 8px;"
+                 @attributes="@context.Attrs">
+            新增
+        </MButton>
+    </ActivatorContent>
+    <ChildContent>
+        <MCard>
+            <MCardTitle>
+                <span class="text-h5">新增分享</span>
+            </MCardTitle>
+            <MCardText>
+                <MContainer>
+                    <MRow>
+                        <MTextField Label="分享名称*"
+                                    @bind-Value="input.Name">
+                        </MTextField>
+                    </MRow>
+                    <MRow>
+                        <MTextField Label="token数量（-1则无限）"
+                                    @bind-Value="input.AvailableToken">
+                        </MTextField>
+                    </MRow>
+                    <MRow>
+                        <MTextField Label="使用数量（-1则无限）"
+                                    @bind-Value="input.AvailableQuantity">
+                        </MTextField>
+                    </MRow>
+                    <MRow>
+                        <PDateTimePicker @bind-Value="input.Expires"
+                                         TimeFormat="TimeFormat.Hr24"
+                                         ViewType="DateTimePickerViewType.Compact">
+                            <ActivatorContent>
+                                <MTextField @bind-Value="input.Expires"
+                                            Label="过期时间"
+                                            Clearable
+                                            Filled
+                                            Readonly
+                                            @attributes="@context.Attrs">
+                                </MTextField>
+                            </ActivatorContent>
+                        </PDateTimePicker>
+                    </MRow>
+                </MContainer>
+                <small>*为必填</small>
+            </MCardText>
+            <MCardActions>
+                <MSpacer></MSpacer>
+                <MButton Color="blue darken-1"
+                         Text
+                         OnClick="() => Visible = false">
+                    关闭
+                </MButton>
+                <MButton Color="blue darken-1"
+                         OnClick="Submit"
+                         Text>
+                    添加
+                </MButton>
+            </MCardActions>
+        </MCard>
+    </ChildContent>
+</MDialog>

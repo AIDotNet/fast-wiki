@@ -17,6 +17,13 @@ public interface IWikiService
     Task<WikiDto> GetAsync(long id);
 
     /// <summary>
+    /// 编辑知识库基本信息
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    Task UpdateAsync(WikiDto dto);
+
+    /// <summary>
     /// 获取知识库列表
     /// </summary>
     /// <param name="keyword"></param>
@@ -80,5 +87,5 @@ public interface IWikiService
     /// <param name="minRelevance"></param>
     /// <returns></returns>
     Task<SearchVectorQuantityResult> GetSearchVectorQuantityAsync(long wikiId, string search,
-        double minRelevance = 0D);
+        double minRelevance = 0.6);
 }

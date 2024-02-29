@@ -10,7 +10,7 @@ public sealed class CompletionsInput
     /// <summary>
     /// 应用Id
     /// </summary>
-    public string ChatApplicationId { get; set; }
+    public string ChatId { get; set; }
 
     public string Content { get; set; }
 }

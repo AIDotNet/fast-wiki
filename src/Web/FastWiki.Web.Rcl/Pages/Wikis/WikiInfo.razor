@@ -39,7 +39,7 @@
                         </ActivatorContent>
                         <ChildContent>
                             <MList Nav Dense>
-                                <WikiUploadLocalFile Value="Id" />
+                                <WikiUploadLocalFile OnSucceed="OnSucceed" Value="Id" />
                                 <MListItem Link>
                                     <MListItemIcon>
                                         <MIcon>mdi-web</MIcon>
@@ -101,7 +101,7 @@
                                     </ActivatorContent>
                                     <ChildContent>
                                         <MList>
-                                            <MListItem OnClick="async () => await Remove(context.Item.Id)">
+                                            <MListItem OnClick=" () =>  Remove(context.Item.Id)">
                                                 <MListItemTitle>删除</MListItemTitle>
                                             </MListItem>
                                         </MList>
@@ -118,12 +118,13 @@
             </MCard>
         </MTabItem>
         <MTabItem>
-            <MCard Flat>
+            <MCard Flat Style="padding:8px;">
                 <WikiSearchTest Value="Id"></WikiSearchTest>
             </MCard>
         </MTabItem>
         <MTabItem>
-            <MCard Flat>
+            <MCard Flat Style="padding:8px;">
+                <WikiConfiguration Value="@Wiki" />
             </MCard>
         </MTabItem>
     </MTabs>

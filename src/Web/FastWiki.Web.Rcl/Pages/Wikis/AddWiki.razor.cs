@@ -8,6 +8,8 @@ public partial class AddWiki
     private IBrowserFile _avatarBrowserFile;
     private CreateWikiInput input = new();
 
+    public List<(string, string)> Models { get; set; } = ChatHelper.GetChatModel();
+
     [Parameter]
     public EventCallback OnSucceed { get; set; }
 

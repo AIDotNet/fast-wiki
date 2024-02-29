@@ -16,8 +16,9 @@ public sealed class Wiki : FullAggregateRoot<long, Guid?>
     /// 知识库模型
     /// </summary>
     public string Model { get; set; }
-
-    protected Wiki() { }
+    protected Wiki()
+    {
+    }
 
     public Wiki(string icon, string name, string model)
     {

@@ -42,6 +42,9 @@
     <_ContentIncludedByDefault Remove="Pages\Wikis\WikiInfo.razor" />
   </ItemGroup>
   <ItemGroup>
+    <Content Update="wwwroot\js\js-helper.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="wwwroot\js\markdow.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
