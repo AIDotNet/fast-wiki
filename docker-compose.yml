@@ -3,6 +3,7 @@ services:
   fast-wiki-service:
     image: registry.cn-shenzhen.aliyuncs.com/fast-wiki/fast-wiki-service
     container_name: fast-wiki-service
+    user: root
     restart: always
     ports:
       - 2181:8080
