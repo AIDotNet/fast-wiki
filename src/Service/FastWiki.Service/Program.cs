@@ -60,12 +60,12 @@ if (app.Environment.IsDevelopment())
 
     #region MigrationDb
 
-    using var context = app.Services.CreateScope().ServiceProvider.GetService<WikiDbContext>();
+    await using var context = app.Services.CreateScope().ServiceProvider.GetService<WikiDbContext>();
     {
-        context!.Database.EnsureCreated();
+        await context!.Database.EnsureCreatedAsync();
 
         // TODO: 创建vector插件如果数据库没有则需要提供支持向量的数据库。
-        context.Database.ExecuteSqlInterpolated($"CREATE EXTENSION IF NOT EXISTS vector;");
+        await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");
     }
 
     #endregion
