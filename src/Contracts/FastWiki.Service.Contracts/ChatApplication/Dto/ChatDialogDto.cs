@@ -6,7 +6,7 @@ public class ChatDialogDto
 
     public string Name { get; set; }
 
-    public string ChatApplicationId { get; set; }
+    public string ChatId { get; set; }
 
     public string Description { get; set; }
 }

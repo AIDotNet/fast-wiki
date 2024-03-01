@@ -1,12 +1,11 @@
-﻿
-<div style="width:@Width;height:@Height">
+﻿<div style="width:@Width;height:@Height">
     @if (FuntionContent != null)
     {
         <div >
             @FuntionContent
         </div>
     }
-    <textarea @bind=Value class="fast-textarea block @Class" placeholder=@Placeholder @onfocus="OnFocus" @onblur="OnBlur" style="width:@Width;height:@Height;resize:none;"></textarea>
+    <textarea @onkeydown="OnKeyDown" @bind=Value class="fast-textarea block @Class" placeholder=@Placeholder @onfocus="OnFocus" @onblur="OnBlur" style="width:@Width;height:@Height;resize:none;"></textarea>
     <div style="display: flex;">
         <MSpacer></MSpacer>
         <MButton OnClick="Submit">

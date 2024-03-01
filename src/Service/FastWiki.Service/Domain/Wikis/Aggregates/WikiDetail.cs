@@ -37,7 +37,7 @@ public sealed class WikiDetail : Entity<long>, IAuditEntity<long>
     /// </summary>
     public string Type { get; set; }
 
-    public long Creator { get; }
+    public long Creator { get; set; }
 
     public DateTime CreationTime { get; set; }
 

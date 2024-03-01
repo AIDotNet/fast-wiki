@@ -1,5 +1,4 @@
 ﻿using FastWiki.Service.Domain.Storage.Aggregates;
-using FastWiki.Service.Domain.Users.Aggregates;
 using System.Text.Json;
 
 namespace FastWiki.Service.DataAccess;
@@ -19,6 +18,8 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
     public DbSet<ChatDialog> ChatDialogs { get; set; }
 
     public DbSet<ChatDialogHistory> ChatDialogHistorys { get; set; }
+
+    public DbSet<ChatShare> ChatShares { get; set; }
 
     protected override void OnModelCreatingExecuting(ModelBuilder modelBuilder)
     {
@@ -42,7 +43,7 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
         modelBuilder.Entity<WikiDetail>(entity =>
         {
-            entity.ToTable("wiki-wiki_details");
+            entity.ToTable("wiki-wiki-details");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
@@ -53,7 +54,7 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
         modelBuilder.Entity<FileStorage>(entity =>
         {
-            entity.ToTable("wiki-file_storages");
+            entity.ToTable("wiki-file-storages");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
@@ -96,7 +97,7 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
             entity.HasKey(x => x.Id);
 
-            entity.HasIndex(x => x.ChatApplicationId);
+            entity.HasIndex(x => x.ChatId);
         });
 
         modelBuilder.Entity<ChatDialogHistory>(entity =>
@@ -105,10 +106,20 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
             entity.HasKey(x => x.Id);
 
-            entity.HasIndex(x => x.ChatApplicationId);
             entity.HasIndex(x => x.ChatDialogId);
             entity.HasIndex(x => x.Creator);
             entity.Property(x => x.Content).HasMaxLength(-1);
+
+        });
+
+        modelBuilder.Entity<ChatShare>(entity =>
+        {
+            entity.ToTable("wiki-chat-share");
+
+
+            entity.HasKey(x => x.Id);
+
+            entity.HasIndex(x => x.ChatApplicationId);
 
         });
 

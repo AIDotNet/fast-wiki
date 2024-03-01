@@ -4,8 +4,8 @@ using System.Net.Http.Json;
 
 namespace FastWiki.ApiGateway.Caller.Service;
 
-public sealed class AuthorizeService(ICaller caller, IHttpClientFactory httpClientFactory)
-    : ServiceBase(caller, httpClientFactory), IAuthorizeService
+public sealed class AuthorizeService(ICaller caller, IHttpClientFactory httpClientFactory,IUserService userService)
+    : ServiceBase(caller, httpClientFactory,userService), IAuthorizeService
 {
     protected override string BaseUrl { get; set; } = "Authorizes";
 

@@ -1,12 +1,15 @@
 ﻿@inject IChatApplicationService ChatApplicationService
 @inject IUserContext UserContext
+@inject LocalStorageJsInterop LocalStorageJsInterop
+@inject JsHelperModule JsHelperModule
+@inject IPopupService PopupService
 
 <div class="chat-container">
     @if (ChatDialogHistory?.Result == null || ChatDialogHistory.Result.Count == 0)
     {
         <div class="message  not-current-user">
             <div class="function-container ">
-                <MAvatar >
+                <MAvatar>
                     <MImage Src="https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg"></MImage>
                 </MAvatar>
             </div>
@@ -28,10 +31,10 @@
                 <div class="function-container ">
                     @if (item.Current)
                     {
-                        <MButton OnClick="async () => await RemoveHistoryAsync(item.Id)" Small Icon>
+                        <MButton OnClick="() =>  RemoveHistoryAsync(item.Id)" Small Icon>
                             <MIcon Small>mdi-delete</MIcon>
                         </MButton>
-                        <MButton Small Icon>
+                        <MButton Small OnClick="()=>OnCopy(item.Content)" Icon>
                             <MIcon Small>mdi-content-copy</MIcon>
                         </MButton>
                         <MAvatar>
@@ -43,10 +46,10 @@
                         <MAvatar>
                             <MImage Src="https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg"></MImage>
                         </MAvatar>
-                        <MButton Small Icon>
+                        <MButton Small OnClick="()=>OnCopy(item.Content)" Icon>
                             <MIcon Small>mdi-content-copy</MIcon>
                         </MButton>
-                        <MButton OnClick="async () => await RemoveHistoryAsync(item.Id)" Small Icon>
+                        <MButton OnClick=" () => RemoveHistoryAsync(item.Id)" Small Icon>
                             <MIcon Small>mdi-delete</MIcon>
                         </MButton>
                     }
@@ -57,7 +60,7 @@
                                  Breaks="true"
                                  Linkify="true"
                                  Typographer="true"
-                                 Class="mt-4 pa-1"/>
+                                 Class="mt-4 pa-1" />
                 </div>
             </div>
         }

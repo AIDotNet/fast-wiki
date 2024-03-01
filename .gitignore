@@ -482,6 +482,8 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+/postgresql
 # Dependencies
 /node_modules
 

@@ -11,6 +11,14 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
         return query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
     }
 
+    public async Task UpdateAsync(Wiki wiki)
+    {
+        await Context.Wikis.Where(x => x.Id == wiki.Id)
+            .ExecuteUpdateAsync(s =>
+                s.SetProperty(b => b.Name, b => wiki.Name)
+                    .SetProperty(b => b.Model, b => wiki.Model));
+    }
+
     /// <inheritdoc />
     public Task<long> GetCountAsync(string? keyword)
     {

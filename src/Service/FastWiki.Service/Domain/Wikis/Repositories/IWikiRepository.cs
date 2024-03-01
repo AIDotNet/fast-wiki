@@ -15,6 +15,13 @@ public interface IWikiRepository : IRepository<Wiki, long>
     Task<List<Wiki>> GetListAsync(string? keyword, int page, int pageSize);
 
     /// <summary>
+    /// 编辑知识库
+    /// </summary>
+    /// <param name="wiki"></param>
+    /// <returns></returns>
+    Task UpdateAsync(Wiki wiki);
+    
+    /// <summary>
     /// 获取知识库数量
     /// </summary>
     /// <param name="keyword"></param>

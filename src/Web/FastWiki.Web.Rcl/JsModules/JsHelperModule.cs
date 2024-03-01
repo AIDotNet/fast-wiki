@@ -16,4 +16,9 @@ public sealed class JsHelperModule(IJSRuntime js) : JSModule(js, "/_content/Fast
     {
         await InvokeVoidAsync("clickElement", element);
     }
+
+    public async ValueTask CopyText(string text)
+    {
+        await InvokeVoidAsync("copyText", text);
+    }
 }

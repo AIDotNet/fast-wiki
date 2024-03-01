@@ -50,7 +50,8 @@ public static class ServiceCollectionExtensions
         {
             var memory = new KernelMemoryBuilder()
                 .WithPostgresMemoryDb(builder.Configuration.GetConnectionString("DefaultConnection"))
-                .WithSimpleFileStorage(new SimpleFileStorageConfig { StorageType = FileSystemTypes.Volatile, Directory = "_files" })
+                .WithSimpleFileStorage(new SimpleFileStorageConfig
+                    { StorageType = FileSystemTypes.Volatile, Directory = "_files" })
                 .WithSearchClientConfig(searchClientConfig)
                 .WithOpenAITextGeneration(new OpenAIConfig()
                 {
@@ -66,8 +67,8 @@ public static class ServiceCollectionExtensions
             return memory;
         });
     }
-    
-    
+
+
     /// <summary>
     /// 注册JWT Bearer认证服务的静态扩展方法
     /// </summary>
@@ -75,7 +76,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddJwtBearerAuthentication(this IServiceCollection services)
     {
         //使用应用密钥得到一个加密密钥字节数组
-        services.AddAuthentication(x =>
+        services
+            .AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -129,7 +131,5 @@ public static class ServiceCollectionExtensions
         {
             OpenAIOption.EmbeddingModel = OPENAI_EMBEDDING_MODEL;
         }
-
-
     }
 }

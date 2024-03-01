@@ -7,6 +7,7 @@ public sealed class WikiCommandHandler(
     IWikiRepository wikiRepository,
     WikiMemoryService wikiMemoryService,
     MemoryServerless memoryServerless,
+    IMapper mapper,
     IEventBus eventBus)
 {
     [EventHandler]
@@ -104,5 +105,12 @@ public sealed class WikiCommandHandler(
     public async Task RemoveWikiDetailVectorQuantityAsync(RemoveWikiDetailVectorQuantityCommand command)
     {
         await memoryServerless.DeleteDocumentAsync(command.DocumentId, "wiki");
+    }
+
+    [EventHandler]
+    public async Task UpdateWikiAsync(UpdateWikiCommand command)
+    {
+        var wiki = mapper.Map<Wiki>(command.Dto);
+        await wikiRepository.UpdateAsync(wiki);
     }
 }

@@ -1,0 +1,48 @@
+﻿@page "/chat/share-chat"
+
+@layout EmptyLayout
+@inject NavigationManager NavigationManager
+@inject LocalStorageJsInterop LocalStorageJsInterop
+@inject IChatApplicationService ChatApplicationService
+<style>
+    .content-container {
+        display: flex;
+    }
+
+    .left-column {
+        width: 160px;
+        min-width: 160px;
+    }
+
+    .middle-column {
+        width: 220px;
+        min-width:220px;
+    }
+
+    .right-column {
+        flex-grow: 1;
+    }
+
+    .vertical-divider {
+        width: 1px; /* 设置宽度为1px */
+        background-color: #E0E0E0; /* 设置分割线颜色为黑色 */
+        height: 100%; /* 设置高度为100px，或者你想要的高度 */
+        margin-left: 10px; /* 可选，设置左边距 */
+        margin-right: 10px; /* 可选，设置右边距 */
+    }
+</style>
+
+<MCard Outlined Style="width: 100%;height: calc(100vh - 20px);margin: 10px;padding: 20px;display: flex;">
+    <div class="middle-column">
+        <MCardTitle>
+            @ChatApplication.Name
+        </MCardTitle>
+        <MDivider></MDivider>
+        <ChatDialog Type="ChatDialogType.ChatShare" ChatId="@GuestId" @bind-Value="ChatDialog"></ChatDialog>
+    </div>
+
+    <div class="vertical-divider"></div>
+    <div class="right-column">
+        <ChatDialogue ChatSharedId="@Id" ChatDialogId="@ChatDialog.Id" ChatApplication="@ChatApplication"></ChatDialogue>
+    </div>
+</MCard>

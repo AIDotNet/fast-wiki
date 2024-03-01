@@ -4,10 +4,13 @@ using Microsoft.SemanticKernel.Text;
 
 namespace FastWiki.Web.Rcl.Pages.Wikis;
 
-public partial class WikiUploadLocalFile
+public partial class WikiUploadLocalFile 
 {
     [Parameter]
     public long Value { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnSucceed { get; set; }
 
     private bool _visible;
 
@@ -159,5 +162,8 @@ public partial class WikiUploadLocalFile
         }
 
         await PopupService.ConfirmAsync("成功", "上传完成", AlertTypes.Success);
+
+        await OnSucceed.InvokeAsync(true);
     }
+
 }

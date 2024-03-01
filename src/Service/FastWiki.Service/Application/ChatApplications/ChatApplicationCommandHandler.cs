@@ -1,3 +1,5 @@
+using DocumentFormat.OpenXml.Wordprocessing;
+using FastWiki.Service.Infrastructure.Helper;
 using Masa.BuildingBlocks.Data.Mapping;
 
 namespace FastWiki.Service.Application.ChatApplications;
@@ -35,7 +37,19 @@ public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplic
     [EventHandler]
     public async Task CreateChatDialogAsync(CreateChatDialogCommand command)
     {
-        var entity = new ChatDialog(command.Input.Name, command.Input.ChatApplicationId, command.Input.Description);
+        var entity = new ChatDialog(command.Input.Name, command.Input.ChatId, command.Input.Description);
+
+        entity.SetType(command.Input.Type);
+
+        await chatApplicationRepository.CreateChatDialogAsync(entity);
+    }
+
+    [EventHandler]
+    public async Task CreateChatDialogChatShareAsync(CreateChatDialogChatShareCommand command)
+    {
+        var entity = new ChatDialog(command.Input.Name, command.Input.ChatId, command.Input.Description);
+
+        entity.SetType(ChatDialogType.ChatShare);
 
         await chatApplicationRepository.CreateChatDialogAsync(entity);
     }
@@ -49,8 +63,9 @@ public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplic
     [EventHandler]
     public async Task CreateChatDialogHistoryAsync(CreateChatDialogHistoryCommand command)
     {
-        var chatDialogHistory = new ChatDialogHistory(command.Input.ChatApplicationId, command.Input.ChatDialogId,
-            command.Input.Content, 0, command.Input.Current, command.Input.Type);
+        var chatDialogHistory = new ChatDialogHistory(command.Input.ChatDialogId,
+            command.Input.Content, TokenHelper.ComputeToken(command.Input.Content), command.Input.Current,
+            command.Input.Type);
 
         await chatApplicationRepository.CreateChatDialogHistoryAsync(chatDialogHistory);
     }
@@ -59,5 +74,13 @@ public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplic
     public async Task RemoveChatDialogHistoryAsync(RemoveChatDialogHistoryCommand command)
     {
         await chatApplicationRepository.RemoveChatDialogHistoryByIdAsync(command.Id);
+    }
+
+    [EventHandler]
+    public async Task CreateChatShareAsync(CreateChatShareCommand command)
+    {
+        var share = new ChatShare(command.Input.Name, command.Input.ChatApplicationId, command.Input.Expires,
+            command.Input.AvailableToken, command.Input.AvailableQuantity);
+        await chatApplicationRepository.CreateChatShareAsync(share);
     }
 }

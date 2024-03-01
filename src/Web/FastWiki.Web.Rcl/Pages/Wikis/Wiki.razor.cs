@@ -21,9 +21,12 @@ public partial class Wiki
         Result = await WikiService.GetWikiListAsync(Search, page, pageSize);
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadingData();
+        if (firstRender)
+        {
+            await LoadingData();
+        }
     }
 
     private async Task Remove(long id)

@@ -10,6 +10,7 @@ public sealed class StorageService : ApplicationService<StorageService>
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
+    [Authorize]
     public async Task<UploadFileResult> UploadFile(HttpContext context)
     {
         var file = context.Request.Form.Files[0];

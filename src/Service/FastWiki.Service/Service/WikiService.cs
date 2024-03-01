@@ -6,6 +6,7 @@
 public sealed class WikiService : ApplicationService<WikiService>, IWikiService
 {
     /// <inheritdoc />
+    [Authorize]
     public async Task CreateAsync(CreateWikiInput input)
     {
         var command = new CreateWikiCommand(input);
@@ -14,6 +15,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
     }
 
     /// <inheritdoc />
+    [Authorize]
     public async Task<WikiDto> GetAsync(long id)
     {
         var query = new WikiQuery(id);
@@ -23,7 +25,16 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         return query.Result;
     }
 
+    [Authorize]
+    public async Task UpdateAsync(WikiDto dto)
+    {
+        var command = new UpdateWikiCommand(dto);
+
+        await EventBus.PublishAsync(command);
+    }
+
     /// <inheritdoc />
+    [Authorize]
     public async Task<PaginatedListBase<WikiDto>> GetWikiListAsync(string? keyword, int page, int pageSize)
     {
         var query = new WikiListQuery(keyword, page, pageSize);
@@ -34,6 +45,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
     }
 
     /// <inheritdoc />
+    [Authorize]
     public async Task RemoveAsync(long id)
     {
         var command = new RemoveWikiCommand(id);
@@ -42,6 +54,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
     }
 
     /// <inheritdoc />
+    [Authorize]
     public async Task CreateWikiDetailsAsync(CreateWikiDetailsInput input)
     {
         var command = new CreateWikiDetailsCommand(input);
@@ -49,6 +62,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         await EventBus.PublishAsync(command);
     }
 
+    [Authorize]
     public async Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId, string? keyword, int page, int pageSize)
     {
         var query = new WikiDetailsQuery(wikiId, keyword, page, pageSize);
@@ -58,6 +72,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         return query.Result;
     }
 
+    [Authorize]
     public async Task RemoveDetailsAsync(long id)
     {
         var command = new RemoveWikiDetailsCommand(id);
@@ -65,6 +80,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         await EventBus.PublishAsync(command);
     }
 
+    [Authorize]
     public async Task<PaginatedListBase<WikiDetailVectorQuantityDto>> GetWikiDetailVectorQuantityAsync(string wikiDetailId, int page, int pageSize)
     {
         var query = new WikiDetailVectorQuantityQuery(wikiDetailId, page, pageSize);
@@ -74,6 +90,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         return query.Result;
     }
 
+    [Authorize]
     public async Task RemoveDetailVectorQuantityAsync(string documentId)
     {
         var command = new RemoveWikiDetailVectorQuantityCommand(documentId);
@@ -81,6 +98,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         await EventBus.PublishAsync(command);
     }
 
+    [Authorize]
     public async Task<SearchVectorQuantityResult> GetSearchVectorQuantityAsync(long wikiId, string search,
         double minRelevance = 0D)
     {

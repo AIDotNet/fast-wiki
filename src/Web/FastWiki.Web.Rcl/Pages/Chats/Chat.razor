@@ -49,13 +49,13 @@
     <div class="left-column">
         <ChatApplicationList @bind-Value="chatApplication" ChatApplication="ChatApplications" />
     </div>
-    <MCard Outlined Style="width: 100%;height: calc(100vh - 80px);margin: 10px;padding: 10px;display: flex;">
+    <MCard Outlined Style="width: 100%;height: calc(100vh - 100px);margin: 10px;padding: 20px;display: flex;">
         <div class="middle-column">
             <MCardTitle>
                 @chatApplication.Name
             </MCardTitle>
             <MDivider></MDivider>
-            <ChatDialog ChatApplicationId="@chatApplication.Id" @bind-Value="ChatDialog"></ChatDialog>
+            <ChatDialog Type="ChatDialogType.ChatApplication" ChatId="@chatApplication.Id" @bind-Value="ChatDialog"></ChatDialog>
         </div>
 
         <div class="vertical-divider"></div>

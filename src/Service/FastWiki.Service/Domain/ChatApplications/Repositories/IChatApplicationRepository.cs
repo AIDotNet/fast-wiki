@@ -23,8 +23,9 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <summary>
     /// 获取对话列表
     /// </summary>
+    /// <param name="queryChatId"></param>
     /// <returns></returns>
-    Task<List<ChatDialog>> GetChatDialogListAsync();
+    Task<List<ChatDialog>> GetChatDialogListAsync(string queryChatId);
 
     /// <summary>
     /// 创建对话记录
@@ -61,4 +62,43 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <param name="id"></param>
     /// <returns></returns>
     Task RemoveChatDialogHistoryByIdAsync(string id);
+
+    /// <summary>
+    /// 创建分享对话
+    /// </summary>
+    /// <param name="share"></param>
+    /// <returns></returns>
+    Task CreateChatShareAsync(ChatShare share);
+
+    /// <summary>
+    /// 获取分享对话列表
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="chatApplicationId"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    Task<List<ChatShare>> GetChatShareListAsync(Guid userId, string chatApplicationId, int page, int pageSize);
+
+    /// <summary>
+    /// 获取分享对话数量
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="chatApplicationId"></param>
+    /// <returns></returns>
+    Task<long> GetChatShareCountAsync(Guid userId, string chatApplicationId);
+
+    /// <summary>
+    /// 获取分享对话
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<ChatShare> GetChatShareAsync(string id);
+
+    /// <summary>
+    /// 通过分享对话获取应用
+    /// </summary>
+    /// <param name="chatShareId"></param>
+    /// <returns></returns>
+    Task<ChatApplication> ChatShareApplicationAsync(string chatShareId);
 }

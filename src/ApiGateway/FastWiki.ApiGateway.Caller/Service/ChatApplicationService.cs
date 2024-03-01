@@ -1,13 +1,12 @@
-using System.Net.Http.Json;
 using FastWiki.ApiGateway.caller.Service;
-using FastWiki.Service.Contracts.ChatApplication;
 using FastWiki.Service.Contracts.ChatApplication.Dto;
 using Masa.Utils.Models;
+using System.Net.Http.Json;
 
 namespace FastWiki.ApiGateway.Caller.Service;
 
-public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory httpClientFactory)
-    : ServiceBase(caller, httpClientFactory), IChatApplicationService
+public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory httpClientFactory,IUserService userService)
+    : ServiceBase(caller, httpClientFactory,userService), IChatApplicationService
 {
     protected override string BaseUrl { get; set; } = "ChatApplications";
 
@@ -41,14 +40,29 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
         return GetAsync<ChatApplicationDto>(nameof(GetAsync) + "/" + id);
     }
 
+    public Task<ChatApplicationDto> GetChatShareApplicationAsync(string chatShareId)
+    {
+        return GetAsync<ChatApplicationDto>(nameof(GetChatShareApplicationAsync), new Dictionary<string, string>()
+        {
+            {
+                "chatShareId", chatShareId
+            }
+        });
+    }
+
     public async Task CreateChatDialogAsync(CreateChatDialogInput input)
     {
         await PostAsync(nameof(CreateChatDialogAsync), input);
     }
 
-    public async Task<List<ChatDialogDto>> GetChatDialogAsync()
+    public async Task<List<ChatDialogDto>> GetChatDialogAsync(string chatId)
     {
-        return await GetAsync<List<ChatDialogDto>>(nameof(GetChatDialogAsync));
+        return await GetAsync<List<ChatDialogDto>>(nameof(GetChatDialogAsync),new Dictionary<string, string>()
+        {
+            {
+                "chatId",chatId
+            }
+        });
     }
 
     public async IAsyncEnumerable<CompletionsDto> CompletionsAsync(CompletionsInput input)
@@ -67,6 +81,22 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
         }
 
         throw new UserFriendlyException("请求异常");
+    }
+
+    public async IAsyncEnumerable<CompletionsDto> ChatShareCompletionsAsync(ChatShareCompletionsInput input)
+    {
+        var response = await SendAsync(HttpMethod.Post, nameof(ChatShareCompletionsAsync), input,
+            HttpCompletionOption.ResponseHeadersRead);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new UserFriendlyException("请求异常");
+        }
+
+        await foreach (var item in response.Content.ReadFromJsonAsAsyncEnumerable<CompletionsDto>())
+        {
+            yield return item;
+        }
     }
 
     public async Task CreateChatDialogHistoryAsync(CreateChatDialogHistoryInput input)
@@ -95,6 +125,29 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
 
     public async Task RemoveDialogHistoryAsync(string id)
     {
-        await DeleteAsync(nameof(RemoveDialogHistoryAsync) + "/"+id);
+        await DeleteAsync(nameof(RemoveDialogHistoryAsync) + "/" + id);
+    }
+
+    public async Task CreateShareAsync(CreateChatShareInput input)
+    {
+        await PostAsync(nameof(CreateShareAsync), input);
+    }
+
+    public async Task<PaginatedListBase<ChatShareDto>> GetChatShareListAsync(string chatApplicationId, int page,
+        int pageSize)
+    {
+        return await GetAsync<PaginatedListBase<ChatShareDto>>(nameof(GetChatShareListAsync),
+            new Dictionary<string, string>()
+            {
+                {
+                    "chatApplicationId", chatApplicationId
+                },
+                {
+                    "page", page.ToString()
+                },
+                {
+                    "pageSize", pageSize.ToString()
+                }
+            });
     }
 }

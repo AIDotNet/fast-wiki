@@ -1,10 +1,11 @@
-﻿using System.Text;
+﻿using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using FastWiki.Service.Contracts;
 
 namespace FastWiki.ApiGateway.caller.Service;
 
-public abstract class ServiceBase(ICaller caller, IHttpClientFactory httpClientFactory)
+public abstract class ServiceBase(ICaller caller, IHttpClientFactory httpClientFactory, IUserService userService)
 {
     protected abstract string BaseUrl { get; set; }
 
@@ -83,6 +84,12 @@ public abstract class ServiceBase(ICaller caller, IHttpClientFactory httpClientF
         HttpCompletionOption option)
     {
         var client = httpClientFactory.CreateClient(Constant.ApiGatewayHttpClient);
+
+        if (client.DefaultRequestHeaders.Authorization == null)
+        {
+            var token = await userService.GetTokenAsync();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
 
         return await client.SendAsync(new HttpRequestMessage()
             {

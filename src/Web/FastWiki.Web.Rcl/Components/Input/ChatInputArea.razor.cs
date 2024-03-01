@@ -27,6 +27,13 @@ public partial class ChatInputArea
         Class = "input-affix-wrapper-focused";
     }
 
+    private async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        if (args is { Key: "Enter", ShiftKey: false, CtrlKey: false, AltKey: false, MetaKey: false })
+        {
+           await Submit();
+        }
+    }
 
     private void OnBlur(FocusEventArgs obj)
     {

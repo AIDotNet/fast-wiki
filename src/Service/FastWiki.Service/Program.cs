@@ -1,5 +1,8 @@
 using FastWiki.Service;
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.GetSection(OpenAIOption.Name)
@@ -8,18 +11,47 @@ builder.Configuration.GetSection(OpenAIOption.Name)
 builder.Configuration.GetSection(JwtOptions.Name)
     .Get<JwtOptions>();
 
-builder.AddLoadEnvironment();
+builder
+    .AddLoadEnvironment();
 
 builder
     .AddFastSemanticKernel();
 
 var app = builder.Services
+    .AddAuthorization()
     .AddJwtBearerAuthentication()
+    .AddMemoryCache()
     .AddEndpointsApiExplorer()
+    .AddMasaIdentity()
     .AddMapster()
     .AddHttpContextAccessor()
     .AddSwaggerGen(options =>
     {
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description =
+                "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer xxxxxxxxxxxxxxx\"",
+        });
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                new string[] { }
+            }
+        });
+
         options.SwaggerDoc("v1",
             new OpenApiInfo
             {
@@ -46,6 +78,9 @@ app.UseMasaExceptionHandler();
 
 app.UseStaticFiles();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger()
@@ -53,12 +88,12 @@ if (app.Environment.IsDevelopment())
 
     #region MigrationDb
 
-    using var context = app.Services.CreateScope().ServiceProvider.GetService<WikiDbContext>();
+    await using var context = app.Services.CreateScope().ServiceProvider.GetService<WikiDbContext>();
     {
-        context!.Database.EnsureCreated();
+        await context!.Database.EnsureCreatedAsync();
 
         // TODO: 创建vector插件如果数据库没有则需要提供支持向量的数据库。
-        context.Database.ExecuteSqlInterpolated($"CREATE EXTENSION IF NOT EXISTS vector;");
+        await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");
     }
 
     #endregion

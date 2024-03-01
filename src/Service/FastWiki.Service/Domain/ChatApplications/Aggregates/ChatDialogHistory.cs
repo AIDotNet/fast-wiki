@@ -1,18 +1,11 @@
-using FastWiki.Service.Contracts;
-
 namespace FastWiki.Service.Domain.ChatApplications.Aggregates;
 
-public class ChatDialogHistory : Entity<string>, IFullAggregateRoot<Guid>
+public sealed class ChatDialogHistory : Entity<string>, IFullAggregateRoot<Guid>
 {
     /// <summary>
     /// 对话id
     /// </summary>
     public string ChatDialogId { get; set; }
-
-    /// <summary>
-    /// 应用Id
-    /// </summary>
-    public string ChatApplicationId { get; set; }
 
     /// <summary>
     /// 对话内容
@@ -44,11 +37,10 @@ public class ChatDialogHistory : Entity<string>, IFullAggregateRoot<Guid>
     {
     }
 
-    public ChatDialogHistory(string chatApplicationId, string chatDialogId, string content, int tokenConsumption,
+    public ChatDialogHistory(string chatDialogId, string content, int tokenConsumption,
         bool current, ChatDialogHistoryType type = ChatDialogHistoryType.Text)
     {
         Id = Guid.NewGuid().ToString("N");
-        ChatApplicationId = chatApplicationId;
         ChatDialogId = chatDialogId;
         Content = content;
         TokenConsumption = tokenConsumption;
