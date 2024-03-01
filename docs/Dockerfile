@@ -2,7 +2,7 @@ FROM nginx:stable-alpine AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM node:16-alpine3.15 AS build
+FROM node:latest AS build
 WORKDIR /src
 COPY . .
 WORKDIR "/src"
