@@ -39,7 +39,7 @@ docker run -d --name fast-wiki-service \
     registry.cn-shenzhen.aliyuncs.com/fast-wiki/fast-wiki-service
 ```
 
-启动fast-wiki-server，`FAST_WIKI_SERVICE`为`fast-wiki-service`的ip地址，因为上传的文件会保存在`fast-wiki-service`的wwwroot目录下，所以需要将`fast-wiki-service`的ip地址替换为自己的ip地址，才能外部正常访问。
+启动fast-wiki-server，`FAST_WIKI_SERVICE`为`fast-wiki-service`的ip地址，因为上传的文件会保存在`fast-wiki-service`的wwwroot目录下，所以需要将`fast-wiki-service`的ip地址替换为自己的ip地址（容器内不要使用127.0.0.1），才能外部正常访问。
 
 ```shell
 
