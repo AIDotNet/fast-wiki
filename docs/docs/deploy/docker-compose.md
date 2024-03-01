@@ -54,7 +54,7 @@ services:
       - FAST_WIKI_SERVICE=http://知识库api的ip:8080 
 ```
 
-修改`docker-compose.yml`中的`{您的TokenKey}`为您的OpenAI Key，如果需要使用自己的代理则修改`OPENAI_CHAT_ENDPOINT`和`OPENAI_CHAT_EMBEDDING_ENDPOINT`为自己的代理地址，`FAST_WIKI_SERVICE`为`fast-wiki-service`的ip地址，因为上传的文件会保存在`fast-wiki-service`的wwwroot目录下，所以需要将`fast-wiki-service`的ip地址替换为自己的ip地址，才能外部正常访问。
+修改`docker-compose.yml`中的`{您的TokenKey}`为您的OpenAI Key，如果需要使用自己的代理则修改`OPENAI_CHAT_ENDPOINT`和`OPENAI_CHAT_EMBEDDING_ENDPOINT`为自己的代理地址，`FAST_WIKI_SERVICE`为`fast-wiki-service`的ip地址，因为上传的文件会保存在`fast-wiki-service`的wwwroot目录下，所以需要将`fast-wiki-service`的ip地址替换为自己的ip地址（容器内不要使用127.0.0.1），才能外部正常访问。
 
 ```shell
 docker-compose up -d
