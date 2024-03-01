@@ -48,8 +48,13 @@ const config: Config = {
           label: "文档",
         },
         {
-          href: "https://github.com/facebook/docusaurus",
+          href: "https://github.com/239573049/fast-wiki",
           label: "GitHub",
+          position: "right",
+        },
+        {
+          href: "https://gitee.com/hejiale010426/fast-wiki",
+          label: "Gitee",
           position: "right",
         },
       ],
