@@ -10,6 +10,8 @@ public partial class ShareChat
 
     private string GuestId;
 
+    private bool? _drawer;
+
     private async Task LoadingChatApplication()
     {
         ChatApplication = await ChatApplicationService.GetChatShareApplicationAsync(Id);

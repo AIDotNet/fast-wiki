@@ -48,11 +48,6 @@ public partial class ChatDialogue
 
     private async Task Submit(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return;
-        }
-
         var user = new ChatDialogHistoryDto()
         {
             ChatDialogId = chatDialogId,

@@ -4,6 +4,7 @@ namespace FastWiki.Web.Rcl.Components.Input;
 
 public partial class ChatInputArea
 {
+
     [Parameter]
     public string Value { get; set; }
 
@@ -31,6 +32,7 @@ public partial class ChatInputArea
     {
         if (args is { Key: "Enter", ShiftKey: false, CtrlKey: false, AltKey: false, MetaKey: false })
         {
+            // 获取value参数
            await Submit();
         }
     }
@@ -42,6 +44,10 @@ public partial class ChatInputArea
 
     private async Task Submit()
     {
+        if (Value.IsNullOrEmpty())
+        {
+            return;
+        }
         await OnSubmit.InvokeAsync(Value);
         Value = string.Empty;
     }

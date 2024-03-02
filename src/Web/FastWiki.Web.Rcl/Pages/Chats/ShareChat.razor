@@ -32,17 +32,20 @@
     }
 </style>
 
-<MCard Outlined Style="width: 100%;height: calc(100vh - 20px);margin: 10px;padding: 20px;display: flex;">
-    <div class="middle-column">
-        <MCardTitle>
-            @ChatApplication.Name
-        </MCardTitle>
-        <MDivider></MDivider>
-        <ChatDialog Type="ChatDialogType.ChatShare" ChatId="@GuestId" @bind-Value="ChatDialog"></ChatDialog>
-    </div>
+<MNavigationDrawer @bind-Value="_drawer"  App>
+    <!-- -->
+    <MCardTitle>
+        @ChatApplication.Name
+    </MCardTitle>
+    <MDivider></MDivider>
+    <ChatDialog Type="ChatDialogType.ChatShare" ChatId="@GuestId" @bind-Value="ChatDialog"></ChatDialog>
+</MNavigationDrawer>
 
-    <div class="vertical-divider"></div>
-    <div class="right-column">
-        <ChatDialogue ChatSharedId="@Id" ChatDialogId="@ChatDialog.Id" ChatApplication="@ChatApplication"></ChatDialogue>
-    </div>
-</MCard>
+<MAppBar App>
+    <MAppBarNavIcon @onclick="()=>_drawer = !(_drawer ?? false)"></MAppBarNavIcon>
+    <MToolbarTitle>@ChatApplication.Name</MToolbarTitle>
+</MAppBar>
+<!-- 根据应用组件来调整你的内容 -->
+<MMain Style="height: 98%;">
+    <ChatDialogue ChatSharedId="@Id" ChatDialogId="@ChatDialog.Id" ChatApplication="@ChatApplication"></ChatDialogue>
+</MMain>

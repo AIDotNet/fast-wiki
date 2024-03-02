@@ -8,6 +8,7 @@ public partial class Chat
 
     private ChatDialogDto ChatDialog = new();
 
+    private bool? _drawer;
     private void ArrowLeft()
     {
         NavigationManager.NavigateTo("/");
