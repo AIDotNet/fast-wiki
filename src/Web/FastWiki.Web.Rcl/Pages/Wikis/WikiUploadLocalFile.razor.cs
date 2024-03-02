@@ -4,7 +4,7 @@ using Microsoft.SemanticKernel.Text;
 
 namespace FastWiki.Web.Rcl.Pages.Wikis;
 
-public partial class WikiUploadLocalFile 
+public partial class WikiUploadLocalFile
 {
     [Parameter]
     public long Value { get; set; }
@@ -44,13 +44,15 @@ public partial class WikiUploadLocalFile
 
     private int _step = 1;
 
-    private readonly Dictionary<IBrowserFile, List<SubsectionInput>>  _files = [];
+    private readonly Dictionary<IBrowserFile, List<SubsectionInput>> _files = [];
 
     public List<UploadSubsectionInput> BrowserFiles = new();
 
     private TrainingPattern _trainingPattern = TrainingPattern.Subsection;
 
     private ProcessMode _processMode = ProcessMode.Auto;
+
+    private bool StartUpload;
 
 
     private readonly List<DataTableHeader<UploadSubsectionInput>> _headers =
@@ -126,6 +128,7 @@ public partial class WikiUploadLocalFile
                 {
                     Count = item.Value.Count,
                     Name = item.Key.Name,
+                    Hash = item.GetHashCode().ToString()
                 });
             }
         }
@@ -133,40 +136,68 @@ public partial class WikiUploadLocalFile
 
     private async Task Upload()
     {
-        foreach (var file in _files)
+        StartUpload = true;
+
+        try
         {
-            var fileItem = BrowserFiles.FirstOrDefault(x => x.Name == file.Key.Name);
-
-            fileItem!.FileProgress = 1;
-
-            var fileInfo = await StorageService.UploadFile(file.Key.OpenReadStream(), file.Key.Name);
-            var input = new CreateWikiDetailsInput()
+            var task = new List<Task>();
+            foreach (var file in _files)
             {
-                Name = file.Key.Name,
-                WikiId = Value,
-                FileId = fileInfo.Id,
-                FilePath = fileInfo.Path,
-                Subsection = subsection,
-                Mode = _processMode,
-                TrainingPattern = _trainingPattern
-            };
+                task.Add( await Task.Factory.StartNew(async v =>
+                {
+                    if (v is not KeyValuePair<IBrowserFile, List<SubsectionInput>> i) return;
 
-            fileItem!.FileProgress = 100;
+                    var fileItem = BrowserFiles.FirstOrDefault(x => x.Hash == i.GetHashCode().ToString());
 
-            _ = InvokeAsync(StateHasChanged);
+                    fileItem!.FileProgress = 1;
 
-            fileItem.DataProgress = 1;
+                    var fileInfo = await StorageService.UploadFile(i.Key.OpenReadStream(), i.Key.Name);
+                    var input = new CreateWikiDetailsInput()
+                    {
+                        Name = i.Key.Name,
+                        WikiId = Value,
+                        FileId = fileInfo.Id,
+                        FilePath = fileInfo.Path,
+                        Subsection = subsection,
+                        Mode = _processMode,
+                        TrainingPattern = _trainingPattern
+                    };
 
-            await WikiService.CreateWikiDetailsAsync(input);
+                    fileItem!.FileProgress = 100;
 
-            fileItem.DataProgress = 100;
+                    _ = InvokeAsync(StateHasChanged);
 
-            _ = InvokeAsync(StateHasChanged);
+                    fileItem.DataProgress = 1;
+
+                    await WikiService.CreateWikiDetailsAsync(input);
+
+                    fileItem.DataProgress = 100;
+
+                    _ = InvokeAsync(StateHasChanged);
+
+                }, file));
+
+
+            }
+
+            // 执行task 每次3个任务
+            var taskList = task.Select((task, index) => (task, index)).GroupBy(x => x.index / 3);
+            foreach (var item in taskList)
+            {
+                var tasks = item.Select(x => x.task).ToArray();
+                await Task.WhenAll(tasks);
+            }
+
+            await PopupService.ConfirmAsync("成功", "上传完成", AlertTypes.Success);
+
+            await OnSucceed.InvokeAsync(true);
+
         }
-
-        await PopupService.ConfirmAsync("成功", "上传完成", AlertTypes.Success);
-
-        await OnSucceed.InvokeAsync(true);
+        catch (Exception e)
+        {
+            await PopupService.ConfirmAsync("失败", e.Message, AlertTypes.Error);
+        }
+        StartUpload = false;
     }
 
 }

@@ -10,4 +10,5 @@ public sealed class UploadSubsectionInput
 
     public int DataProgress { get; set; }
 
+    public string Hash { get; set; }
 }
