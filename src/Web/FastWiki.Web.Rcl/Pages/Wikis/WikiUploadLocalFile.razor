@@ -49,23 +49,32 @@
                 <MStepperItems>
                     <MStepperContent Step="1">
                         <MCard Outlined Class="mb-12">
-                            <DropUpload Multiple Directory OnUploadChanged="UploadChanged">
+                            
+                            <MSwitch @bind-Value="Directory"
+                                     LeftText="文件"
+                                     RightText="目录"
+                                     Style="margin-left: 50%;"
+                                     Color="black"
+                                     TrackColor="#E5E6EB">
+                            </MSwitch>
+
+                            <DropUpload Accept="@string.Join(',', _types)" Multiple Directory="Directory" OnUploadChanged="UploadChanged">
                                 <div class="flex flex-col items-center justify-center h-full upload-item">
                                     <MIcon Size="48">mdi-file-upload</MIcon>
                                     <div class="text-h6">拖拽文件到此处</div>
                                     <div class="text-caption">或点击上传</div>
                                 </div>
                             </DropUpload>
-                            <MCardActions Style="display:block;overflow: auto;max-height: 60vh;">
+                            <MCardActions Style="display: block; overflow: auto; max-height: 60vh;">
                                 @foreach (var item in _files)
                                 {
                                     <MChip Class="ma-2"
                                            Close
                                            Color="green"
                                            TextColor="white"
-                                           OnCloseClick="()=>RemoveFile(item.Key)">
+                                           OnCloseClick="() => RemoveFile(item.Key)">
                                         @item.Key.Name
-                                        <span style="font-size:10px;margin-left:4px;">
+                                        <span style="font-size: 10px; margin-left: 4px;">
                                             文件大小：@StringHelper.FormatBytes(item.Key.Size)
                                         </span>
                                     </MChip>
@@ -114,7 +123,7 @@
                                     }
                                     <MButton Block Color="primary" OnClick="Preview">预览</MButton>
                                 </div>
-                                <div style="flex: 1;margin:15px;">
+                                <div style="flex: 1;margin:15px;height: 70vh;overflow: auto;">
                                     @foreach (var item in _files)
                                     {
                                         @foreach (var input in item.Value)

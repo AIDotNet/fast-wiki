@@ -35,6 +35,8 @@ public partial class WikiUploadLocalFile
             ".pdf"
         ];
 
+    public bool Directory { get; set; }
+
     /// <summary>
     /// 最多支持文件数量
     /// </summary>
