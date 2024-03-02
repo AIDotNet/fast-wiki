@@ -49,14 +49,14 @@
                 <MStepperItems>
                     <MStepperContent Step="1">
                         <MCard Outlined Class="mb-12">
-                            <DropUpload Multiple OnUploadChanged="UploadChanged">
+                            <DropUpload Multiple Directory OnUploadChanged="UploadChanged">
                                 <div class="flex flex-col items-center justify-center h-full upload-item">
                                     <MIcon Size="48">mdi-file-upload</MIcon>
                                     <div class="text-h6">拖拽文件到此处</div>
                                     <div class="text-caption">或点击上传</div>
                                 </div>
                             </DropUpload>
-                            <MCardActions>
+                            <MCardActions Style="display:block;overflow: auto;max-height: 60vh;">
                                 @foreach (var item in _files)
                                 {
                                     <MChip Class="ma-2"
@@ -70,8 +70,9 @@
                                         </span>
                                     </MChip>
                                 }
-                                <MSpacer></MSpacer>
-                                <MButton Color="primary" OnClick="SelectFileHandle">下一步</MButton>
+                            </MCardActions>
+                            <MCardActions>
+                                <MButton Color="primary" Block OnClick="SelectFileHandle">下一步</MButton>
                             </MCardActions>
                         </MCard>
                     </MStepperContent>
@@ -114,31 +115,21 @@
                                     <MButton Block Color="primary" OnClick="Preview">预览</MButton>
                                 </div>
                                 <div style="flex: 1;margin:15px;">
-                                    <MTabs Vertical>
-                                        @foreach (var item in _files)
+                                    @foreach (var item in _files)
+                                    {
+                                        @foreach (var input in item.Value)
                                         {
-                                            <MTab>
-                                                @item.Key.Name @("#" + item.Value.Count)
-                                            </MTab>
+                                            <MCard Style="margin:8px;"
+                                                   Outlined>
+                                                <MCardTitle Style="font-size:16px;font-weight:bold;">
+                                                    @input.Name @("(#" + (item.Value.IndexOf(input) + 1) + ")")
+                                                </MCardTitle>
+                                                <div style="white-space: pre-line;margin:8px;">
+                                                    @input.Content
+                                                </div>
+                                            </MCard>
                                         }
-                                        @foreach (var item in _files)
-                                        {
-                                            <MTabItem Style="overflow:auto;height:calc(100vh - 340px)">
-                                                @foreach (var input in item.Value)
-                                                {
-                                                    <MCard Style="margin:8px;"
-                                                           Outlined>
-                                                        <MCardTitle Style="font-size:16px;font-weight:bold;">
-                                                            @input.Name @("(#" + (item.Value.IndexOf(input) + 1) + ")")
-                                                        </MCardTitle>
-                                                        <div style="white-space: pre-line;margin:8px;">
-                                                            @input.Content
-                                                        </div>
-                                                    </MCard>
-                                                }
-                                            </MTabItem>
-                                        }
-                                    </MTabs>
+                                    }
                                 </div>
                             </div>
                             <MCardActions>

@@ -47,6 +47,9 @@ public class WikiAuthenticationStateProvider(LocalStorageJsInterop localStorageJ
     {
         if (token.IsNullOrEmpty())
         {
+            NotifyAuthenticationStateChanged(
+                Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new NotIIdentity()))));
+
             return;
         }
 

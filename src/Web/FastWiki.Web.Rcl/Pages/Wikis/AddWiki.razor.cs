@@ -44,6 +44,12 @@ public partial class AddWiki
             return;
         }
 
+        if (_avatarBrowserFile.Size > 1024 * 1024 * 5)
+        {
+            await PopupService.EnqueueSnackbarAsync(new SnackbarOptions("知识库头像大小不能超过5M", AlertTypes.Warning));
+            return;
+        }
+
         var result = await StorageService.UploadFile(_avatarBrowserFile.OpenReadStream(), _avatarBrowserFile.Name);
 
         input.Icon = result.Path;

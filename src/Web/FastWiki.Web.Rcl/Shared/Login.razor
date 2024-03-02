@@ -1,4 +1,7 @@
-﻿<MMenu OffsetX Left OffsetY>
+﻿@inject NavigationManager NavigationManager
+@inject LocalStorageJsInterop LocalStorageJsInterop
+
+<MMenu OffsetX Left OffsetY>
     <ActivatorContent Context="menuContext">
         <div class="text-center border-left-solid" style="width:88px;">
             <MAvatar @attributes="menuContext.Attrs" Size=40>
@@ -8,23 +11,13 @@
     </ActivatorContent>
     <ChildContent>
         <MList Dense>
-            <MListItem Link Href="/pages/authentication/login-v1">
+            <MListItem Link OnClick="OnLogout">
                 <MListItemIcon Class="mr-4">
                     <MIcon Size=20 Color="neutral-lighten-4">fa:fas fa-user-circle</MIcon>
                 </MListItemIcon>
                 <MListItemContent>
                     <MListItemTitle>
-                        <span class="neutral-lighten-4--text">Login v1</span>
-                    </MListItemTitle>
-                </MListItemContent>
-            </MListItem>
-            <MListItem Link Href="/pages/authentication/login-v2">
-                <MListItemIcon Class="mr-4">
-                    <MIcon Size=20 Color="neutral-lighten-4">fa:fas fa-sign-in-alt</MIcon>
-                </MListItemIcon>
-                <MListItemContent>
-                    <MListItemTitle>
-                        <span class="neutral-lighten-4--text">Login v2</span>
+                        <span class="neutral-lighten-4--text">退出登录</span>
                     </MListItemTitle>
                 </MListItemContent>
             </MListItem>

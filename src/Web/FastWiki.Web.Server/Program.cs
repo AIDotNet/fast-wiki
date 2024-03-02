@@ -8,7 +8,17 @@ var FAST_WIKI_SERVICE = Environment.GetEnvironmentVariable("FAST_WIKI_SERVICE");
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+builder.Services.AddServerSideBlazor()
+    .AddHubOptions(options =>
+    {
+        options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+        options.EnableDetailedErrors = false;
+        options.HandshakeTimeout = TimeSpan.FromSeconds(15);
+        options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+        options.MaximumParallelInvocationsPerClient = 1;
+        options.MaximumReceiveMessageSize = 64 * 1024;
+        options.StreamBufferCapacity = 10;
+    }); 
 builder.Services
     .AddMasaBlazor(builder =>
     {

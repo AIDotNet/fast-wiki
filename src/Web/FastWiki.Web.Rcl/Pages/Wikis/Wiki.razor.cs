@@ -26,6 +26,7 @@ public partial class Wiki
         if (firstRender)
         {
             await LoadingData();
+            StateHasChanged();
         }
     }
 

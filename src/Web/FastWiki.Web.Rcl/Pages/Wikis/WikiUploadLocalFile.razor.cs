@@ -42,7 +42,7 @@ public partial class WikiUploadLocalFile
 
     private int _step = 1;
 
-    private readonly Dictionary<IBrowserFile, List<SubsectionInput>> _files = [];
+    private readonly Dictionary<IBrowserFile, List<SubsectionInput>>  _files = [];
 
     public List<UploadSubsectionInput> BrowserFiles = new();
 
@@ -84,7 +84,8 @@ public partial class WikiUploadLocalFile
     private void UploadChanged(InputFileChangeEventArgs args)
     {
         _files.Clear();
-        foreach (var item in args.GetMultipleFiles(MaxFilesCount).Where(x => _types.Contains(x.ContentType) || NameSuffix.Any(n => x.Name.EndsWith(n))).ToList())
+        foreach (var item in args.GetMultipleFiles(int.MaxValue)
+                     .Take(MaxFilesCount).Where(x => _types.Contains(x.ContentType) || NameSuffix.Any(n => x.Name.EndsWith(n))).ToList())
         {
             _files.Add(item, []);
         }

@@ -7,30 +7,33 @@
 @inject IHttpClientFactory HttpClientFactory
 
 <MApp>
-    <PPageTabsProvider>
-        <CascadingValue Value="GlobalConfig.Culture.Name" Name="CultureName">
-            <MAppBar Elevation=0 App Height="100" Class="default-app-bar mx-6">
-                <div class="default-app-bar__actions page-mode--tab">
-                    <MSpacer/>
-                    <Language OnLanguageChanged="OnLanguageChanged"/>
-                    <Login/>
-                </div>
-                <div class="default-app-bar__nav page-mode--tab">
-                    <PageTabs @ref="_pageTabs"/>
-                </div>
-            </MAppBar>
+    <MErrorHandler>
 
-            <Navigation/>
+        <PPageTabsProvider>
+            <CascadingValue Value="GlobalConfig.Culture.Name" Name="CultureName">
+                <MAppBar Elevation=0 App Height="100" Class="default-app-bar mx-6">
+                    <div class="default-app-bar__actions page-mode--tab">
+                        <MSpacer />
+                        <Language OnLanguageChanged="OnLanguageChanged" />
+                        <Login />
+                    </div>
+                    <div class="default-app-bar__nav page-mode--tab">
+                        <PageTabs @ref="_pageTabs" />
+                    </div>
+                </MAppBar>
 
-            <MMain Class="fill-lighten-1">
-                <div class="pa-6">
-                    <PPageContainer PageTabs="@_pageTabs?.PPageTabs">
-                        @Body
-                    </PPageContainer>
-                </div>
-            </MMain>
-        </CascadingValue>
-    </PPageTabsProvider>
+                <Navigation />
+
+                <MMain Class="fill-lighten-1">
+                    <div class="pa-6">
+                        <PPageContainer PageTabs="@_pageTabs?.PPageTabs">
+                            @Body
+                        </PPageContainer>
+                    </div>
+                </MMain>
+            </CascadingValue>
+        </PPageTabsProvider>
+    </MErrorHandler>
 </MApp>
 
 <MButton Dark Fab Fixed Bottom Right Href="https://github.com/239573049/fast-wiki">
