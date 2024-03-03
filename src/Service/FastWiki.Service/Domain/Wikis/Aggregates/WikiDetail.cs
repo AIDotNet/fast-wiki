@@ -37,6 +37,8 @@ public sealed class WikiDetail : Entity<long>, IAuditEntity<long>
     /// </summary>
     public string Type { get; set; }
 
+    public WikiQuantizationState State { get; set; }
+
     public long Creator { get; set; }
 
     public DateTime CreationTime { get; set; }
@@ -54,6 +56,7 @@ public sealed class WikiDetail : Entity<long>, IAuditEntity<long>
         Path = path;
         DataCount = dataCount;
         Type = type;
+        State = WikiQuantizationState.None;
     }
 
     protected WikiDetail()

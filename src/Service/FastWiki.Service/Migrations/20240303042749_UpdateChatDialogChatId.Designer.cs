@@ -3,6 +3,7 @@ using System;
 using FastWiki.Service.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FastWiki.Service.Migrations
 {
     [DbContext(typeof(WikiDbContext))]
-    partial class WikiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240303042749_UpdateChatDialogChatId")]
+    partial class UpdateChatDialogChatId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -331,18 +334,18 @@ namespace FastWiki.Service.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("d2b220f9-ec98-4d9e-be8e-d4247c62cd1f"),
+                            Id = new Guid("abd7e154-ed32-4441-9c35-9fd6ab306e23"),
                             Account = "admin",
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                            CreationTime = new DateTime(2024, 3, 3, 5, 1, 46, 361, DateTimeKind.Utc).AddTicks(8631),
+                            CreationTime = new DateTime(2024, 3, 3, 4, 27, 49, 614, DateTimeKind.Utc).AddTicks(6846),
                             Email = "239573049@qq.com",
                             IsDeleted = false,
                             IsDisable = false,
-                            ModificationTime = new DateTime(2024, 3, 3, 5, 1, 46, 361, DateTimeKind.Utc).AddTicks(8633),
+                            ModificationTime = new DateTime(2024, 3, 3, 4, 27, 49, 614, DateTimeKind.Utc).AddTicks(6847),
                             Name = "admin",
-                            Password = "86267b268fed10b00b0f111e0aabc0ec",
+                            Password = "138a300745acabff5c93f604c3a5df9c",
                             Phone = "13049809673",
-                            Salt = "0ec17a397853473ebb701bba84cf9228"
+                            Salt = "9c2182e49a034990a7730b7f80fbfd00"
                         });
                 });
 
@@ -424,9 +427,6 @@ namespace FastWiki.Service.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
-
-                    b.Property<int>("State")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Type")
                         .IsRequired()

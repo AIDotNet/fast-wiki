@@ -73,4 +73,18 @@ public interface IWikiRepository : IRepository<Wiki, long>
     /// <param name="wikiDetailIds"></param>
     /// <returns></returns>
     Task RemoveDetailsAsync(List<long> wikiDetailIds);
+    
+    /// <summary>
+    /// 修改详情状态
+    /// </summary>
+    /// <param name="wikiDetailId"></param>
+    /// <param name="state"></param>
+    /// <returns></returns>
+    Task UpdateDetailsState(long wikiDetailId, WikiQuantizationState state);
+    
+    /// <summary>
+    /// 获取失败的详情量化数据
+    /// </summary>
+    /// <returns></returns>
+    Task<List<WikiDetail>> GetFailedDetailsAsync();
 }

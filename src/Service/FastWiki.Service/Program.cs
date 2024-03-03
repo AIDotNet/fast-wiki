@@ -1,4 +1,5 @@
 using FastWiki.Service;
+using FastWiki.Service.Backgrounds;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
@@ -19,6 +20,7 @@ builder
 
 var app = builder.Services
     .AddAuthorization()
+    .AddHostedService<QuantizeBackgroundService>()
     .AddJwtBearerAuthentication()
     .AddMemoryCache()
     .AddEndpointsApiExplorer()
@@ -90,7 +92,7 @@ if (app.Environment.IsDevelopment())
 
     await using var context = app.Services.CreateScope().ServiceProvider.GetService<WikiDbContext>();
     {
-        await context!.Database.EnsureCreatedAsync();
+        await context!.Database.MigrateAsync();
 
         // TODO: 创建vector插件如果数据库没有则需要提供支持向量的数据库。
         await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");

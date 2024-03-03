@@ -57,6 +57,19 @@ dotnet run
 
 默认账号密码：admin Aa123456
 
+## 环境变量参数
+
+FastWikiService环境变量参数：
+- QUANTIZE_MAX_TASK：量化任务的最大并发数，默认为3
+- OPENAI_CHAT_ENDPOINT：OpenAI API的地址
+- OPENAI_CHAT_EMBEDDING_ENDPOINT： Embedding API的地址
+- OPENAI_CHAT_TOKEN： OpenAI API的Token
+- OPENAI_CHAT_MODEL： 对话的模型，默认gpt-3.5-turbo
+- OPENAI_EMBEDDING_MODEL： Embedding的模型，默认text-embedding-3-small
+
+FastWiki.Web.Server环境变量参数：
+- FAST_WIKI_SERVICE：FastWikiService的地址，默认为http://localhost:5124
+
 ## 技术交流
 
 微信号：hjl010426

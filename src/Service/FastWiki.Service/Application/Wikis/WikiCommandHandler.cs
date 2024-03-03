@@ -1,4 +1,5 @@
 ﻿using FastWiki.Service.Application.Storage.Queries;
+using FastWiki.Service.Backgrounds;
 using FastWiki.Service.Service;
 
 namespace FastWiki.Service.Application.Wikis;
@@ -46,44 +47,49 @@ public sealed class WikiCommandHandler(
     [EventHandler]
     public async Task CreateWikiDetailsAsync(CreateWikiDetailsCommand command)
     {
-        var serverless = wikiMemoryService.CreateMemoryServerless(new SearchClientConfig()
-        {
-            MaxAskPromptSize = 128000,
-            MaxMatchesCount = 3,
-            AnswerTokens = 2000,
-            EmptyAnswer = "知识库未搜索到相关内容"
-        }, command.Input.Mode == ProcessMode.Auto ? 512 : command.Input.Subsection);
+        // var serverless = wikiMemoryService.CreateMemoryServerless(new SearchClientConfig()
+        // {
+        //     MaxAskPromptSize = 128000,
+        //     MaxMatchesCount = 3,
+        //     AnswerTokens = 2000,
+        //     EmptyAnswer = "知识库未搜索到相关内容"
+        // }, command.Input.Mode == ProcessMode.Auto ? 512 : command.Input.Subsection);
 
-        var wikiDetails = new WikiDetail(command.Input.WikiId, command.Input.Name, command.Input.FilePath,
+        var wikiDetail = new WikiDetail(command.Input.WikiId, command.Input.Name, command.Input.FilePath,
             command.Input.FileId, 0, "file");
 
-        var fileInfoQuery = new StorageInfoQuery(command.Input.FileId);
+        wikiDetail = await wikiRepository.AddDetailsAsync(wikiDetail);
 
-        await eventBus.PublishAsync(fileInfoQuery);
-
-        wikiDetails = await wikiRepository.AddDetailsAsync(wikiDetails);
-
-        try
-        {
-            var result = await serverless.ImportDocumentAsync(fileInfoQuery.Result.FullName,
-                wikiDetails.Id.ToString(),
-                tags: new TagCollection()
-                {
-                    {
-                        "wikiId", command.Input.WikiId.ToString()
-                    },
-                    {
-                        "fileId", command.Input.FileId.ToString()
-                    },
-                    {
-                        "wikiDetailId", wikiDetails.Id.ToString()
-                    }
-                }, "wiki");
-        }
-        catch (Exception e)
-        {
-            await wikiRepository.RemoveDetailsAsync(wikiDetails.Id);
-        }
+        await QuantizeBackgroundService.AddWikiDetailAsync(wikiDetail);
+        
+        //
+        // var fileInfoQuery = new StorageInfoQuery(command.Input.FileId);
+        //
+        // await eventBus.PublishAsync(fileInfoQuery);
+        //
+        // wikiDetails = await wikiRepository.AddDetailsAsync(wikiDetails);
+        //
+        // try
+        // {
+        //     var result = await serverless.ImportDocumentAsync(fileInfoQuery.Result.FullName,
+        //         wikiDetails.Id.ToString(),
+        //         tags: new TagCollection()
+        //         {
+        //             {
+        //                 "wikiId", command.Input.WikiId.ToString()
+        //             },
+        //             {
+        //                 "fileId", command.Input.FileId.ToString()
+        //             },
+        //             {
+        //                 "wikiDetailId", wikiDetails.Id.ToString()
+        //             }
+        //         }, "wiki");
+        // }
+        // catch (Exception e)
+        // {
+        //     await wikiRepository.RemoveDetailsAsync(wikiDetails.Id);
+        // }
     }
 
     [EventHandler]

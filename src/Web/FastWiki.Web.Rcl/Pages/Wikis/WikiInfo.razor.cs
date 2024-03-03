@@ -38,6 +38,11 @@ public partial class WikiInfo
             Text = "数据类型",
             Sortable = false, Value = nameof(WikiDetailDto.Type)
         },
+        new()
+        {
+            Text = "数据状态",
+            Sortable = false, Value = nameof(WikiDetailDto.State)
+        },
 
         new()
         {

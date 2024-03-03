@@ -63,6 +63,18 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
         await Context.WikiDetails.Where(x => wikiDetailIds.Contains(x.Id)).ExecuteDeleteAsync();
     }
 
+    public Task UpdateDetailsState(long wikiDetailId, WikiQuantizationState state)
+    {
+        return Context.WikiDetails.Where(x => x.Id == wikiDetailId)
+            .ExecuteUpdateAsync(s => s.SetProperty(b => b.State, b => state));
+    }
+
+    public Task<List<WikiDetail>> GetFailedDetailsAsync()
+    {
+        return Context.WikiDetails
+            .Where(x => x.State == WikiQuantizationState.Fail || x.State == WikiQuantizationState.None).ToListAsync();
+    }
+
 
     private IQueryable<Wiki> CreateQuery(string? keyword)
     {

@@ -5,11 +5,15 @@ public sealed class ChatDialog : Entity<string>, IFullAggregateRoot<Guid>
     public string Name { get; set; }
 
     /// <summary>
-    /// 如果Type是ChatApplication则来源是应用
-    /// 如果Type是ChatShare则来源分享对话的游客
+    /// 游客Id如果是游客对话
     /// </summary>
-    public string ChatId { get; set; }
+    public string? ChatId { get; set; }
 
+    /// <summary>
+    /// 应用Id
+    /// </summary>
+    public string ApplicationId { get; set; }
+    
     public string Description { get; set; }
 
     public ChatDialogType Type { get; set; }

@@ -87,6 +87,10 @@
                             {
                                 <span>@context.Value</span>
                             }
+                            else if (context.Header.Value == nameof(WikiDetailDto.State))
+                            {
+                                <span>@context.Item.StateName</span>
+                            }
                             else
                             {
                                 <MButton OnClick="()=>OpenWikiDetailAsync(context.Item)">

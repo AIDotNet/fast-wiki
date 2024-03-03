@@ -8,5 +8,10 @@ public class CreateChatDialogInput
 
     public string Description { get; set; } = string.Empty;
 
+    /// <summary>
+    /// 应用Id
+    /// </summary>
+    public string ApplicationId { get; set; }
+    
     public ChatDialogType Type { get; set; }
 }

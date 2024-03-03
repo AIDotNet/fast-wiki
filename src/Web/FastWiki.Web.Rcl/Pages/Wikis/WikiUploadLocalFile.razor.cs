@@ -141,51 +141,36 @@ public partial class WikiUploadLocalFile
         try
         {
             var task = new List<Task>();
-            foreach (var file in _files)
+            foreach (var i in _files)
             {
-                task.Add( await Task.Factory.StartNew(async v =>
+                var fileItem = BrowserFiles.FirstOrDefault(x => x.Hash == i.GetHashCode().ToString());
+
+                fileItem!.FileProgress = 1;
+
+                var fileInfo = await StorageService.UploadFile(i.Key.OpenReadStream(), i.Key.Name);
+                var input = new CreateWikiDetailsInput()
                 {
-                    if (v is not KeyValuePair<IBrowserFile, List<SubsectionInput>> i) return;
+                    Name = i.Key.Name,
+                    WikiId = Value,
+                    FileId = fileInfo.Id,
+                    FilePath = fileInfo.Path,
+                    Subsection = subsection,
+                    Mode = _processMode,
+                    TrainingPattern = _trainingPattern
+                };
 
-                    var fileItem = BrowserFiles.FirstOrDefault(x => x.Hash == i.GetHashCode().ToString());
+                fileItem!.FileProgress = 100;
 
-                    fileItem!.FileProgress = 1;
+                _ = InvokeAsync(StateHasChanged);
 
-                    var fileInfo = await StorageService.UploadFile(i.Key.OpenReadStream(), i.Key.Name);
-                    var input = new CreateWikiDetailsInput()
-                    {
-                        Name = i.Key.Name,
-                        WikiId = Value,
-                        FileId = fileInfo.Id,
-                        FilePath = fileInfo.Path,
-                        Subsection = subsection,
-                        Mode = _processMode,
-                        TrainingPattern = _trainingPattern
-                    };
+                fileItem.DataProgress = 1;
 
-                    fileItem!.FileProgress = 100;
+                await WikiService.CreateWikiDetailsAsync(input);
 
-                    _ = InvokeAsync(StateHasChanged);
+                fileItem.DataProgress = 100;
 
-                    fileItem.DataProgress = 1;
+                _ = InvokeAsync(StateHasChanged);
 
-                    await WikiService.CreateWikiDetailsAsync(input);
-
-                    fileItem.DataProgress = 100;
-
-                    _ = InvokeAsync(StateHasChanged);
-
-                }, file));
-
-
-            }
-
-            // 执行task 每次3个任务
-            var taskList = task.Select((task, index) => (task, index)).GroupBy(x => x.index / 3);
-            foreach (var item in taskList)
-            {
-                var tasks = item.Select(x => x.task).ToArray();
-                await Task.WhenAll(tasks);
             }
 
             await PopupService.ConfirmAsync("成功", "上传完成", AlertTypes.Success);

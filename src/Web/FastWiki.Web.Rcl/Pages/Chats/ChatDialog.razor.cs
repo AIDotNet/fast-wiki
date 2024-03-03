@@ -2,22 +2,27 @@
 
 public partial class ChatDialog
 {
-    private string _chatId;
+    private string _applicationId;
 
     [Parameter]
-    public string ChatId
+    public string ApplicationId
     {
-        get => _chatId;
+        get => _applicationId;
         set
         {
-            if (value == ChatId)
+            if (value == ApplicationId)
             {
                 return;
             }
-            _chatId = value;
+            _applicationId = value;
             _ = LoadingDialogAsync();
         }
     }
+
+    /// <summary>
+    /// 游客Id可空
+    /// </summary>
+    [Parameter] public string? ChatId { get; set; }
 
     [Parameter] public ChatDialogType Type { get; set; }
 
@@ -46,19 +51,20 @@ public partial class ChatDialog
 
     private async Task LoadingDialogAsync()
     {
-        _chatDialogs = await ChatApplicationService.GetChatDialogAsync(_chatId);
+        _chatDialogs = await ChatApplicationService.GetChatDialogAsync(_applicationId);
 
-        if (_chatDialogs.Count == 0 && _chatId != null)
+        if (_chatDialogs.Count == 0 && _applicationId != null)
         {
             await ChatApplicationService.CreateChatDialogAsync(new()
             {
                 Name = "默认对话",
-                ChatId = _chatId,
+                ChatId = ChatId,
                 Description = "默认创建的对话",
-                Type = Type
+                Type = Type,
+                ApplicationId = _applicationId
             });
 
-            _chatDialogs = await ChatApplicationService.GetChatDialogAsync(_chatId);
+            _chatDialogs = await ChatApplicationService.GetChatDialogAsync(_applicationId);
         }
 
         SelectedItem = _chatDialogs.First().Id;
@@ -71,11 +77,11 @@ public partial class ChatDialog
         await ChatApplicationService.CreateChatDialogAsync(new()
         {
             Name = "新建对话",
-            ChatId = _chatId,
+            ChatId = _applicationId,
             Description = "新建的对话",
             Type = Type
         });
 
-        _chatDialogs = await ChatApplicationService.GetChatDialogAsync(_chatId);
+        _chatDialogs = await ChatApplicationService.GetChatDialogAsync(_applicationId);
     }
 }

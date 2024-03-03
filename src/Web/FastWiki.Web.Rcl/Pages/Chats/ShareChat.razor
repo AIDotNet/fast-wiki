@@ -38,7 +38,7 @@
         @ChatApplication.Name
     </MCardTitle>
     <MDivider></MDivider>
-    <ChatDialog Type="ChatDialogType.ChatShare" ChatId="@GuestId" @bind-Value="ChatDialog"></ChatDialog>
+    <ChatDialog Type="ChatDialogType.ChatShare" ApplicationId="@ChatApplication.Id" ChatId="@GuestId" @bind-Value="ChatDialog"></ChatDialog>
 </MNavigationDrawer>
 
 <MAppBar App>
