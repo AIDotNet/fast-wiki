@@ -89,7 +89,6 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
 
     /// <param name="chatId"></param>
     /// <inheritdoc />
-    [Authorize]
     public async Task<List<ChatDialogDto>> GetChatShareDialogAsync(string chatId)
     {
         var query = new ChatShareDialogQuery(chatId);
