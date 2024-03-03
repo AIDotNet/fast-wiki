@@ -2,7 +2,10 @@ using Masa.BuildingBlocks.Authentication.Identity;
 
 namespace FastWiki.Service.Application.ChatApplications;
 
-public class ChatApplicationQueryHandler(IChatApplicationRepository chatApplicationRepository, IMapper mapper,IUserContext userContext)
+public class ChatApplicationQueryHandler(
+    IChatApplicationRepository chatApplicationRepository,
+    IMapper mapper,
+    IUserContext userContext)
 {
     [EventHandler]
     public async Task ChatApplicationAsync(ChatApplicationQuery query)
@@ -29,7 +32,15 @@ public class ChatApplicationQueryHandler(IChatApplicationRepository chatApplicat
     [EventHandler]
     public async Task ChatDialogAsync(ChatDialogQuery query)
     {
-        var result = await chatApplicationRepository.GetChatDialogListAsync(query.chatId);
+        var result = await chatApplicationRepository.GetChatDialogListAsync(query.chatId,query.all);
+
+        query.Result = mapper.Map<List<ChatDialogDto>>(result);
+    }
+
+    [EventHandler]
+    public async Task ChatShareDialogAsync(ChatShareDialogQuery query)
+    {
+        var result = await chatApplicationRepository.GetChatShareDialogListAsync(query.chatId);
 
         query.Result = mapper.Map<List<ChatDialogDto>>(result);
     }
@@ -45,7 +56,7 @@ public class ChatApplicationQueryHandler(IChatApplicationRepository chatApplicat
 
         query.Result = new PaginatedListBase<ChatDialogHistoryDto>()
         {
-            Result = mapper.Map<List<ChatDialogHistoryDto>>(result.OrderBy(x=>x.CreationTime)),
+            Result = mapper.Map<List<ChatDialogHistoryDto>>(result.OrderBy(x => x.CreationTime)),
             Total = total
         };
     }

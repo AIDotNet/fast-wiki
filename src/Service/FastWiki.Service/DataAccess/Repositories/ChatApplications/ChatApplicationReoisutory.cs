@@ -37,9 +37,23 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
         }
     }
 
-    public async Task<List<ChatDialog>> GetChatDialogListAsync(string queryChatId)
+    public async Task<List<ChatDialog>> GetChatDialogListAsync(string applicationId, bool all)
     {
-        return await Context.ChatDialogs.Where(x => x.ChatId == queryChatId)
+        var query = Context.ChatDialogs.Where(x => x.ApplicationId == applicationId);
+
+        if (!all)
+        {
+            query = query.Where(x => x.Type == ChatDialogType.ChatApplication);
+        }
+
+        return await query
+            .OrderByDescending(x => x.CreationTime)
+            .ToListAsync();
+    }
+
+    public async Task<List<ChatDialog>> GetChatShareDialogListAsync(string chatId)
+    {
+        return await Context.ChatDialogs.Where(x => x.ChatId == chatId)
             .OrderByDescending(x => x.CreationTime)
             .ToListAsync();
     }

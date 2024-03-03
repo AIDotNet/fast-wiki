@@ -37,19 +37,10 @@ public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplic
     [EventHandler]
     public async Task CreateChatDialogAsync(CreateChatDialogCommand command)
     {
-        var entity = new ChatDialog(command.Input.Name, command.Input.ChatId, command.Input.Description);
+        var entity = new ChatDialog(command.Input.Name, command.Input.ChatId, command.Input.Description,
+            command.Input.ApplicationId);
 
         entity.SetType(command.Input.Type);
-
-        await chatApplicationRepository.CreateChatDialogAsync(entity);
-    }
-
-    [EventHandler]
-    public async Task CreateChatDialogChatShareAsync(CreateChatDialogChatShareCommand command)
-    {
-        var entity = new ChatDialog(command.Input.Name, command.Input.ChatId, command.Input.Description);
-
-        entity.SetType(ChatDialogType.ChatShare);
 
         await chatApplicationRepository.CreateChatDialogAsync(entity);
     }

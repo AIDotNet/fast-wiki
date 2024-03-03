@@ -1,0 +1,32 @@
+﻿@inject IChatApplicationService ChatApplicationService
+
+
+<MCardTitle>
+    对话日志
+</MCardTitle>
+<MDataTable Headers="_headers"
+            Items="chatDialogs"
+            Style="width:100%;">
+    <ItemColContent>
+        @if (context.Header.Value == nameof(ChatDialogDto.Id))
+        {
+            <span>@chatDialogs.IndexOf(context.Item)</span>
+        }
+        else if (context.Header.Value == nameof(ChatDialogDto.Name))
+        {
+            <span>@context.Value</span>
+        }
+        else if (context.Header.Value == nameof(ChatDialogDto.Description))
+        {
+            <span>@context.Value</span>
+        }
+        else if (context.Header.Value == nameof(ChatDialogDto.Type))
+        {
+            <span>@context.Item.TypeName</span>
+        }
+        else
+        {
+            <MButton>查看详情</MButton>
+        }
+    </ItemColContent>
+</MDataTable>

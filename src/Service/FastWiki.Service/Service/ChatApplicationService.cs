@@ -1,5 +1,4 @@
 using FastWiki.Service.Infrastructure.Helper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.SemanticKernel.ChatCompletion;
 
@@ -75,11 +74,25 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
         await EventBus.PublishAsync(command);
     }
 
+    /// <param name="applicationId"></param>
+    /// <param name="all"></param>
+    /// <inheritdoc />
+    [Authorize]
+    public async Task<List<ChatDialogDto>> GetChatDialogAsync(string applicationId, bool all)
+    {
+        var query = new ChatDialogQuery(applicationId,all);
+
+        await EventBus.PublishAsync(query);
+
+        return query.Result;
+    }
+
     /// <param name="chatId"></param>
     /// <inheritdoc />
-    public async Task<List<ChatDialogDto>> GetChatDialogAsync(string chatId)
+    [Authorize]
+    public async Task<List<ChatDialogDto>> GetChatShareDialogAsync(string chatId)
     {
-        var query = new ChatDialogQuery(chatId);
+        var query = new ChatShareDialogQuery(chatId);
 
         await EventBus.PublishAsync(query);
 

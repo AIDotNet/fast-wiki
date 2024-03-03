@@ -57,9 +57,17 @@ public interface IChatApplicationService
     /// <summary>
     /// 获取对话列表
     /// </summary>
+    /// <param name="applicationId"></param>
+    /// <param name="all"></param>
+    /// <returns></returns>
+    Task<List<ChatDialogDto>> GetChatDialogAsync(string applicationId,bool all);
+
+    /// <summary>
+    /// 获取分享对话列表
+    /// </summary>
     /// <param name="chatId"></param>
     /// <returns></returns>
-    Task<List<ChatDialogDto>> GetChatDialogAsync(string chatId);
+    Task<List<ChatDialogDto>> GetChatShareDialogAsync(string chatId);
     
     /// <summary>
     /// 创建对话记录

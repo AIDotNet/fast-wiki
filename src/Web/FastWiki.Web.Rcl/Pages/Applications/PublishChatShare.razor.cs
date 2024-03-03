@@ -65,7 +65,7 @@ public partial class PublishChatShare
     ];
 
 
-    private async Task OnPageChanged(int page)
+    private void OnPageChanged(int page)
     {
         if (this.page == page)
             return;

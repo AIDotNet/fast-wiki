@@ -41,7 +41,7 @@ public sealed class QuantizeBackgroundService : BackgroundService
         var QUANTIZE_MAX_TASK = Environment.GetEnvironmentVariable("QUANTIZE_MAX_TASK");
         if (!string.IsNullOrEmpty(QUANTIZE_MAX_TASK))
         {
-            int?.TryParse(QUANTIZE_MAX_TASK, out MaxTask);
+            int.TryParse(QUANTIZE_MAX_TASK, out MaxTask);
         }
 
         // TODO: 程序启动时加载失败的wikiDetail

@@ -32,13 +32,14 @@ public sealed class ChatDialog : Entity<string>, IFullAggregateRoot<Guid>
     {
     }
 
-    public ChatDialog(string name, string chatId, string description)
+    public ChatDialog(string name, string chatId, string description,string applicationId)
     {
         Id = Guid.NewGuid().ToString("N");
         Name = name;
         ChatId = chatId;
         Description = description;
         Type = ChatDialogType.ChatApplication;
+        ApplicationId = applicationId;
     }
 
     public void SetType(ChatDialogType type)

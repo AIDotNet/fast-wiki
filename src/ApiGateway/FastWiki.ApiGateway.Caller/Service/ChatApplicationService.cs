@@ -55,9 +55,22 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
         await PostAsync(nameof(CreateChatDialogAsync), input);
     }
 
-    public async Task<List<ChatDialogDto>> GetChatDialogAsync(string chatId)
+    public async Task<List<ChatDialogDto>> GetChatDialogAsync(string chatId, bool all)
     {
         return await GetAsync<List<ChatDialogDto>>(nameof(GetChatDialogAsync),new Dictionary<string, string>()
+        {
+            {
+                "applicationId",chatId
+            },
+            {
+                "all",all.ToString()
+            },
+        });
+    }
+
+    public async Task<List<ChatDialogDto>> GetChatShareDialogAsync(string chatId)
+    {
+        return await GetAsync<List<ChatDialogDto>>(nameof(GetChatShareDialogAsync), new Dictionary<string, string>()
         {
             {
                 "chatId",chatId

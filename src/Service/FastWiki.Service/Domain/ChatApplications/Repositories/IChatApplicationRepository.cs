@@ -23,9 +23,17 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <summary>
     /// 获取对话列表
     /// </summary>
-    /// <param name="queryChatId"></param>
+    /// <param name="applicationId"></param>
+    /// <param name="all"></param>
     /// <returns></returns>
-    Task<List<ChatDialog>> GetChatDialogListAsync(string queryChatId);
+    Task<List<ChatDialog>> GetChatDialogListAsync(string applicationId, bool all);
+    
+    /// <summary>
+    /// 获取分享对话列表
+    /// </summary>
+    /// <param name="chatId"></param>
+    /// <returns></returns>
+    Task<List<ChatDialog>> GetChatShareDialogListAsync(string chatId);
 
     /// <summary>
     /// 创建对话记录
