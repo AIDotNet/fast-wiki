@@ -44,6 +44,11 @@ public sealed class WikiService(ICaller caller, IHttpClientFactory httpClientFac
         await PostAsync(nameof(CreateWikiDetailsAsync), input);
     }
 
+    public async Task CreateWikiDetailWebPageInputAsync(CreateWikiDetailWebPageInput input)
+    {
+        await PostAsync(nameof(CreateWikiDetailWebPageInputAsync), input);
+    }
+
     public async Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId, string? keyword, int page,
         int pageSize)
     {

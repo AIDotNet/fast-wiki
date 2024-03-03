@@ -1,10 +1,14 @@
 using DocumentFormat.OpenXml.Wordprocessing;
 using FastWiki.Service.Infrastructure.Helper;
+using Masa.BuildingBlocks.Authentication.Identity;
 using Masa.BuildingBlocks.Data.Mapping;
 
 namespace FastWiki.Service.Application.ChatApplications;
 
-public class ChatApplicationCommandHandler(IChatApplicationRepository chatApplicationRepository, IMapper mapper)
+public class ChatApplicationCommandHandler(
+    IChatApplicationRepository chatApplicationRepository,
+    IMapper mapper,
+    IUserContext userContext)
 {
     [EventHandler]
     public async Task CreateChatApplicationAsync(CreateChatApplicationCommand command)

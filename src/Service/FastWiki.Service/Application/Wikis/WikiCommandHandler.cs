@@ -47,49 +47,34 @@ public sealed class WikiCommandHandler(
     [EventHandler]
     public async Task CreateWikiDetailsAsync(CreateWikiDetailsCommand command)
     {
-        // var serverless = wikiMemoryService.CreateMemoryServerless(new SearchClientConfig()
-        // {
-        //     MaxAskPromptSize = 128000,
-        //     MaxMatchesCount = 3,
-        //     AnswerTokens = 2000,
-        //     EmptyAnswer = "知识库未搜索到相关内容"
-        // }, command.Input.Mode == ProcessMode.Auto ? 512 : command.Input.Subsection);
-
         var wikiDetail = new WikiDetail(command.Input.WikiId, command.Input.Name, command.Input.FilePath,
             command.Input.FileId, 0, "file");
 
         wikiDetail = await wikiRepository.AddDetailsAsync(wikiDetail);
-
-        await QuantizeBackgroundService.AddWikiDetailAsync(wikiDetail);
         
-        //
-        // var fileInfoQuery = new StorageInfoQuery(command.Input.FileId);
-        //
-        // await eventBus.PublishAsync(fileInfoQuery);
-        //
-        // wikiDetails = await wikiRepository.AddDetailsAsync(wikiDetails);
-        //
-        // try
-        // {
-        //     var result = await serverless.ImportDocumentAsync(fileInfoQuery.Result.FullName,
-        //         wikiDetails.Id.ToString(),
-        //         tags: new TagCollection()
-        //         {
-        //             {
-        //                 "wikiId", command.Input.WikiId.ToString()
-        //             },
-        //             {
-        //                 "fileId", command.Input.FileId.ToString()
-        //             },
-        //             {
-        //                 "wikiDetailId", wikiDetails.Id.ToString()
-        //             }
-        //         }, "wiki");
-        // }
-        // catch (Exception e)
-        // {
-        //     await wikiRepository.RemoveDetailsAsync(wikiDetails.Id);
-        // }
+        QuantizeWikiDetail quantizeWikiDetail = mapper.Map<QuantizeWikiDetail>(wikiDetail);
+        quantizeWikiDetail.Subsection = command.Input.Subsection;
+        quantizeWikiDetail.Mode = command.Input.Mode;
+        quantizeWikiDetail.TrainingPattern = command.Input.TrainingPattern;
+        
+        await QuantizeBackgroundService.AddWikiDetailAsync(quantizeWikiDetail);
+
+    }
+
+    [EventHandler]
+    public async Task CreateWikiDetailWebPageAsync(CreateWikiDetailWebPageCommand command)
+    {
+        var wikiDetail = new WikiDetail(command.Input.WikiId, command.Input.Name, command.Input.Path,
+            -1, 0, "web");
+
+        wikiDetail = await wikiRepository.AddDetailsAsync(wikiDetail);
+
+        QuantizeWikiDetail quantizeWikiDetail = mapper.Map<QuantizeWikiDetail>(wikiDetail);
+        quantizeWikiDetail.Subsection = command.Input.Subsection;
+        quantizeWikiDetail.Mode = command.Input.Mode;
+        quantizeWikiDetail.TrainingPattern = command.Input.TrainingPattern;
+
+        await QuantizeBackgroundService.AddWikiDetailAsync(quantizeWikiDetail);
     }
 
     [EventHandler]

@@ -33,6 +33,8 @@ public partial class Application
     private async Task Remove(string id)
     {
         await ChatApplicationService.RemoveAsync(id);
+
+        await Loading();
     }
 
     private async Task OnSearch()

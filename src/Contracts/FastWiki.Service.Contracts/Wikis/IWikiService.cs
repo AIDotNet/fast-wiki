@@ -45,6 +45,13 @@ public interface IWikiService
     /// <param name="input"></param>
     /// <returns></returns>
     Task CreateWikiDetailsAsync(CreateWikiDetailsInput input);
+    
+    /// <summary>
+    /// 创建知识库详情 Web 页面
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    Task CreateWikiDetailWebPageInputAsync(CreateWikiDetailWebPageInput input);
 
     /// <summary>
     /// 获取知识库详情列表
