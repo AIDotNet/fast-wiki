@@ -21,7 +21,7 @@ public partial class ApplicationSessionLog
 
         new()
         {
-            Text = "索引数量",
+            Text = "描述",
             Sortable = false, Value = nameof(ChatDialogDto.Description)
         },
         new()
