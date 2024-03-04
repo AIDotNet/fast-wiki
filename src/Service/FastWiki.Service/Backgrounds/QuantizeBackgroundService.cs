@@ -1,5 +1,7 @@
 using System.Threading.Channels;
+using FastWiki.Service.Domain.Wikis.Aggregates;
 using FastWiki.Service.Service;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FastWiki.Service.Backgrounds;
 
@@ -45,9 +47,18 @@ public sealed class QuantizeBackgroundService : BackgroundService
             int.TryParse(QUANTIZE_MAX_TASK, out MaxTask);
         }
 
+        if (MaxTask < 0)
+        {
+            MaxTask = 1;
+        }
+
         // TODO: 首次启动程序的时候需要加载未处理的量化数据
         await LoadingWikiDetailAsync();
-        await Task.Factory.StartNew(WikiDetailHandlerAsync, stoppingToken);
+
+        for (int i = 0; i < MaxTask; i++)
+        {
+            await Task.Factory.StartNew(WikiDetailHandlerAsync, stoppingToken);
+        }
     }
 
     /// <summary>
@@ -61,110 +72,92 @@ public sealed class QuantizeBackgroundService : BackgroundService
 
     private async Task WikiDetailHandlerAsync()
     {
+        using var asyncServiceScope = _serviceProvider.CreateScope();
         while (await WikiDetails.Reader.WaitToReadAsync())
         {
+            Interlocked.Increment(ref CurrentTask);
             var wikiDetail = await WikiDetails.Reader.ReadAsync();
-
-            if (wikiDetail != null)
-            {
-                for (var i = 0; i < 200; i++)
-                {
-                    if (CurrentTask < MaxTask)
-                    {
-                        _ = HandlerAsync(wikiDetail);
-                        break;
-                    }
-
-                    await Task.Delay(500);
-                }
-            }
+            await HandlerAsync(wikiDetail, asyncServiceScope.ServiceProvider);
+            Interlocked.Decrement(ref CurrentTask);
         }
     }
 
     /// <summary>
     /// 处理量化
     /// </summary>
-    /// <param name="state"></param>
-    private async ValueTask HandlerAsync(object state)
+    /// <param name="wikiDetail"></param>
+    private async ValueTask HandlerAsync(QuantizeWikiDetail wikiDetail, IServiceProvider service)
     {
-        Interlocked.Increment(ref CurrentTask);
-        if (state is QuantizeWikiDetail wikiDetail)
+        var fileStorageRepository = service.GetRequiredService<IFileStorageRepository>();
+        var wikiRepository = service.GetRequiredService<IWikiRepository>();
+        var wikiMemoryService = service.GetRequiredService<WikiMemoryService>();
+        var wiki = await wikiRepository.FindAsync(x => x.Id == wikiDetail.WikiId);
+        if (wikiDetail.Subsection == 0)
         {
-            using var asyncServiceScope = _serviceProvider.CreateScope();
-
-            var fileStorageRepository = asyncServiceScope.ServiceProvider.GetRequiredService<IFileStorageRepository>();
-            var wikiRepository = asyncServiceScope.ServiceProvider.GetRequiredService<IWikiRepository>();
-            var wikiMemoryService = asyncServiceScope.ServiceProvider.GetRequiredService<WikiMemoryService>();
-            var wiki = await wikiRepository.FindAsync(x => x.Id == wikiDetail.WikiId);
-            if (wikiDetail.Subsection == 0)
-            {
-                wikiDetail.Subsection = 512;
-            }
-
-            // 获取知识库配置的模型，如果没有则使用默认模型
-            var serverless = wikiMemoryService.CreateMemoryServerless(new SearchClientConfig(),
-                wikiDetail.Mode == ProcessMode.Auto ? 512 : wikiDetail.Subsection, wiki?.Model, wiki?.EmbeddingModel);
-
-            try
-            {
-                Console.WriteLine($"开始量化：ʼ{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId}");
-
-                string result = string.Empty;
-                if (wikiDetail.Type == "file")
-                {
-                    var fileInfoQuery = await fileStorageRepository.FindAsync(x => x.Id == wikiDetail.FileId);
-
-                    result = await serverless.ImportDocumentAsync(fileInfoQuery.FullName,
-                        wikiDetail.Id.ToString(),
-                        tags: new TagCollection()
-                        {
-                            {
-                                "wikiId", wikiDetail.WikiId.ToString()
-                            },
-                            {
-                                "fileId", wikiDetail.FileId.ToString()
-                            },
-                            {
-                                "wikiDetailId", wikiDetail.Id.ToString()
-                            }
-                        }, "wiki");
-                }
-                else if (wikiDetail.Type == "web")
-                {
-                    result = await serverless.ImportWebPageAsync(wikiDetail.Path,
-                        wikiDetail.Id.ToString(),
-                        tags: new TagCollection()
-                        {
-                            {
-                                "wikiId", wikiDetail.WikiId.ToString()
-                            },
-                            {
-                                "wikiDetailId", wikiDetail.Id.ToString()
-                            }
-                        }, "wiki");
-                }
-
-                await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Accomplish);
-                Console.WriteLine($"量化成功：{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {result}");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(
-                    $"量化失败{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {Environment.NewLine + e.Message}");
-
-                // TODO: 由于api可能存在限流，如果出现异常大概率是限流导致，在这里等待一会
-                await Task.Delay(500);
-
-                if (wikiDetail.State != WikiQuantizationState.Fail)
-                {
-                    await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Fail);
-                }
-
-                await AddWikiDetailAsync(wikiDetail);
-            }
+            wikiDetail.Subsection = 512;
         }
 
-        Interlocked.Decrement(ref CurrentTask);
+        // 获取知识库配置的模型，如果没有则使用默认模型
+        var serverless = wikiMemoryService.CreateMemoryServerless(new SearchClientConfig(),
+        wikiDetail.Mode == ProcessMode.Auto ? 512 : wikiDetail.Subsection, wiki?.Model, wiki?.EmbeddingModel);
+        try
+        {
+            Console.WriteLine($"开始量化：ʼ{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId}");
+
+            string result = string.Empty;
+            if (wikiDetail.Type == "file")
+            {
+                var fileInfoQuery = await fileStorageRepository.FindAsync(x => x.Id == wikiDetail.FileId);
+
+                result = await serverless.ImportDocumentAsync(fileInfoQuery.FullName,
+                    wikiDetail.Id.ToString(),
+                tags: new TagCollection()
+                {
+                            {
+                                "wikiId", wikiDetail.WikiId.ToString()
+                    },
+                            {
+                                "fileId", wikiDetail.FileId.ToString()
+                    },
+                            {
+                                "wikiDetailId", wikiDetail.Id.ToString()
+                    }
+                    }, "wiki");
+            }
+            else if (wikiDetail.Type == "web")
+            {
+                result = await serverless.ImportWebPageAsync(wikiDetail.Path,
+                    wikiDetail.Id.ToString(),
+                    tags: new TagCollection()
+                    {
+                        {
+                                "wikiId", wikiDetail.WikiId.ToString()
+                        },
+                        {
+                                "wikiDetailId", wikiDetail.Id.ToString()
+                            }
+                    }, "wiki");
+            }
+
+            await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Accomplish);
+            Console.WriteLine($"量化成功：{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {result}");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(
+            $"量化失败{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {Environment.NewLine + e.Message}");
+
+            // TODO: 由于api可能存在限流，如果出现异常大概率是限流导致，在这里等待一会
+            await Task.Delay(500);
+
+            if (wikiDetail.State != WikiQuantizationState.Fail)
+            {
+                await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Fail);
+            }
+
+            await AddWikiDetailAsync(wikiDetail);
+        }
+
     }
 
     private async Task LoadingWikiDetailAsync()
