@@ -70,8 +70,6 @@ public partial class ChatDialogue
 
         ChatDialogHistory.Result.Add(chat);
 
-        int size = 0;
-
         if (ChatSharedId.IsNullOrWhiteSpace())
         {
             await foreach (var item in ChatApplicationService.CompletionsAsync(new CompletionsInput()
@@ -87,12 +85,7 @@ public partial class ChatDialogue
                     chat.SourceFile.AddRange(item.SourceFile);
                 }
 
-                size++;
-                if (size > 3)
-                {
-                    await ScrollToBottom();
-                    size = 0;
-                }
+                await ScrollToBottom();
             }
         }
         else
@@ -110,12 +103,7 @@ public partial class ChatDialogue
                     chat.SourceFile.AddRange(item.SourceFile);
                 }
 
-                size++;
-                if (size > 3)
-                {
-                    await ScrollToBottom();
-                    size = 0;
-                }
+                await ScrollToBottom();
             }
         }
 
