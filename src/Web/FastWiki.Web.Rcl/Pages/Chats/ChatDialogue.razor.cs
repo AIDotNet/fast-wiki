@@ -42,6 +42,7 @@ public partial class ChatDialogue
     {
         ChatDialogHistory = await ChatApplicationService.GetChatDialogHistoryAsync(ChatDialogId, page, pageSize);
         await InvokeAsync(StateHasChanged);
+
     }
 
     private async Task Submit(string value)
@@ -129,7 +130,7 @@ public partial class ChatDialogue
     private async Task ScrollToBottom()
     {
         await JsHelperJsInterop.ScrollToBottom("chat-dialogue");
-        await InvokeAsync(StateHasChanged);
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private async Task RemoveHistoryAsync(string id)
