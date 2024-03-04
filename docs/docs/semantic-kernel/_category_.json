@@ -1,0 +1,14 @@
+{
+    "position": 5,
+    "label": "semantic-kernel",
+    "collapsible": true,
+    "collapsed": false,
+    "className": "red",
+    "link": {
+        "type": "generated-index",
+        "title": "semantic-kernel"
+    },
+    "customProps": {
+        "description": "semantic-kernel中文文档！"
+    }
+}

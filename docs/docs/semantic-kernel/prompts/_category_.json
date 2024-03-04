@@ -1,0 +1,14 @@
+{
+    "position": 3,
+    "label": "Prompt 工程",
+    "collapsible": true,
+    "collapsed": false,
+    "className": "red",
+    "link": {
+        "type": "generated-index",
+        "title": "Prompt 工程"
+    },
+    "customProps": {
+        "description": "Prompt 工程"
+    }
+}
