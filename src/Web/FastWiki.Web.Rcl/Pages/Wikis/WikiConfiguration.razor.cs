@@ -9,6 +9,8 @@ public partial class WikiConfiguration
 
     public List<(string, string)> Models { get; set; } = ChatHelper.GetChatModel();
 
+    public List<(string, string)> EmbeddingModels { get; set; } = ChatHelper.GetEmbeddingModel();
+
     private async Task SubmitAsync()
     {
         await WikiService.UpdateAsync(Value);

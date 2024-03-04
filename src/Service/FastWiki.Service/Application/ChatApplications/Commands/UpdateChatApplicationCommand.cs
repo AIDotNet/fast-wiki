@@ -1,5 +1,3 @@
-using FastWiki.Service.Contracts.ChatApplication.Dto;
-
 namespace FastWiki.Service.Application.ChatApplications.Commands;
 
 /// <summary>

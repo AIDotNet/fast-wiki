@@ -16,7 +16,8 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
         await Context.Wikis.Where(x => x.Id == wiki.Id)
             .ExecuteUpdateAsync(s =>
                 s.SetProperty(b => b.Name, b => wiki.Name)
-                    .SetProperty(b => b.Model, b => wiki.Model));
+                    .SetProperty(b => b.Model, b => wiki.Model)
+                    .SetProperty(b => b.EmbeddingModel, b => wiki.EmbeddingModel));
     }
 
     /// <inheritdoc />
@@ -77,7 +78,8 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
 
     public async Task RemoveDetailsVectorAsync(string index, string id)
     {
-        await Context.Database.ExecuteSqlRawAsync($"delete from \"{ConnectionStringsOptions.TableNamePrefix + index}\" where id='{id}';");
+        await Context.Database.ExecuteSqlRawAsync(
+            $"delete from \"{ConnectionStringsOptions.TableNamePrefix + index}\" where id='{id}';");
     }
 
 

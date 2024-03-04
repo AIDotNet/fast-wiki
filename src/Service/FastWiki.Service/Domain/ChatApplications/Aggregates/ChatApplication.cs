@@ -85,4 +85,14 @@ public sealed class ChatApplication : FullAggregateRoot<string, Guid?>
     /// </summary>
     public double Relevancy { get; set; } = 0.4;
 
+    /// <summary>
+    /// 未找到的回答模板
+    /// 如果模板为空则使用Chat对话模型回答。
+    /// </summary>
+    public string? NoReplyFoundTemplate { get; set; }
+
+    /// <summary>
+    /// 显示引用文件
+    /// </summary>
+    public bool ShowSourceFile { get; set; }
 }

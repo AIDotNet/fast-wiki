@@ -1,3 +1,6 @@
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using FastWiki.Service.Application.Storage.Queries;
+using FastWiki.Service.Domain.Storage.Aggregates;
 using FastWiki.Service.Infrastructure.Helper;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -80,7 +83,7 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
     [Authorize]
     public async Task<List<ChatDialogDto>> GetChatDialogAsync(string applicationId, bool all)
     {
-        var query = new ChatDialogQuery(applicationId,all);
+        var query = new ChatDialogQuery(applicationId, all);
 
         await EventBus.PublishAsync(query);
 
@@ -113,6 +116,7 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
 
         var prompt = string.Empty;
 
+        var sourceFile = new List<FileStorage>();
         // 如果为空则不使用知识库
         if (chatApplicationQuery.Result.WikiIds.Count != 0)
         {
@@ -124,10 +128,49 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
 
             var result = await memoryServerless.SearchAsync(input.Content, "wiki", filters: filters, limit: 3);
 
+            var fileIds = new List<long>();
+
             result.Results.ForEach(x =>
             {
+                // 获取fileId
+                var fileId = x.Partitions.Select(x => x.Tags.FirstOrDefault(x => x.Key == "fileId"))
+                    .FirstOrDefault(x => !x.Value.IsNullOrEmpty())
+                    .Value.FirstOrDefault();
+
+                if (!fileId.IsNullOrWhiteSpace() && long.TryParse(fileId, out var id))
+                {
+                    fileIds.Add(id);
+                }
+
                 prompt += string.Join(Environment.NewLine, x.Partitions.Select(x => x.Text));
             });
+
+            if (result.Results.Count == 0 &&
+                !string.IsNullOrWhiteSpace(chatApplicationQuery.Result.NoReplyFoundTemplate))
+            {
+                yield return new CompletionsDto()
+                {
+                    Content = chatApplicationQuery.Result.NoReplyFoundTemplate
+                };
+                yield break;
+            }
+
+            var tokens = TokenHelper.GetGptEncoding().Encode(prompt);
+
+            prompt = TokenHelper.GetGptEncoding()
+                .Decode(tokens.Take(chatApplicationQuery.Result.MaxResponseToken).ToList());
+
+            input.Content = chatApplicationQuery.Result.Template.Replace("{{quote}}", prompt)
+                .Replace("{{question}}", input.Content);
+
+            if (fileIds.Count > 0 && chatApplicationQuery.Result.ShowSourceFile)
+            {
+                var fileQuery = new StorageInfosQuery(fileIds);
+
+                await EventBus.PublishAsync(fileQuery);
+
+                sourceFile.AddRange(fileQuery.Result);
+            }
         }
 
         var chatStream = wikiMemoryService.CreateOpenAIChatCompletionService(chatApplicationQuery.Result.ChatModel);
@@ -163,9 +206,22 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
         {
             yield return new CompletionsDto()
             {
-                Content = item.Content ?? string.Empty
+                Content = item.Content ?? string.Empty,
             };
             await Task.Delay(1);
+        }
+
+        if (sourceFile.Count > 0)
+        {
+            yield return new CompletionsDto()
+            {
+                SourceFile = sourceFile.Select(x => new SourceFileDto()
+                {
+                    Name = x.Name,
+                    FilePath = x.Path,
+                    FileId = x.Id.ToString()
+                }).ToList()
+            };
         }
     }
 
@@ -186,6 +242,8 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
 
         var prompt = string.Empty;
 
+        var sourceFile = new List<FileStorage>();
+
         // 如果为空则不使用知识库
         if (chatApplicationQuery.Result.WikiIds.Count != 0)
         {
@@ -197,17 +255,49 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
             var result = await memoryServerless.SearchAsync(input.Content, "wiki", filters: filters, limit: 3,
                 minRelevance: chatApplicationQuery.Result.Relevancy);
 
+            var fileIds = new List<long>();
+
             result.Results.ForEach(x =>
             {
+                // 获取fileId
+                var fileId = x.Partitions.Select(x => x.Tags.FirstOrDefault(x => x.Key == "fileId"))
+                    .FirstOrDefault(x => !x.Value.IsNullOrEmpty())
+                    .Value.FirstOrDefault();
+
+                if (!fileId.IsNullOrWhiteSpace() && long.TryParse(fileId, out var id))
+                {
+                    fileIds.Add(id);
+                }
+
                 prompt += string.Join(Environment.NewLine, x.Partitions.Select(x => x.Text));
             });
 
+            if (result.Results.Count == 0 &&
+                !string.IsNullOrWhiteSpace(chatApplicationQuery.Result.NoReplyFoundTemplate))
+            {
+                yield return new CompletionsDto()
+                {
+                    Content = chatApplicationQuery.Result.NoReplyFoundTemplate
+                };
+                yield break;
+            }
+
             var tokens = TokenHelper.GetGptEncoding().Encode(prompt);
 
-            prompt = TokenHelper.GetGptEncoding().Decode(tokens.Take(chatApplicationQuery.Result.MaxResponseToken).ToList());
+            prompt = TokenHelper.GetGptEncoding()
+                .Decode(tokens.Take(chatApplicationQuery.Result.MaxResponseToken).ToList());
 
             input.Content = chatApplicationQuery.Result.Template.Replace("{{quote}}", prompt)
                 .Replace("{{question}}", input.Content);
+
+            if (fileIds.Count > 0 && chatApplicationQuery.Result.ShowSourceFile)
+            {
+                var fileQuery = new StorageInfosQuery(fileIds);
+
+                await EventBus.PublishAsync(fileQuery);
+
+                sourceFile.AddRange(fileQuery.Result);
+            }
         }
 
         var chatHistory = new ChatHistory();
@@ -267,9 +357,22 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
         {
             yield return new CompletionsDto()
             {
-                Content = item.Content ?? string.Empty
+                Content = item.Content ?? string.Empty,
             };
             await Task.Delay(1);
+        }
+
+        if (sourceFile.Count > 0)
+        {
+            yield return new CompletionsDto()
+            {
+                SourceFile = sourceFile.Select(x => new SourceFileDto()
+                {
+                    Name = x.Name,
+                    FilePath = x.Path,
+                    FileId = x.Id.ToString()
+                }).ToList()
+            };
         }
     }
 

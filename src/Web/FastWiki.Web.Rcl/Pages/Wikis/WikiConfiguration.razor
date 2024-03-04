@@ -10,12 +10,20 @@
                Rows="5"
                RowHeight="15">
     </MTextarea>
-
+    
     <MSelect Items="Models"
              @bind-Value="@Value.Model"
              ItemText="u => u.Item1"
              ItemValue="u => u.Item2"
              Label="选择对话基础模型"
+             Dense
+             Outlined></MSelect>
+
+    <MSelect Items="EmbeddingModels"
+             @bind-Value="@Value.EmbeddingModel"
+             ItemText="u => u.Item1"
+             ItemValue="u => u.Item2"
+             Label="选择量化模型"
              Dense
              Outlined></MSelect>
 

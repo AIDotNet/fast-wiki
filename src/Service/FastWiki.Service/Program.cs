@@ -1,6 +1,8 @@
 using FastWiki.Service;
 using FastWiki.Service.Backgrounds;
 using Masa.Contrib.Authentication.Identity;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
@@ -82,7 +84,17 @@ var app = builder.Services
 
 app.UseMasaExceptionHandler();
 
-app.UseStaticFiles();
+var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider
+{
+    Mappings =
+    {
+        [".md"] = "application/octet-stream"
+    }
+};
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = fileExtensionContentTypeProvider
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

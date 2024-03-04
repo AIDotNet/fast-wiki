@@ -3,8 +3,9 @@
 @inject LocalStorageJsInterop LocalStorageJsInterop
 @inject JsHelperModule JsHelperModule
 @inject IPopupService PopupService
+@inject JsHelperJsInterop JsHelperJsInterop
 
-<div class="chat-container">
+<div class="chat-container" id="chat-dialogue">
     @if (ChatDialogHistory?.Result == null || ChatDialogHistory.Result.Count == 0)
     {
         <div class="message  not-current-user">
@@ -61,6 +62,19 @@
                                  Linkify="true"
                                  Typographer="true"
                                  Class="mt-4 pa-1" />
+                    @if (item.SourceFile.Count > 0)
+                    {
+                        <div style="margin: 5px;font-weight: bold;">
+                            引用文件：
+                        </div>
+                    }
+
+                    @foreach (var i in item.SourceFile)
+                    {
+                        <MChip Label OnClick="()=>OpenSourceFile(i)">
+                            @i.Name
+                        </MChip>
+                    }
                 </div>
             </div>
         }

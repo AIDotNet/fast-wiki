@@ -1,6 +1,4 @@
-﻿using FastWiki.Infrastructure.Rcl.Command.JsInterop;
-
-namespace FastWiki.Web.Rcl.Pages.Chats;
+﻿namespace FastWiki.Web.Rcl.Pages.Chats;
 
 public partial class ChatDialogue
 {
@@ -72,6 +70,7 @@ public partial class ChatDialogue
 
         ChatDialogHistory.Result.Add(chat);
 
+        int size = 0;
 
         if (ChatSharedId.IsNullOrWhiteSpace())
         {
@@ -83,7 +82,17 @@ public partial class ChatDialogue
             }))
             {
                 chat.Content += item.Content;
-                _ = InvokeAsync(StateHasChanged);
+                if (item.SourceFile?.Count > 0)
+                {
+                    chat.SourceFile.AddRange(item.SourceFile);
+                }
+
+                size++;
+                if (size > 3)
+                {
+                    await ScrollToBottom();
+                    size = 0;
+                }
             }
         }
         else
@@ -96,9 +105,21 @@ public partial class ChatDialogue
             }))
             {
                 chat.Content += item.Content;
-                _ = InvokeAsync(StateHasChanged);
+                if (item.SourceFile?.Count > 0)
+                {
+                    chat.SourceFile.AddRange(item.SourceFile);
+                }
+
+                size++;
+                if (size > 3)
+                {
+                    await ScrollToBottom();
+                    size = 0;
+                }
             }
         }
+
+        await ScrollToBottom();
 
         await ChatApplicationService.CreateChatDialogHistoryAsync(new CreateChatDialogHistoryInput()
         {
@@ -117,6 +138,12 @@ public partial class ChatDialogue
         });
     }
 
+    private async Task ScrollToBottom()
+    {
+        await JsHelperJsInterop.ScrollToBottom("chat-dialogue");
+        await InvokeAsync(StateHasChanged);
+    }
+
     private async Task RemoveHistoryAsync(string id)
     {
         await ChatApplicationService.RemoveDialogHistoryAsync(id);
@@ -124,12 +151,9 @@ public partial class ChatDialogue
         await LoadingChatDialogHistoryAsync();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async Task OpenSourceFile(SourceFileDto item)
     {
-        if (firstRender)
-        {
-            await Task.CompletedTask;
-        }
+        await JsHelperJsInterop.OpenUrl(item.FilePath);
     }
 
     private async Task OnCopy(string text)

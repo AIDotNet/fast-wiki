@@ -3,6 +3,7 @@ using System;
 using FastWiki.Service.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FastWiki.Service.Migrations
 {
     [DbContext(typeof(WikiDbContext))]
-    partial class WikiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240304150711_AddNoReplyFound")]
+    partial class AddNoReplyFound
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,9 +76,6 @@ namespace FastWiki.Service.Migrations
 
                     b.Property<double>("Relevancy")
                         .HasColumnType("double precision");
-
-                    b.Property<bool>("ShowSourceFile")
-                        .HasColumnType("boolean");
 
                     b.Property<double>("Temperature")
                         .HasColumnType("double precision");
@@ -337,18 +337,18 @@ namespace FastWiki.Service.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("358be106-ef0d-48f6-8080-8dd9baa70bb0"),
+                            Id = new Guid("2d1e2010-20df-4493-8dbb-5877a2636249"),
                             Account = "admin",
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                            CreationTime = new DateTime(2024, 3, 4, 15, 42, 8, 623, DateTimeKind.Utc).AddTicks(9490),
+                            CreationTime = new DateTime(2024, 3, 4, 15, 7, 11, 399, DateTimeKind.Utc).AddTicks(9028),
                             Email = "239573049@qq.com",
                             IsDeleted = false,
                             IsDisable = false,
-                            ModificationTime = new DateTime(2024, 3, 4, 15, 42, 8, 623, DateTimeKind.Utc).AddTicks(9493),
+                            ModificationTime = new DateTime(2024, 3, 4, 15, 7, 11, 399, DateTimeKind.Utc).AddTicks(9029),
                             Name = "admin",
-                            Password = "6e9fb78da16160f9f4b15dd5fd32c015",
+                            Password = "796f1fe636b48af22a2200923b2cb81b",
                             Phone = "13049809673",
-                            Salt = "d865425680544e0589022eae5de3ea0f"
+                            Salt = "60e7948e5ff44bd48929fa5186360cf4"
                         });
                 });
 

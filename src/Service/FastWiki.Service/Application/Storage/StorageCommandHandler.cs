@@ -25,6 +25,7 @@ public class StorageCommandHandler(IFileStorageRepository fileStorageRepository,
             $"{(accessor.HttpContext.Request.IsHttps ? ("https") : ("http"))}://{accessor.HttpContext.Request.Host}";
 
         await using var fileStream = fileInfo.Create();
+        
         await command.File.CopyToAsync(fileStream);
 
         var fileStorage = new FileStorage(command.File.FileName, host + "/" + filePath, command.File.Length, false);

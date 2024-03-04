@@ -10,7 +10,8 @@
              ItemValue="u => u.Item2"
              Label="选择对话基础模型"
              Dense
-             Outlined></MSelect>
+             Outlined>
+    </MSelect>
 
     <MTextarea Label="开场白"
                @bind-Value="Value.Opener"
@@ -26,19 +27,28 @@
                Rows="5"
                RowHeight="15">
     </MTextarea>
+    <MTextarea Label="未找到的回答"
+               @bind-Value="Value.NoReplyFoundTemplate"
+               Outlined
+               Placeholder="如果在知识库中未搜索到相关知识则回复固定模板。"
+               Rows="5"
+               RowHeight="15">
+    </MTextarea>
     <MSlider @bind-Value="Value.Temperature"
              Label="温度"
              Min="0"
              Max="1"
              Step="0.1"
-             ThumbLabel="@("always")"></MSlider>
+             ThumbLabel="@("always")">
+    </MSlider>
 
     <MSlider @bind-Value="Value.MaxResponseToken"
              Label="最大响应Token"
              Min="200"
              Max="128000"
              Step="100"
-             ThumbLabel="@("always")"></MSlider>
+             ThumbLabel="@("always")">
+    </MSlider>
 
     <MTextField Label="引用上限"
                 @bind-Value="Value.ReferenceUpperLimit"
@@ -50,7 +60,14 @@
              Min="0"
              Max="1"
              Step="0.05"
-             ThumbLabel="@("always")"></MSlider>
+             ThumbLabel="@("always")">
+    </MSlider>
+    <MCheckbox
+        @bind-Value="Value.ShowSourceFile"
+        TrueValue=@true
+        FalseValue=@false
+        Label="@($"{(Value.ShowSourceFile ? "显示引用文件" : "不显示引用文件")}")">
+    </MCheckbox>
     <MDialog Width="800">
         <ActivatorContent>
             <MButton Style="margin-top:10px;" @attributes="@context.Attrs" Block>选择知识库</MButton>
@@ -73,7 +90,7 @@
                                Color="orange"
                                Label
                                Outlined
-                               OnCloseClick="()=>RemoveWiki(item)">
+                               OnCloseClick="() => RemoveWiki(item)">
                             @Wikis.Result.FirstOrDefault(x => x.Id == item)?.Name
                         </MChip>
                     }
@@ -84,7 +101,7 @@
                     {
                         <MButton Class="mr-2"
                                  Outlined
-                                 OnClick="()=>SelectWiki(item)">
+                                 OnClick="() => SelectWiki(item)">
                             @item.Name
                         </MButton>
                     }

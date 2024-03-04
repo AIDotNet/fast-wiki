@@ -30,7 +30,7 @@ public partial class ChatDialog
         get => _chatId;
         set
         {
-            if (value.IsNullOrWhiteSpace())
+            if (value.IsNullOrWhiteSpace() || _chatId == value)
             {
                 return;
             }

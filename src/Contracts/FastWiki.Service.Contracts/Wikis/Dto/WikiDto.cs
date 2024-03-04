@@ -18,4 +18,9 @@ public class WikiDto
     /// 知识库模型
     /// </summary>
     public string Model { get; set; }
+
+    /// <summary>
+    /// 知识库向量化模型
+    /// </summary>
+    public string EmbeddingModel { get; set; } = "text-embedding-3-small";
 }

@@ -29,5 +29,10 @@ public sealed class ChatDialogHistoryDto
     /// </summary>
     public ChatDialogHistoryType Type { get; set; }
 
+    /// <summary>
+    /// 源文件引用
+    /// </summary>
+    public List<SourceFileDto> SourceFile { get; set; } = new();
+
     public DateTime CreationTime { get; set; }
 }

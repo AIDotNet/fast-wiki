@@ -47,6 +47,8 @@ public partial class ApplicationConfiguration
             ChatModel = Value.ChatModel,
             Id = Value.Id,
             MaxResponseToken = Value.MaxResponseToken,
+            NoReplyFoundTemplate = Value.NoReplyFoundTemplate,
+            ShowSourceFile = Value.ShowSourceFile,
             Name = Value.Name,
             WikiIds = Value.WikiIds,
             Opener = Value.Opener,
