@@ -11,7 +11,7 @@ public class StorageCommandHandler(IFileStorageRepository fileStorageRepository,
     [EventHandler]
     public async Task UploadFileStorage(UploadFileStorageCommand command)
     {
-        var filePath = "uploads/" + Guid.NewGuid().ToString("N") + "/" + Path.GetExtension(command.File.FileName);
+        var filePath = "uploads/" + Guid.NewGuid().ToString("N") + "/" + command.File.FileName;
         var fileStreamPath = Path.Combine("wwwroot", filePath);
 
         var fileInfo = new FileInfo(fileStreamPath);
