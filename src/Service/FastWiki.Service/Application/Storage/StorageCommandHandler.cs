@@ -11,7 +11,7 @@ public class StorageCommandHandler(IFileStorageRepository fileStorageRepository,
     [EventHandler]
     public async Task UploadFileStorage(UploadFileStorageCommand command)
     {
-        var filePath = "uploads/" + Guid.NewGuid().ToString("N") + Path.GetExtension(command.File.FileName);
+        var filePath = "uploads/" + Guid.NewGuid().ToString("N") + "/" + Path.GetExtension(command.File.FileName);
         var fileStreamPath = Path.Combine("wwwroot", filePath);
 
         var fileInfo = new FileInfo(fileStreamPath);
@@ -25,7 +25,7 @@ public class StorageCommandHandler(IFileStorageRepository fileStorageRepository,
             $"{(accessor.HttpContext.Request.IsHttps ? ("https") : ("http"))}://{accessor.HttpContext.Request.Host}";
 
         await using var fileStream = fileInfo.Create();
-        
+
         await command.File.CopyToAsync(fileStream);
 
         var fileStorage = new FileStorage(command.File.FileName, host + "/" + filePath, command.File.Length, false);
