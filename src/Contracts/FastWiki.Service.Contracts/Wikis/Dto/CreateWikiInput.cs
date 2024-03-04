@@ -13,7 +13,12 @@ public sealed class CreateWikiInput
     public string Name { get; set; }
 
     /// <summary>
-    /// 知识库模型
+    /// 知识库QA问答模型
     /// </summary>
     public string Model { get; set; } = "gpt-3.5-turbo";
+
+    /// <summary>
+    /// 知识库向量化模型
+    /// </summary>
+    public string EmbeddingModel { get; set; } = "text-embedding-3-small";
 }

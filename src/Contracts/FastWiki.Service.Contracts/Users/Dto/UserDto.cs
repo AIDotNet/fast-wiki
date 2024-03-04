@@ -1,6 +1,6 @@
 namespace FastWiki.Service.Contracts.Users.Dto;
 
-public class UserDto
+public sealed class UserDto
 {
     public Guid Id { get; set; }
     

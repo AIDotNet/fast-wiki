@@ -87,4 +87,12 @@ public interface IWikiRepository : IRepository<Wiki, long>
     /// </summary>
     /// <returns></returns>
     Task<List<WikiDetail>> GetFailedDetailsAsync();
+
+    /// <summary>
+    /// 删除知识库详情指定的向量数据
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RemoveDetailsVectorAsync(string index, string id);
 }

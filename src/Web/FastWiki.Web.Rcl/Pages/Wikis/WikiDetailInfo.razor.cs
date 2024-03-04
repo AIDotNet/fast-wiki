@@ -34,4 +34,11 @@ public partial class WikiDetailInfo
 
         await Loading();
     }
+
+    private async Task RemoveDetailsVectorAsync(string id)
+    {
+        await WikiService.RemoveDetailsVectorAsync(id);
+        this.page = 1;
+        await Loading();
+    } 
 }

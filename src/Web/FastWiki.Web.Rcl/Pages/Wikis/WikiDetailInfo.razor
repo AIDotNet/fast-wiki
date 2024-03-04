@@ -23,7 +23,7 @@
                             <MCardActions>
                                 <MSpacer></MSpacer>
                                 <MButton Small @attributes="@context.Attrs" Text>查看详情</MButton>
-                                <MButton Small OnClick="()=>{}" Text>删除</MButton>
+                                <MButton Small OnClick="()=>RemoveDetailsVectorAsync(item.Id)" Text>删除</MButton>
                             </MCardActions>
                         </MCard>
                     </ActivatorContent>

@@ -62,6 +62,13 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         await EventBus.PublishAsync(command);
     }
 
+    public Task CreateWikiDetailWebPageInputAsync(CreateWikiDetailWebPageInput input)
+    {
+        var command = new CreateWikiDetailWebPageCommand(input);
+        
+        return EventBus.PublishAsync(command);
+    }
+
     [Authorize]
     public async Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId, string? keyword, int page, int pageSize)
     {
@@ -107,5 +114,12 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         await EventBus.PublishAsync(query);
 
         return query.Result;
+    }
+
+    public async Task RemoveDetailsVectorAsync(string id)
+    {
+        var command = new RemoveDetailsVectorCommand(System.Web.HttpUtility.UrlDecode(id));
+
+        await EventBus.PublishAsync(command);
     }
 }

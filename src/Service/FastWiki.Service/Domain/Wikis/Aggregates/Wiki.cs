@@ -16,14 +16,21 @@ public sealed class Wiki : FullAggregateRoot<long, Guid?>
     /// 知识库模型
     /// </summary>
     public string Model { get; set; }
+
+    /// <summary>
+    /// 知识库向量化模型
+    /// </summary>
+    public string EmbeddingModel { get; set; }
+    
     protected Wiki()
     {
     }
 
-    public Wiki(string icon, string name, string model)
+    public Wiki(string icon, string name, string model,string embeddingModel)
     {
         Icon = icon;
         Name = name;
         Model = model;
+        EmbeddingModel = embeddingModel;
     }
 }

@@ -1,5 +1,6 @@
 using FastWiki.Service;
 using FastWiki.Service.Backgrounds;
+using Masa.Contrib.Authentication.Identity;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
@@ -11,6 +12,9 @@ builder.Configuration.GetSection(OpenAIOption.Name)
 
 builder.Configuration.GetSection(JwtOptions.Name)
     .Get<JwtOptions>();
+
+builder.Configuration.GetSection(ConnectionStringsOptions.Name)
+    .Get<ConnectionStringsOptions>();
 
 builder
     .AddLoadEnvironment();
@@ -24,7 +28,7 @@ var app = builder.Services
     .AddJwtBearerAuthentication()
     .AddMemoryCache()
     .AddEndpointsApiExplorer()
-    .AddMasaIdentity()
+    .AddMasaIdentity(options => { options.UserId = ClaimType.DEFAULT_USER_ID; })
     .AddMapster()
     .AddHttpContextAccessor()
     .AddSwaggerGen(options =>

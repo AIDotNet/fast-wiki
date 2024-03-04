@@ -5,7 +5,7 @@ namespace FastWiki.Service.Domain.Wikis.Aggregates;
 /// <summary>
 /// 知识库详情
 /// </summary>
-public sealed class WikiDetail : Entity<long>, IAuditEntity<long>
+public class WikiDetail : Entity<long>, IAuditEntity<long>
 {
     /// <summary>
     /// 知识库Id

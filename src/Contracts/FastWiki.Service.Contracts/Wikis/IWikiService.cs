@@ -45,6 +45,13 @@ public interface IWikiService
     /// <param name="input"></param>
     /// <returns></returns>
     Task CreateWikiDetailsAsync(CreateWikiDetailsInput input);
+    
+    /// <summary>
+    /// 创建知识库详情 Web 页面
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    Task CreateWikiDetailWebPageInputAsync(CreateWikiDetailWebPageInput input);
 
     /// <summary>
     /// 获取知识库详情列表
@@ -88,4 +95,11 @@ public interface IWikiService
     /// <returns></returns>
     Task<SearchVectorQuantityResult> GetSearchVectorQuantityAsync(long wikiId, string search,
         double minRelevance = 0.6);
+
+    /// <summary>
+    /// 删除指定知识库详情的向量数据
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RemoveDetailsVectorAsync(string id);
 }

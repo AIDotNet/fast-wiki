@@ -16,9 +16,9 @@ public sealed class AuthorizeService(IMapper mapper) : ApplicationService<Author
 
         await EventBus.PublishAsync(userInfo);
 
-        return new AuthorizeDto()
+        return new AuthorizeDto
         {
-            Token = JwtHelper.GeneratorAccessToken(mapper.Map<UserDto>(userInfo))
+            Token = JwtHelper.GeneratorAccessToken(userInfo.Result)
         };
     }
 }

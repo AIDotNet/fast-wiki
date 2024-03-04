@@ -1,4 +1,5 @@
 ﻿using FastWiki.Infrastructure.Common.Helper;
+using FastWiki.Web.Rcl.Helper;
 
 namespace FastWiki.Web.Rcl.Pages.Applications;
 

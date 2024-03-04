@@ -4,8 +4,8 @@ using Masa.Utils.Models;
 
 namespace FastWiki.ApiGateway.Caller.Service;
 
-public sealed class WikiService(ICaller caller, IHttpClientFactory httpClientFactory,IUserService userService)
-    : ServiceBase(caller, httpClientFactory,userService), IWikiService
+public sealed class WikiService(ICaller caller, IHttpClientFactory httpClientFactory, IUserService userService)
+    : ServiceBase(caller, httpClientFactory, userService), IWikiService
 {
     protected override string BaseUrl { get; set; } = "Wikis";
 
@@ -42,6 +42,11 @@ public sealed class WikiService(ICaller caller, IHttpClientFactory httpClientFac
     public async Task CreateWikiDetailsAsync(CreateWikiDetailsInput input)
     {
         await PostAsync(nameof(CreateWikiDetailsAsync), input);
+    }
+
+    public async Task CreateWikiDetailWebPageInputAsync(CreateWikiDetailWebPageInput input)
+    {
+        await PostAsync(nameof(CreateWikiDetailWebPageInputAsync), input);
     }
 
     public async Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId, string? keyword, int page,
@@ -89,5 +94,10 @@ public sealed class WikiService(ICaller caller, IHttpClientFactory httpClientFac
                 { "search", search },
                 { "minRelevance", minRelevance.ToString() }
             });
+    }
+
+    public async Task RemoveDetailsVectorAsync(string id)
+    {
+        await DeleteAsync(nameof(RemoveDetailsVectorAsync) + "/" + System.Web.HttpUtility.UrlEncode(id));
     }
 }

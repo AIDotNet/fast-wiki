@@ -140,7 +140,6 @@ public partial class WikiUploadLocalFile
 
         try
         {
-            var task = new List<Task>();
             foreach (var i in _files)
             {
                 var fileItem = BrowserFiles.FirstOrDefault(x => x.Hash == i.GetHashCode().ToString());

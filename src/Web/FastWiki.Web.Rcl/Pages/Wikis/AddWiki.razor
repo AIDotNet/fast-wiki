@@ -39,6 +39,15 @@
                                  Dense
                                  Outlined></MSelect>
                     </MRow>
+                    <MRow>
+                        <MSelect Items="EmbeddingModels"
+                                 @bind-Value="@input.EmbeddingModel"
+                                 ItemText="u => u.Item1"
+                                 ItemValue="u => u.Item2"
+                                 Label="*选择量化模型"
+                                 Dense
+                                 Outlined></MSelect>
+                    </MRow>
                 </MContainer>
                 <small>*为必填</small>
             </MCardText>
