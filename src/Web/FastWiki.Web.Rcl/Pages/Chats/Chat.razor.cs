@@ -9,6 +9,7 @@ public partial class Chat
     private ChatDialogDto ChatDialog = new();
 
     private bool? _drawer;
+
     private void ArrowLeft()
     {
         NavigationManager.NavigateTo("/");
@@ -18,6 +19,13 @@ public partial class Chat
     private async Task LoadingWiki()
     {
         ChatApplications = await ChatApplicationService.GetListAsync(1, int.MaxValue);
+        if (ChatApplications.Result.Count == 0)
+        {
+            await PopupService.EnqueueSnackbarAsync(new SnackbarOptions("请先创建应用",AlertTypes.Error));
+            NavigationManager.NavigateTo("/application");
+            return;
+        }
+
         await InvokeAsync(StateHasChanged);
     }
 

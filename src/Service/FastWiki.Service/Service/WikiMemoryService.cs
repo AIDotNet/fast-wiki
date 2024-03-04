@@ -10,15 +10,19 @@ namespace FastWiki.Service.Service;
 /// 知识库内存服务
 /// </summary>
 /// <param name="configuration"></param>
-public class WikiMemoryService(IConfiguration configuration) : ISingletonDependency
+public sealed class WikiMemoryService : ISingletonDependency
 {
     private static readonly OpenAIHttpClientHandler HttpClientHandler = new();
-    
+
     public MemoryServerless CreateMemoryServerless(SearchClientConfig searchClientConfig,
-        int maxTokensPerLine)
+        int maxTokensPerLine, string? chatModel = null, string? embeddingModel = null)
     {
         var memory = new KernelMemoryBuilder()
-            .WithPostgresMemoryDb(configuration.GetConnectionString("DefaultConnection"))
+            .WithPostgresMemoryDb(new PostgresConfig()
+            {
+                ConnectionString = ConnectionStringsOptions.DefaultConnection,
+                TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
+            })
             .WithSimpleFileStorage(new SimpleFileStorageConfig
             {
                 StorageType = FileSystemTypes.Volatile,
@@ -32,12 +36,15 @@ public class WikiMemoryService(IConfiguration configuration) : ISingletonDepende
             .WithOpenAITextGeneration(new OpenAIConfig()
             {
                 APIKey = OpenAIOption.ChatToken,
-                TextModel = OpenAIOption.ChatModel
+                TextModel = string.IsNullOrEmpty(chatModel) ? OpenAIOption.ChatModel : chatModel
             }, null, new HttpClient(HttpClientHandler))
             .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
             {
-                APIKey = OpenAIOption.ChatToken,
-                EmbeddingModel = OpenAIOption.EmbeddingModel,
+                // 如果 EmbeddingToken 为空，则使用 ChatToken
+                APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
+                    ? OpenAIOption.ChatToken
+                    : OpenAIOption.EmbeddingToken,
+                EmbeddingModel = string.IsNullOrEmpty(embeddingModel) ? OpenAIOption.EmbeddingModel : embeddingModel,
             }, null, false, new HttpClient(HttpClientHandler))
             .Build<MemoryServerless>();
 
@@ -48,6 +55,7 @@ public class WikiMemoryService(IConfiguration configuration) : ISingletonDepende
         string modelId,
         string? organization = null)
     {
-        return new OpenAIChatCompletionService(modelId, OpenAIOption.ChatToken, organization, new HttpClient(HttpClientHandler));
+        return new OpenAIChatCompletionService(modelId, OpenAIOption.ChatToken, organization,
+            new HttpClient(HttpClientHandler));
     }
 }

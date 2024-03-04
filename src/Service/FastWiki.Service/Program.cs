@@ -13,6 +13,9 @@ builder.Configuration.GetSection(OpenAIOption.Name)
 builder.Configuration.GetSection(JwtOptions.Name)
     .Get<JwtOptions>();
 
+builder.Configuration.GetSection(ConnectionStringsOptions.Name)
+    .Get<ConnectionStringsOptions>();
+
 builder
     .AddLoadEnvironment();
 

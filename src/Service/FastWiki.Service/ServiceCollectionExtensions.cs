@@ -46,10 +46,15 @@ public static class ServiceCollectionExtensions
             EmptyAnswer = "知识库未搜索到相关内容"
         };
 
-        builder.Services.AddScoped<MemoryServerless>(_ =>
+        var httpclient = new HttpClient(handler);
+        builder.Services.AddScoped<MemoryServerless>((_) =>
         {
             var memory = new KernelMemoryBuilder()
-                .WithPostgresMemoryDb(builder.Configuration.GetConnectionString("DefaultConnection"))
+                .WithPostgresMemoryDb(new PostgresConfig()
+                {
+                    ConnectionString = ConnectionStringsOptions.DefaultConnection,
+                    TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
+                })
                 .WithSimpleFileStorage(new SimpleFileStorageConfig
                     { StorageType = FileSystemTypes.Volatile, Directory = "_files" })
                 .WithSearchClientConfig(searchClientConfig)
@@ -57,12 +62,15 @@ public static class ServiceCollectionExtensions
                 {
                     APIKey = OpenAIOption.ChatToken,
                     TextModel = OpenAIOption.ChatModel
-                }, null, new HttpClient(handler))
+                }, null, httpclient)
                 .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
                 {
-                    APIKey = OpenAIOption.ChatToken,
+                    // 如果 EmbeddingToken 为空，则使用 ChatToken
+                    APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
+                        ? OpenAIOption.ChatToken
+                        : OpenAIOption.EmbeddingToken,
                     EmbeddingModel = OpenAIOption.EmbeddingModel,
-                }, null, false, new HttpClient(handler))
+                }, null, false, httpclient)
                 .Build<MemoryServerless>();
             return memory;
         });
@@ -106,6 +114,7 @@ public static class ServiceCollectionExtensions
         var OPENAI_CHAT_TOKEN = Environment.GetEnvironmentVariable("OPENAI_CHAT_TOKEN");
         var OPENAI_CHAT_MODEL = Environment.GetEnvironmentVariable("OPENAI_CHAT_MODEL");
         var OPENAI_EMBEDDING_MODEL = Environment.GetEnvironmentVariable("OPENAI_EMBEDDING_MODEL");
+        var OPENAI_EMBEDDING_TOKEN = Environment.GetEnvironmentVariable("OPENAI_EMBEDDING_TOKEN");
 
         if (!OPENAI_CHAT_ENDPOINT.IsNullOrWhiteSpace())
         {
@@ -130,6 +139,11 @@ public static class ServiceCollectionExtensions
         if (!OPENAI_EMBEDDING_MODEL.IsNullOrWhiteSpace())
         {
             OpenAIOption.EmbeddingModel = OPENAI_EMBEDDING_MODEL;
+        }
+
+        if (!OPENAI_EMBEDDING_TOKEN.IsNullOrWhiteSpace())
+        {
+            OpenAIOption.EmbeddingToken = OPENAI_EMBEDDING_TOKEN;
         }
     }
 }

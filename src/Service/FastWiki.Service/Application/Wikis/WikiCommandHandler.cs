@@ -1,5 +1,4 @@
-﻿using FastWiki.Service.Application.Storage.Queries;
-using FastWiki.Service.Backgrounds;
+﻿using FastWiki.Service.Backgrounds;
 using FastWiki.Service.Service;
 
 namespace FastWiki.Service.Application.Wikis;
@@ -14,7 +13,7 @@ public sealed class WikiCommandHandler(
     [EventHandler]
     public async Task CreateWiki(CreateWikiCommand command)
     {
-        var wiki = new Wiki(command.Input.Icon, command.Input.Name, command.Input.Model);
+        var wiki = new Wiki(command.Input.Icon, command.Input.Name, command.Input.Model, command.Input.EmbeddingModel);
         await wikiRepository.AddAsync(wiki);
     }
 
@@ -51,14 +50,13 @@ public sealed class WikiCommandHandler(
             command.Input.FileId, 0, "file");
 
         wikiDetail = await wikiRepository.AddDetailsAsync(wikiDetail);
-        
+
         QuantizeWikiDetail quantizeWikiDetail = mapper.Map<QuantizeWikiDetail>(wikiDetail);
         quantizeWikiDetail.Subsection = command.Input.Subsection;
         quantizeWikiDetail.Mode = command.Input.Mode;
         quantizeWikiDetail.TrainingPattern = command.Input.TrainingPattern;
-        
-        await QuantizeBackgroundService.AddWikiDetailAsync(quantizeWikiDetail);
 
+        await QuantizeBackgroundService.AddWikiDetailAsync(quantizeWikiDetail);
     }
 
     [EventHandler]
@@ -96,6 +94,12 @@ public sealed class WikiCommandHandler(
     public async Task RemoveWikiDetailVectorQuantityAsync(RemoveWikiDetailVectorQuantityCommand command)
     {
         await memoryServerless.DeleteDocumentAsync(command.DocumentId, "wiki");
+    }
+
+    [EventHandler]
+    public async Task RemoveDetailsVectorAsync(RemoveDetailsVectorCommand command)
+    {
+        await wikiRepository.RemoveDetailsVectorAsync("wiki", command.Id);
     }
 
     [EventHandler]

@@ -66,6 +66,7 @@ FastWikiService环境变量参数：
 - OPENAI_CHAT_TOKEN： OpenAI API的Token
 - OPENAI_CHAT_MODEL： 对话的模型，默认gpt-3.5-turbo
 - OPENAI_EMBEDDING_MODEL： Embedding的模型，默认text-embedding-3-small
+- OPENAI_EMBEDDING_TOKEN: Embedding的Token, 默认为空，为空则使用对话的Token
 
 FastWiki.Web.Server环境变量参数：
 - FAST_WIKI_SERVICE：FastWikiService的地址，默认为http://localhost:5124

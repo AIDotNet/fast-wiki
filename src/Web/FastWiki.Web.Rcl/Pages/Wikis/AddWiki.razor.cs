@@ -1,4 +1,6 @@
-﻿namespace FastWiki.Web.Rcl.Pages.Wikis;
+﻿using FastWiki.Web.Rcl.Helper;
+
+namespace FastWiki.Web.Rcl.Pages.Wikis;
 
 public partial class AddWiki
 {
@@ -9,6 +11,8 @@ public partial class AddWiki
     private CreateWikiInput input = new();
 
     public List<(string, string)> Models { get; set; } = ChatHelper.GetChatModel();
+
+    public List<(string, string)> EmbeddingModels { get; set; } = ChatHelper.GetEmbeddingModel();
 
     [Parameter]
     public EventCallback OnSucceed { get; set; }

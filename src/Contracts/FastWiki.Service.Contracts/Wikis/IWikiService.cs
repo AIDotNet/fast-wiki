@@ -95,4 +95,11 @@ public interface IWikiService
     /// <returns></returns>
     Task<SearchVectorQuantityResult> GetSearchVectorQuantityAsync(long wikiId, string search,
         double minRelevance = 0.6);
+
+    /// <summary>
+    /// 删除指定知识库详情的向量数据
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RemoveDetailsVectorAsync(string id);
 }

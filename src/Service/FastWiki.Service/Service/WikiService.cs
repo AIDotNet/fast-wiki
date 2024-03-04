@@ -115,4 +115,11 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
 
         return query.Result;
     }
+
+    public async Task RemoveDetailsVectorAsync(string id)
+    {
+        var command = new RemoveDetailsVectorCommand(System.Web.HttpUtility.UrlDecode(id));
+
+        await EventBus.PublishAsync(command);
+    }
 }

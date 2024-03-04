@@ -1,4 +1,6 @@
-﻿namespace FastWiki.Web.Rcl.Pages.Wikis;
+﻿using FastWiki.Web.Rcl.Helper;
+
+namespace FastWiki.Web.Rcl.Pages.Wikis;
 
 public partial class WikiConfiguration
 {

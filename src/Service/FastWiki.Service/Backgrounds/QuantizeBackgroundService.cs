@@ -8,12 +8,12 @@ public sealed class QuantizeBackgroundService : BackgroundService
     private readonly IServiceProvider _serviceProvider;
 
     /// <summary>
-    /// ???????????
+    /// 当前任务数量
     /// </summary>
     private static int CurrentTask = 0;
 
     /// <summary>
-    /// ???????????
+    /// 最大量化任务数量
     /// </summary>
     public static int MaxTask = 3;
 
@@ -25,7 +25,7 @@ public sealed class QuantizeBackgroundService : BackgroundService
         });
 
     /// <summary>
-    /// ??????
+    /// 构造
     /// </summary>
     public QuantizeBackgroundService(IServiceProvider serviceProvider)
     {
@@ -33,25 +33,25 @@ public sealed class QuantizeBackgroundService : BackgroundService
     }
 
     /// <summary>
-    /// ???????
+    /// 执行
     /// </summary>
     /// <param name="stoppingToken"></param>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // ?????????????????????????????
+        // 获取环境变量中的最大任务数量
         var QUANTIZE_MAX_TASK = Environment.GetEnvironmentVariable("QUANTIZE_MAX_TASK");
         if (!string.IsNullOrEmpty(QUANTIZE_MAX_TASK))
         {
             int.TryParse(QUANTIZE_MAX_TASK, out MaxTask);
         }
 
-        // TODO: ?????????????????wikiDetail
+        // TODO: 首次启动程序的时候需要加载未处理的量化数据
         await LoadingWikiDetailAsync();
         await Task.Factory.StartNew(WikiDetailHandlerAsync, stoppingToken);
     }
 
     /// <summary>
-    /// ????wikiDetail??????
+    /// 
     /// </summary>
     /// <param name="wikiDetail"></param>
     public static async Task AddWikiDetailAsync(QuantizeWikiDetail wikiDetail)
@@ -61,14 +61,12 @@ public sealed class QuantizeBackgroundService : BackgroundService
 
     private async Task WikiDetailHandlerAsync()
     {
-        // wikiDetails???????
         while (await WikiDetails.Reader.WaitToReadAsync())
         {
             var wikiDetail = await WikiDetails.Reader.ReadAsync();
 
             if (wikiDetail != null)
             {
-                // ????????С????????????? ?????????
                 for (var i = 0; i < 200; i++)
                 {
                     if (CurrentTask < MaxTask)
@@ -77,7 +75,6 @@ public sealed class QuantizeBackgroundService : BackgroundService
                         break;
                     }
 
-                    // ??? 1s
                     await Task.Delay(500);
                 }
             }
@@ -85,7 +82,7 @@ public sealed class QuantizeBackgroundService : BackgroundService
     }
 
     /// <summary>
-    /// ????wikiDetail??????????
+    /// 处理量化
     /// </summary>
     /// <param name="state"></param>
     private async ValueTask HandlerAsync(object state)
@@ -98,22 +95,23 @@ public sealed class QuantizeBackgroundService : BackgroundService
             var fileStorageRepository = asyncServiceScope.ServiceProvider.GetRequiredService<IFileStorageRepository>();
             var wikiRepository = asyncServiceScope.ServiceProvider.GetRequiredService<IWikiRepository>();
             var wikiMemoryService = asyncServiceScope.ServiceProvider.GetRequiredService<WikiMemoryService>();
-            
-            if(wikiDetail.Subsection == 0)
+            var wiki = await wikiRepository.FindAsync(x => x.Id == wikiDetail.WikiId);
+            if (wikiDetail.Subsection == 0)
             {
                 wikiDetail.Subsection = 512;
             }
+
+            // 获取知识库配置的模型，如果没有则使用默认模型
             var serverless = wikiMemoryService.CreateMemoryServerless(new SearchClientConfig(),
-                wikiDetail.Mode == ProcessMode.Auto ? 512 : wikiDetail.Subsection);
-            
+                wikiDetail.Mode == ProcessMode.Auto ? 512 : wikiDetail.Subsection, wiki?.Model, wiki?.EmbeddingModel);
+
             try
             {
-                Console.WriteLine($"量化数据开始{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId}");
+                Console.WriteLine($"开始量化：ʼ{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId}");
 
                 string result = string.Empty;
                 if (wikiDetail.Type == "file")
                 {
-                    // ????wikiDetail
                     var fileInfoQuery = await fileStorageRepository.FindAsync(x => x.Id == wikiDetail.FileId);
 
                     result = await serverless.ImportDocumentAsync(fileInfoQuery.FullName,
@@ -147,14 +145,14 @@ public sealed class QuantizeBackgroundService : BackgroundService
                 }
 
                 await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Accomplish);
-                Console.WriteLine($"量化完成{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {result}");
+                Console.WriteLine($"量化成功：{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {result}");
             }
             catch (Exception e)
             {
                 Console.WriteLine(
-                    $"异常数据{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {Environment.NewLine + e.Message}");
+                    $"量化失败{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {Environment.NewLine + e.Message}");
 
-                // TODO: 可能出现限流导致异常，这里需要等待
+                // TODO: 由于api可能存在限流，如果出现异常大概率是限流导致，在这里等待一会
                 await Task.Delay(500);
 
                 if (wikiDetail.State != WikiQuantizationState.Fail)
@@ -175,18 +173,14 @@ public sealed class QuantizeBackgroundService : BackgroundService
 
         var wikiRepository = asyncServiceScope.ServiceProvider.GetRequiredService<IWikiRepository>();
         var mapper = asyncServiceScope.ServiceProvider.GetRequiredService<IMapper>();
-
-        // ???????wikiDetail
-        var wikiDetails = await wikiRepository.GetFailedDetailsAsync();
-
-        foreach (var wikiDetail in wikiDetails)
+        foreach (var wikiDetail in await wikiRepository.GetFailedDetailsAsync())
         {
             await AddWikiDetailAsync(mapper.Map<QuantizeWikiDetail>(wikiDetail));
         }
     }
 }
 
-public class QuantizeWikiDetail : WikiDetail
+public sealed class QuantizeWikiDetail : WikiDetail
 {
     public int Subsection { get; set; }
 

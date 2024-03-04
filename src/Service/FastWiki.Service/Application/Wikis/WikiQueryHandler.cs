@@ -93,7 +93,7 @@ public sealed class WikiQueryHandler(
                 dto.Add(new WikiDetailVectorQuantityDto()
                 {
                     Content = item.Payload["text"].ToString() ?? string.Empty,
-                    FileId = item.Tags["fileId"].FirstOrDefault() ?? string.Empty,
+                    FileId = item.Tags.FirstOrDefault(x=>x.Key=="fileId").Value?.FirstOrDefault() ?? string.Empty,
                     Id = item.Id,
                     WikiDetailId = item.Tags["wikiDetailId"].FirstOrDefault() ?? string.Empty,
                     Document_Id = item.Tags["__document_id"].FirstOrDefault() ?? string.Empty

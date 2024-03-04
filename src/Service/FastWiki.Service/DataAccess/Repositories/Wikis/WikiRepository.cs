@@ -75,6 +75,11 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
             .Where(x => x.State == WikiQuantizationState.Fail || x.State == WikiQuantizationState.None).ToListAsync();
     }
 
+    public async Task RemoveDetailsVectorAsync(string index, string id)
+    {
+        await Context.Database.ExecuteSqlRawAsync($"delete from \"{ConnectionStringsOptions.TableNamePrefix + index}\" where id='{id}';");
+    }
+
 
     private IQueryable<Wiki> CreateQuery(string? keyword)
     {
