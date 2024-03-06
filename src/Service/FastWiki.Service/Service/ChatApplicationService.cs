@@ -111,13 +111,13 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
 
         if (chatApplicationQuery.Result == null)
         {
-            throw new UserFriendlyException("Ó¦ÓÃId²»´æÔÚ");
+            throw new UserFriendlyException("åº”ç”¨Idä¸å­˜åœ¨");
         }
 
         var prompt = string.Empty;
 
         var sourceFile = new List<FileStorage>();
-        // Èç¹ûÎª¿ÕÔò²»Ê¹ÓÃÖªÊ¶¿â
+        // å¦‚æœä¸ºç©ºåˆ™ä¸ä½¿ç”¨çŸ¥è¯†åº“
         if (chatApplicationQuery.Result.WikiIds.Count != 0)
         {
             var memoryServerless = GetRequiredService<MemoryServerless>();
@@ -126,13 +126,13 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
                 .Select(chatApplication => new MemoryFilter().ByTag("wikiId", chatApplication.ToString())).ToList();
 
 
-            var result = await memoryServerless.SearchAsync(input.Content, "wiki", filters: filters, limit: 3);
+            var result = await memoryServerless.SearchAsync(input.Content, "wiki", filters: filters, limit: 3, minRelevance: chatApplicationQuery.Result.Relevancy);
 
             var fileIds = new List<long>();
 
             result.Results.ForEach(x =>
             {
-                // »ñÈ¡fileId
+                // è·å–fileId
                 var fileId = x.Partitions.Select(x => x.Tags.FirstOrDefault(x => x.Key == "fileId"))
                     .FirstOrDefault(x => !x.Value.IsNullOrEmpty())
                     .Value.FirstOrDefault();
@@ -182,7 +182,7 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
             chatHistory.AddSystemMessage(chatApplicationQuery.Result.Prompt);
         }
 
-        // TODO: ºóÆÚ¿ÉĞŞ¸ÄÎª¿ÉÅäÖÃ
+        // TODO: åæœŸå¯ä¿®æ”¹ä¸ºå¯é…ç½®
         var historyQuery = new ChatDialogHistoryQuery(input.ChatDialogId, 1, 3);
 
         await EventBus.PublishAsync(historyQuery);
@@ -237,14 +237,14 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
 
         if (chatApplicationQuery.Result == null)
         {
-            throw new UserFriendlyException("Ó¦ÓÃId²»´æÔÚ");
+            throw new UserFriendlyException("åº”ç”¨Idä¸å­˜åœ¨");
         }
 
         var prompt = string.Empty;
 
         var sourceFile = new List<FileStorage>();
 
-        // Èç¹ûÎª¿ÕÔò²»Ê¹ÓÃÖªÊ¶¿â
+        // å¦‚æœä¸ºç©ºåˆ™ä¸ä½¿ç”¨çŸ¥è¯†åº“
         if (chatApplicationQuery.Result.WikiIds.Count != 0)
         {
             var memoryServerless = GetRequiredService<MemoryServerless>();
@@ -259,7 +259,7 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
 
             result.Results.ForEach(x =>
             {
-                // »ñÈ¡fileId
+                // è·å–fileId
                 var fileId = x.Partitions.Select(x => x.Tags.FirstOrDefault(x => x.Key == "fileId"))
                     .FirstOrDefault(x => !x.Value.IsNullOrEmpty())
                     .Value.FirstOrDefault();
@@ -307,7 +307,7 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
             chatHistory.AddSystemMessage(chatApplicationQuery.Result.Prompt);
         }
 
-        // TODO: ºóÆÚ¿ÉĞŞ¸ÄÎª¿ÉÅäÖÃ
+        // TODO: åæœŸå¯ä¿®æ”¹ä¸ºå¯é…ç½®
         var historyQuery = new ChatDialogHistoryQuery(input.ChatDialogId, 1, 3);
 
         await EventBus.PublishAsync(historyQuery);
@@ -333,17 +333,17 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
 
             if (userToken < 0)
             {
-                throw new UserFriendlyException("tokenÒÑ±»ÏûºÄÍê³É");
+                throw new UserFriendlyException("tokenå·²è¢«æ¶ˆè€—å®Œæˆ");
             }
 
             var token = chatHistory.Sum(history => TokenHelper.ComputeToken(history.Content ?? string.Empty));
 
             if (token > userToken)
             {
-                throw new UserFriendlyException("token²»×ã");
+                throw new UserFriendlyException("tokenä¸è¶³");
             }
 
-            // ¼ÆËãtoken
+            // è®¡ç®—token
             userToken -= token;
 
             memoryCache.Remove(chatShareInfoQuery.Id);
