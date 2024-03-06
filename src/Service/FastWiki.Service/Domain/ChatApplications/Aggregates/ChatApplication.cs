@@ -13,8 +13,14 @@ public sealed class ChatApplication : FullAggregateRoot<string, Guid?>
     {
         Opener =
 """
-您好，欢迎使用FastWiki知识库，我可以帮助您查找知识库中的内容，您可以输入您的问题，我会尽力帮您解答。
-来自FastWiki知识库的问候。                 
+FastWiki本项目是一个高性能、基于最新技术栈的知识库系统，专为大规模信息检索和智能搜索设计。
+    利用微软Semantic Kernel进行深度学习和自然语言处理，结合.NET 8和`MasaBlazor`前端框架，后台采用`MasaFramework`，实现了一个高效、易用、可扩展的智能向量搜索平台。
+    我们的目标是提供一个能够理解和处理复杂查询的智能搜索解决方案，帮助用户快速准确地获取所需信息。采用Apache-2.0，您也可以完全商用不会有任何版权纠纷
+[Github](https://github.com/239573049/fast-wiki)
+[Gitee](https://gitee.com/hejiale010426/fast-wiki)
+[项目文档](https://docs.token-ai.cn/)
+
+当前AI提供了Avalonia中文文档知识库功能！  
 """;
 
         Template =
