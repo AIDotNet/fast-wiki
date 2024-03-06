@@ -27,4 +27,9 @@ public class ChatDialogDto
             return "错误状态";
         }
     }
+
+    /// <summary>
+    /// 是否编辑
+    /// </summary>
+    public bool IsEdit { get; set; }
 }

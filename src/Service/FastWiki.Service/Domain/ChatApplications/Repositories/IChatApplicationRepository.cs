@@ -109,4 +109,26 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <param name="chatShareId"></param>
     /// <returns></returns>
     Task<ChatApplication> ChatShareApplicationAsync(string chatShareId);
+
+    /// <summary>
+    /// 编辑对话
+    /// </summary>
+    /// <param name="chatDialog"></param>
+    /// <returns></returns>
+    Task UpdateChatDialogAsync(ChatDialog chatDialog);
+
+    /// <summary>
+    /// 删除分享对话
+    /// </summary>
+    /// <param name="chatId"></param>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RemoveShareDialogAsync(string chatId, string id);
+
+    /// <summary>
+    /// 编辑分享对话
+    /// </summary>
+    /// <param name="chatDialog"></param>
+    /// <returns></returns>
+    Task UpdateShareDialogAsync(ChatDialog chatDialog);
 }

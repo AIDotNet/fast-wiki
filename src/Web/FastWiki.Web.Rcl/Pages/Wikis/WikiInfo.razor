@@ -30,7 +30,7 @@
                 <MCardTitle>
                     <span>数据数量</span>
                     <MSpacer></MSpacer>
-                    <MTextField Dense Outlined TValue="string" Label="搜索"></MTextField>
+                    <MTextField Dense Outlined @bind-Value="keyword" Label="搜索" OnAppendOuterClick="OnSearchAsync" AppendOuterIcon="fa:fas fa-search"></MTextField>
                     <MMenu OffsetY>
                         <ActivatorContent>
                             <MButton @attributes="@context.Attrs" Style="margin-bottom: 18px;margin-left: 8px;">
@@ -78,7 +78,7 @@
                             }
                             else if (context.Header.Value == nameof(WikiDetailDto.CreationTime))
                             {
-                                <span>@context.Value</span>
+                                <span>@context.Item.CreationTime.ToString("yyyy-MM-dd hh:mm:ss")</span>
                             }
                             else if (context.Header.Value == nameof(WikiDetailDto.State))
                             {

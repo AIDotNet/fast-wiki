@@ -9,7 +9,7 @@ public partial class WikiInfo
     private int page = 1;
     private int pageSize = 10;
 
-    private string keyword = "";
+    private string keyword = string.Empty;
 
     private readonly List<DataTableHeader<WikiDetailDto>> _headers =
     [
@@ -92,6 +92,12 @@ public partial class WikiInfo
             page = 1;
             await LoadData();
         }
+    }
+
+    private async Task OnSearchAsync()
+    {
+        page = 1;
+        await LoadData();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

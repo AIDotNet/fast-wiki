@@ -122,4 +122,33 @@ public interface IChatApplicationService
     /// <param name="pageSize"></param>
     /// <returns></returns>
     Task<PaginatedListBase<ChatShareDto>> GetChatShareListAsync(string chatApplicationId, int page, int pageSize);
+
+    /// <summary>
+    /// 删除对话
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RemoveDialogAsync(string id);
+
+    /// <summary>
+    /// 编辑对话
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    Task UpdateDialogAsync(ChatDialogDto input);
+
+    /// <summary>
+    /// 删除指定分享对话
+    /// </summary>
+    /// <param name="chatId"></param>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RemoveShareDialogAsync(string chatId, string id);
+
+    /// <summary>
+    /// 编辑分享对话
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    Task UpdateShareDialogAsync(ChatDialogDto input);
 }

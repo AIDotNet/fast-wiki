@@ -418,4 +418,33 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
 
         return query.Result;
     }
+
+    [Authorize]
+    public async Task RemoveDialogAsync(string id)
+    {
+        var command = new RemoveChatDialogCommand(id);
+
+        await EventBus.PublishAsync(command);
+    }
+
+    [Authorize]
+    public async Task UpdateDialogAsync(ChatDialogDto input)
+    {
+        var command = new UpdateChatDialogCommand(input);
+
+        await EventBus.PublishAsync(command);
+    }
+
+    public async Task RemoveShareDialogAsync(string chatId, string id)
+    {
+        var command = new RemoveShareDialogCommand(chatId, id);
+        await EventBus.PublishAsync(command);
+    }
+
+    public async Task UpdateShareDialogAsync(ChatDialogDto input)
+    {
+        var command = new UpdateShareChatDialogCommand(input);
+
+        await EventBus.PublishAsync(command);
+    }
 }

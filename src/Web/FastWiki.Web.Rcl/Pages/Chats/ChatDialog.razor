@@ -1,17 +1,48 @@
 ﻿@inject IChatApplicationService ChatApplicationService
+@inject IPopupService PopupService
 
 <MList Nav
        Dense>
     <MListItemGroup @bind-Value="SelectedItem"
                     Color="primary">
-        <MButton
-            OnClick="CreateDialogAsync" Block Style="margin-bottom:8px;">新建对话</MButton>
+        <MButton OnClick="CreateDialogAsync" Block Style="margin-bottom:8px;">新建对话</MButton>
 
         @foreach (var item in _chatDialogs)
         {
             <MListItem Value="item.Id">
                 <MListItemContent>
-                    <MListItemTitle>@item.Name</MListItemTitle>
+                    <MListItemTitle Style="display: flex; justify-content: space-between; align-items: center;">
+                        @if (item.IsEdit)
+                        {
+                            <MTextField Solo Dense
+                                        @bind-Value="item.Name"
+                                        Style="width: 100%;"
+                                        OnBlur="async () => await UpdateDialogAsync(item)">
+                            </MTextField>
+                        }
+                        else
+                        {
+                            @item.Name
+                        }
+                        <MMenu Right
+                               Bottom>
+                            <ActivatorContent>
+                                <MButton Right Icon @attributes="@context.Attrs">
+                                    <MIcon>mdi-dots-vertical</MIcon>
+                                </MButton>
+                            </ActivatorContent>
+                            <ChildContent>
+                                <MList>
+                                    <MListItem OnClick="() => RemoveDialogAsync(item.Id)">
+                                        <MListItemTitle>删除</MListItemTitle>
+                                    </MListItem>
+                                    <MListItem OnClick=" () =>  RenameAsync(item)">
+                                        <MListItemTitle > 重命名</MListItemTitle>
+                                    </MListItem>
+                                </MList>
+                            </ChildContent>
+                        </MMenu>
+                    </MListItemTitle>
                 </MListItemContent>
             </MListItem>
         }

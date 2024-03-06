@@ -1,5 +1,7 @@
+using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Wordprocessing;
 using FastWiki.Service.Infrastructure.Helper;
+using JetBrains.Annotations;
 using Masa.BuildingBlocks.Authentication.Identity;
 using Masa.BuildingBlocks.Data.Mapping;
 
@@ -77,5 +79,25 @@ public class ChatApplicationCommandHandler(
         var share = new ChatShare(command.Input.Name, command.Input.ChatApplicationId, command.Input.Expires,
             command.Input.AvailableToken, command.Input.AvailableQuantity);
         await chatApplicationRepository.CreateChatShareAsync(share);
+    }
+
+    [EventHandler]
+    public async Task UpdateChatDialogAsync(UpdateChatDialogCommand command)
+    {
+        var chatDialog = mapper.Map<ChatDialog>(command.Input);
+
+        await chatApplicationRepository.UpdateChatDialogAsync(chatDialog);
+    }
+
+    [EventHandler]
+    public async Task RemoveShareDialogAsync(RemoveShareDialogCommand command)
+    {
+        await chatApplicationRepository.RemoveShareDialogAsync(command.ChatId,command.Id);
+    }
+
+    [EventHandler]
+    public async Task UpdateShareChatDialogAsync(UpdateShareChatDialogCommand command)
+    {
+        await chatApplicationRepository.UpdateShareDialogAsync(mapper.Map<ChatDialog>(command.Input));
     }
 }

@@ -29,12 +29,8 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
 
     public async Task RemoveChatDialogAsync(string id)
     {
-        var entity = await Context.ChatDialogs.FirstOrDefaultAsync(x => x.Id == id);
-
-        if (entity != null)
-        {
-            Context.ChatDialogs.Remove(entity);
-        }
+        await Context.ChatDialogs.Where(x => x.Id == id).ExecuteDeleteAsync();
+        await Context.ChatDialogHistorys.Where(x => x.ChatDialogId == id).ExecuteDeleteAsync();
     }
 
     public async Task<List<ChatDialog>> GetChatDialogListAsync(string applicationId, bool all)
@@ -134,6 +130,25 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
             select application;
 
         return await query.AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task UpdateChatDialogAsync(ChatDialog chatDialog)
+    {
+        await Context.ChatDialogs.Where(x => x.Id == chatDialog.Id).ExecuteUpdateAsync(x =>
+            x.SetProperty(b => b.Name, chatDialog.Name));
+    }
+
+    public async Task RemoveShareDialogAsync(string chatId, string id)
+    {
+        await Context.ChatDialogs.Where(x => x.ChatId == chatId && x.Id == id).ExecuteDeleteAsync();
+        await Context.ChatDialogHistorys.Where(x => x.ChatDialogId == id).ExecuteDeleteAsync();
+    }
+
+    public async Task UpdateShareDialogAsync(ChatDialog chatDialog)
+    {
+        await Context.ChatDialogs.Where(x => x.ChatId == chatDialog.ChatId && x.Id == chatDialog.Id)
+            .ExecuteUpdateAsync(x =>
+                x.SetProperty(b => b.Name, chatDialog.Name));
     }
 
     private IQueryable<ChatShare> CreateChatShareQueryable(Guid userId, string chatApplicationId)

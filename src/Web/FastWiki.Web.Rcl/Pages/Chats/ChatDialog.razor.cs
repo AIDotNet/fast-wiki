@@ -58,8 +58,8 @@ public partial class ChatDialog
                 return;
             }
 
-            _ = ValueChanged.InvokeAsync(_chatDialogs.FirstOrDefault(x => x.Id == value.ToString()));
             _selectedItem = value;
+            Value = _chatDialogs.FirstOrDefault(x => x.Id == value.ToString());
         }
     }
 
@@ -121,6 +121,46 @@ public partial class ChatDialog
         else
         {
             _chatDialogs = await ChatApplicationService.GetChatShareDialogAsync(ChatId);
+        }
+
+    }
+
+    private async Task RemoveDialogAsync(string id)
+    {
+        if (_chatDialogs.Count < 2)
+        {
+            await PopupService.EnqueueSnackbarAsync(new SnackbarOptions("提示", "对话请至少保留一个！"));
+            return;
+        }
+
+        if (ChatId.IsNullOrWhiteSpace())
+        {
+            await ChatApplicationService.RemoveDialogAsync(id);
+        }
+        else
+        {
+            await ChatApplicationService.RemoveShareDialogAsync(ChatId,id);
+        }
+
+        _ = LoadingDialogAsync();
+    }
+
+    private void RenameAsync(ChatDialogDto item)
+    {
+        item.IsEdit = true;
+    }
+
+    private async Task UpdateDialogAsync(ChatDialogDto item)
+    {
+        item.IsEdit = false;
+        if (ChatId.IsNullOrWhiteSpace())
+        {
+            await ChatApplicationService.UpdateDialogAsync(item);
+        }
+        else
+        {
+            item.ChatId = ChatId;
+            await ChatApplicationService.UpdateShareDialogAsync(item);
         }
 
     }

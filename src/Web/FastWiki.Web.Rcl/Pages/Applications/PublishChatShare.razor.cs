@@ -12,6 +12,10 @@ public partial class PublishChatShare
         get => value;
         set
         {
+            if (this.value == value)
+            {
+                return;
+            }
             this.value = value;
             page = 1;
             _ = LoadingAsync();
