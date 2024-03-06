@@ -72,9 +72,7 @@ FastWiki.Web.Server环境变量参数：
 - FAST_WIKI_SERVICE：FastWikiService的地址，默认为http://localhost:5124
 
 ## 技术交流
-
-微信号：hjl010426
-qq: 239573049
+![输入图片说明](img/wechat.png)
 
 ## 贡献指南
 
