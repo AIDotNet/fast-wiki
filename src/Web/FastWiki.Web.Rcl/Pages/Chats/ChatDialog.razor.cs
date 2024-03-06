@@ -44,7 +44,7 @@ public partial class ChatDialog
 
     [Parameter] public ChatDialogDto Value { get; set; }
 
-    [Parameter] public EventCallback<ChatDialogDto> ValueChanged { get; set; }
+    [Parameter] public EventCallback<ChatDialogDto>? ValueChanged { get; set; }
 
     private StringNumber _selectedItem;
 
@@ -59,7 +59,7 @@ public partial class ChatDialog
             }
 
             _selectedItem = value;
-            Value = _chatDialogs.FirstOrDefault(x => x.Id == value.ToString());
+            ValueChanged?.InvokeAsync(_chatDialogs.FirstOrDefault(x => x.Id == value.ToString()));
         }
     }
 
@@ -139,7 +139,7 @@ public partial class ChatDialog
         }
         else
         {
-            await ChatApplicationService.RemoveShareDialogAsync(ChatId,id);
+            await ChatApplicationService.RemoveShareDialogAsync(ChatId, id);
         }
 
         _ = LoadingDialogAsync();
