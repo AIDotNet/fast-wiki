@@ -5,8 +5,8 @@ using System.Net.Http.Json;
 
 namespace FastWiki.ApiGateway.Caller.Service;
 
-public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory httpClientFactory,IUserService userService)
-    : ServiceBase(caller, httpClientFactory,userService), IChatApplicationService
+public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory httpClientFactory, IUserService userService)
+    : ServiceBase(caller, httpClientFactory, userService), IChatApplicationService
 {
     protected override string BaseUrl { get; set; } = "ChatApplications";
 
@@ -57,7 +57,7 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
 
     public async Task<List<ChatDialogDto>> GetChatDialogAsync(string chatId, bool all)
     {
-        return await GetAsync<List<ChatDialogDto>>(nameof(GetChatDialogAsync),new Dictionary<string, string>()
+        return await GetAsync<List<ChatDialogDto>>(nameof(GetChatDialogAsync), new Dictionary<string, string>()
         {
             {
                 "applicationId",chatId
@@ -176,11 +176,32 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
 
     public async Task RemoveShareDialogAsync(string chatId, string id)
     {
-        await DeleteAsync(nameof(RemoveDialogAsync) + "/" + id+"?chatId="+chatId).ConfigureAwait(false); ;
+        await DeleteAsync(nameof(RemoveDialogAsync) + "/" + id + "?chatId=" + chatId).ConfigureAwait(false); ;
     }
 
     public async Task UpdateShareDialogAsync(ChatDialogDto input)
     {
         await PutAsync(nameof(UpdateDialogAsync), input).ConfigureAwait(false);
+    }
+
+    public async Task<PaginatedListBase<ChatDialogDto>> GetSessionLogDialogAsync(string chatApplicationId, int page, int pageSize)
+    {
+        return
+            await GetAsync<PaginatedListBase<ChatDialogDto>>(nameof(GetSessionLogDialogAsync),
+                new Dictionary<string, string>()
+                {
+                    {
+
+                        "chatApplicationId",chatApplicationId
+                    },
+                    {
+
+                        "page",page.ToString()
+                    },
+                    {
+
+                        "pageSize",pageSize.ToString()
+                    }
+                });
     }
 }

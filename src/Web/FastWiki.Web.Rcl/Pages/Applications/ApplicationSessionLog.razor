@@ -5,12 +5,13 @@
     对话日志
 </MCardTitle>
 <MDataTable Headers="_headers"
-            Items="chatDialogs"
+            Items="chatDialogs.Result"
+            HideDefaultFooter="true"
             Style="width:100%;">
     <ItemColContent>
         @if (context.Header.Value == nameof(ChatDialogDto.Id))
         {
-            <span>@chatDialogs.IndexOf(context.Item)</span>
+            <span>@chatDialogs.Result.IndexOf(context.Item)</span>
         }
         else if (context.Header.Value == nameof(ChatDialogDto.Name))
         {
@@ -24,9 +25,20 @@
         {
             <span>@context.Item.TypeName</span>
         }
+        else if (context.Header.Value == nameof(ChatDialogDto.Type))
+        {
+            <span>@context.Item.TypeName</span>
+        }
+        else if (context.Header.Value == nameof(ChatDialogDto.CreationTime))
+        {
+            <span>@context.Item.CreationTime.ToString("yyyy-MM-dd hh:mm:ss")</span>
+        }
         else
         {
             <MButton>查看详情</MButton>
         }
     </ItemColContent>
+    <FooterContent>
+        <MPagination Value="page" ValueChanged="OnPageChanged" Class="my-4" Length=@((int)Math.Ceiling((double)chatDialogs.Total / pageSize))></MPagination>
+    </FooterContent>
 </MDataTable>

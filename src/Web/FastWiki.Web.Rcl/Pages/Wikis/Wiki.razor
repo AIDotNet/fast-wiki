@@ -85,7 +85,7 @@ else
         <div class="mr-auto pt-3 text-btn neutral-lighten-1--text"> @((page - 1) * pageSize + 1) - @(page * pageSize) 当前页： @(page)</div>
         @if (Result?.Total > 0)
         {
-            <MPagination @bind-Value="page" Color="primary" Circle Length=@((int)(Result?.Total??0))></MPagination>
+            <MPagination @bind-Value="page" Color="primary" Circle Length=@((int)Math.Ceiling((double)Result.Total / pageSize))></MPagination>
         }
     </div>
 </MCardText>

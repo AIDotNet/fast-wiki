@@ -131,4 +131,20 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <param name="chatDialog"></param>
     /// <returns></returns>
     Task UpdateShareDialogAsync(ChatDialog chatDialog);
+
+    /// <summary>
+    /// 获取对话记录的对话列表
+    /// </summary>
+    /// <param name="chatApplicationId"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    Task<List<ChatDialog>> GetSessionLogDialogListAsync(string chatApplicationId, int page, int pageSize);
+
+    /// <summary>
+    /// 获取对话记录的数量
+    /// </summary>
+    /// <param name="chatApplicationId"></param>
+    /// <returns></returns>
+    Task<long> GetSessionLogDialogCountAsync(string chatApplicationId);
 }

@@ -138,6 +138,20 @@ public sealed class QuantizeBackgroundService : BackgroundService
                             }
                     }, "wiki");
             }
+            else if (wikiDetail.Type == "data")
+            {
+                result = await serverless.ImportDocumentAsync(wikiDetail.Path,
+                                       wikiDetail.Id.ToString(),
+                                                          tags: new TagCollection()
+                                                          {
+                                                              {
+                                "wikiId", wikiDetail.WikiId.ToString()
+                        },
+                                                              {
+                                "wikiDetailId", wikiDetail.Id.ToString()
+                            }
+                    }, "wiki");
+            }
 
             await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Accomplish);
             Console.WriteLine($"量化成功：{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {result}");

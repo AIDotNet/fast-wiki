@@ -32,7 +32,7 @@ public class ChatApplicationQueryHandler(
     [EventHandler]
     public async Task ChatDialogAsync(ChatDialogQuery query)
     {
-        var result = await chatApplicationRepository.GetChatDialogListAsync(query.chatId,query.all);
+        var result = await chatApplicationRepository.GetChatDialogListAsync(query.chatId, query.all);
 
         query.Result = mapper.Map<List<ChatDialogDto>>(result);
     }
@@ -92,5 +92,20 @@ public class ChatApplicationQueryHandler(
         var chatApplication = await chatApplicationRepository.ChatShareApplicationAsync(query.chatSharedId);
 
         query.Result = mapper.Map<ChatApplicationDto>(chatApplication);
+    }
+
+    [EventHandler]
+    public async Task GetSessionLogDialogQueryAsync(GetSessionLogDialogQuery query)
+    {
+        var result =
+            await chatApplicationRepository.GetSessionLogDialogListAsync(query.chatApplicationId, query.page, query.pageSize);
+
+        var total = await chatApplicationRepository.GetSessionLogDialogCountAsync(query.chatApplicationId);
+
+        query.Result = new PaginatedListBase<ChatDialogDto>()
+        {
+            Result = mapper.Map<List<ChatDialogDto>>(result),
+            Total = total
+        };
     }
 }

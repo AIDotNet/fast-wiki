@@ -447,4 +447,14 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
 
         await EventBus.PublishAsync(command);
     }
+
+    [Authorize]
+    public async Task<PaginatedListBase<ChatDialogDto>> GetSessionLogDialogAsync(string chatApplicationId, int page, int pageSize)
+    {
+        var query = new GetSessionLogDialogQuery(chatApplicationId, page, pageSize);
+
+        await EventBus.PublishAsync(query);
+
+        return query.Result;
+    }
 }

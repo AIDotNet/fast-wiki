@@ -62,11 +62,18 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         await EventBus.PublishAsync(command);
     }
 
-    public Task CreateWikiDetailWebPageInputAsync(CreateWikiDetailWebPageInput input)
+    public async Task CreateWikiDetailWebPageInputAsync(CreateWikiDetailWebPageInput input)
     {
         var command = new CreateWikiDetailWebPageCommand(input);
         
-        return EventBus.PublishAsync(command);
+        await EventBus.PublishAsync(command);
+    }
+
+    public async Task CreateWikiDetailDataAsync(CreateWikiDetailDataInput input)
+    {
+        var command = new CreateWikiDetailDataCommand(input);
+
+        await EventBus.PublishAsync(command);
     }
 
     [Authorize]

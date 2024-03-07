@@ -67,7 +67,23 @@ public sealed class WikiCommandHandler(
 
         wikiDetail = await wikiRepository.AddDetailsAsync(wikiDetail);
 
-        QuantizeWikiDetail quantizeWikiDetail = mapper.Map<QuantizeWikiDetail>(wikiDetail);
+        var quantizeWikiDetail = mapper.Map<QuantizeWikiDetail>(wikiDetail);
+        quantizeWikiDetail.Subsection = command.Input.Subsection;
+        quantizeWikiDetail.Mode = command.Input.Mode;
+        quantizeWikiDetail.TrainingPattern = command.Input.TrainingPattern;
+
+        await QuantizeBackgroundService.AddWikiDetailAsync(quantizeWikiDetail);
+    }
+
+    [EventHandler]
+    public async Task CreateWikiDetailDataAsync(CreateWikiDetailDataCommand command)
+    {
+        var wikiDetail = new WikiDetail(command.Input.WikiId, command.Input.Name, command.Input.FilePath,
+                       command.Input.FileId, 0, "data");
+
+        wikiDetail = await wikiRepository.AddDetailsAsync(wikiDetail);
+
+        var quantizeWikiDetail = mapper.Map<QuantizeWikiDetail>(wikiDetail);
         quantizeWikiDetail.Subsection = command.Input.Subsection;
         quantizeWikiDetail.Mode = command.Input.Mode;
         quantizeWikiDetail.TrainingPattern = command.Input.TrainingPattern;

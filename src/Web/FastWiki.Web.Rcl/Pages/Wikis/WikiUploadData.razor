@@ -9,10 +9,11 @@
         <MListItem Link
                    @attributes="@context.Attrs">
             <MListItemIcon>
-                <MIcon>mdi-file-chart-outline</MIcon>
+                <MIcon>mdi-text-box-edit-outline</MIcon>
             </MListItemIcon>
+
             <MListItemContent>
-                <MListItemTitle>网页链接</MListItemTitle>
+                <MListItemTitle>自定义文本</MListItemTitle>
             </MListItemContent>
         </MListItem>
     </ActivatorContent>
@@ -48,29 +49,13 @@
 
                 <MStepperItems>
                     <MStepperContent Step="1">
-                        <MCard Outlined Class="mb-12">
-                            <MCardActions Style="display: block; overflow: auto; max-height: 60vh;">
-                                <div style="display: flex;">
-                                    <div style="width: 120px;text-align: center;">网络链接</div>
-                                    <textarea class="upload-textarea" @bind="WebPage" placeholder="请输入内容"></textarea>
-                                </div>
-                                <div>
-                                    @if (!string.IsNullOrEmpty(WebPage))
-                                    {
-                                        @foreach (var item in WebPage.Split('\n').Where(x=>!x.IsNullOrEmpty()))
-                                        {
-                                            <div style="background-color: #F4F4F7;border-radius: 10px;padding: 8px;margin: 8px;">
-                                                @item
-                                                <MButton OnClick="()=>Remove(item)" Icon>
-                                                    <MIcon>mdi-close</MIcon>
-                                                </MButton>
-                                            </div>
-                                        }
-                                    }
-                                </div>
-                            </MCardActions>
+                        <MCard Outlined Class="mb-12" Style="padding: 8px;">
+
+                            <MTextField Outlined Label="数据集名称：" @bind-Value="name"/>
+
+                            <textarea class="upload-textarea" style="width: 100%;" @bind="data" placeholder="数据集内容"></textarea>
                             <MCardActions>
-                                <MButton Color="primary" Block OnClick="SelectFileHandle">下一步</MButton>
+                                <MButton Color="primary" Block OnClick="DataHandle">下一步</MButton>
                             </MCardActions>
                         </MCard>
                     </MStepperContent>
@@ -110,15 +95,19 @@
 
                                         </div>
                                     }
+                                    <MButton Block Color="primary" OnClick="Preview">预览</MButton>
                                 </div>
                                 <div style="flex: 1;margin:15px;height: 70vh;overflow: auto;">
-                                    @foreach (var input in WebPage.Split('\n').Where(x => !x.IsNullOrEmpty()))
+                                    @foreach (var input in datas)
                                     {
                                         <MCard Style="margin:8px;"
                                                Outlined>
                                             <MCardTitle Style="font-size:16px;font-weight:bold;">
-                                                @input
+                                                @name @("(#" + (datas.IndexOf(input) + 1) + ")")
                                             </MCardTitle>
+                                            <div style="white-space: pre-line;margin:8px;">
+                                                @input
+                                            </div>
                                         </MCard>
                                     }
                                 </div>
@@ -126,45 +115,7 @@
                             <MCardActions>
                                 <MSpacer></MSpacer>
                                 <MButton Color="primary" OnClick="() => _step = 1">上一步</MButton>
-                                <MButton Color="primary" OnClick="DataHandler">下一步</MButton>
-                            </MCardActions>
-                        </MCard>
-                    </MStepperContent>
-                    <MStepperContent Step="3">
-                        <MCard Class="mb-12">
-                            <div style="display: flex;">
-                                <MDataTable Headers="_headers"
-                                            Items="Pages"
-                                            Style="width:100%;"
-                                            Class="elevation-1">
-                                    <ItemColContent>
-                                        @if (context.Header.Value == nameof(UploadSubsectionInput.Name))
-                                        {
-                                            <span>@context.Value</span>
-                                        }
-                                        else if (context.Header.Value == nameof(UploadSubsectionInput.Count))
-                                        {
-                                            <span>@context.Value</span>
-                                        }
-                                        else if (context.Header.Value == nameof(UploadSubsectionInput.FileProgress))
-                                        {
-                                            <MProgressLinear Value="@((int)context.Value)" Height="10" Context="progress">
-                                                <strong>@($"{progress}%")</strong>
-                                            </MProgressLinear>
-                                        }
-                                        else if (context.Header.Value == nameof(UploadSubsectionInput.DataProgress))
-                                        {
-                                            <MProgressLinear Value="@((int)context.Value)" Height="10" Context="progress">
-                                                <strong>@($"{progress}%")</strong>
-                                            </MProgressLinear>
-                                        }
-                                    </ItemColContent>
-                                </MDataTable>
-                            </div>
-                            <MCardActions>
-                                <MSpacer></MSpacer>
-                                <MButton Color="primary" OnClick="()=>_step=2">上一步</MButton>
-                                <MButton Color="primary" OnClick="Upload">共@(Pages.Count)个文件|开始上传</MButton>
+                                <MButton Color="primary" OnClick="Handler">完成</MButton>
                             </MCardActions>
                         </MCard>
                     </MStepperContent>
@@ -173,10 +124,8 @@
         </MCard>
     </ChildContent>
 </MDialog>
-
-
 <style>
-
+    
 
     .upload-textarea {
         height: 250px;
@@ -189,8 +138,8 @@
         outline: none;
     }
 
-        .upload-textarea:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 5px #007bff;
-        }
+    .upload-textarea:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px #007bff;
+    }
 </style>

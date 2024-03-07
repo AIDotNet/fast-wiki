@@ -151,4 +151,13 @@ public interface IChatApplicationService
     /// <param name="input"></param>
     /// <returns></returns>
     Task UpdateShareDialogAsync(ChatDialogDto input);
+
+    /// <summary>
+    /// 获取对话记录列表
+    /// </summary>
+    /// <param name="chatApplicationId"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    Task<PaginatedListBase<ChatDialogDto>> GetSessionLogDialogAsync(string chatApplicationId, int page, int pageSize);
 }

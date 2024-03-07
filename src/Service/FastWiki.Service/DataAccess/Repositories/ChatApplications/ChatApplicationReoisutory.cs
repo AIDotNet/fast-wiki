@@ -151,6 +151,24 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
                 x.SetProperty(b => b.Name, chatDialog.Name));
     }
 
+    public Task<List<ChatDialog>> GetSessionLogDialogListAsync(string chatApplicationId, int page, int pageSize)
+    {
+        var query = Context.ChatDialogs.Where(x => x.ApplicationId == chatApplicationId);
+
+        return query
+            .OrderByDescending(x => x.CreationTime)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    public async Task<long> GetSessionLogDialogCountAsync(string chatApplicationId)
+    {
+        var query = Context.ChatDialogs.Where(x => x.ApplicationId == chatApplicationId);
+
+        return await query.LongCountAsync();
+    }
+
     private IQueryable<ChatShare> CreateChatShareQueryable(Guid userId, string chatApplicationId)
     {
         return Context.ChatShares.AsNoTracking()

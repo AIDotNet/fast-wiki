@@ -12,6 +12,8 @@ public class ChatDialogDto
 
     public ChatDialogType Type { get; set; }
 
+    public DateTime CreationTime { get; set; }
+
     public string TypeName
     {
         get

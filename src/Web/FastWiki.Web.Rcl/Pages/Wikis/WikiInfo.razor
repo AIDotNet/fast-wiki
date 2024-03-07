@@ -40,16 +40,8 @@
                         <ChildContent>
                             <MList Nav Dense>
                                 <WikiUploadLocalFile OnSucceed="OnSucceed" Value="Id" />
-                                <WikiUploadWebPage Value="Id" />
-                                <MListItem Link>
-                                    <MListItemIcon>
-                                        <MIcon>mdi-text-box-edit-outline</MIcon>
-                                    </MListItemIcon>
-
-                                    <MListItemContent>
-                                        <MListItemTitle>自定义文本</MListItemTitle>
-                                    </MListItemContent>
-                                </MListItem>
+                                <WikiUploadWebPage OnSucceed="OnSucceed" Value="Id" />
+                                <WikiUploadData OnSucceed="OnSucceed" Value="Id" />
                             </MList>
                         </ChildContent>
                     </MMenu>

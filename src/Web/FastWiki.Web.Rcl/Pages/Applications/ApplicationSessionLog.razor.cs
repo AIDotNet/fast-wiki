@@ -2,6 +2,8 @@
 
 public partial class ApplicationSessionLog
 {
+    private int page = 1;
+    private int pageSize = 10;
 
     private readonly List<DataTableHeader<ChatDialogDto>> _headers =
     [
@@ -29,7 +31,11 @@ public partial class ApplicationSessionLog
             Text = "对话来源",
             Sortable = false, Value = nameof(ChatDialogDto.Type)
         },
-
+        new()
+        {
+            Text = "创建时间",
+            Sortable = false, Value = nameof(ChatDialogDto.CreationTime)
+        },
         new()
         {
             Text = "操作",
@@ -40,11 +46,11 @@ public partial class ApplicationSessionLog
     [Parameter]
     public string ChatApplicationId { get; set; }
 
-    private List<ChatDialogDto> chatDialogs = new();
+    private PaginatedListBase<ChatDialogDto> chatDialogs = new();
 
     private async Task LoadingAsync()
     {
-        chatDialogs = await ChatApplicationService.GetChatDialogAsync(ChatApplicationId, true);
+        chatDialogs = await ChatApplicationService.GetSessionLogDialogAsync(ChatApplicationId, page,pageSize);
 
         await InvokeAsync(StateHasChanged);
     }
@@ -55,5 +61,13 @@ public partial class ApplicationSessionLog
         {
             await LoadingAsync();
         }
+    }
+    private void OnPageChanged(int page)
+    {
+        if (this.page == page)
+            return;
+
+        this.page = page;
+
     }
 }
