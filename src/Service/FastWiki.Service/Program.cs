@@ -24,7 +24,15 @@ builder
 builder
     .AddFastSemanticKernel();
 
-var app = builder.Services
+var app = builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowAll",
+            builder => builder
+                .SetIsOriginAllowed(_ => true)
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
+    })
     .AddAuthorization()
     .AddHostedService<QuantizeBackgroundService>()
     .AddJwtBearerAuthentication()
@@ -82,7 +90,25 @@ var app = builder.Services
     .AddAutoInject()
     .AddServices(builder, option => option.MapHttpMethodsForUnmatched = ["Post"]);
 
-app.UseMasaExceptionHandler();
+app.Use((async (context, next) =>
+{
+    try
+    {
+        await next(context);
+    }
+    catch (UserFriendlyException userFriendlyException)
+    {
+        context.Response.StatusCode = 400;
+
+        await context.Response.WriteAsJsonAsync(ResultDto.CreateError(userFriendlyException.Message, "400"));
+    }
+    catch (Exception e)
+    {
+        context.Response.StatusCode = 500;
+
+        await context.Response.WriteAsJsonAsync(ResultDto.CreateError(e.Message, "500"));
+    }
+}));
 
 var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider
 {
@@ -96,6 +122,7 @@ app.UseStaticFiles(new StaticFileOptions
     ContentTypeProvider = fileExtensionContentTypeProvider
 });
 
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 

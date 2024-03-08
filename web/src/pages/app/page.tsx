@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import DesktopPage from './(desktop)';
 import MobilePage from './(mobile)';
-import { isMobileDevice } from '../components/ResponsiveIndex';
+import { isMobileDevice } from '../../components/ResponsiveIndex';
 
 export default function Login() {
     const [isMobile, setIsMobile] = useState(isMobileDevice());
