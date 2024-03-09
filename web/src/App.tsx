@@ -8,7 +8,8 @@ import App from './pages/app/page'
 import { ThemeProvider } from '@lobehub/ui'
 import Wiki from './pages/wiki/page'
 import Chat from './pages/chat/page'
-import { User } from './pages/user/page'
+import User from './pages/user/page'
+import AppDetail from './pages/app-detail/page'
 
 
 const router = createBrowserRouter([{
@@ -18,6 +19,7 @@ const router = createBrowserRouter([{
   element: <MainLayout />,
   children: [
     { path: '/app', element: <App /> },
+    { path: '/app/:id', element: <AppDetail /> }, // Add this line to bind /app/id
     { path: '/wiki', element: <Wiki /> },
     { path: '/chat', element: <Chat /> },
     { path: '/user', element: <User /> },

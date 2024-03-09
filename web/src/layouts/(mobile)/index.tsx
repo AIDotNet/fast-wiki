@@ -8,7 +8,6 @@ import styled from 'styled-components';
 
 const ActiveTitle = styled.span`
     color: #1890ff;
-    
 `;
 
 

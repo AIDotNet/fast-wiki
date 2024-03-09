@@ -95,6 +95,7 @@ app.Use((async (context, next) =>
     try
     {
         await next(context);
+
     }
     catch (UserFriendlyException userFriendlyException)
     {

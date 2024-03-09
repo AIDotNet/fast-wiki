@@ -55,9 +55,9 @@ const DesktopLayout = memo(() => {
       bottomActions={<ActionIcon icon={Settings2} />}
       topActions={
         <>
-          {tabs.map((item) => {
+          {tabs.map((item,index) => {
             return (
-              <Tooltip arrow={true} placement='right' title={item.description}>
+              <Tooltip key={index} arrow={true} placement='right' title={item.description}>
                 <ActionIcon
                   active={tab === item.key}
                   icon={item.icon}

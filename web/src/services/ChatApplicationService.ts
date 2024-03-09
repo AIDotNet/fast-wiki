@@ -1,5 +1,6 @@
-import { post, get, del, put } from '../utils/fetch';
+import { postJson, get, del, putJson } from '../utils/fetch';
 import { config } from '../config';
+import { ChatApplicationDto, ChatDialogDto, PaginatedListBase } from '../models';
 
 const prefix = `/api/${config.VITE_VERSIONS}/ChatApplications`;
 
@@ -8,7 +9,7 @@ const prefix = `/api/${config.VITE_VERSIONS}/ChatApplications`;
  * @param data - 聊天应用程序的数据。
  */
 export function CreateChatApplications(data: any) {
-    return post(prefix, data);
+    return postJson(prefix, data);
 }
 
 /**
@@ -16,7 +17,7 @@ export function CreateChatApplications(data: any) {
  * @param data - 聊天应用程序的数据。
  */
 export function PutChatApplications(data: any) {
-    return put(prefix, data);
+    return putJson(prefix, data);
 }
 
 /**
@@ -30,19 +31,14 @@ export function DeleteChatApplications(id: string) {
  * 通过ID获取聊天应用程序。
  * @param id - 聊天应用程序的ID。
  */
-/**
- * Retrieves a chat application by its ID.
- * @param id - The ID of the chat application.
- * @returns A Promise that resolves to the chat application object.
- */
-export function GetChatApplications(id: string) {
+export function GetChatApplications(id: string) : Promise<ChatApplicationDto> {
     return get(`${prefix}/${id}`);
 }
 
 /**
  * 获取聊天应用程序列表。
  */
-export function GetChatApplicationsList(page: number, pageSize: number) {
+export function GetChatApplicationsList(page: number, pageSize: number) : Promise<PaginatedListBase<ChatApplicationDto>> {
     return get(`${prefix}/List?page=${page}&pageSize=${pageSize}`);
 }
 
@@ -58,7 +54,7 @@ export function GetChatShareApplication(chatShareId: string) {
  * @param data - 聊天应用程序的数据。
  */
 export function CreateChatDialog(data: any) {
-    return post(`${prefix}/ChatDialog`, data);
+    return postJson(`${prefix}/ChatDialog`, data);
 }
 
 /**
@@ -91,7 +87,7 @@ export function GetChatDialogSse(applicationId: string) {
  * @returns
  */
 export function CreateChatDialogHistory(data: any) {
-    return post(`${prefix}/ChatDialogHistory`, data);
+    return postJson(`${prefix}/ChatDialogHistory`, data);
 }
 
 /**
@@ -120,7 +116,7 @@ export function DeleteDialogHistory(id: string) {
  * @returns 
  */
 export function CreateShare(data: any) {
-    return post(`${prefix}/Share`, data);
+    return postJson(`${prefix}/Share`, data);
 }
 
 /**
@@ -147,7 +143,7 @@ export function DeleteDialog(id: string) {
  * @returns 
  */
 export function PutDialog(data: any) {
-    return put(`${prefix}/Dialog`, data);
+    return putJson(`${prefix}/Dialog`, data);
 }
 
 
@@ -167,7 +163,7 @@ export function DeleteShareDialog(id: string) {
  * @returns 
  */
 export function PutShareDialog(data: any) {
-    return put(`${prefix}/ShareDialog`, data);
+    return putJson(`${prefix}/ShareDialog`, data);
 }
 
 /**
@@ -175,6 +171,6 @@ export function PutShareDialog(data: any) {
  * @param chatId 
  * @returns 
  */
-export function GetSessionLogDialog(chatApplicationId: string, page: number, pageSize: number) {
+export function GetSessionLogDialog(chatApplicationId: string, page: number, pageSize: number) : Promise<PaginatedListBase<ChatDialogDto>>{
     return get(`${prefix}/SessionLogDialog?chatApplicationId=${chatApplicationId}&page=${page}&pageSize=${pageSize}`);
 }
