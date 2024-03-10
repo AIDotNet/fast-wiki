@@ -1,5 +1,6 @@
 using FastWiki.Service;
 using FastWiki.Service.Backgrounds;
+using FastWiki.Service.Service;
 using Masa.Contrib.Authentication.Identity;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
@@ -95,7 +96,6 @@ app.Use((async (context, next) =>
     try
     {
         await next(context);
-
     }
     catch (UserFriendlyException userFriendlyException)
     {
@@ -144,5 +144,7 @@ if (app.Environment.IsDevelopment())
 
     #endregion
 }
+
+app.MapPost("/v1/chat/completions", OpenAIService.Completions);
 
 app.Run();

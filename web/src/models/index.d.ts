@@ -172,15 +172,33 @@ export interface WikiDto {
 interface ChatModel {
     label: string;
     value: string;
-  }
-  
-  interface EmbeddingModel {
+}
+
+interface EmbeddingModel {
     label: string;
     value: string;
-  }
-  
-  interface Models {
+}
+
+interface Models {
     chatModel: ChatModel[];
     embeddingModel: EmbeddingModel[];
-  }
-  
+}
+
+
+export enum TrainingPattern {
+    Subsection,
+    QA
+}
+
+export enum ProcessMode {
+    Auto,
+    Custom
+}
+export interface WikiDetailVectorQuantityDto {
+    id: string;
+    content: string;
+    document_Id: string;
+    wikiDetailId: string;
+    fileId: string;
+    index: number;
+}

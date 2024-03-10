@@ -53,6 +53,50 @@ export async function fetch(url: string, options: any) {
   }
 }
 
+export async function fetchRaw(url: string, data:any) {
+  const token = localStorage.getItem('token');
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    
+  };
+  try {
+    // 拼接baseUrl并且处理/重复问题
+    const baseUrl = config.FAST_API_URL;
+    url = `${baseUrl}${url}`.replace(/([^:]\/)\/+/g, '$1');
+    const response = await window.fetch(url, { 
+      headers,
+      method: 'POST',
+      body: JSON.stringify(data)
+     });
+
+    if (response.ok === false) {
+      const reader = await response.text();
+      throw new Error(reader);
+    }
+
+    const reader = response.body!.getReader();
+    return {
+      [Symbol.asyncIterator]() {
+        return {
+          async next() {
+            const { done, value } = await reader.read();
+            if (done) {
+              return { done: true, value: null };
+            }
+            return {
+              done: false,
+              value: new TextDecoder("utf-8").decode(value),
+            };
+          },
+        };
+      },
+    };
+  } catch (error: any) {
+    throw error;
+  }
+}
+
 export const get = (url: string, options?: any) => {
   return fetch(url, {
     method: 'GET',

@@ -93,7 +93,7 @@ export function GetWikiDetailVectorQuantity(wikiDetailId: string, page: number, 
  * 删除指定的Wiki知识库详情向量数据
  */
 export function DelDetailVectoryQuantity(id: string) {
-    return del(`${prefix}/WikiDetailVectorQuantity?documentId=${id}`)
+    return del(`${prefix}/DetailVectorQuantity?documentId=${id}`)
 }
 
 /**
@@ -107,5 +107,8 @@ export function GetSearchVectorQuantity(wikiId: string, search: string, minRelev
  * 删除指定的Wiki知识库详情向量数据
  */
 export function DelDetailsVector(id: string) {
+    // 将id进行url编码
+    id = encodeURIComponent(id);
+
     return del(`${prefix}/DetailsVector/${id}`)
 }

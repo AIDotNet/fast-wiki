@@ -1,6 +1,6 @@
 import { memo, useState } from "react";
 import Header from "../features/Header";
-import { AppList } from "../features/AppList";
+import { AppList } from "../features/WikiList";
 import { Layout } from "@lobehub/ui";
 
 const DesktopLayout = memo(() => {

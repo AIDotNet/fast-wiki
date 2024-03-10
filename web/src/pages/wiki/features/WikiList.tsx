@@ -35,14 +35,16 @@ export function AppList(props: IAppListProps) {
 
     const render = (item: WikiDto) => (
         <Flexbox align={'flex-start'} gap={8} horizontal style={{ padding: 16, height: 100 }}>
-            <Avatar size={24} src={item.icon} style={{ flex: 'none' }} />
-            <Flexbox><Flexbox>
+
+            <Avatar size={50} src={item.icon} style={{ flex: 'none' }} />
+            <Flexbox onClick={()=>{
+                openWikiDetail(item.id);
+            }}>
                 <div style={{ fontSize: 15, fontWeight: 600 }}>{item.name}</div>
                 <div style={{ opacity: 0.6 }}>
                     QA模型：
                     {item.model}
                 </div>
-            </Flexbox>
             </Flexbox>
             <Button
                 style={{
@@ -57,7 +59,6 @@ export function AppList(props: IAppListProps) {
     )
 
     async function deleteWiki(id: number) {
-        //删除
         await DeleteWikis(id);
         message.success('删除成功');
         setInput({
@@ -65,6 +66,10 @@ export function AppList(props: IAppListProps) {
             page: 1
         });
         loadingData();
+    }
+
+    function openWikiDetail(id: number) {
+        navigate(`/wiki/${id}`);
     }
 
     async function loadingData() {

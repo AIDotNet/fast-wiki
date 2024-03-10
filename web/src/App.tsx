@@ -10,6 +10,7 @@ import Wiki from './pages/wiki/page'
 import Chat from './pages/chat/page'
 import User from './pages/user/page'
 import AppDetail from './pages/app-detail/page'
+import WikiDetail from './pages/wiki-detail/page'
 
 
 const router = createBrowserRouter([{
@@ -19,8 +20,9 @@ const router = createBrowserRouter([{
   element: <MainLayout />,
   children: [
     { path: '/app', element: <App /> },
-    { path: '/app/:id', element: <AppDetail /> }, // Add this line to bind /app/id
+    { path: '/app/:id', element: <AppDetail /> },
     { path: '/wiki', element: <Wiki /> },
+    { path: '/wiki/:id', element: <WikiDetail /> },
     { path: '/chat', element: <Chat /> },
     { path: '/user', element: <User /> },
   ]

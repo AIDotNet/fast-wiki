@@ -73,6 +73,7 @@ export default memo(() => {
                             changeTab(item);
                         }} type={tab?.key === item.key ? 'default' : 'text'} style={{
                             marginBottom: 16,
+                            width: '100%'
                         }} size='large'>{item.label}</Button>
                     })}
                 </LeftTabs>

@@ -1,5 +1,5 @@
 import { memo, useState } from "react";
-import { AppList } from "../features/AppList";
+import { AppList } from "../features/WikiList";
 
 const MobileLayout = memo(() => {
     const [input, setInput] = useState({

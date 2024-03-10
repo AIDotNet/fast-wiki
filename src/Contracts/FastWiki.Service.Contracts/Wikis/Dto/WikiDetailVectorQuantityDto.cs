@@ -2,6 +2,11 @@
 
 public sealed class WikiDetailVectorQuantityDto
 {
+    /// <summary>
+    /// 当前索引
+    /// </summary>
+    public int Index { get; set; }
+    
     public string Id { get; set; }
 
     /// <summary>
