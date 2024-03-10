@@ -20,6 +20,7 @@ import {
 import { Eraser, Languages } from 'lucide-react';
 import { Flexbox } from 'react-layout-kit';
 import { fetchRaw } from "../../../utils/fetch";
+import CreateDialog from "../feautres/CreateDialog";
 
 const DialogList = styled.div`
     margin-top: 8px;
@@ -48,6 +49,7 @@ export default function DesktopLayout() {
     const [applications, setApplications] = useState([] as any[]);
     const [application, setApplication] = useState(null as any);
     const [dialogs, setDialogs] = useState([] as any[]);
+    const [createDialogVisible, setCreateDialogVisible] = useState(false);
     const [dialog, setDialog] = useState({} as any);
     const [history, setHistory] = useState([] as any[]);
     const [value, setValue] = useState('' as string);
@@ -207,7 +209,7 @@ export default function DesktopLayout() {
                     return;
                 }
 
-                if(content.startsWith(',') === true){
+                if (content.startsWith(',') === true) {
                     content = content.slice(1);
                 }
 
@@ -219,7 +221,7 @@ export default function DesktopLayout() {
                 obj.forEach((item) => {
                     chat.content += item.content;
                 });
-                
+
                 setHistory([...history, chat]);
             }
         }
@@ -231,7 +233,7 @@ export default function DesktopLayout() {
             type: 0
         })
 
-        
+
         await CreateChatDialogHistory({
             chatDialogId: dialog.id,
             content: chat.content,
@@ -288,9 +290,10 @@ export default function DesktopLayout() {
                             }}>{item.name}</DialogItem>
                     })
                 }
-                <Button style={{
+                <Button onClick={()=>setCreateDialogVisible(true)} style={{
                     marginTop: 8
                 }} block>新建对话</Button>
+
             </DialogList>
         </DraggablePanel>
         <div style={{
@@ -346,6 +349,13 @@ export default function DesktopLayout() {
                     />
                 </Flexbox>
             </div>
+            <CreateDialog visible={createDialogVisible} id={application?.id} type={0} onClose={() => {
+                setCreateDialogVisible(false);
+                loadingDialogs();
+            }} onSucess={() => {
+                setCreateDialogVisible(false);
+                loadingDialogs();
+            }} />
         </div>
     </>
 }
