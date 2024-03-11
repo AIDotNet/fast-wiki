@@ -1,18 +1,22 @@
 import './App.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { Suspense, lazy } from 'react'
 import MainLayout from './layouts/main-layout'
 import Home from './pages/home/page'
 import Login from './pages/login/page'
 import App from './pages/app/page'
 
 import { ThemeProvider } from '@lobehub/ui'
-import Wiki from './pages/wiki/page'
-import Chat from './pages/chat/page'
-import User from './pages/user/page'
-import AppDetail from './pages/app-detail/page'
-import WikiDetail from './pages/wiki-detail/page'
-import ShareChat from './pages/share-chat/page'
+const Chat = lazy(() => import('./pages/chat/page'));
+const User = lazy(() => import('./pages/user/page'));
 
+const AppDetail = lazy(() => import('./pages/app-detail/page'));
+
+const WikiDetail = lazy(() => import('./pages/wiki-detail/page'));
+
+const ShareChat = lazy(() => import('./pages/share-chat/page'));
+
+const Wiki = lazy(() => import('./pages/wiki/page'));
 
 const router = createBrowserRouter([{
   path: '/',
@@ -20,12 +24,36 @@ const router = createBrowserRouter([{
 }, {
   element: <MainLayout />,
   children: [
-    { path: '/app', element: <App /> },
-    { path: '/app/:id', element: <AppDetail /> },
-    { path: '/wiki', element: <Wiki /> },
-    { path: '/wiki/:id', element: <WikiDetail /> },
-    { path: '/chat', element: <Chat /> },
-    { path: '/user', element: <User /> },
+    {
+      path: '/app', element: <Suspense fallback={'加载中'}>
+        <App />
+      </Suspense>
+    },
+    {
+      path: '/app/:id', element: <Suspense fallback={'加载中'}>
+        <AppDetail />
+      </Suspense>
+    },
+    {
+      path: '/wiki', element: <Suspense fallback={'加载中'}>
+        <Wiki />
+      </Suspense>
+    },
+    {
+      path: '/wiki/:id', element: <Suspense fallback={'加载中'}>
+        <WikiDetail />
+      </Suspense>
+    },
+    {
+      path: '/chat', element: <Suspense fallback={'加载中'}>
+        <Chat />
+      </Suspense>
+    },
+    {
+      path: '/user', element: <Suspense fallback={'加载中'}>
+        <User />
+      </Suspense>
+    },
   ]
 }, {
   path: '/login',
