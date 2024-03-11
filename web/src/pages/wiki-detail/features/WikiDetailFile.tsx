@@ -1,6 +1,6 @@
 import { Modal, SpotlightCard } from "@lobehub/ui";
 import { useEffect, useState } from "react";
-import { DelDetailVectoryQuantity, DelDetailsVector, GetWikiDetailVectorQuantity } from "../../../services/WikiService";
+import { DelDetailsVector, GetWikiDetailVectorQuantity } from "../../../services/WikiService";
 import { WikiDetailVectorQuantityDto } from "../../../models";
 import { Button, message } from "antd";
 
@@ -66,7 +66,7 @@ export default function WikiDetailFile({
                     {item.content}
                 </div>
             </Flexbox>
-            <Button onClick={()=>removeWikiDetail(item.id)} type='primary' size='small' style={{
+            <Button onClick={() => removeWikiDetail(item.id)} type='primary' size='small' style={{
                 position: 'absolute',
                 right: 16,
                 bottom: 16
@@ -90,6 +90,7 @@ export default function WikiDetailFile({
 
             }}>
             </SpotlightCard>
+            {taotal}
         </Modal>
     )
 }

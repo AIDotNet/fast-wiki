@@ -2,16 +2,11 @@ import { Avatar, GridShowcase, LogoThree, SpotlightCard } from '@lobehub/ui';
 import { useEffect, useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
 import { message, Button, Pagination } from 'antd';
-import styled from 'styled-components';
 import { WikiDto } from '../../../models';
 import { useNavigate } from 'react-router-dom';
 import { GetWikisList, DeleteWikis } from '../../../services/WikiService';
 import { DeleteOutlined } from '@ant-design/icons';
 
-
-const AppItemDetail = styled.div`
-    padding: 16px;
-`;
 
 interface IAppListProps {
     input: {
@@ -37,7 +32,7 @@ export function AppList(props: IAppListProps) {
         <Flexbox align={'flex-start'} gap={8} horizontal style={{ padding: 16, height: 100 }}>
 
             <Avatar size={50} src={item.icon} style={{ flex: 'none' }} />
-            <Flexbox onClick={()=>{
+            <Flexbox onClick={() => {
                 openWikiDetail(item.id);
             }}>
                 <div style={{ fontSize: 15, fontWeight: 600 }}>{item.name}</div>

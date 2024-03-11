@@ -1,4 +1,4 @@
-import { Icon, MobileTabBar, MobileTabBarProps } from "@lobehub/ui";
+import { Icon, MobileTabBar } from "@lobehub/ui";
 import { memo, useEffect, useState } from "react";
 import { Album, Box, User, BotMessageSquare } from 'lucide-react';
 import { Flexbox } from 'react-layout-kit';

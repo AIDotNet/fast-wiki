@@ -34,7 +34,7 @@ interface IUploadWikiFileProps {
 
 export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps) {
     const [current, setCurrent] = useState(0);
-    const [uploading, setUploading] = useState(false);
+    // const [uploading, setUploading] = useState(false);
     const [fileList, setFileList] = useState<any[]>([]);
     const [processMode, setProcessMode] = useState(ProcessMode.Auto);
     const [trainingPattern, setTrainingPattern] = useState(TrainingPattern.Subsection);
@@ -44,7 +44,7 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
         multiple: true,
         showUploadList: false,
         accept: '.md,.pdf,.docs,.txt,.json,.excel,.word,.html',
-        beforeUpload: (file, files) => {
+        beforeUpload: (file: any) => {
             fileList.push(file);
             setFileList([...fileList]);
             return false;
@@ -76,7 +76,7 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
     ];
 
     function saveFile() {
-        fileList.forEach(async (file, index) => {
+        fileList.forEach(async (file) => {
             const fileItem = await FileService(file);
             file.progress = 100;
 
@@ -187,7 +187,7 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                 }}>
                     <Radio.Group style={{
                         marginBottom: 20
-                    }} onChange={(v) => {
+                    }} onChange={(v: any) => {
                         const value = Number(v.target.value);
                         setTrainingPattern(value as TrainingPattern);
                     }} value={trainingPattern}>
@@ -207,7 +207,7 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                     {
                         trainingPattern === TrainingPattern.Subsection && <div>
                             <span>处理模式：</span>
-                            <Radio.Group onChange={(v) => {
+                            <Radio.Group onChange={(v: any) => {
                                 const value = Number(v.target.value);
                                 setProcessMode(value as ProcessMode);
                             }} value={processMode}>
@@ -222,7 +222,7 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                                     <Input
                                         placeholder="请输入分段长度"
                                         value={subsection}
-                                        onChange={(e) => {
+                                        onChange={(e: any) => {
                                             setSubsection(Number(e.target.value));
                                         }}
                                         style={{

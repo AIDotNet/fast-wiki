@@ -47,7 +47,7 @@ export default memo((props: IReleaseApplicationProps) => {
         {
             title: '操作',
             key: 'action',
-            render: (_, record) => (
+            render: () => (
                 <Button>删除</Button>
             ),
         },

@@ -1,4 +1,4 @@
-import { Table, Button, Dropdown, MenuProps,message } from 'antd';
+import { Table, Button, Dropdown, MenuProps, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { DeleteWikiDetails, GetWikiDetailsList } from '../../../services/WikiService';
 import WikiDetailFile from './WikiDetailFile';
@@ -39,7 +39,7 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
         {
             title: '操作',
             key: 'action',
-            render: (i: any, item: any) => (
+            render: (_: any, item: any) => (
                 <>
                     <Button onClick={() => {
                         setVisible(true);

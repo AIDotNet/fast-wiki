@@ -53,7 +53,7 @@ export default function DesktopLayout() {
     const [dialog, setDialog] = useState({} as any);
     const [history, setHistory] = useState([] as any[]);
     const [value, setValue] = useState('' as string);
-    const [input, setInput] = useState({
+    const [input] = useState({
         page: 1,
         pageSize: 5
     });
@@ -290,7 +290,7 @@ export default function DesktopLayout() {
                             }}>{item.name}</DialogItem>
                     })
                 }
-                <Button onClick={()=>setCreateDialogVisible(true)} style={{
+                <Button onClick={() => setCreateDialogVisible(true)} style={{
                     marginTop: 8
                 }} block>新建对话</Button>
 
@@ -338,10 +338,10 @@ export default function DesktopLayout() {
                             <ChatInputActionBar
                                 leftAddons={
                                     <>
-                                        <ActionIcon icon={Languages} />
+                                        <ActionIcon icon={Languages} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
                                         <ActionIcon onClick={() => {
                                             setValue('');
-                                        }} icon={Eraser} />
+                                        }} icon={Eraser} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
                                     </>
                                 }
                             />

@@ -39,7 +39,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
 
     const [model, setModel] = useState([] as any[]);
     const [wiki, setWiki] = useState([] as any[]);
-    const [input, setInput] = useState({
+    const [input,] = useState({
         keyword: '',
         page: 1,
         pageSize: 10

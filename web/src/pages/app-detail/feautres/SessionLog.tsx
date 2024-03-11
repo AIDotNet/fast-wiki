@@ -42,7 +42,7 @@ export default function SessionLog({ id }: ISessionLogProps) {
         {
             title: 'Action',
             key: 'action',
-            render: (_, record) => (
+            render: () => (
                 <Button>查看详情</Button>
             ),
         },
@@ -76,7 +76,7 @@ export default function SessionLog({ id }: ISessionLogProps) {
     }, [input]);
 
     function handleTableChange(page: number, pageSize: number) {
-        
+
         setInput({
             ...input,
             page: page,

@@ -10,10 +10,8 @@ services:
     build: 
       context: .
       dockerfile: ./src/Service/FastWiki.Service/Dockerfile
-    depends_on:
-      - postgres
     volumes:
-      - ./wwwroot/uploads:/app/wwwroot/uploads
+      - ./wwwroot:/app/wwwroot/
     environment:
       - OPENAI_CHAT_ENDPOINT=https://api.openai.com
       - OPENAI_CHAT_EMBEDDING_ENDPOINT=https://api.openai.com
@@ -33,3 +31,15 @@ services:
       TZ: Asia/Shanghai  # 数据库时区
     volumes:
       - ./postgresql:/var/lib/postgresql/data # 将PostgreSql数据持久化
+
+  fast-wiki-server:
+    image: registry.cn-shenzhen.aliyuncs.com/fast-wiki/fast-wiki-server
+    container_name: fast-wiki-server
+    restart: always 
+    ports:
+      - "2180:8080"
+    build: 
+      context: .
+      dockerfile: ./src/Web/FastWiki.Web.Server/Dockerfile
+    environment:
+      - FAST_WIKI_SERVICE=http://知识库api的ip:8080 

@@ -96,6 +96,12 @@ app.Use((async (context, next) =>
     try
     {
         await next(context);
+
+        if (context.Response.StatusCode == 404)
+        {
+            context.Request.Path = "/index.html";
+            await next(context);
+        }
     }
     catch (UserFriendlyException userFriendlyException)
     {
@@ -115,7 +121,7 @@ var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider
 {
     Mappings =
     {
-        [".md"] = "application/octet-stream"
+        [".md"] = "application/octet-stream",
     }
 };
 app.UseStaticFiles(new StaticFileOptions
@@ -126,7 +132,6 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger()

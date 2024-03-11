@@ -1,10 +1,10 @@
 import { Tabs } from 'antd';
 import { memo } from 'react';
-import { useParams } from 'react-router-dom';
+// import { useParams } from 'react-router-dom';
 
 
 export default memo(() => {
-    const { id } = useParams<{ id: string }>();
+    // const { id } = useParams<{ id: string }>();
 
     return (
         <div style={{ display: 'flex', margin: 20 }}>

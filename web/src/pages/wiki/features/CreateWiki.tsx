@@ -1,4 +1,4 @@
-import { Avatar, Modal } from "@lobehub/ui";
+import { Modal } from "@lobehub/ui";
 import { Form, Input, Button, message, Select, Upload } from 'antd';
 import { useEffect, useState } from "react";
 import { getModels } from "../../../store/Model";

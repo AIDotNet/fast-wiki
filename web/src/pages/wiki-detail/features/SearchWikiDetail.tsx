@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styled from 'styled-components';
 import { Button } from 'antd';
 import { GetSearchVectorQuantity } from "../../../services/WikiService";
@@ -106,7 +106,7 @@ export default function SearchWikiDetail({
                         flexDirection: 'column',
                         gap: 16,
                         overflow: 'auto',
-                        
+
                         height: 'calc(100vh - 100px)',
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
