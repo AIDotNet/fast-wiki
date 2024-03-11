@@ -5,6 +5,7 @@ import { Button, Table } from 'antd';
 import styled from 'styled-components';
 import CreateApplication from "./CreateApplication";
 import { GetChatShareList } from "../../../services/ChatApplicationService";
+import { copyToClipboard } from "../../../utils/stringHelper";
 
 
 const Title = styled.div`
@@ -47,8 +48,10 @@ export default memo((props: IReleaseApplicationProps) => {
         {
             title: '操作',
             key: 'action',
-            render: () => (
-                <Button>删除</Button>
+            render: (_, item) => (
+                <Button onClick={() => {
+                    copyToClipboard(location.origin + "/share-chat?id=" + item.id)
+                }}>分享</Button>
             ),
         },
     ];

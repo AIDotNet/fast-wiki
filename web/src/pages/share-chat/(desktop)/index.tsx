@@ -1,7 +1,7 @@
 import { ChatList, DraggablePanel, } from "@lobehub/ui";
 import { Select } from 'antd';
 import { useEffect, useState } from "react";
-import { CreateChatDialog, CreateChatDialogHistory, GetChatApplicationsList, GetChatDialog, GetChatDialogHistory, GetChatShareApplication } from "../../../services/ChatApplicationService";
+import { CreateChatDialog, CreateChatDialogHistory, GetChatApplicationsList, GetChatDialog, GetChatDialogHistory, GetChatShareApplication, GetChatShareDialog } from "../../../services/ChatApplicationService";
 import Divider from "@lobehub/ui/es/Form/components/FormDivider";
 import { Button, message } from 'antd'
 import { useNavigate } from "react-router-dom";
@@ -46,7 +46,7 @@ const DialogItem = styled.div`
 `;
 
 export default function DesktopLayout() {
-    const id = new URLSearchParams(window.location.search).get('id');
+    const id = new URLSearchParams(window.location.search).get('id') as string;
     if (!id) {
         return (<div style={{
             textAlign: 'center',
@@ -109,7 +109,7 @@ export default function DesktopLayout() {
     async function loadingDialogs() {
         try {
 
-            const result = (await GetChatDialog(application.id, true)) as any[];
+            const result = (await GetChatShareDialog(id)) as any[];
             setDialogs(result);
             if (result.length === 0) {
                 await AddChatDialog({
@@ -203,7 +203,7 @@ export default function DesktopLayout() {
 
         setHistory([...history]);
 
-        const stream = await fetchRaw('/api/v1/ChatApplications/Completions', {
+        const stream = await fetchRaw('/api/v1/ChatApplications/ChatShareCompletions', {
             chatDialogId: dialog.id,
             content: v,
             chatId: application.id
