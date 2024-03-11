@@ -1,7 +1,7 @@
 import { ChatList, DraggablePanel, Tooltip, } from "@lobehub/ui";
 import { Select } from 'antd';
 import { useEffect, useState } from "react";
-import { CreateChatDialog, CreateChatDialogHistory, DeleteDialog, DeleteDialogHistory, GetChatApplicationsList, GetChatDialogHistory, GetChatShareApplication, GetChatShareDialog, PutChatHistory } from "../../../services/ChatApplicationService";
+import { CreateChatDialog, CreateChatDialogHistory, DeleteDialog, DeleteDialogHistory, DeleteShareDialog, GetChatDialogHistory, GetChatShareApplication, GetChatShareDialog, PutChatHistory } from "../../../services/ChatApplicationService";
 import Divider from "@lobehub/ui/es/Form/components/FormDivider";
 import { Button, message } from 'antd'
 import { DeleteOutlined } from '@ant-design/icons';
@@ -68,7 +68,6 @@ export default function DesktopLayout() {
         localStorage.setItem('ChatShare', guestId)
     }
     const navigate = useNavigate();
-    const [applications, setApplications] = useState([] as any[]);
     const [application, setApplication] = useState(null as any);
     const [dialogs, setDialogs] = useState([] as any[]);
     const [createDialogVisible, setCreateDialogVisible] = useState(false);
@@ -92,24 +91,6 @@ export default function DesktopLayout() {
     }
 
 
-    async function loadingApplications() {
-        try {
-            const result = await GetChatApplicationsList(1, 1000);
-            setApplications(result.result);
-            if (result.total === 0) {
-                message.error('您还没有应用，请先创建应用');
-                // 等待1秒后跳转
-                setTimeout(() => {
-                    navigate('/app');
-                }, 1000);
-                return;
-            }
-            setApplication(result.result[0]);
-
-        } catch (error) {
-
-        }
-    }
 
     async function loadingDialogs() {
         try {
@@ -180,7 +161,6 @@ export default function DesktopLayout() {
     }, [dialog, input]);
 
     useEffect(() => {
-        loadingApplications();
         loadingDialogs();
     }, []);
 
@@ -299,8 +279,8 @@ export default function DesktopLayout() {
     }
 
 
-    function deleteDialog(id: string) {
-        DeleteDialog(id)
+    function deleteDialog(itemId: string) {
+        DeleteShareDialog(itemId,id)
             .then(() => {
                 loadingDialogs();
             })
@@ -334,32 +314,6 @@ export default function DesktopLayout() {
             pin={true}
             minWidth={0}
         >
-            <div
-                style={{
-                    padding: 8,
-                }}>
-
-                <div style={{
-                    fontSize: 20,
-                    fontWeight: 600,
-                    marginBottom: 16
-                }}>
-                    请选择您的应用
-                </div>
-                <Select
-                    title="请选择您的应用"
-                    style={{
-                        width: '100%',
-                    }}
-                    onChange={handleChange}
-                    defaultValue={application?.id}
-                    value={application?.id}
-                    options={applications.map((item) => {
-                        return { label: item.name, value: item.id }
-                    })}
-                />
-            </div>
-            <Divider />
             <DialogList>
                 {
                     dialogs?.map((item: any) => {

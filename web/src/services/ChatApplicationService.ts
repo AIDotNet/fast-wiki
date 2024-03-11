@@ -152,8 +152,8 @@ export function PutDialog(data: any) {
  * @param data 
  * @returns 
  */
-export function DeleteShareDialog(id: string) {
-    return del(`${prefix}/ShareDialog/${id}`);
+export function DeleteShareDialog(id: string,chatId: string) {
+    return del(`${prefix}/ShareDialog/${id}?chatId=`+chatId);
 }
 
 
