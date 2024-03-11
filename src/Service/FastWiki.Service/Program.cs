@@ -108,7 +108,6 @@ app.Use((async (context, next) =>
         {
             context.Request.Path = "/index.html";
             await next(context);
-            context.Response.StatusCode = 200;
         }
     }
     catch (UserFriendlyException userFriendlyException)
