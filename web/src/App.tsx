@@ -11,6 +11,7 @@ import Chat from './pages/chat/page'
 import User from './pages/user/page'
 import AppDetail from './pages/app-detail/page'
 import WikiDetail from './pages/wiki-detail/page'
+import ShareChat from './pages/share-chat/page'
 
 
 const router = createBrowserRouter([{
@@ -29,6 +30,9 @@ const router = createBrowserRouter([{
 }, {
   path: '/login',
   element: <Login />
+}, {
+  path: '/share-chat',
+  element: <ShareChat />
 }])
 
 
