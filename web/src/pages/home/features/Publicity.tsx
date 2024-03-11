@@ -109,7 +109,8 @@ export function Publicity() {
             </Slogan>
             <Features style={{
                 margin: '20px',
-
+                width: '96%',
+                maxWidth: '96%',
             }} items={items} />
         </>
     );

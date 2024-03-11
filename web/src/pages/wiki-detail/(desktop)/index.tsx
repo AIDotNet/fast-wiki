@@ -8,6 +8,8 @@ import { Avatar } from '@lobehub/ui';
 import WikiData from '../features/WikiData';
 import UploadWikiFile from '../features/UploadWikiFile';
 import SearchWikiDetail from '../features/SearchWikiDetail';
+import { WikiDto } from '../../../models';
+import WikiInfo from '../features/WikiInfo';
 const LeftTabs = styled.div`
     width: 190px;
     min-width: 190px;
@@ -24,7 +26,7 @@ export default memo(() => {
     const { id } = useParams<{ id: string }>();
     if (id === undefined) return (<div>id is undefined</div>)
 
-    const [wiki, setWiki] = useState({} as any);
+    const [wiki, setWiki] = useState({} as WikiDto);
 
     const [tabs, setTabs] = useState([] as any[]);
 
@@ -123,10 +125,7 @@ export default memo(() => {
                     tab?.key === 2 && <SearchWikiDetail onChagePath={key => changeTab(key)} id={id} />
                 }
                 {
-                    tab?.key === 3 && null
-                }
-                {
-                    tab?.key === 3 && null
+                    tab?.key === 3 && <WikiInfo id={id} />
                 }
                 {
                     tab === 'upload' && <UploadWikiFile id={id} onChagePath={key => changeTab(key)} />

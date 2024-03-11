@@ -5,7 +5,10 @@ using System.Net.Http.Json;
 
 namespace FastWiki.ApiGateway.Caller.Service;
 
-public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory httpClientFactory, IUserService userService)
+public sealed class ChatApplicationService(
+    ICaller caller,
+    IHttpClientFactory httpClientFactory,
+    IUserService userService)
     : ServiceBase(caller, httpClientFactory, userService), IChatApplicationService
 {
     protected override string BaseUrl { get; set; } = "ChatApplications";
@@ -52,7 +55,8 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
 
     public async Task CreateChatDialogAsync(CreateChatDialogInput input)
     {
-        await PostAsync(nameof(CreateChatDialogAsync), input).ConfigureAwait(false); ;
+        await PostAsync(nameof(CreateChatDialogAsync), input).ConfigureAwait(false);
+        ;
     }
 
     public async Task<List<ChatDialogDto>> GetChatDialogAsync(string chatId, bool all)
@@ -60,10 +64,10 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
         return await GetAsync<List<ChatDialogDto>>(nameof(GetChatDialogAsync), new Dictionary<string, string>()
         {
             {
-                "applicationId",chatId
+                "applicationId", chatId
             },
             {
-                "all",all.ToString()
+                "all", all.ToString()
             },
         });
     }
@@ -73,7 +77,7 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
         return await GetAsync<List<ChatDialogDto>>(nameof(GetChatShareDialogAsync), new Dictionary<string, string>()
         {
             {
-                "chatId",chatId
+                "chatId", chatId
             }
         });
     }
@@ -114,7 +118,8 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
 
     public async Task CreateChatDialogHistoryAsync(CreateChatDialogHistoryInput input)
     {
-        await PostAsync(nameof(CreateChatDialogHistoryAsync), input).ConfigureAwait(false); ;
+        await PostAsync(nameof(CreateChatDialogHistoryAsync), input).ConfigureAwait(false);
+        ;
     }
 
     public async Task<PaginatedListBase<ChatDialogHistoryDto>> GetChatDialogHistoryAsync(string chatDialogId, int page,
@@ -133,17 +138,20 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
                     nameof(pageSize),
                     pageSize.ToString()
                 }
-            }).ConfigureAwait(false); ;
+            }).ConfigureAwait(false);
+        ;
     }
 
     public async Task RemoveDialogHistoryAsync(string id)
     {
-        await DeleteAsync(nameof(RemoveDialogHistoryAsync) + "/" + id).ConfigureAwait(false); ;
+        await DeleteAsync(nameof(RemoveDialogHistoryAsync) + "/" + id).ConfigureAwait(false);
+        ;
     }
 
     public async Task CreateShareAsync(CreateChatShareInput input)
     {
-        await PostAsync(nameof(CreateShareAsync), input).ConfigureAwait(false); ;
+        await PostAsync(nameof(CreateShareAsync), input).ConfigureAwait(false);
+        ;
     }
 
     public async Task<PaginatedListBase<ChatShareDto>> GetChatShareListAsync(string chatApplicationId, int page,
@@ -161,12 +169,14 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
                 {
                     "pageSize", pageSize.ToString()
                 }
-            }).ConfigureAwait(false); ;
+            }).ConfigureAwait(false);
+        ;
     }
 
     public async Task RemoveDialogAsync(string id)
     {
-        await DeleteAsync(nameof(RemoveDialogAsync) + "/" + id).ConfigureAwait(false); ;
+        await DeleteAsync(nameof(RemoveDialogAsync) + "/" + id).ConfigureAwait(false);
+        ;
     }
 
     public async Task UpdateDialogAsync(ChatDialogDto input)
@@ -176,7 +186,8 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
 
     public async Task RemoveShareDialogAsync(string chatId, string id)
     {
-        await DeleteAsync(nameof(RemoveDialogAsync) + "/" + id + "?chatId=" + chatId).ConfigureAwait(false); ;
+        await DeleteAsync(nameof(RemoveDialogAsync) + "/" + id + "?chatId=" + chatId).ConfigureAwait(false);
+        ;
     }
 
     public async Task UpdateShareDialogAsync(ChatDialogDto input)
@@ -184,24 +195,27 @@ public sealed class ChatApplicationService(ICaller caller, IHttpClientFactory ht
         await PutAsync(nameof(UpdateDialogAsync), input).ConfigureAwait(false);
     }
 
-    public async Task<PaginatedListBase<ChatDialogDto>> GetSessionLogDialogAsync(string chatApplicationId, int page, int pageSize)
+    public async Task<PaginatedListBase<ChatDialogDto>> GetSessionLogDialogAsync(string chatApplicationId, int page,
+        int pageSize)
     {
         return
             await GetAsync<PaginatedListBase<ChatDialogDto>>(nameof(GetSessionLogDialogAsync),
                 new Dictionary<string, string>()
                 {
                     {
-
-                        "chatApplicationId",chatApplicationId
+                        "chatApplicationId", chatApplicationId
                     },
                     {
-
-                        "page",page.ToString()
+                        "page", page.ToString()
                     },
                     {
-
-                        "pageSize",pageSize.ToString()
+                        "pageSize", pageSize.ToString()
                     }
                 });
+    }
+
+    public async Task PutChatHistoryAsync(PutChatHistoryInput input)
+    {
+        await PutAsync(nameof(PutChatHistoryAsync), input).ConfigureAwait(false);
     }
 }

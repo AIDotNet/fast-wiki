@@ -1,11 +1,12 @@
-import { ChatList, DraggablePanel, } from "@lobehub/ui";
+import { ChatList, DraggablePanel, Tooltip, } from "@lobehub/ui";
 import { Select } from 'antd';
 import { useEffect, useState } from "react";
-import { CreateChatDialog, CreateChatDialogHistory, GetChatApplicationsList, GetChatDialog, GetChatDialogHistory } from "../../../services/ChatApplicationService";
+import { CreateChatDialog, CreateChatDialogHistory, DeleteDialog, DeleteDialogHistory, GetChatApplicationsList, GetChatDialog, GetChatDialogHistory, PutChatHistory } from "../../../services/ChatApplicationService";
 import Divider from "@lobehub/ui/es/Form/components/FormDivider";
 import { Button, message } from 'antd'
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { DeleteOutlined } from '@ant-design/icons';
 import {
     ActionIcon,
     ChatInputActionBar,
@@ -25,6 +26,8 @@ import CreateDialog from "../feautres/CreateDialog";
 const DialogList = styled.div`
     margin-top: 8px;
     padding: 8px;
+    overflow: auto;
+    height: calc(100vh - 110px);
 `;
 
 const DialogItem = styled.div`
@@ -53,6 +56,7 @@ export default function DesktopLayout() {
     const [dialog, setDialog] = useState({} as any);
     const [history, setHistory] = useState([] as any[]);
     const [value, setValue] = useState('' as string);
+    const [loading, setLoading] = useState(false);
     const [input] = useState({
         page: 1,
         pageSize: 5
@@ -116,6 +120,14 @@ export default function DesktopLayout() {
             });
 
             setHistory(history);
+
+            // 等待1秒后滚动到底部
+            setTimeout(() => {
+                const chatlayout = document.getElementById('chat-layout');
+                if (chatlayout) {
+                    chatlayout.scrollTop = chatlayout.scrollHeight;
+                }
+            }, 1000);
         } catch (error) {
 
         }
@@ -157,7 +169,14 @@ export default function DesktopLayout() {
 
     async function sendChat() {
         const v = value;
+        if(loading){
+            return
+        }
+
+        setLoading(true);
         setValue('');
+        
+        const chatlayout = document.getElementById('chat-layout');
 
         history.push({
             content: v,
@@ -173,11 +192,6 @@ export default function DesktopLayout() {
 
         setHistory([...history]);
 
-        const stream = await fetchRaw('/api/v1/ChatApplications/Completions', {
-            chatDialogId: dialog.id,
-            content: v,
-            chatId: application.id
-        });
 
         let chat = {
             content: '',
@@ -192,6 +206,18 @@ export default function DesktopLayout() {
         };
 
         setHistory([...history, chat]);
+
+        // 滚动到底部
+        if (chatlayout) {
+            chatlayout.scrollTop = chatlayout.scrollHeight;
+        }
+
+        const stream = await fetchRaw('/api/v1/ChatApplications/Completions', {
+            chatDialogId: dialog.id,
+            content: v,
+            chatId: application.id
+        });
+
 
         for await (const c of stream) {
             if (c) {
@@ -214,7 +240,6 @@ export default function DesktopLayout() {
                 }
 
                 content = "[" + content + "]";
-                console.log(content);
 
                 var obj = JSON.parse(content) as any[];
 
@@ -223,6 +248,11 @@ export default function DesktopLayout() {
                 });
 
                 setHistory([...history, chat]);
+
+                // 滚动到底部
+                if (chatlayout) {
+                    chatlayout.scrollTop = chatlayout.scrollHeight;
+                }
             }
         }
 
@@ -240,8 +270,31 @@ export default function DesktopLayout() {
             current: false,
             type: 0
         })
+
+        
+        setLoading(false);
     }
 
+    function deleteDialog(id: string) {
+        DeleteDialog(id)
+            .then(() => {
+                loadingDialogs();
+            })
+    }
+
+    async function ActionsClick(e: any, item: any) {
+        if (e.key === 'del') {
+            await DeleteDialogHistory(item.id)
+            message.success('删除成功');
+
+            const index = history.findIndex((i) => i.id === item.id);
+            history.splice(index, 1);
+            setHistory([...history]);
+
+        } else if (e.key === 'regenerate') {
+            message.error('暂时并未支持重置!');
+        }
+    }
 
     return <>
         <DraggablePanel
@@ -287,7 +340,19 @@ export default function DesktopLayout() {
                             className={dialog?.id === item.id ? 'selected' : ''}
                             onClick={() => {
                                 setDialog(item);
-                            }}>{item.name}</DialogItem>
+                            }}>
+                            <Tooltip title={item.description}>
+                                {item.name}
+                            </Tooltip>
+                            <Button
+                                style={{
+                                    float: 'inline-end',
+                                }}
+                                size='small'
+                                icon={<DeleteOutlined />}
+                                onClick={() => deleteDialog(item.id)}
+                            />
+                        </DialogItem>
                     })
                 }
                 <Button onClick={() => setCreateDialogVisible(true)} style={{
@@ -311,11 +376,39 @@ export default function DesktopLayout() {
                 </div>
             </div>
             <Divider />
-            <div id='chat-layout' style={{ height: 'calc(100vh - 362px)' }}>
-
+            <div id='chat-layout' style={{
+                height: 'calc(100vh - 362px)',
+                overflow: 'auto',
+            }}>
                 <ChatList
-
-                    data={history}
+                    onMessageChange={async (e:any, message) => {
+                        if(e === 0){
+                            return
+                        }
+                        await PutChatHistory({
+                            id: e,
+                            content: message
+                        })
+                        // 修改history
+                        history.forEach((item) => {
+                            if (item.id === e) {
+                                item.content = message;
+                            }
+                        });
+                        setHistory([...history]);
+                    }}
+                    data={(history.length === 0 || history === null) ? [{
+                        content: application.opener,
+                        createAt: new Date().toISOString(),
+                        extra: {},
+                        id: 0,
+                        meta: {
+                            avatar: "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/chatgpt.png",
+                            title: "AI助手",
+                        },
+                        role: 'assistant',
+                    }]: history}
+                    onActionsClick={ActionsClick}
                     renderActions={ActionsBar}
                     renderMessages={{
                         default: ({ id, editableContent }) => <div id={id}>{editableContent}</div>,
@@ -332,8 +425,14 @@ export default function DesktopLayout() {
                         onChange={(e) => {
                             setValue(e.target.value);
                         }}
+                        onKeyUpCapture={(e) => {
+
+                            if (e.key === 'Enter' && !e.shiftKey && value !== '') {
+                                sendChat();
+                            }
+                        }}
                         placeholder="请输入您的消息"
-                        bottomAddons={<ChatSendButton onSend={() => sendChat()} />}
+                        bottomAddons={<ChatSendButton loading={loading} onSend={() => sendChat()} />}
                         topAddons={
                             <ChatInputActionBar
                                 leftAddons={

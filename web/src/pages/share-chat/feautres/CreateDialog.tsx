@@ -9,6 +9,7 @@ interface IAppHeaderProps {
     visible: boolean; // 是否显示
     onClose: () => void; // 关闭回调
     type: number; // 类型
+    chatId: string; // 对话ID
 }
 
 export default function CreateDialog({
@@ -17,6 +18,7 @@ export default function CreateDialog({
     visible,
     onClose,
     type,
+    chatId
 }: IAppHeaderProps) {
 
     const [data, setData] = useState({
@@ -24,13 +26,12 @@ export default function CreateDialog({
         description:'',
         type: type,
     });
-    console.log(id);
-    
 
     function createDialog() {
 
         CreateChatDialog({
             ...data,
+            chatId: chatId,
             applicationId: id
         })
             .then(() => {

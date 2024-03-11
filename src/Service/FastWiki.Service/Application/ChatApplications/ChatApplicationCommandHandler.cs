@@ -92,12 +92,19 @@ public class ChatApplicationCommandHandler(
     [EventHandler]
     public async Task RemoveShareDialogAsync(RemoveShareDialogCommand command)
     {
-        await chatApplicationRepository.RemoveShareDialogAsync(command.ChatId,command.Id);
+        await chatApplicationRepository.RemoveShareDialogAsync(command.ChatId, command.Id);
     }
 
     [EventHandler]
     public async Task UpdateShareChatDialogAsync(UpdateShareChatDialogCommand command)
     {
         await chatApplicationRepository.UpdateShareDialogAsync(mapper.Map<ChatDialog>(command.Input));
+    }
+
+    [EventHandler]
+    public async Task UpdateChatShareAsync(PutChatHistoryCommand command)
+    {
+        await chatApplicationRepository.PutChatHistoryAsync(command.Input.Id, command.Input.Content,
+            command.Input.ChatShareId);
     }
 }

@@ -73,7 +73,9 @@ export default () => {
               </Flex>
             }
             actions={
-              <Button type='text'>
+              <Button type='text' onClick={()=>{
+                window.location.href = '/app';
+              }}>
                 立即开始
               </Button>
             }

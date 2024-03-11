@@ -31,6 +31,8 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
     {
         await Context.ChatDialogs.Where(x => x.Id == id).ExecuteDeleteAsync();
         await Context.ChatDialogHistorys.Where(x => x.ChatDialogId == id).ExecuteDeleteAsync();
+        
+        await Context.SaveChangesAsync();
     }
 
     public async Task<List<ChatDialog>> GetChatDialogListAsync(string applicationId, bool all)
@@ -167,6 +169,29 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
         var query = Context.ChatDialogs.Where(x => x.ApplicationId == chatApplicationId);
 
         return await query.LongCountAsync();
+    }
+
+    public async Task PutChatHistoryAsync(string id, string content, string? chatShareId)
+    {
+        if (chatShareId.IsNullOrEmpty())
+        {
+            await Context.ChatDialogHistorys.Where(x => x.Id == id)
+                .ExecuteUpdateAsync(x =>
+                    x.SetProperty(b => b.Content, content));
+        }
+        else
+        {
+            var result = await Context.ChatShares.FirstOrDefaultAsync(x => x.Id == chatShareId);
+
+            if (result == null)
+            {
+                throw new UserFriendlyException("分享对话不存在");
+            }
+
+            await Context.ChatDialogHistorys.Where(x => x.Id == id)
+                .ExecuteUpdateAsync(x =>
+                    x.SetProperty(b => b.Content, content));
+        }
     }
 
     private IQueryable<ChatShare> CreateChatShareQueryable(Guid userId, string chatApplicationId)

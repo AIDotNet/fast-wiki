@@ -1,7 +1,7 @@
 import { memo, useEffect, useState } from "react";
 import { ChatShareDto } from "../../../models";
 import type { TableProps } from 'antd';
-import { Button, Table } from 'antd';
+import { Button, Table ,message } from 'antd';
 import styled from 'styled-components';
 import CreateApplication from "./CreateApplication";
 import { GetChatShareList } from "../../../services/ChatApplicationService";
@@ -51,6 +51,7 @@ export default memo((props: IReleaseApplicationProps) => {
             render: (_, item) => (
                 <Button onClick={() => {
                     copyToClipboard(location.origin + "/share-chat?id=" + item.id)
+                    message.success('复制成功');
                 }}>分享</Button>
             ),
         },

@@ -1,4 +1,3 @@
-using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using FastWiki.Service.Application.Storage.Queries;
 using FastWiki.Service.Domain.Storage.Aggregates;
 using FastWiki.Service.Infrastructure.Helper;
@@ -456,5 +455,12 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
         await EventBus.PublishAsync(query);
 
         return query.Result;
+    }
+
+    public Task PutChatHistoryAsync(PutChatHistoryInput input)
+    {
+        var command = new PutChatHistoryCommand(input);
+
+        return EventBus.PublishAsync(command);
     }
 }

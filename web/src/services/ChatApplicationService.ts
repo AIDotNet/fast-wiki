@@ -107,7 +107,7 @@ export function GetChatDialogHistory(chatDialogId: string, page: number, pageSiz
  * @returns 
  */
 export function DeleteDialogHistory(id: string) {
-    return del(`${prefix}/ChatDialogHistory/${id}`);
+    return del(`${prefix}/DialogHistory/${id}`);
 }
 
 /**
@@ -173,4 +173,13 @@ export function PutShareDialog(data: any) {
  */
 export function GetSessionLogDialog(chatApplicationId: string, page: number, pageSize: number) : Promise<PaginatedListBase<ChatDialogDto>>{
     return get(`${prefix}/SessionLogDialog?chatApplicationId=${chatApplicationId}&page=${page}&pageSize=${pageSize}`);
+}
+
+/**
+ * 编辑聊天分享。
+ * @param chatId 
+ * @returns 
+ */
+export function PutChatHistory(data: any) {
+    return putJson(`${prefix}/ChatHistory`, data);
 }
