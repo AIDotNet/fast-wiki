@@ -103,7 +103,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                     fontSize: 20,
                     marginRight: 20
                 }}>开场白</span>
-                <textarea value={application.opener}
+                <textarea value={application?.opener??""}
                     onChange={(e) => {
                         setApplication({
                             ...application,
