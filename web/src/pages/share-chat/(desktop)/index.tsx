@@ -1,6 +1,6 @@
 import { ChatList, DraggablePanel, Tooltip, } from "@lobehub/ui";
 import { useEffect, useState } from "react";
-import { CreateChatDialog, CreateChatDialogHistory, DeleteDialog, DeleteDialogHistory, DeleteShareDialog, GetChatDialogHistory, GetChatShareApplication, GetChatShareDialog, PutChatHistory } from "../../../services/ChatApplicationService";
+import { CreateChatDialog, CreateChatDialogHistory, DeleteDialogHistory, DeleteShareDialog, GetChatDialogHistory, GetChatShareApplication, GetChatShareDialog, PutChatHistory } from "../../../services/ChatApplicationService";
 import Divider from "@lobehub/ui/es/Form/components/FormDivider";
 import { Button, message } from 'antd'
 import { DeleteOutlined } from '@ant-design/icons';
