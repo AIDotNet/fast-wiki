@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using FastWiki.Service;
 using FastWiki.Service.Backgrounds;
 using FastWiki.Service.Service;
@@ -24,6 +25,11 @@ builder
 
 builder
     .AddFastSemanticKernel();
+
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimit"));
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+builder.Services.AddInMemoryRateLimiting();
+
 
 var app = builder.Services.AddCors(options =>
     {
@@ -124,6 +130,8 @@ var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider
         [".md"] = "application/octet-stream",
     }
 };
+app.UseIpRateLimiting();
+
 app.UseStaticFiles(new StaticFileOptions
 {
     ContentTypeProvider = fileExtensionContentTypeProvider
