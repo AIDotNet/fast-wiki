@@ -94,6 +94,7 @@ var app = builder.Services.AddCors(options =>
             .UseUoW<WikiDbContext>()
             .UseRepository<WikiDbContext>();
     })
+    .AddResponseCompression()
     .AddAutoInject()
     .AddServices(builder, option => option.MapHttpMethodsForUnmatched = ["Post"]);
 
@@ -131,6 +132,8 @@ var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider
     }
 };
 app.UseIpRateLimiting();
+
+app.UseResponseCompression();
 
 app.UseStaticFiles(new StaticFileOptions
 {
