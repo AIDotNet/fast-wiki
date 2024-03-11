@@ -1,11 +1,9 @@
 import { ChatList, DraggablePanel, Tooltip, } from "@lobehub/ui";
-import { Select } from 'antd';
 import { useEffect, useState } from "react";
 import { CreateChatDialog, CreateChatDialogHistory, DeleteDialog, DeleteDialogHistory, DeleteShareDialog, GetChatDialogHistory, GetChatShareApplication, GetChatShareDialog, PutChatHistory } from "../../../services/ChatApplicationService";
 import Divider from "@lobehub/ui/es/Form/components/FormDivider";
 import { Button, message } from 'antd'
 import { DeleteOutlined } from '@ant-design/icons';
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import {
     ActionIcon,
@@ -67,7 +65,7 @@ export default function DesktopLayout() {
         guestId = generateRandomString(10)
         localStorage.setItem('ChatShare', guestId)
     }
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [application, setApplication] = useState(null as any);
     const [dialogs, setDialogs] = useState([] as any[]);
     const [createDialogVisible, setCreateDialogVisible] = useState(false);
@@ -164,9 +162,9 @@ export default function DesktopLayout() {
         loadingDialogs();
     }, []);
 
-    function handleChange(value: any) {
-        console.log(`selected ${value}`);
-    }
+    // function handleChange(value: any) {
+    //     console.log(`selected ${value}`);
+    // }
 
     const control: ChatListProps | any =
     {
