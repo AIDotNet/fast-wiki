@@ -123,6 +123,7 @@ public partial class ChatDialog
             _chatDialogs = await ChatApplicationService.GetChatShareDialogAsync(ChatId);
         }
 
+        SelectedItem = _chatDialogs.First().Id;
     }
 
     private async Task RemoveDialogAsync(string id)
