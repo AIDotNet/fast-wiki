@@ -95,6 +95,7 @@ public sealed class WikiQueryHandler(
                     Content = item.Payload["text"].ToString() ?? string.Empty,
                     FileId = item.Tags.FirstOrDefault(x=>x.Key=="fileId").Value?.FirstOrDefault() ?? string.Empty,
                     Id = item.Id,
+                    Index = size,
                     WikiDetailId = item.Tags["wikiDetailId"].FirstOrDefault() ?? string.Empty,
                     Document_Id = item.Tags["__document_id"].FirstOrDefault() ?? string.Empty
                 });

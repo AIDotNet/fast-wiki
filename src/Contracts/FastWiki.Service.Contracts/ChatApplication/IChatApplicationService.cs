@@ -160,4 +160,10 @@ public interface IChatApplicationService
     /// <param name="pageSize"></param>
     /// <returns></returns>
     Task<PaginatedListBase<ChatDialogDto>> GetSessionLogDialogAsync(string chatApplicationId, int page, int pageSize);
+    
+    /// <summary>
+    /// 修改对话记录内容
+    /// </summary>
+    /// <returns></returns>
+    Task PutChatHistoryAsync(PutChatHistoryInput input);
 }

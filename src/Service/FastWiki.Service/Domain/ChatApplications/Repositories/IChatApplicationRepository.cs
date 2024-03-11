@@ -147,4 +147,13 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <param name="chatApplicationId"></param>
     /// <returns></returns>
     Task<long> GetSessionLogDialogCountAsync(string chatApplicationId);
+    
+    /// <summary>
+    /// 修改对话记录内容
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="content"></param>
+    /// <param name="chatShareId"></param>
+    /// <returns></returns>
+    Task PutChatHistoryAsync(string id,string content,string? chatShareId);
 }

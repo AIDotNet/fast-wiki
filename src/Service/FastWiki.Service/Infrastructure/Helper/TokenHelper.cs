@@ -7,7 +7,7 @@ public static class TokenHelper
     private static GptEncoding? _encoding;
 
     /// <summary>
-    /// ªÒ»°GptEncoding
+    /// Ëé∑ÂèñGptEncoding
     /// </summary>
     /// <returns></returns>
     public static GptEncoding GetGptEncoding()
@@ -18,7 +18,7 @@ public static class TokenHelper
     }
 
     /// <summary>
-    /// º∆À„token
+    /// ËÆ°ÁÆótoken
     /// </summary>
     /// <param name="tokens"></param>
     /// <returns></returns>

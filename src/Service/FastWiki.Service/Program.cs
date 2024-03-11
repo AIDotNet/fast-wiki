@@ -1,5 +1,6 @@
 using FastWiki.Service;
 using FastWiki.Service.Backgrounds;
+using FastWiki.Service.Service;
 using Masa.Contrib.Authentication.Identity;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
@@ -24,7 +25,15 @@ builder
 builder
     .AddFastSemanticKernel();
 
-var app = builder.Services
+var app = builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowAll",
+            builder => builder
+                .SetIsOriginAllowed(_ => true)
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
+    })
     .AddAuthorization()
     .AddHostedService<QuantizeBackgroundService>()
     .AddJwtBearerAuthentication()
@@ -82,13 +91,37 @@ var app = builder.Services
     .AddAutoInject()
     .AddServices(builder, option => option.MapHttpMethodsForUnmatched = ["Post"]);
 
-app.UseMasaExceptionHandler();
+app.Use((async (context, next) =>
+{
+    try
+    {
+        await next(context);
+
+        if (context.Response.StatusCode == 404)
+        {
+            context.Request.Path = "/index.html";
+            await next(context);
+        }
+    }
+    catch (UserFriendlyException userFriendlyException)
+    {
+        context.Response.StatusCode = 400;
+
+        await context.Response.WriteAsJsonAsync(ResultDto.CreateError(userFriendlyException.Message, "400"));
+    }
+    catch (Exception e)
+    {
+        context.Response.StatusCode = 500;
+
+        await context.Response.WriteAsJsonAsync(ResultDto.CreateError(e.Message, "500"));
+    }
+}));
 
 var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider
 {
     Mappings =
     {
-        [".md"] = "application/octet-stream"
+        [".md"] = "application/octet-stream",
     }
 };
 app.UseStaticFiles(new StaticFileOptions
@@ -96,9 +129,9 @@ app.UseStaticFiles(new StaticFileOptions
     ContentTypeProvider = fileExtensionContentTypeProvider
 });
 
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger()
@@ -116,5 +149,7 @@ if (app.Environment.IsDevelopment())
 
     #endregion
 }
+
+app.MapPost("/v1/chat/completions", OpenAIService.Completions);
 
 app.Run();

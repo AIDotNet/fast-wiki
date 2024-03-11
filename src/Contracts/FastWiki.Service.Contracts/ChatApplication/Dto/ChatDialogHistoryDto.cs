@@ -35,4 +35,6 @@ public sealed class ChatDialogHistoryDto
     public List<SourceFileDto> SourceFile { get; set; } = new();
 
     public DateTime CreationTime { get; set; }
+
+    public long CreateAt => (long)(CreationTime.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds;
 }
