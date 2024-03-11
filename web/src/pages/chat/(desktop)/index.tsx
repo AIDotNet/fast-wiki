@@ -398,7 +398,7 @@ export default function DesktopLayout() {
                         setHistory([...history]);
                     }}
                     data={(history.length === 0 || history === null) ? [{
-                        content: application.opener,
+                        content: application?.opener??"",
                         createAt: new Date().toISOString(),
                         extra: {},
                         id: 0,
