@@ -60,7 +60,7 @@ export default function DesktopLayout() {
     /**
      * 获取游客id
      */
-    let guestId = localStorage.getItem('ChatShare')
+    let guestId = localStorage.getItem('ChatShare') as string;
     if (!guestId) {
         guestId = generateRandomString(10)
         localStorage.setItem('ChatShare', guestId)
@@ -93,7 +93,7 @@ export default function DesktopLayout() {
     async function loadingDialogs() {
         try {
 
-            const result = (await GetChatShareDialog(id)) as any[];
+            const result = (await GetChatShareDialog(guestId)) as any[];
             setDialogs(result);
             if (result.length === 0) {
                 await AddChatDialog({
