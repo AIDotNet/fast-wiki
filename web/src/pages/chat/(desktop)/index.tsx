@@ -1,27 +1,18 @@
-import { ChatList, DraggablePanel, Tooltip, } from "@lobehub/ui";
+import { DraggablePanel, Tooltip, } from "@lobehub/ui";
 import { Select } from 'antd';
 import { useEffect, useState } from "react";
-import { CreateChatDialog, CreateChatDialogHistory, DeleteDialog, DeleteDialogHistory, GetChatApplicationsList, GetChatDialog, GetChatDialogHistory, PutChatHistory } from "../../../services/ChatApplicationService";
+import { CreateChatDialog, DeleteDialog, GetChatApplicationsList, GetChatDialog, GetChatDialogHistory } from "../../../services/ChatApplicationService";
 import Divider from "@lobehub/ui/es/Form/components/FormDivider";
 import { Button, message } from 'antd'
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { DeleteOutlined } from '@ant-design/icons';
-import {
-    ActionIcon,
-    ChatInputActionBar,
-    ChatInputArea,
-    ChatSendButton,
-} from '@lobehub/ui';
-import {
-    ActionsBar,
-    ChatListProps,
-} from '@lobehub/ui';
-
-import { Eraser, Languages } from 'lucide-react';
-import { Flexbox } from 'react-layout-kit';
-import { fetchRaw } from "../../../utils/fetch";
 import CreateDialog from "../feautres/CreateDialog";
+import ChatAppList from "../feautres/ChatAppList";
+
+
+import { Flexbox } from 'react-layout-kit';
+import FastChatInput from "../../../components/FastChatInput";
 
 const DialogList = styled.div`
     margin-top: 8px;
@@ -55,8 +46,6 @@ export default function DesktopLayout() {
     const [createDialogVisible, setCreateDialogVisible] = useState(false);
     const [dialog, setDialog] = useState({} as any);
     const [history, setHistory] = useState([] as any[]);
-    const [value, setValue] = useState('' as string);
-    const [loading, setLoading] = useState(false);
     const [input] = useState({
         page: 1,
         pageSize: 5
@@ -103,6 +92,9 @@ export default function DesktopLayout() {
 
     async function LoadingSession() {
         try {
+            if (dialog.id === undefined) {
+                return;
+            }
             const result = await GetChatDialogHistory(dialog.id, input.page, input.pageSize);
 
             const history = result.result.map((item: any) => {
@@ -158,121 +150,11 @@ export default function DesktopLayout() {
         loadingApplications();
     }, []);
 
-    function handleChange(value: any) {
-        console.log(`selected ${value}`);
-    }
-
-    const control: ChatListProps | any =
-    {
-        showTitle: false,
-    }
-
-    async function sendChat() {
-        const v = value;
-        if(loading){
-            return
+    function handleChange(id: any) {
+        const app = applications.find(app => app.id === id);
+        if (app) {
+            setApplication(app);
         }
-
-        setLoading(true);
-        setValue('');
-        
-        const chatlayout = document.getElementById('chat-layout');
-
-        history.push({
-            content: v,
-            createAt: new Date().toISOString(),
-            extra: {},
-            id: new Date().getTime(),
-            meta: {
-                avatar: "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                title: "我",
-            },
-            role: 'user',
-        })
-
-        setHistory([...history]);
-
-
-        let chat = {
-            content: '',
-            createAt: new Date().toISOString(),
-            extra: {},
-            id: new Date().getTime(),
-            meta: {
-                avatar: "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/chatgpt.png",
-                title: "AI助手",
-            },
-            role: 'assistant',
-        };
-
-        setHistory([...history, chat]);
-
-        // 滚动到底部
-        if (chatlayout) {
-            chatlayout.scrollTop = chatlayout.scrollHeight;
-        }
-
-        const stream = await fetchRaw('/api/v1/ChatApplications/Completions', {
-            chatDialogId: dialog.id,
-            content: v,
-            chatId: application.id
-        });
-
-
-        for await (const c of stream) {
-            if (c) {
-                let content = c;
-                // 先匹配删除前缀 [ 和后缀 ]
-                if (content.startsWith('[') || content.startsWith(',')) {
-                    // 删除第一个字符
-                    content = c.slice(1);
-                }
-                if (content.endsWith(']')) {
-                    // 删除最后一个字符
-                    content = c.slice(0, c.length - 1);
-                }
-                if (content === '') {
-                    return;
-                }
-
-                if (content.startsWith(',') === true) {
-                    content = content.slice(1);
-                }
-
-                content = "[" + content + "]";
-
-                var obj = JSON.parse(content) as any[];
-
-                obj.forEach((item) => {
-                    chat.content += item.content;
-                });
-
-                setHistory([...history, chat]);
-
-                // 滚动到底部
-                if (chatlayout) {
-                    chatlayout.scrollTop = chatlayout.scrollHeight;
-                }
-            }
-        }
-
-        await CreateChatDialogHistory({
-            chatDialogId: dialog.id,
-            content: v,
-            current: true,
-            type: 0
-        })
-
-
-        await CreateChatDialogHistory({
-            chatDialogId: dialog.id,
-            content: chat.content,
-            current: false,
-            type: 0
-        })
-
-        
-        setLoading(false);
     }
 
     function deleteDialog(id: string) {
@@ -280,20 +162,6 @@ export default function DesktopLayout() {
             .then(() => {
                 loadingDialogs();
             })
-    }
-
-    async function ActionsClick(e: any, item: any) {
-        if (e.key === 'del') {
-            await DeleteDialogHistory(item.id)
-            message.success('删除成功');
-
-            const index = history.findIndex((i) => i.id === item.id);
-            history.splice(index, 1);
-            setHistory([...history]);
-
-        } else if (e.key === 'regenerate') {
-            message.error('暂时并未支持重置!');
-        }
     }
 
     return <>
@@ -361,10 +229,7 @@ export default function DesktopLayout() {
 
             </DialogList>
         </DraggablePanel>
-        <div style={{
-            height: '100vh',
-            width: '100%',
-        }}>
+        <Flexbox style={{ height: '100vh', position: 'relative', width: '100%' }}>
             <div style={{ height: 60 }}>
                 <div style={{
                     fontSize: 20,
@@ -376,78 +241,13 @@ export default function DesktopLayout() {
                 </div>
             </div>
             <Divider />
-            <div id='chat-layout' style={{
-                height: 'calc(100vh - 362px)',
-                overflow: 'auto',
-            }}>
-                <ChatList
-                    onMessageChange={async (e:any, message) => {
-                        if(e === 0){
-                            return
-                        }
-                        await PutChatHistory({
-                            id: e,
-                            content: message
-                        })
-                        // 修改history
-                        history.forEach((item) => {
-                            if (item.id === e) {
-                                item.content = message;
-                            }
-                        });
-                        setHistory([...history]);
-                    }}
-                    data={(history.length === 0 || history === null) ? [{
-                        content: application?.opener??"",
-                        createAt: new Date().toISOString(),
-                        extra: {},
-                        id: 0,
-                        meta: {
-                            avatar: "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/chatgpt.png",
-                            title: "AI助手",
-                        },
-                        role: 'assistant',
-                    }]: history}
-                    onActionsClick={ActionsClick}
-                    renderActions={ActionsBar}
-                    renderMessages={{
-                        default: ({ id, editableContent }) => <div id={id}>{editableContent}</div>,
-                    }}
-                    style={{ width: '100%' }}
-                    {...control}
-                />
-            </div>
+            <ChatAppList setHistory={(v: any[]) => {
+                setHistory(v);
+            }} history={history} application={application} />
             <Divider />
-            <div style={{ height: 300 }}>
-                <Flexbox style={{ height: 300, position: 'relative' }}>
-                    <ChatInputArea
-                        value={value}
-                        onChange={(e) => {
-                            setValue(e.target.value);
-                        }}
-                        onKeyUpCapture={(e) => {
-
-                            if (e.key === 'Enter' && !e.shiftKey && value !== '') {
-                                sendChat();
-                            }
-                        }}
-                        placeholder="请输入您的消息"
-                        bottomAddons={<ChatSendButton loading={loading} onSend={() => sendChat()} />}
-                        topAddons={
-                            <ChatInputActionBar
-                                leftAddons={
-                                    <>
-                                        <ActionIcon icon={Languages} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
-                                        <ActionIcon onClick={() => {
-                                            setValue('');
-                                        }} icon={Eraser} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
-                                    </>
-                                }
-                            />
-                        }
-                    />
-                </Flexbox>
-            </div>
+            <FastChatInput dialog={dialog} application={application} setHistory={(v: any[]) => {
+                setHistory(v);
+            }} history={history} />
             <CreateDialog visible={createDialogVisible} id={application?.id} type={0} onClose={() => {
                 setCreateDialogVisible(false);
                 loadingDialogs();
@@ -455,6 +255,6 @@ export default function DesktopLayout() {
                 setCreateDialogVisible(false);
                 loadingDialogs();
             }} />
-        </div>
+        </Flexbox>
     </>
 }

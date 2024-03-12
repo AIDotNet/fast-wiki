@@ -254,48 +254,52 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
             var result = await memoryServerless.SearchAsync(input.Content, "wiki", filters: filters, limit: 3,
                 minRelevance: chatApplicationQuery.Result.Relevancy);
 
-            var fileIds = new List<long>();
-
-            result.Results.ForEach(x =>
+            if(result.Results.Count != 0)
             {
-                // 获取fileId
-                var fileId = x.Partitions.Select(x => x.Tags.FirstOrDefault(x => x.Key == "fileId"))
-                    .FirstOrDefault(x => !x.Value.IsNullOrEmpty())
-                    .Value.FirstOrDefault();
 
-                if (!fileId.IsNullOrWhiteSpace() && long.TryParse(fileId, out var id))
+                var fileIds = new List<long>();
+
+                result.Results.ForEach(x =>
                 {
-                    fileIds.Add(id);
+                    // 获取fileId
+                    var fileId = x.Partitions.Select(x => x.Tags.FirstOrDefault(x => x.Key == "fileId"))
+                        .FirstOrDefault(x => !x.Value.IsNullOrEmpty())
+                        .Value.FirstOrDefault();
+
+                    if (!fileId.IsNullOrWhiteSpace() && long.TryParse(fileId, out var id))
+                    {
+                        fileIds.Add(id);
+                    }
+
+                    prompt += string.Join(Environment.NewLine, x.Partitions.Select(x => x.Text));
+                });
+
+                if (result.Results.Count == 0 &&
+                    !string.IsNullOrWhiteSpace(chatApplicationQuery.Result.NoReplyFoundTemplate))
+                {
+                    yield return new CompletionsDto()
+                    {
+                        Content = chatApplicationQuery.Result.NoReplyFoundTemplate
+                    };
+                    yield break;
                 }
 
-                prompt += string.Join(Environment.NewLine, x.Partitions.Select(x => x.Text));
-            });
+                var tokens = TokenHelper.GetGptEncoding().Encode(prompt);
 
-            if (result.Results.Count == 0 &&
-                !string.IsNullOrWhiteSpace(chatApplicationQuery.Result.NoReplyFoundTemplate))
-            {
-                yield return new CompletionsDto()
+                prompt = TokenHelper.GetGptEncoding()
+                    .Decode(tokens.Take(chatApplicationQuery.Result.MaxResponseToken).ToList());
+
+                input.Content = chatApplicationQuery.Result.Template.Replace("{{quote}}", prompt)
+                    .Replace("{{question}}", input.Content);
+
+                if (fileIds.Count > 0 && chatApplicationQuery.Result.ShowSourceFile)
                 {
-                    Content = chatApplicationQuery.Result.NoReplyFoundTemplate
-                };
-                yield break;
-            }
+                    var fileQuery = new StorageInfosQuery(fileIds);
 
-            var tokens = TokenHelper.GetGptEncoding().Encode(prompt);
+                    await EventBus.PublishAsync(fileQuery);
 
-            prompt = TokenHelper.GetGptEncoding()
-                .Decode(tokens.Take(chatApplicationQuery.Result.MaxResponseToken).ToList());
-
-            input.Content = chatApplicationQuery.Result.Template.Replace("{{quote}}", prompt)
-                .Replace("{{question}}", input.Content);
-
-            if (fileIds.Count > 0 && chatApplicationQuery.Result.ShowSourceFile)
-            {
-                var fileQuery = new StorageInfosQuery(fileIds);
-
-                await EventBus.PublishAsync(fileQuery);
-
-                sourceFile.AddRange(fileQuery.Result);
+                    sourceFile.AddRange(fileQuery.Result);
+                }
             }
         }
 
