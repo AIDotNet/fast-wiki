@@ -8,7 +8,7 @@ namespace FastWiki.Service.Service;
 /// <summary>
 /// ÊÚÈ¨·þÎñ
 /// </summary>
-public sealed class AuthorizeService(IMapper mapper) : ApplicationService<AuthorizeService>, IAuthorizeService
+public sealed class AuthorizeService : ApplicationService<AuthorizeService>, IAuthorizeService
 {
     public async Task<AuthorizeDto> TokenAsync(string account, string pass)
     {

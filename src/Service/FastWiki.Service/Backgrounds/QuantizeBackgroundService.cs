@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FastWiki.Service.Backgrounds;
 
+/// <summary>
+/// 后台任务，用于量化
+/// </summary>
 public sealed class QuantizeBackgroundService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
@@ -12,12 +15,12 @@ public sealed class QuantizeBackgroundService : BackgroundService
     /// <summary>
     /// 当前任务数量
     /// </summary>
-    private static int CurrentTask = 0;
+    private static int _currentTask = 0;
 
     /// <summary>
     /// 最大量化任务数量
     /// </summary>
-    public static int MaxTask = 3;
+    private static int _maxTask = 1;
 
     private static readonly Channel<QuantizeWikiDetail> WikiDetails = Channel.CreateBounded<QuantizeWikiDetail>(
         new BoundedChannelOptions(1000)
@@ -44,18 +47,18 @@ public sealed class QuantizeBackgroundService : BackgroundService
         var QUANTIZE_MAX_TASK = Environment.GetEnvironmentVariable("QUANTIZE_MAX_TASK");
         if (!string.IsNullOrEmpty(QUANTIZE_MAX_TASK))
         {
-            int.TryParse(QUANTIZE_MAX_TASK, out MaxTask);
+            int.TryParse(QUANTIZE_MAX_TASK, out _maxTask);
         }
 
-        if (MaxTask < 0)
+        if (_maxTask < 0)
         {
-            MaxTask = 1;
+            _maxTask = 1;
         }
 
         // TODO: 首次启动程序的时候需要加载未处理的量化数据
         await LoadingWikiDetailAsync();
 
-        for (int i = 0; i < MaxTask; i++)
+        for (int i = 0; i < _maxTask; i++)
         {
             await Task.Factory.StartNew(WikiDetailHandlerAsync, stoppingToken);
         }
@@ -75,10 +78,10 @@ public sealed class QuantizeBackgroundService : BackgroundService
         using var asyncServiceScope = _serviceProvider.CreateScope();
         while (await WikiDetails.Reader.WaitToReadAsync())
         {
-            Interlocked.Increment(ref CurrentTask);
+            Interlocked.Increment(ref _currentTask);
             var wikiDetail = await WikiDetails.Reader.ReadAsync();
             await HandlerAsync(wikiDetail, asyncServiceScope.ServiceProvider);
-            Interlocked.Decrement(ref CurrentTask);
+            Interlocked.Decrement(ref _currentTask);
         }
     }
 
@@ -86,7 +89,8 @@ public sealed class QuantizeBackgroundService : BackgroundService
     /// 处理量化
     /// </summary>
     /// <param name="wikiDetail"></param>
-    private async ValueTask HandlerAsync(QuantizeWikiDetail wikiDetail, IServiceProvider service)
+    /// <param name="service"></param>
+    private static async ValueTask HandlerAsync(QuantizeWikiDetail wikiDetail, IServiceProvider service)
     {
         var fileStorageRepository = service.GetRequiredService<IFileStorageRepository>();
         var wikiRepository = service.GetRequiredService<IWikiRepository>();

@@ -3,17 +3,17 @@ namespace FastWiki.Service.Contracts;
 public enum WikiQuantizationState
 {
     /// <summary>
-    /// Ä¬ÈÏ×´Ì¬
+    /// é»˜è®¤
     /// </summary>
     None = 0,
     
     /// <summary>
-    /// Íê³É
+    /// å®Œæˆ
     /// </summary>
     Accomplish,
     
     /// <summary>
-    /// Ê§°Ü
+    /// å¤±è´¥
     /// </summary>
     Fail
 }

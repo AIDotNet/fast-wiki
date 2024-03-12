@@ -4,7 +4,7 @@ using FastWiki.Service.Domain.Users.Repositories;
 
 namespace FastWiki.Service.Application.Users;
 
-public class UserQueryHandler(IUserRepository userRepository, IMapper mapper)
+public sealed class UserQueryHandler(IUserRepository userRepository, IMapper mapper)
 {
     [EventHandler]
     public async Task UserInfoAsync(UserInfoQuery query)
@@ -13,12 +13,12 @@ public class UserQueryHandler(IUserRepository userRepository, IMapper mapper)
 
         if (dto == null)
         {
-            throw new UserFriendlyException("ÕËºÅ²»´æÔÚ");
+            throw new UserFriendlyException("è´¦å·ä¸å­˜åœ¨");
         }
 
         if (!dto.CheckCipher(query.Pass))
         {
-            throw new UserFriendlyException("ÃÜÂë´íÎó");
+            throw new UserFriendlyException("å¯†ç é”™è¯¯");
         }
 
         query.Result = mapper.Map<UserDto>(dto);
