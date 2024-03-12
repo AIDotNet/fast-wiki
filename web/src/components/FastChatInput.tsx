@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreateChatDialogHistory } from "../services/ChatApplicationService";
 import { generateRandomString } from "../utils/stringHelper";
 import { fetchRaw } from "../utils/fetch";
@@ -6,6 +6,7 @@ import { NodeAdaptiveLayout } from "../layouts/adaptive-layout";
 import { ActionIcon, ChatInputActionBar, ChatInputArea, ChatSendButton, MobileChatInputArea, MobileChatSendButton } from "@lobehub/ui";
 import { Flexbox } from 'react-layout-kit';
 import { Eraser, Languages } from 'lucide-react';
+import React from "react";
 
 interface IFastChatInputProps {
     dialog: any;
@@ -23,12 +24,21 @@ export default function FastChatInput({
     setHistory
 }: IFastChatInputProps) {
 
-    const [value, setValue] = useState('');
+    const [value, setValue] = useState<string>();
     const [loading, setLoading] = useState(false);
+    const ref = React.useRef(null);
 
     async function sendChat() {
-        const v = value;
+        // ref获取value
+        const data = (ref as any).current?.resizableTextArea.textArea.value ?? value;
+        if ((ref as any).current?.resizableTextArea.textArea.value) {
+            (ref as any).current.resizableTextArea.textArea.value = '';
+        }
         setValue('');
+
+        if (!data || data === '') {
+            return;
+        }
         if (loading) {
             return;
         }
@@ -36,7 +46,7 @@ export default function FastChatInput({
         const chatlayout = document.getElementById('chat-layout');
 
         history.push({
-            content: v,
+            content: data,
             createAt: new Date().toISOString(),
             extra: {},
             id: generateRandomString(10),
@@ -73,14 +83,14 @@ export default function FastChatInput({
         if (id) {
             stream = await fetchRaw('/api/v1/ChatApplications/ChatShareCompletions', {
                 chatDialogId: dialog.id,
-                content: v,
+                content: data,
                 chatId: application.id,
                 chatShareId: id,
             });
         } else {
             stream = await fetchRaw('/api/v1/ChatApplications/Completions', {
                 chatDialogId: dialog.id,
-                content: value,
+                content: data,
                 chatId: application.id
             });
         }
@@ -124,7 +134,7 @@ export default function FastChatInput({
 
         await CreateChatDialogHistory({
             chatDialogId: dialog.id,
-            content: v,
+            content: data,
             current: true,
             type: 0
         })
@@ -139,36 +149,13 @@ export default function FastChatInput({
         setLoading(false);
     }
 
-    return (
-        <NodeAdaptiveLayout MobilePage={
-            <MobileChatInputArea
-                value={value}
-                onChange={(e) => {
-                    console.log(e.target.value);
+    useEffect(() => {
+        console.log(value);
 
-                    setValue(e.target.value);
-                }}
-                placeholder="请输入您的消息"
-                onKeyUpCapture={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey && value !== '') {
-                        sendChat();
-                    }
-                }}
-                textAreaRightAddons={<MobileChatSendButton loading={loading} onSend={() => sendChat()} />}
-                topAddons={
-                    <ChatInputActionBar
-                        leftAddons={
-                            <>
-                                <ActionIcon icon={Languages} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
-                                <ActionIcon onClick={() => {
-                                    setValue('');
-                                }} icon={Eraser} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
-                            </>
-                        }
-                    />
-                }
-            />} DesktopPage={
-                <div style={{ height: 300 }}>
+    }, [value]);
+
+    return (
+        <div style={{ height: 300 }}>
                     <Flexbox style={{ height: 300, position: 'relative', width: '100%' }}>
                         <ChatInputArea
                             value={value}
@@ -196,6 +183,6 @@ export default function FastChatInput({
                             }
                         />
                     </Flexbox>
-                </div> as any} />
+                </div>
     )
 }

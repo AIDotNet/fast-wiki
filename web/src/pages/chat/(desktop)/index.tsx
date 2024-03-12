@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { DeleteOutlined } from '@ant-design/icons';
 import CreateDialog from "../feautres/CreateDialog";
-import ChatInput from "../feautres/ChatInput";
 import ChatAppList from "../feautres/ChatAppList";
 
 
@@ -151,8 +150,11 @@ export default function DesktopLayout() {
         loadingApplications();
     }, []);
 
-    function handleChange(value: any) {
-        console.log(`selected ${value}`);
+    function handleChange(id: any) {
+        const app = applications.find(app => app.id === id);
+        if (app) {
+            setApplication(app);
+        }
     }
 
     function deleteDialog(id: string) {

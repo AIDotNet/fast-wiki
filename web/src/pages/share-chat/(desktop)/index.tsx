@@ -6,11 +6,9 @@ import { Button, message } from 'antd'
 import { DeleteOutlined } from '@ant-design/icons';
 import styled from "styled-components";
 
-
 import { Flexbox } from 'react-layout-kit';
 import CreateDialog from "../feautres/CreateDialog";
 import { generateRandomString } from "../../../utils/stringHelper";
-import ShareChatInput from "../feautres/ShareChatInput";
 import ChatAppList from "../feautres/ShareChatAppList";
 import FastChatInput from "../../../components/FastChatInput";
 
@@ -63,6 +61,7 @@ export default function DesktopLayout() {
     const [createDialogVisible, setCreateDialogVisible] = useState(false);
     const [dialog, setDialog] = useState({} as any);
     const [history, setHistory] = useState([] as any[]);
+    const [expanded, setExpanded] = useState(true);
     const [input] = useState({
         page: 1,
         pageSize: 5
@@ -75,6 +74,8 @@ export default function DesktopLayout() {
 
     async function loadingApplication() {
         const app = await GetChatShareApplication(id as any);
+        console.log(app);
+        
         setApplication(app)
     }
 
@@ -171,10 +172,8 @@ export default function DesktopLayout() {
         <DraggablePanel
             mode="fixed"
             placement="left"
-            showHandlerWhenUnexpand={true}
-            resize={false}
-            pin={true}
-            minWidth={0}
+            expand={expanded}
+            onExpandChange={(v)=>setExpanded(v)}
         >
             <DialogList>
                 {

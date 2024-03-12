@@ -24,8 +24,6 @@ export default function CreateDialog({
         description:'',
         type: type,
     });
-    console.log(id);
-    
 
     function createDialog() {
 
