@@ -68,9 +68,6 @@ FastWikiService环境变量参数：
 - OPENAI_EMBEDDING_MODEL： Embedding的模型，默认text-embedding-3-small
 - OPENAI_EMBEDDING_TOKEN: Embedding的Token, 默认为空，为空则使用对话的Token
 
-FastWiki.Web.Server环境变量参数：
-- FAST_WIKI_SERVICE：FastWikiService的地址，默认为http://localhost:5124
-
 ## 技术交流
 ![输入图片说明](img/wechat.png)
 
