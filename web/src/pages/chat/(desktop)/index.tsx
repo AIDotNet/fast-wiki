@@ -72,7 +72,7 @@ export default function DesktopLayout() {
     async function loadingDialogs() {
         try {
 
-            const result = (await GetChatDialog(application.id, true)) as any[];
+            const result = (await GetChatDialog(application.id, false)) as any[];
             setDialogs(result);
             if (result.length === 0) {
                 await AddChatDialog({

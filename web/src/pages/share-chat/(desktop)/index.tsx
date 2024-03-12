@@ -220,7 +220,7 @@ export default function DesktopLayout() {
             <ChatAppList history={history} setHistory={(v: any[]) => setHistory(v)} application={application} id={id} />
             <Divider />
             <FastChatInput history={history} setHistory={(v: any[]) => setHistory(v)} dialog={dialog} application={application} id={id} />
-            <CreateDialog chatId={id} visible={createDialogVisible} id={application?.id} type={1} onClose={() => {
+            <CreateDialog chatId={guestId} visible={createDialogVisible} id={application?.id} type={1} onClose={() => {
                 setCreateDialogVisible(false);
                 loadingDialogs();
             }} onSucess={() => {
