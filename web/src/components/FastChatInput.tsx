@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { CreateChatDialogHistory } from "../services/ChatApplicationService";
 import { generateRandomString } from "../utils/stringHelper";
 import { fetchRaw } from "../utils/fetch";
-import { ActionIcon, ChatInputActionBar, ChatInputArea, ChatSendButton} from "@lobehub/ui";
+import { ActionIcon, ChatInputActionBar, ChatInputArea, ChatSendButton } from "@lobehub/ui";
 import { Flexbox } from 'react-layout-kit';
 import { Eraser, Languages } from 'lucide-react';
 import React from "react";
@@ -98,10 +98,14 @@ export default function FastChatInput({
             if (c) {
                 let content = c;
                 // 先匹配删除前缀 [ 和后缀 ]
-                if (content.startsWith('[') || content.startsWith(',')) {
-                    // 删除第一个字符
+                if (content.startsWith('[')) {
                     content = c.slice(1);
                 }
+
+                if (content.startsWith(',')) {
+                    content = content.slice(1);
+                }
+
                 if (content.endsWith(']')) {
                     // 删除最后一个字符
                     content = c.slice(0, c.length - 1);
@@ -110,13 +114,15 @@ export default function FastChatInput({
                     return;
                 }
 
-                if (content.startsWith(',') === true) {
-                    content = content.slice(1);
+                if (!content.startsWith('[')) {
+                    content = "[" + content
                 }
 
-                content = "[" + content + "]";
-                console.log(content);
+                if (!content.endsWith(']')) {
+                    content = content + "]"
+                }
 
+                console.log(content);
                 var obj = JSON.parse(content) as any[];
 
                 obj.forEach((item) => {
@@ -148,40 +154,35 @@ export default function FastChatInput({
         setLoading(false);
     }
 
-    useEffect(() => {
-        console.log(value);
-
-    }, [value]);
-
     return (
         <div style={{ height: 300 }}>
-                    <Flexbox style={{ height: 300, position: 'relative', width: '100%' }}>
-                        <ChatInputArea
-                            value={value}
-                            onChange={(e: any) => {
-                                setValue(e.target.value);
-                            }}
-                            placeholder="请输入您的消息"
-                            onKeyUpCapture={(e: any) => {
-                                if (e.key === 'Enter' && !e.shiftKey && value !== '') {
-                                    sendChat();
-                                }
-                            }}
-                            bottomAddons={<ChatSendButton loading={loading} onSend={() => sendChat()} />}
-                            topAddons={
-                                <ChatInputActionBar
-                                    leftAddons={
-                                        <>
-                                            <ActionIcon icon={Languages} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
-                                            <ActionIcon onClick={() => {
-                                                setValue('');
-                                            }} icon={Eraser} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
-                                        </>
-                                    }
-                                />
+            <Flexbox style={{ height: 300, position: 'relative', width: '100%' }}>
+                <ChatInputArea
+                    value={value}
+                    onChange={(e: any) => {
+                        setValue(e.target.value);
+                    }}
+                    placeholder="请输入您的消息"
+                    onKeyUpCapture={(e: any) => {
+                        if (e.key === 'Enter' && !e.shiftKey && value !== '') {
+                            sendChat();
+                        }
+                    }}
+                    bottomAddons={<ChatSendButton loading={loading} onSend={() => sendChat()} />}
+                    topAddons={
+                        <ChatInputActionBar
+                            leftAddons={
+                                <>
+                                    <ActionIcon icon={Languages} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
+                                    <ActionIcon onClick={() => {
+                                        setValue('');
+                                    }} icon={Eraser} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
+                                </>
                             }
                         />
-                    </Flexbox>
-                </div>
+                    }
+                />
+            </Flexbox>
+        </div>
     )
 }
