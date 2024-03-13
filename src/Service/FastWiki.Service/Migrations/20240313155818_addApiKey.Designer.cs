@@ -3,6 +3,7 @@ using System;
 using FastWiki.Service.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FastWiki.Service.Migrations
 {
     [DbContext(typeof(WikiDbContext))]
-    partial class WikiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240313155818_addApiKey")]
+    partial class addApiKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,9 +175,9 @@ namespace FastWiki.Service.Migrations
                     b.Property<Guid>("Modifier")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ReferenceFile")
+                    b.Property<string[]>("ReferenceFile")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text[]");
 
                     b.Property<int>("TokenConsumption")
                         .HasColumnType("integer");
@@ -347,18 +350,18 @@ namespace FastWiki.Service.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("0a36bba0-2bb5-4fbc-81da-997392e91c49"),
+                            Id = new Guid("152edb28-ec98-4fe8-98e3-29b4487f3cc4"),
                             Account = "admin",
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                            CreationTime = new DateTime(2024, 3, 13, 16, 44, 47, 925, DateTimeKind.Utc).AddTicks(654),
+                            CreationTime = new DateTime(2024, 3, 13, 15, 58, 17, 901, DateTimeKind.Utc).AddTicks(4531),
                             Email = "239573049@qq.com",
                             IsDeleted = false,
                             IsDisable = false,
-                            ModificationTime = new DateTime(2024, 3, 13, 16, 44, 47, 925, DateTimeKind.Utc).AddTicks(655),
+                            ModificationTime = new DateTime(2024, 3, 13, 15, 58, 17, 901, DateTimeKind.Utc).AddTicks(4533),
                             Name = "admin",
-                            Password = "f078dcf6acf7ecd387f1d4b346abd8bb",
+                            Password = "9d90012acf6c9d8f65539f9f525b9c23",
                             Phone = "13049809673",
-                            Salt = "5dba412d5db94106bbcc26b51fc1c8b4"
+                            Salt = "165fe60f29234634a7885f624b147964"
                         });
                 });
 

@@ -20,7 +20,7 @@ public sealed class WikiCommandHandler(
     [EventHandler]
     public async Task RemoveWiki(RemoveWikiCommand command)
     {
-        var wikiDetailsQuery = new WikiDetailsQuery(command.Id, string.Empty, 1, int.MaxValue);
+        var wikiDetailsQuery = new WikiDetailsQuery(command.Id, null, string.Empty, 1, int.MaxValue);
 
         await eventBus.PublishAsync(wikiDetailsQuery);
 
@@ -79,7 +79,7 @@ public sealed class WikiCommandHandler(
     public async Task CreateWikiDetailDataAsync(CreateWikiDetailDataCommand command)
     {
         var wikiDetail = new WikiDetail(command.Input.WikiId, command.Input.Name, command.Input.FilePath,
-                       command.Input.FileId, 0, "data");
+            command.Input.FileId, 0, "data");
 
         wikiDetail = await wikiRepository.AddDetailsAsync(wikiDetail);
 

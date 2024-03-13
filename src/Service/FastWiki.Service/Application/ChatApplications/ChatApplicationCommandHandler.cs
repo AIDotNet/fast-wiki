@@ -107,4 +107,10 @@ public class ChatApplicationCommandHandler(
         await chatApplicationRepository.PutChatHistoryAsync(command.Input.Id, command.Input.Content,
             command.Input.ChatShareId);
     }
+
+    [EventHandler]
+    public async Task DeductTokenAsync(DeductTokenCommand command)
+    {
+        await chatApplicationRepository.DeductTokenAsync(command.Id, command.token);
+    }
 }

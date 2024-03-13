@@ -15,8 +15,6 @@ public class StorageQueryHandler(IFileStorageRepository fileStorageRepository)
     [EventHandler]
     public async Task StorageInfosAsync(StorageInfosQuery query)
     {
-        var result = await fileStorageRepository.GetListAsync(x => query.FileId.Contains(x.Id));
-
-        query.Result = result;
+        query.Result =  await fileStorageRepository.GetListAsync(query.FileId.ToArray());
     }
 }

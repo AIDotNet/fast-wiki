@@ -27,6 +27,11 @@ public sealed class ChatDialogHistory : Entity<string>, IFullAggregateRoot<Guid>
     /// </summary>
     public ChatDialogHistoryType Type { get; set; }
 
+    /// <summary>
+    /// 引用文件
+    /// </summary>
+    public List<ReferenceFile> ReferenceFile { get; set; } = new();
+
     public Guid Creator { get; set; }
     public DateTime CreationTime { get; set; }
     public Guid Modifier { get; set; }
@@ -47,4 +52,13 @@ public sealed class ChatDialogHistory : Entity<string>, IFullAggregateRoot<Guid>
         Current = current;
         Type = type;
     }
+}
+
+public class ReferenceFile
+{
+    public string Name { get; set; }
+
+    public string FilePath { get; set; }
+
+    public string FileId { get; set; }
 }

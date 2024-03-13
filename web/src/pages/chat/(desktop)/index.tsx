@@ -8,11 +8,11 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { DeleteOutlined } from '@ant-design/icons';
 import CreateDialog from "../feautres/CreateDialog";
-import ChatAppList from "../feautres/ChatAppList";
 
 
 import { Flexbox } from 'react-layout-kit';
 import FastChatInput from "../../../components/FastChatInput";
+import ChatAppList from "../../../components/ChatAppList";
 
 const DialogList = styled.div`
     margin-top: 8px;

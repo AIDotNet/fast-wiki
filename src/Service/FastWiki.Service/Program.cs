@@ -143,6 +143,13 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapPost("/v1/chat/completions", OpenAIService.Completions)
+    .WithTags("OpenAI")
+    .WithGroupName("OpenAI")
+    .WithDescription("OpenAI Completions")
+    .WithOpenApi();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger()
@@ -160,7 +167,5 @@ if (app.Environment.IsDevelopment())
 
     #endregion
 }
-
-app.MapPost("/v1/chat/completions", OpenAIService.Completions);
 
 app.Run();

@@ -86,9 +86,7 @@ export default function WikiDetailFile({
                     right: 16,
                 }} onClick={() => { }}>插入</Button>
             </div>
-            <SpotlightCard renderItem={renderItem} items={wikiDetailInfo} style={{
-
-            }}>
+            <SpotlightCard renderItem={renderItem} items={wikiDetailInfo}>
             </SpotlightCard>
             {taotal}
         </Modal>

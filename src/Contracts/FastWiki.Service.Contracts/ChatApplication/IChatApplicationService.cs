@@ -77,13 +77,6 @@ public interface IChatApplicationService
     Task CreateChatDialogHistoryAsync(CreateChatDialogHistoryInput input);
 
     /// <summary>
-    /// 智能对话
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    IAsyncEnumerable<CompletionsDto> CompletionsAsync(CompletionsInput input);
-
-    /// <summary>
     /// 对话分享
     /// </summary>
     /// <param name="input"></param>

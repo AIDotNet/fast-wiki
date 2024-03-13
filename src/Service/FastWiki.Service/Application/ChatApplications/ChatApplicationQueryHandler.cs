@@ -54,9 +54,11 @@ public class ChatApplicationQueryHandler(
 
         var total = await chatApplicationRepository.GetChatDialogHistoryCountAsync(query.ChatDialogId);
 
+        var dto = mapper.Map<List<ChatDialogHistoryDto>>(result.OrderBy(x => x.CreationTime));
+
         query.Result = new PaginatedListBase<ChatDialogHistoryDto>()
         {
-            Result = mapper.Map<List<ChatDialogHistoryDto>>(result.OrderBy(x => x.CreationTime)),
+            Result = dto,
             Total = total
         };
     }
@@ -98,7 +100,8 @@ public class ChatApplicationQueryHandler(
     public async Task GetSessionLogDialogQueryAsync(GetSessionLogDialogQuery query)
     {
         var result =
-            await chatApplicationRepository.GetSessionLogDialogListAsync(query.chatApplicationId, query.page, query.pageSize);
+            await chatApplicationRepository.GetSessionLogDialogListAsync(query.chatApplicationId, query.page,
+                query.pageSize);
 
         var total = await chatApplicationRepository.GetSessionLogDialogCountAsync(query.chatApplicationId);
 
@@ -107,5 +110,11 @@ public class ChatApplicationQueryHandler(
             Result = mapper.Map<List<ChatDialogDto>>(result),
             Total = total
         };
+    }
+
+    [EventHandler]
+    public async Task GetAPIKeyChatShareAsync(GetAPIKeyChatShareQuery query)
+    {
+        query.Result = await chatApplicationRepository.GetAPIKeyChatShareAsync(query.APIKey);
     }
 }

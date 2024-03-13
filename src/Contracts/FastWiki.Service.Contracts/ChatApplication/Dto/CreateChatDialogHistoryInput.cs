@@ -20,5 +20,15 @@ public sealed class CreateChatDialogHistoryInput
     /// <summary>
     /// 对话类型
     /// </summary>
-    public ChatDialogHistoryType Type { get; set; } 
+    public ChatDialogHistoryType Type { get; set; }
+
+    /// <summary>
+    /// 消耗token
+    /// </summary>
+    public int ExpendToken { get; set; }
+    
+    /// <summary>
+    /// 源文件引用
+    /// </summary>
+    public List<SourceFileDto> SourceFile { get; set; } = [];
 }

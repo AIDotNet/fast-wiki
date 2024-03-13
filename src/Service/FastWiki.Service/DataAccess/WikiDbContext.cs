@@ -110,17 +110,20 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.HasIndex(x => x.Creator);
             entity.Property(x => x.Content).HasMaxLength(-1);
 
+            entity.Property(x => x.ReferenceFile)
+                .HasConversion(item => JsonSerializer.Serialize(item, new JsonSerializerOptions()),
+                    item => JsonSerializer.Deserialize<List<ReferenceFile>>(item, new JsonSerializerOptions()));
         });
 
         modelBuilder.Entity<ChatShare>(entity =>
         {
             entity.ToTable("wiki-chat-share");
 
+            entity.HasKey(x => x.APIKey);
 
             entity.HasKey(x => x.Id);
 
             entity.HasIndex(x => x.ChatApplicationId);
-
         });
 
         var user = new User("admin", "admin", "Aa123456",

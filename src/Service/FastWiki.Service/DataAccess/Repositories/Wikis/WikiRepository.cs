@@ -27,15 +27,16 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
         return query.LongCountAsync();
     }
 
-    public async Task<List<WikiDetail>> GetDetailsListAsync(long wikiId, string? keyword, int page, int pageSize)
+    public async Task<List<WikiDetail>> GetDetailsListAsync(long wikiId, WikiQuantizationState? queryState,
+        string? keyword, int page, int pageSize)
     {
-        var query = CreateDetailsQuery(wikiId, keyword);
+        var query = CreateDetailsQuery(wikiId, queryState, keyword);
         return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
     }
 
-    public async Task<long> GetDetailsCountAsync(long wikiId, string? keyword)
+    public async Task<long> GetDetailsCountAsync(long wikiId, WikiQuantizationState? queryState, string? keyword)
     {
-        var query = CreateDetailsQuery(wikiId, keyword);
+        var query = CreateDetailsQuery(wikiId, queryState, keyword);
         return await query.LongCountAsync();
     }
 
@@ -95,7 +96,7 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
         return query;
     }
 
-    private IQueryable<WikiDetail> CreateDetailsQuery(long wikiId, string? keyword)
+    private IQueryable<WikiDetail> CreateDetailsQuery(long wikiId, WikiQuantizationState? queryState, string? keyword)
     {
         var query = Context.WikiDetails.AsNoTracking();
 
@@ -103,6 +104,9 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
         {
             query = query.Where(x => x.FileName.Contains(keyword));
         }
+
+        if (queryState.HasValue)
+            query = query.Where(x => x.State == queryState.Value);
 
         query = query.Where(x => x.WikiId == wikiId);
 

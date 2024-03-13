@@ -156,4 +156,19 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <param name="chatShareId"></param>
     /// <returns></returns>
     Task PutChatHistoryAsync(string id,string content,string? chatShareId);
+    
+    /// <summary>
+    /// 通过APIKey获取分享对话
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <returns></returns>
+    Task<ChatShare> GetAPIKeyChatShareAsync(string apiKey);
+    
+    /// <summary>
+    /// 扣款指定分享对话的token
+    /// </summary>
+    /// <param name="chatShareId"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    Task DeductTokenAsync(string chatShareId, int token);
 }

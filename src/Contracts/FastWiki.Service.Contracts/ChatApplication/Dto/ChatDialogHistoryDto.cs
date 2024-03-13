@@ -17,7 +17,7 @@ public sealed class ChatDialogHistoryDto
     /// <summary>
     /// 对话消耗token
     /// </summary>
-    public int TokenConsumption { get; set; }
+    public int TokenConsumption { get; set; } = 0;
 
     /// <summary>
     /// 是否本人
@@ -27,12 +27,12 @@ public sealed class ChatDialogHistoryDto
     /// <summary>
     /// 对话类型
     /// </summary>
-    public ChatDialogHistoryType Type { get; set; }
+    public ChatDialogHistoryType Type { get; set; } = ChatDialogHistoryType.Text;
 
     /// <summary>
     /// 源文件引用
     /// </summary>
-    public List<SourceFileDto> SourceFile { get; set; } = new();
+    public List<SourceFileDto> ReferenceFile { get; set; } = [];
 
     public DateTime CreationTime { get; set; }
 

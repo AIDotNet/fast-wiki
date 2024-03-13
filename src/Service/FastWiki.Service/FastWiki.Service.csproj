@@ -29,6 +29,7 @@
         <PackageReference Include="Masa.Contrib.Exceptions" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EFCore" Version="$(MasaFrameworkPackageVersion)" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.3" />
         <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.29.240219.2" />
         <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Postgres" Version="0.29.240219.2" />
         <PackageReference Include="Microsoft.SemanticKernel" Version="1.4.0" />

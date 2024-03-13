@@ -2,7 +2,7 @@
 
 namespace FastWiki.Service.DataAccess.Repositories.Storage;
 
-public class FileStorageRepository(WikiDbContext context, IUnitOfWork unitOfWork)
+public sealed class FileStorageRepository(WikiDbContext context, IUnitOfWork unitOfWork)
     : Repository<WikiDbContext, FileStorage, long>(context, unitOfWork), IFileStorageRepository
 {
     public async Task<FileStorage> AddAsync(FileStorage fileStorage)
@@ -12,5 +12,12 @@ public class FileStorageRepository(WikiDbContext context, IUnitOfWork unitOfWork
         await Context.SaveChangesAsync();
 
         return entity.Entity;
+    }
+
+    public async Task<List<FileStorage>> GetListAsync(params long[] ids)
+    {
+        return await Context.FileStorages.AsNoTracking()
+            .Where(x => ids.Contains(x.Id))
+            .ToListAsync();
     }
 }

@@ -29,11 +29,14 @@ export default memo((props: IReleaseApplicationProps) => {
             title: '过期时间',
             dataIndex: 'expires',
             key: 'expires',
+            render: (text) => {
+                return text ? new Date(text).toLocaleString() : '永久有效';
+            }
         },
         {
-            title: '对话类型',
-            dataIndex: 'typeName',
-            key: 'typeName',
+            title: '使用Token数量',
+            dataIndex: 'usedToken',
+            key: 'usedToken',
         },
         {
             title: '可用Token数量',
@@ -46,13 +49,27 @@ export default memo((props: IReleaseApplicationProps) => {
             key: 'availableQuantity',
         },
         {
-            title: '操作',
+            title: <div style={{
+                textAlign: 'center',
+                
+            }}>
+                    操作
+                </div>,
             key: 'action',
             render: (_, item) => (
+                <>
+                    
                 <Button onClick={() => {
                     copyToClipboard(location.origin + "/share-chat?id=" + item.id)
                     message.success('复制成功');
-                }}>分享</Button>
+                }}>分享链接</Button>
+                <Button style={{
+                    marginLeft: 8
+                }} onClick={() => {
+                    copyToClipboard(item.apiKey)
+                    message.success('复制APIKey成功');
+                }}>复制Key</Button>
+                </>
             ),
         },
     ];

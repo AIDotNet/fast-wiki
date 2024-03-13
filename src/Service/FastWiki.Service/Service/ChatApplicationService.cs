@@ -1,5 +1,6 @@
 using FastWiki.Service.Application.Storage.Queries;
 using FastWiki.Service.Domain.Storage.Aggregates;
+using FastWiki.Service.Infrastructure;
 using FastWiki.Service.Infrastructure.Helper;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -100,130 +101,6 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
         return query.Result;
     }
 
-    /// <inheritdoc />
-    [Authorize]
-    public async IAsyncEnumerable<CompletionsDto> CompletionsAsync(CompletionsInput input)
-    {
-        var chatApplicationQuery = new ChatApplicationInfoQuery(input.ChatId);
-
-        await EventBus.PublishAsync(chatApplicationQuery);
-
-        if (chatApplicationQuery.Result == null)
-        {
-            throw new UserFriendlyException("应用Id不存在");
-        }
-
-        var prompt = string.Empty;
-
-        var sourceFile = new List<FileStorage>();
-        // 如果为空则不使用知识库
-        if (chatApplicationQuery.Result.WikiIds.Count != 0)
-        {
-            var memoryServerless = GetRequiredService<MemoryServerless>();
-
-            var filters = chatApplicationQuery.Result.WikiIds
-                .Select(chatApplication => new MemoryFilter().ByTag("wikiId", chatApplication.ToString())).ToList();
-
-
-            var result = await memoryServerless.SearchAsync(input.Content, "wiki", filters: filters, limit: 3, minRelevance: chatApplicationQuery.Result.Relevancy);
-
-            var fileIds = new List<long>();
-
-            result.Results.ForEach(x =>
-            {
-                // 获取fileId
-                var fileId = x.Partitions.Select(x => x.Tags.FirstOrDefault(x => x.Key == "fileId"))
-                    .FirstOrDefault(x => !x.Value.IsNullOrEmpty())
-                    .Value.FirstOrDefault();
-
-                if (!fileId.IsNullOrWhiteSpace() && long.TryParse(fileId, out var id))
-                {
-                    fileIds.Add(id);
-                }
-
-                prompt += string.Join(Environment.NewLine, x.Partitions.Select(x => x.Text));
-            });
-
-            if (result.Results.Count == 0 &&
-                !string.IsNullOrWhiteSpace(chatApplicationQuery.Result.NoReplyFoundTemplate))
-            {
-                yield return new CompletionsDto()
-                {
-                    Content = chatApplicationQuery.Result.NoReplyFoundTemplate
-                };
-                yield break;
-            }
-
-            var tokens = TokenHelper.GetGptEncoding().Encode(prompt);
-
-            prompt = TokenHelper.GetGptEncoding()
-                .Decode(tokens.Take(chatApplicationQuery.Result.MaxResponseToken).ToList());
-
-            input.Content = chatApplicationQuery.Result.Template.Replace("{{quote}}", prompt)
-                .Replace("{{question}}", input.Content);
-
-            if (fileIds.Count > 0 && chatApplicationQuery.Result.ShowSourceFile)
-            {
-                var fileQuery = new StorageInfosQuery(fileIds);
-
-                await EventBus.PublishAsync(fileQuery);
-
-                sourceFile.AddRange(fileQuery.Result);
-            }
-        }
-
-        var chatStream = wikiMemoryService.CreateOpenAIChatCompletionService(chatApplicationQuery.Result.ChatModel);
-
-        var chatHistory = new ChatHistory();
-
-        if (!chatApplicationQuery.Result.Prompt.IsNullOrWhiteSpace())
-        {
-            chatHistory.AddSystemMessage(chatApplicationQuery.Result.Prompt);
-        }
-
-        // TODO: 后期可修改为可配置
-        var historyQuery = new ChatDialogHistoryQuery(input.ChatDialogId, 1, 3);
-
-        await EventBus.PublishAsync(historyQuery);
-
-        foreach (var message in historyQuery.Result.Result)
-        {
-            if (message.Current)
-            {
-                chatHistory.AddUserMessage(message.Content);
-            }
-            else
-            {
-                chatHistory.AddAssistantMessage(message.Content);
-            }
-        }
-
-        chatHistory.AddUserMessage(chatApplicationQuery.Result.Template.Replace("{{quote}}", prompt)
-            .Replace("{{question}}", input.Content));
-
-        await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory))
-        {
-            yield return new CompletionsDto()
-            {
-                Content = item.Content ?? string.Empty,
-            };
-            await Task.Delay(1);
-        }
-
-        if (sourceFile.Count > 0)
-        {
-            yield return new CompletionsDto()
-            {
-                SourceFile = sourceFile.Select(x => new SourceFileDto()
-                {
-                    Name = x.Name,
-                    FilePath = x.Path,
-                    FileId = x.Id.ToString()
-                }).ToList()
-            };
-        }
-    }
-
     public async IAsyncEnumerable<CompletionsDto> ChatShareCompletionsAsync(ChatShareCompletionsInput input)
     {
         var chatShareInfoQuery = new ChatShareInfoQuery(input.ChatShareId);
@@ -254,9 +131,8 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
             var result = await memoryServerless.SearchAsync(input.Content, "wiki", filters: filters, limit: 3,
                 minRelevance: chatApplicationQuery.Result.Relevancy);
 
-            if(result.Results.Count != 0)
+            if (result.Results.Count != 0)
             {
-
                 var fileIds = new List<long>();
 
                 result.Results.ForEach(x =>
@@ -356,27 +232,16 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
 
         var chatStream = wikiMemoryService.CreateOpenAIChatCompletionService(chatApplicationQuery.Result.ChatModel);
 
+        var context = GetRequiredService<IHttpContextAccessor>().HttpContext;
+
         await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory))
         {
-            yield return new CompletionsDto()
-            {
-                Content = item.Content ?? string.Empty,
-            };
-            await Task.Delay(1);
+            await context!.WriteOpenAiResultAsync(item.Content, chatApplicationQuery.Result.ChatModel,
+                Guid.NewGuid().ToString("N"),
+                Guid.NewGuid().ToString("N"));
         }
-
-        if (sourceFile.Count > 0)
-        {
-            yield return new CompletionsDto()
-            {
-                SourceFile = sourceFile.Select(x => new SourceFileDto()
-                {
-                    Name = x.Name,
-                    FilePath = x.Path,
-                    FileId = x.Id.ToString()
-                }).ToList()
-            };
-        }
+        
+        await context!.WriteEndAsync();
     }
 
     public async Task CreateChatDialogHistoryAsync(CreateChatDialogHistoryInput input)
@@ -452,7 +317,8 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
     }
 
     [Authorize]
-    public async Task<PaginatedListBase<ChatDialogDto>> GetSessionLogDialogAsync(string chatApplicationId, int page, int pageSize)
+    public async Task<PaginatedListBase<ChatDialogDto>> GetSessionLogDialogAsync(string chatApplicationId, int page,
+        int pageSize)
     {
         var query = new GetSessionLogDialogQuery(chatApplicationId, page, pageSize);
 

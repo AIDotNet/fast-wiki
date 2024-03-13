@@ -38,9 +38,9 @@ public sealed class WikiQueryHandler(
     [EventHandler]
     public async Task GetWikiDetails(WikiDetailsQuery query)
     {
-        var wikis = await wikiRepository.GetDetailsListAsync(query.WikiId, query.Keyword, query.Page, query.PageSize);
+        var wikis = await wikiRepository.GetDetailsListAsync(query.WikiId,query.State, query.Keyword, query.Page, query.PageSize);
 
-        var count = await wikiRepository.GetDetailsCountAsync(query.WikiId, query.Keyword);
+        var count = await wikiRepository.GetDetailsCountAsync(query.WikiId,query.State, query.Keyword);
 
         query.Result = new PaginatedListBase<WikiDetailDto>()
         {

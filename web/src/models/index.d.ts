@@ -52,6 +52,9 @@ export interface ChatShareDto {
     expires: string;
     availableToken: number;
     availableQuantity: number;
+    apiKey: string;
+    usedToken: number;
+    
 }
 export interface CompletionsDto {
     content: string;
@@ -201,4 +204,10 @@ export interface WikiDetailVectorQuantityDto {
     wikiDetailId: string;
     fileId: string;
     index: number;
+}
+
+export enum WikiQuantizationState {
+    None = 0,
+    Accomplish,
+    Fail
 }

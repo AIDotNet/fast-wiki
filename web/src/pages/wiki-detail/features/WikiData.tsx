@@ -1,7 +1,8 @@
-import { Table, Button, Dropdown, MenuProps, message } from 'antd';
+import { Table, Button, Dropdown, MenuProps, message, Select } from 'antd';
 import { useEffect, useState } from 'react';
 import { DeleteWikiDetails, GetWikiDetailsList } from '../../../services/WikiService';
 import WikiDetailFile from './WikiDetailFile';
+import { WikiQuantizationState } from '../../../models/index.d';
 
 interface IWikiDataProps {
     id: string;
@@ -66,8 +67,9 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
     const [input, setInput] = useState({
         keyword: '',
         page: 1,
-        pageSize: 10
-    } as any);
+        pageSize: 10,
+        state: null as WikiQuantizationState | null
+    });
 
     const items: MenuProps['items'] = [
         {
@@ -120,7 +122,7 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
 
     async function loadingData() {
         try {
-            const result = await GetWikiDetailsList(id, input.keyword, input.page, input.pageSize);
+            const result = await GetWikiDetailsList(id, input.keyword, input.page, input.pageSize, input.state);
             setData(result.result);
             setTotal(result.total);
         } catch (error) {
@@ -133,7 +135,7 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
     }, [id, input]);
 
     return (<>
-        <div style={{
+        <header style={{
             padding: 16,
             fontSize: 20,
             fontWeight: 600
@@ -146,7 +148,28 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
                     <Button >上传文件</Button>
                 </Dropdown>
             </div>
-        </div>
+            <Select
+                defaultValue={null}
+                style={{ 
+                    width: 120,
+                    marginLeft: 16,
+                    marginRight: 16,
+                    float: 'right' 
+                }}
+                onChange={(v: WikiQuantizationState | null) => {
+                    setInput({
+                        ...input,
+                        state: v
+                    })
+                }}
+                options={[
+                    { value: null, label: '全部' },
+                    { value: WikiQuantizationState.None, label: '处理中' },
+                    { value: WikiQuantizationState.Accomplish, label: '完成' },
+                    { value: WikiQuantizationState.Fail, label: '失败' },
+                ]}
+            />
+        </header>
         <Table dataSource={data}
             pagination={{
                 current: input.page,

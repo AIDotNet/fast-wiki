@@ -31,7 +31,7 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
     {
         await Context.ChatDialogs.Where(x => x.Id == id).ExecuteDeleteAsync();
         await Context.ChatDialogHistorys.Where(x => x.ChatDialogId == id).ExecuteDeleteAsync();
-        
+
         await Context.SaveChangesAsync();
     }
 
@@ -192,6 +192,20 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
                 .ExecuteUpdateAsync(x =>
                     x.SetProperty(b => b.Content, content));
         }
+    }
+
+    public async Task<ChatShare> GetAPIKeyChatShareAsync(string apiKey)
+    {
+        return await Context.ChatShares
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.APIKey == apiKey);
+    }
+
+    public Task DeductTokenAsync(string chatShareId, int token)
+    {
+        return Context.ChatShares.Where(x => x.Id == chatShareId)
+            .ExecuteUpdateAsync(x =>
+                x.SetProperty(b => b.UsedToken, x => x.UsedToken + token));
     }
 
     private IQueryable<ChatShare> CreateChatShareQueryable(Guid userId, string chatApplicationId)

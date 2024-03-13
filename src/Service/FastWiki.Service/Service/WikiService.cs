@@ -65,7 +65,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
     public async Task CreateWikiDetailWebPageInputAsync(CreateWikiDetailWebPageInput input)
     {
         var command = new CreateWikiDetailWebPageCommand(input);
-        
+
         await EventBus.PublishAsync(command);
     }
 
@@ -77,9 +77,10 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
     }
 
     [Authorize]
-    public async Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId, string? keyword, int page, int pageSize)
+    public async Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId, WikiQuantizationState? state,
+        string? keyword, int page, int pageSize)
     {
-        var query = new WikiDetailsQuery(wikiId, keyword, page, pageSize);
+        var query = new WikiDetailsQuery(wikiId, state, keyword, page, pageSize);
 
         await EventBus.PublishAsync(query);
 
@@ -95,7 +96,8 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
     }
 
     [Authorize]
-    public async Task<PaginatedListBase<WikiDetailVectorQuantityDto>> GetWikiDetailVectorQuantityAsync(string wikiDetailId, int page, int pageSize)
+    public async Task<PaginatedListBase<WikiDetailVectorQuantityDto>> GetWikiDetailVectorQuantityAsync(
+        string wikiDetailId, int page, int pageSize)
     {
         var query = new WikiDetailVectorQuantityQuery(wikiDetailId, page, pageSize);
 

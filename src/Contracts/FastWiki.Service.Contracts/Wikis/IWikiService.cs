@@ -68,7 +68,7 @@ public interface IWikiService
     /// <param name="page"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId, string? keyword, int page, int pageSize);
+    Task<PaginatedListBase<WikiDetailDto>> GetWikiDetailsAsync(long wikiId,WikiQuantizationState? state, string? keyword, int page, int pageSize);
 
     /// <summary>
     /// 删除知识库详情列表

@@ -9,7 +9,7 @@ import styled from "styled-components";
 import { Flexbox } from 'react-layout-kit';
 import CreateDialog from "../feautres/CreateDialog";
 import { generateRandomString } from "../../../utils/stringHelper";
-import ChatAppList from "../feautres/ShareChatAppList";
+import ChatAppList from "../../../components/ChatAppList";
 import FastChatInput from "../../../components/FastChatInput";
 
 const DialogList = styled.div`

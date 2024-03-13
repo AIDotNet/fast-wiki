@@ -1,23 +1,24 @@
-import {
-    ChatList,
-    ActionsBar, ChatListProps
-} from "@lobehub/ui";
-import { DeleteDialogHistory, PutChatHistory } from "../../../services/ChatApplicationService";
+import { ChatList, ChatListProps } from "@lobehub/ui";
+import { DeleteDialogHistory, PutChatHistory } from "../services/ChatApplicationService";
 import { message } from "antd";
+
+import {
+    ActionsBar,
+} from '@lobehub/ui';
 
 interface IChatAppListProps {
     application: any;
     history: any[];
     setHistory: any;
+    id?: string;
 }
 
 export default function ChatAppList({
     application,
     history,
-    setHistory
+    setHistory,
+    id,
 }: IChatAppListProps) {
-
-
 
     async function ActionsClick(e: any, item: any) {
         if (e.key === 'del') {
@@ -39,27 +40,8 @@ export default function ChatAppList({
     }
 
     return (
-        <div id='chat-layout' style={{
-            height: 'calc(100vh - 362px)',
-            overflow: 'auto',
-        }}>
+        <div id='chat-layout' style={{ overflow: 'auto', flex: 1 }}>
             <ChatList
-                onMessageChange={async (e: any, message) => {
-                    if (e === 0) {
-                        return
-                    }
-                    await PutChatHistory({
-                        id: e,
-                        content: message
-                    })
-                    // 修改history
-                    history.forEach((item) => {
-                        if (item.id === e) {
-                            item.content = message;
-                        }
-                    });
-                    setHistory([...history]);
-                }}
                 data={(history.length === 0 || history === null) ? [{
                     content: application?.opener ?? "",
                     createAt: new Date().toISOString(),
@@ -71,8 +53,31 @@ export default function ChatAppList({
                     },
                     role: 'assistant',
                 }] : history}
-                onActionsClick={ActionsClick}
                 renderActions={ActionsBar}
+                onActionsClick={ActionsClick}
+                onMessageChange={async (e: any, message) => {
+                    if (e === 0) {
+                        return
+                    }
+                    if (id) {
+                        await PutChatHistory({
+                            id: e,
+                            content: message,
+                            chatShareId: id
+                        })
+                    } else {
+                        await PutChatHistory({
+                            id: e,
+                            content: message
+                        })
+                    }
+                    history.forEach((item) => {
+                        if (item.id === e) {
+                            item.content = message;
+                        }
+                    });
+                    setHistory([...history]);
+                }}
                 renderMessages={{
                     default: ({ id, editableContent }) => <div id={id}>{editableContent}</div>,
                 }}
