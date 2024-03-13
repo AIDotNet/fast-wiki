@@ -48,8 +48,4 @@
         <ProjectReference Include="..\..\Contracts\FastWiki.Service.Contracts\FastWiki.Service.Contracts.csproj" />
         <ProjectReference Include="..\..\Infrastructure\FastWiki.Infrastructure.Common\FastWiki.Infrastructure.Common.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="wwwroot\" />
-    </ItemGroup>
 </Project>
