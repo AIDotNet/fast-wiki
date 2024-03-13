@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CreateChatDialogHistory } from "../services/ChatApplicationService";
 import { generateRandomString } from "../utils/stringHelper";
 import { fetchRaw } from "../utils/fetch";
