@@ -5,7 +5,7 @@
 
 ## 技术栈
 
-- 前端框架：MasaBlazor于react并存
+- 前端框架：react+lobeUI+ts
 - 后端框架：MasaFramework 基于 .NET 8
 - 向量搜索引擎：使用 PostgreSQL 的向量插件，优化搜索性能
 - 深度学习与NLP：微软Semantic Kernel，提升搜索的语义理解能力
@@ -15,7 +15,7 @@
 
 - 智能搜索：借助Semantic Kernel的深度学习和自然语言处理技术，能够理解复杂查询，提供精准的搜索结果。
 - 高性能：通过pgsql的向量插件优化向量搜索性能，确保即使在大数据量下也能快速响应。
-- 现代化前端：使用MasaBlazor前端框架，提供响应式设计和用户友好的界面。
+- 现代化前端：使用react+lobeUI前端框架，提供响应式设计和用户友好的界面。
 - 强大的后端：基于最新的.NET 8和MasaFramework，确保了代码的高效性和可维护性。
 - 开源和社区驱动：采用Apache-2.0许可证，鼓励开发者和企业使用和贡献。
 
@@ -38,6 +38,7 @@ git clone https://github.com/239573049/fast-wiki.git
 在项目根目录下执行：
 
 ```
+cd src/Service/FastWiki.Service
 dotnet restore
 ```
 
@@ -69,7 +70,7 @@ FastWikiService环境变量参数：
 - OPENAI_EMBEDDING_TOKEN: Embedding的Token, 默认为空，为空则使用对话的Token
 
 ## 技术交流
-![输入图片说明](img/wechat.png)
+![群聊二维码](img/wechat.png)
 
 ## 贡献指南
 
