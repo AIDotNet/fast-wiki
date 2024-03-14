@@ -2567,9 +2567,9 @@ lru-cache@^6.0.0:
     yallist "^4.0.0"
 
 lucide-react@latest:
-  version "0.356.0"
-  resolved "https://registry.npmjs.org/lucide-react/-/lucide-react-0.356.0.tgz"
-  integrity sha512-MDInjLrmZToccH2UxEshntujBlFwtOofGB22FN/eg39FfGVYV1TT1eMIv2j4rdaTJBpYjUuX7fEo9pwYkNFgwA==
+  version "0.358.0"
+  resolved "https://registry.npmjs.org/lucide-react/-/lucide-react-0.358.0.tgz"
+  integrity sha512-rBSptRjZTMBm24zsFhR6pK/NgbT18JegZGKcH4+1H3+UigMSRpeoWLtR/fAwMYwYnlJOZB+y8WpeHne9D6X6Kg==
 
 markdown-table@^3.0.0:
   version "3.0.3"

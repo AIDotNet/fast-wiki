@@ -1,4 +1,6 @@
-﻿namespace FastWiki.Service.Service;
+﻿using Masa.BuildingBlocks.Authentication.Identity;
+
+namespace FastWiki.Service.Service;
 
 public abstract class ApplicationService<TService> : ServiceBase where TService : class
 {
@@ -6,4 +8,5 @@ public abstract class ApplicationService<TService> : ServiceBase where TService 
 
     protected ILogger<TService> Logger => GetRequiredService<ILogger<TService>>();
 
+    protected IUserContext UserContext => GetRequiredService<IUserContext>();
 }

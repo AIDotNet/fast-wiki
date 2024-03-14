@@ -4,9 +4,13 @@ import { memo, useEffect, useState } from "react";
 import { Flexbox } from 'react-layout-kit';
 import { Outlet } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { Dropdown, message } from "antd";
+import ChangePassword from "../../components/ChangePassword";
+
 
 const DesktopLayout = memo(() => {
   const [tab, setTab] = useState<string>('chat');
+  const [ChangePasswordVisible, setChangePasswordVisible] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const tabs = [{
@@ -31,13 +35,42 @@ const DesktopLayout = memo(() => {
     path: '/user'
   }]
 
-  useEffect(()=>{
+  const items = [
+    {
+      key: '1',
+      onClick: () => setChangePasswordVisible(true),
+      label: (
+        <span>修改密码</span>
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <span>系统设置</span>
+      ),
+    },
+    {
+      key: '3',
+      onClick: () => {
+        message.success('退出成功');
+        setTimeout(() => {
+          localStorage.removeItem('token');
+          navigate('/login');
+        }, 1000);
+      },
+      label: (
+        <span>退出登录</span>
+      ),
+    },
+  ]
+
+  useEffect(() => {
     // 获取当前路由匹配前缀一致的tab
     const currentTab = tabs.find(item => window.location.pathname.startsWith(item.path));
-    if(currentTab) {
+    if (currentTab) {
       setTab(currentTab.key);
     }
-    
+
   })
 
   function updateTab(item: { key: string, path: string, description: string, icon: any }) {
@@ -52,10 +85,13 @@ const DesktopLayout = memo(() => {
   >
     <SideNav
       avatar={<Logo size={40} />}
-      bottomActions={<ActionIcon icon={Settings2} />}
+      bottomActions={
+        <Dropdown menu={{ items }} placement="topRight">
+          <ActionIcon icon={Settings2} />
+        </Dropdown>}
       topActions={
         <>
-          {tabs.map((item,index) => {
+          {tabs.map((item, index) => {
             return (
               <Tooltip key={index} arrow={true} placement='right' title={item.description}>
                 <ActionIcon
@@ -72,6 +108,9 @@ const DesktopLayout = memo(() => {
     >
     </SideNav>
     <Outlet />
+    <ChangePassword visible={ChangePasswordVisible} onClose={() => setChangePasswordVisible(false)} onSuccess={() => {
+      setChangePasswordVisible(false);
+    }} />
   </Flexbox>)
 });
 
