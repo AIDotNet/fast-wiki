@@ -1,115 +1,81 @@
-# 
+# FastWiki
+## 介绍
 
-FastWiki 发布 v0.1.0  
+本项目是一个高性能、基于最新技术栈的知识库系统，专为大规模信息检索和智能搜索设计。利用微软Semantic Kernel进行深度学习和自然语言处理，结合.NET 8和MasaBlazor于react并存框架，后台采用MasaFramework，实现了一个高效、易用、可扩展的智能向量搜索平台。我们的目标是提供一个能够理解和处理复杂查询的智能搜索解决方案，帮助用户快速准确地获取所需信息。
 
-https://github.com/239573049/fast-wiki/releases/tag/v0.1.0
+## 技术栈
 
-## 更新日志
+- 前端框架：react+lobeUI+ts
+- 后端框架：MasaFramework 基于 .NET 8
+- 向量搜索引擎：使用 PostgreSQL 的向量插件，优化搜索性能
+- 深度学习与NLP：微软Semantic Kernel，提升搜索的语义理解能力
+- 许可证：Apache-2.0，鼓励社区贡献和使用
 
+## 特点
 
-* 兼容`OpenAI`接口格式
-* 删除Blazor版本UI
-* 删除`useEffect,`
-* 解决可能存在问题的bug
-* 修复对话可以看到所有对话
-* Merge branch 'master' of https://gitee.com/hejiale010426/fast-wiki
-* 更新文档
-* 更新加入群聊地址
-* 修改删除
-* Merge pull request #12 from 239573049/feature/ui-bug
-* 适配手机端分享界面
-* 优化前端代码逻辑
-* 修复staticcode错误
-* Merge branch 'master' of https://gitee.com/hejiale010426/fast-wiki
-* 优化打包体积
-* 修改文档
-* 增加静态文件压缩中间件
-* 修复对话框bug
+- 智能搜索：借助Semantic Kernel的深度学习和自然语言处理技术，能够理解复杂查询，提供精准的搜索结果。
+- 高性能：通过pgsql的向量插件优化向量搜索性能，确保即使在大数据量下也能快速响应。
+- 现代化前端：使用react+lobeUI前端框架，提供响应式设计和用户友好的界面。
+- 强大的后端：基于最新的.NET 8和MasaFramework，确保了代码的高效性和可维护性。
+- 开源和社区驱动：采用Apache-2.0许可证，鼓励开发者和企业使用和贡献。
 
-## 快速入门
+## 快速开始
 
-下载`docker-compose.yml`脚本
+### 先决条件
 
-```
-curl https://gitee.com/hejiale010426/fast-wiki/raw/master/docker-compose.yml -O docker-compose.yml
-```
+确保你已经安装了.NET 8 SDK和PostgreSQL数据库，并且配置了相应的环境。
 
-下载完成以后会在当前目录下生成一个`docker-compose.yml`文件，当然默认下载的并不能直接使用，我们使用nano编辑文件的内容：
+### 安装
+
+1. 克隆仓库：
 
 ```
-nano docker-compose.yml
+git clone https://github.com/239573049/fast-wiki.git
 ```
 
-文件大概内容如下 ，如果你有代理的话则修改`OPENAI_CHAT_ENDPOINT`和`OPENAI_CHAT_EMBEDDING_ENDPOINT`的地址为你的代理地址，格式是 `http://ip:端口`即可，然后`OPENAI_CHAT_TOKEN`需要提供您的OpenAI的Key或您的代理的Token，其他的都默认即可，`ASPNETCORE_ENVIRONMENT=Development`则会自动迁移数据库，并且下一个版本的更新也会自动更新，第一次执行务必使用。
+2. 安装依赖项：
 
-```yml
-version: '3.8'  # 可以根据需要使用不同的版本
-services:
-  fast-wiki-service:
-    image: registry.cn-shenzhen.aliyuncs.com/fast-wiki/fast-wiki-service
-    container_name: fast-wiki-service
-    user: root
-    restart: always
-    ports:
-      - "8080:8080"
-    build: 
-      context: .
-      dockerfile: ./src/Service/FastWiki.Service/Dockerfile
-    depends_on:
-      - postgres
-    volumes:
-      - ./wwwroot/uploads:/app/wwwroot/uploads
-    environment:
-      - OPENAI_CHAT_ENDPOINT=https://api.openai.com
-      - OPENAI_CHAT_EMBEDDING_ENDPOINT=https://api.openai.com
-      - OPENAI_CHAT_TOKEN={您的TokenKey}
-      - OPENAI_CHAT_MODEL=gpt-3.5-turbo
-      - OPENAI_EMBEDDING_MODEL=text-embedding-3-small
-      - ASPNETCORE_ENVIRONMENT=Development
-
-  postgres: # 当前compose服务名
-    image: registry.cn-shenzhen.aliyuncs.com/fast-wiki/pgvector:v0.5.0 # 拉取的数据库镜像
-    container_name: postgres  # 容器运行的容器名称
-    restart: always  # 开机自启动
-    environment:  # 环境变量
-      POSTGRES_USER: token  # 默认账号
-      POSTGRES_PASSWORD: dd666666 # 默认密码
-      POSTGRES_DB: wiki # 默认数据库
-      TZ: Asia/Shanghai  # 数据库时区
-    volumes:
-      - ./postgresql:/var/lib/postgresql/data # 将PostgreSql数据持久化
-```
-
-修改完上面的配置然后将容器执行启来：
+在项目根目录下执行：
 
 ```
-docker-compose up -d
+cd src/Service/FastWiki.Service
+dotnet restore
 ```
 
-然后我们访问启用的访问的端口 `http://ip:8080`， 进入首页以后点击立即开始。
+3. 数据库配置：
 
-![image-20240314012829413](C:\Users\23957\AppData\Roaming\Typora\typora-user-images\image-20240314012829413.png)
+确保你的PostgreSQL数据库运行正常，并且创建了必要的数据库。根据你的配置修改`appsettings.json`中的数据库连接字符串。
 
-然后登录系统，默认的账号 `admin `密码`Aa123456`，登录成功以后再点击立即开始，则进入首页。
+### 运行
 
-![image-20240314012901080](C:\Users\23957\AppData\Roaming\Typora\typora-user-images\image-20240314012901080.png)
+在项目根目录下执行：
 
-然后点击右上角的新增，输入测试应用名称，添加完成，点击左边菜单的第一个对话。
+```
+dotnet run
+```
 
-![image-20240314013011591](C:\Users\23957\AppData\Roaming\Typora\typora-user-images\image-20240314013011591.png)
+这将启动后端服务。对于前端部分，请参照MasaBlazor文档，进行相应的构建和启动步骤。
 
-进入对话就可以于AI进行对话了：
+默认账号密码：admin Aa123456
 
-![image-20240314013117535](C:\Users\23957\AppData\Roaming\Typora\typora-user-images\image-20240314013117535.png)
+## 环境变量参数
 
-上面只是简单的入门了FastWiki的对话功能，更多功能可以自行搭建测试。
+FastWikiService环境变量参数：
+- QUANTIZE_MAX_TASK：量化任务的最大并发数，默认为3
+- OPENAI_CHAT_ENDPOINT：OpenAI API的地址
+- OPENAI_CHAT_EMBEDDING_ENDPOINT： Embedding API的地址
+- OPENAI_CHAT_TOKEN： OpenAI API的Token
+- OPENAI_CHAT_MODEL： 对话的模型，默认gpt-3.5-turbo
+- OPENAI_EMBEDDING_MODEL： Embedding的模型，默认text-embedding-3-small
+- OPENAI_EMBEDDING_TOKEN: Embedding的Token, 默认为空，为空则使用对话的Token
 
-## 结尾
+## 技术交流
+![群聊二维码](img/wechat.png)
 
-![1710351434246](C:\Users\23957\Documents\WeChat Files\wxid_j3ttzrjqqql912\FileStorage\Temp\1710351434246.png)
+## 贡献指南
 
-- GitHub仓库：[FastWiki Github]( https://github.com/239573049/fast-wiki)
-- Gitee仓库：[FastWiki on Gitee](https://gitee.com/hejiale010426/fast-wiki)
-- 体验地址：[MasaBlazor知识库体验](https://chat.token-ai.cn/share-chat?id=939b3ad2f853422db0d781bcb19a8bf1)
+我们欢迎所有形式的贡献，无论是功能请求、bug报告、代码提交、文档或是其他类型的支持。请参阅`CONTRIBUTING.md`了解如何开始。
 
-我们期待您的反馈和贡献！
+## 许可证
+
+本项目采用Apache-2.0许可证。详情请见[LICENSE](LICENSE)文件。
