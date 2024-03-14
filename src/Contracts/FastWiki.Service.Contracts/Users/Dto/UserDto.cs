@@ -43,4 +43,6 @@ public sealed class UserDto
     /// ÊÇ·ñ½ûÓÃ
     /// </summary>
     public bool IsDisable { get;  set; }
+
+    public RoleType Role { get; set; }
 }

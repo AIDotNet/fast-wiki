@@ -10,4 +10,13 @@ public static class Constant
     /// ∂‘ª∞∑÷œÌ
     /// </summary>
     public const string ChatShare = nameof(ChatShare);
+    
+    public class Role
+    {
+        public const string Guest = nameof(RoleType.Guest);
+        
+        public const string User = nameof(RoleType.User);
+        
+        public const string Admin = nameof(RoleType.Admin);
+    }
 }
