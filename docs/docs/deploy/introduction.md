@@ -38,7 +38,7 @@ services:
     environment:
       - OPENAI_CHAT_ENDPOINT=https://api.openai.com
       - OPENAI_CHAT_EMBEDDING_ENDPOINT=https://api.openai.com
-      - OPENAI_CHAT_TOKEN={您的TokenKey}
+      - OPENAI_CHAT_TOKEN=您的TokenKey
       - OPENAI_CHAT_MODEL=gpt-3.5-turbo
       - OPENAI_EMBEDDING_MODEL=text-embedding-3-small
       - ASPNETCORE_ENVIRONMENT=Development
