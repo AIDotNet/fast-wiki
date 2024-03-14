@@ -176,7 +176,11 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
                 pageSize: input.pageSize,
                 total: total,
                 onChange: handleTableChange,
-            }} columns={columns} />
+            }} scroll={{ y: 'calc(100vh - 240px)' }} columns={columns} style={{
+                overflow: 'auto',
+                padding: 16,
+                borderRadius: 8,
+            }}/>
         <WikiDetailFile onClose={() => {
             setVisible(false);
         }} wikiDetail={openItem} visible={visible} />

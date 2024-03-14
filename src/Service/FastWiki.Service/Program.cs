@@ -30,7 +30,6 @@ builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection(
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 builder.Services.AddInMemoryRateLimiting();
 
-
 var app = builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowAll",

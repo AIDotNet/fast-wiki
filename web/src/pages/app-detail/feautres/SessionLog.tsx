@@ -95,7 +95,7 @@ export default function SessionLog({ id }: ISessionLogProps) {
                     pageSize: input.pageSize,
                     total: total,
                     onChange: handleTableChange,
-                }}
+                }} scroll={{ y: 'calc(100vh - 240px)' }} 
                 columns={columns}
                 dataSource={data} />
         </>)

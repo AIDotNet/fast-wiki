@@ -131,6 +131,7 @@ export default memo((props: IReleaseApplicationProps) => {
                 total: total,
                 onChange: handleTableChange,
             }}
+            scroll={{ y: 'calc(100vh - 240px)' }} 
             columns={columns}
             dataSource={data} />
         <CreateApplication id={props.id} visible={visible}
