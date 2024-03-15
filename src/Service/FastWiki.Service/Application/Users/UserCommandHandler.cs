@@ -24,4 +24,22 @@ public sealed class UserCommandHandler(IUserRepository userRepository)
 
         await userRepository.UpdateAsync(user);
     }
+
+    [EventHandler]
+    public async Task DeleteUserAsync(DeleteUserCommand command)
+    {
+        await userRepository.DeleteAsync(command.Id);
+    }
+
+    [EventHandler]
+    public async Task DisableUserAsync(DisableUserCommand command)
+    {
+        await userRepository.DisableAsync(command.Id, command.IsDisable);
+    }
+
+    [EventHandler]
+    public async Task UpdateRoleAsync(UpdateRoleCommand command)
+    {
+        await userRepository.UpdateRoleAsync(command.Id, command.Role);
+    }
 }

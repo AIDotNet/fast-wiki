@@ -27,11 +27,10 @@ public sealed class UserQueryHandler(IUserRepository userRepository, IMapper map
     [EventHandler]
     public async Task UserListAsync(UserListQuery query)
     {
-        var list = await userRepository.GetPaginatedListAsync(x => x.Account.Contains(query.Keyword), query.Page,
-            query.PageSize);
-        
-        var total = await userRepository.GetCountAsync(x => x.Account.Contains(query.Keyword));
-        
+        var list = await userRepository.GetListAsync(query.Keyword, query.Page, query.PageSize);
+
+        var total = await userRepository.GetCountAsync(query.Keyword);
+
         query.Result = new PaginatedListBase<UserDto>
         {
             Total = total,
