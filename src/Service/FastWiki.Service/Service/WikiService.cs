@@ -37,7 +37,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
     [Authorize]
     public async Task<PaginatedListBase<WikiDto>> GetWikiListAsync(string? keyword, int page, int pageSize)
     {
-        var query = new WikiListQuery(keyword, page, pageSize);
+        var query = new WikiListQuery(UserContext.GetUserId<Guid>(),keyword, page, pageSize);
 
         await EventBus.PublishAsync(query);
 

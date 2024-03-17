@@ -58,10 +58,13 @@ public sealed class QuantizeBackgroundService : BackgroundService
         // TODO: 首次启动程序的时候需要加载未处理的量化数据
         await LoadingWikiDetailAsync();
 
-        for (int i = 0; i < _maxTask; i++)
+        var tasks = new List<Task>();
+        for (var i = 0; i < _maxTask; i++)
         {
-            await Task.Factory.StartNew(WikiDetailHandlerAsync, stoppingToken);
+            tasks.Add(Task.Factory.StartNew(WikiDetailHandlerAsync, stoppingToken));
         }
+        
+        await Task.WhenAll(tasks);
     }
 
     /// <summary>

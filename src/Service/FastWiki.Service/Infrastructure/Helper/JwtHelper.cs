@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using FastWiki.Service.Contracts.Users.Dto;
 using Masa.Contrib.Authentication.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -51,6 +52,7 @@ public class JwtHelper
         {
             new(ClaimType.DEFAULT_USER_NAME, user.Account),
             new(ClaimType.DEFAULT_USER_ID, user.Id.ToString()),
+            new(ClaimTypes.Role, user.Role.ToString()),
             new("IsDisable", user.IsDisable.ToString()),
         });
     }

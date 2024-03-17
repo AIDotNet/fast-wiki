@@ -5,7 +5,6 @@ using FastWiki.Service.Contracts.OpenAI;
 using FastWiki.Service.Domain.Storage.Aggregates;
 using FastWiki.Service.Infrastructure;
 using FastWiki.Service.Infrastructure.Helper;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace FastWiki.Service.Service;
@@ -110,26 +109,6 @@ public static class OpenAIService
             chatHistory.AddSystemMessage(chatApplication.Prompt);
         }
 
-        // 添加用户输入，并且计算请求token数量
-        module.messages.ForEach(x =>
-        {
-            if (!x.content.IsNullOrEmpty())
-            {
-                requestToken += TokenHelper.ComputeToken(x.content);
-                if (x.role == "user")
-                {
-                    chatHistory.AddUserMessage(x.content);
-                }
-                else if (x.role == "assistant")
-                {
-                    chatHistory.AddSystemMessage(x.content);
-                }
-                else if (x.role == "system")
-                {
-                    chatHistory.AddSystemMessage(x.content);
-                }
-            }
-        });
 
         var content = module.messages.Last();
 
@@ -178,9 +157,9 @@ public static class OpenAIService
                 .Decode(tokens.Take(chatApplication.MaxResponseToken).ToList());
 
             // 如果prompt不为空，则需要进行模板替换
-            if (!prompt.IsNormalized())
+            if (!prompt.IsNullOrEmpty())
             {
-                content.content = chatApplication.Template.Replace("{{quote}}", prompt)
+                prompt = chatApplication.Template.Replace("{{quote}}", prompt)
                     .Replace("{{question}}", content.content);
             }
 
@@ -194,6 +173,36 @@ public static class OpenAIService
                 sourceFile.AddRange(fileQuery.Result);
             }
         }
+
+        // 删除最后一个消息
+        module.messages.RemoveAt(module.messages.Count - 1);
+        module.messages.Add(new ChatCompletionRequestMessage()
+        {
+            content = prompt,
+            role = "user"
+        });
+
+        // 添加用户输入，并且计算请求token数量
+        module.messages.ForEach(x =>
+        {
+            if (!x.content.IsNullOrEmpty())
+            {
+                requestToken += TokenHelper.ComputeToken(x.content);
+                if (x.role == "user")
+                {
+                    chatHistory.AddUserMessage(x.content);
+                }
+                else if (x.role == "assistant")
+                {
+                    chatHistory.AddSystemMessage(x.content);
+                }
+                else if (x.role == "system")
+                {
+                    chatHistory.AddSystemMessage(x.content);
+                }
+            }
+        });
+
 
         if (getAPIKeyChatShareQuery?.Result != null)
         {
@@ -239,7 +248,7 @@ public static class OpenAIService
         var createChatDialogHistoryCommand = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
         {
             ChatDialogId = chatDialogId,
-            Content = content.content,
+            Content = module.messages.Last().content,
             ExpendToken = requestToken,
             Type = ChatDialogHistoryType.Text,
             Current = true

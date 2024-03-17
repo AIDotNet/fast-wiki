@@ -1,6 +1,6 @@
 ﻿namespace FastWiki.Service.Application.ChatApplications.Queries;
 
-public record ChatDialogQuery(string chatId, bool all) : Query<List<ChatDialogDto>>
+public record ChatDialogQuery(string chatId, bool all, Guid userId) : Query<List<ChatDialogDto>>
 {
     public override List<ChatDialogDto> Result
     {

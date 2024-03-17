@@ -12,27 +12,32 @@ const DesktopLayout = memo(() => {
   const [tab, setTab] = useState<string>('chat');
   const [ChangePasswordVisible, setChangePasswordVisible] = useState<boolean>(false);
   const navigate = useNavigate();
+  const [role, setRole] = useState<string>('');
 
   const tabs = [{
     icon: BotMessageSquare,
     key: 'chat',
     description: '聊天',
-    path: '/chat'
+    path: '/chat',
+    role: 'admin, user'
   }, {
     icon: Box,
     key: 'application',
     description: '应用',
-    path: '/app'
+    path: '/app',
+    role: 'admin, user'
   }, {
     icon: Album,
     key: 'wiki',
     description: '知识库',
-    path: '/wiki'
+    path: '/wiki',
+    role: 'admin, user'
   }, {
     icon: User,
     key: 'user',
     description: '用户管理',
-    path: '/user'
+    path: '/user',
+    role: 'admin'
   }]
 
   const items = [
@@ -71,7 +76,15 @@ const DesktopLayout = memo(() => {
       setTab(currentTab.key);
     }
 
-  })
+    const token = localStorage.getItem('token');
+    // 解析token
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      setRole(payload.role)
+    }
+
+
+  }, [])
 
   function updateTab(item: { key: string, path: string, description: string, icon: any }) {
     setTab(item.key);
@@ -91,18 +104,22 @@ const DesktopLayout = memo(() => {
         </Dropdown>}
       topActions={
         <>
-          {tabs.map((item, index) => {
-            return (
-              <Tooltip key={index} arrow={true} placement='right' title={item.description}>
-                <ActionIcon
-                  active={tab === item.key}
-                  icon={item.icon}
-                  key={item.key}
-                  onClick={() => updateTab(item)}
-                  size="large"
-                />
-              </Tooltip>)
-          })}
+          {tabs
+            .filter(item => {
+              return item.role.toLowerCase().includes(role.toLowerCase())
+            })
+            .map((item, index) => {
+              return (
+                <Tooltip key={index} arrow={true} placement='right' title={item.description}>
+                  <ActionIcon
+                    active={tab === item.key}
+                    icon={item.icon}
+                    key={item.key}
+                    onClick={() => updateTab(item)}
+                    size="large"
+                  />
+                </Tooltip>)
+            })}
         </>
       }
     >

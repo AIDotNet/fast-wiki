@@ -44,7 +44,11 @@ var app = builder.Services.AddCors(options =>
     .AddJwtBearerAuthentication()
     .AddMemoryCache()
     .AddEndpointsApiExplorer()
-    .AddMasaIdentity(options => { options.UserId = ClaimType.DEFAULT_USER_ID; })
+    .AddMasaIdentity(options =>
+    {
+        options.UserId = ClaimType.DEFAULT_USER_ID;
+        options.Role = "role";
+    })
     .AddMapster()
     .AddHttpContextAccessor()
     .AddSwaggerGen(options =>

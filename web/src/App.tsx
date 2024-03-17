@@ -18,6 +18,8 @@ const ShareChat = lazy(() => import('./pages/share-chat/page'));
 
 const Wiki = lazy(() => import('./pages/wiki/page'));
 
+const Register = lazy(() => import('./pages/register/page'));
+
 const router = createBrowserRouter([{
   path: '/',
   element: <Home />
@@ -58,6 +60,9 @@ const router = createBrowserRouter([{
 }, {
   path: '/login',
   element: <Login />
+}, {
+  path: '/register',
+  element: <Register />
 }, {
   path: '/share-chat',
   element: <ShareChat />
