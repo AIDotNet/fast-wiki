@@ -39,4 +39,11 @@ public interface IUserRepository : IRepository<User, Guid>
     /// <param name="role"></param>
     /// <returns></returns>
     Task UpdateRoleAsync(Guid id,RoleType role);
+    
+    /// <summary>
+    /// 验证账户是否存在
+    /// </summary>
+    /// <param name="account"></param>
+    /// <returns></returns>
+    Task<bool> IsExistAccountAsync(string account);
 }

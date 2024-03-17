@@ -30,7 +30,7 @@ public sealed class UserService : ApplicationService<UserService>
     public async Task DeleteUserAsync(Guid id)
     {
         if (id == UserContext.GetUserId<Guid>())
-            throw new UserFriendlyException("不能删除自己");
+            throw new UserFriendlyException("涓嶈兘鍒犻櫎鑷繁");
 
         var command = new DeleteUserCommand(id);
 
@@ -41,7 +41,7 @@ public sealed class UserService : ApplicationService<UserService>
     public async Task DisableUserAsync(Guid id, bool disable)
     {
         if (id == UserContext.GetUserId<Guid>())
-            throw new UserFriendlyException("不能禁用自己");
+            throw new UserFriendlyException("涓嶈兘绂佺敤鑷繁");
 
         var command = new DisableUserCommand(id, disable);
 
@@ -52,6 +52,13 @@ public sealed class UserService : ApplicationService<UserService>
     public async Task UpdateRoleAsync(Guid id, RoleType role)
     {
         var command = new UpdateRoleCommand(id, role);
+
+        await EventBus.PublishAsync(command);
+    }
+    
+    public async Task CreateAsync(CreateUserInput input)
+    {
+        var command = new CreateUserCommand(input);
 
         await EventBus.PublishAsync(command);
     }

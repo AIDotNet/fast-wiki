@@ -39,6 +39,11 @@ public sealed class UserRepository : Repository<WikiDbContext, User, Guid>, IUse
             item.SetProperty(x => x.Role, role));
     }
 
+    public async Task<bool> IsExistAccountAsync(string account)
+    {
+        return await Context.Users.AnyAsync(x => x.Account == account);
+    }
+
     private IQueryable<User> GetQuery(string? keyword)
     {
         var query = Context.Users.AsQueryable();

@@ -1,4 +1,4 @@
-import { del, fetch, get, post, put } from '../utils/fetch';
+import { del, get, post, postJson, put } from '../utils/fetch';
 
 import { config } from '../config';
 import { RoleType } from '../models/index.d';
@@ -39,7 +39,7 @@ export const DeleteUser = (id: string) => {
  * @param id 用户id
  * @param disable 是否禁用
  */
-export const DisableUser = (id: string,disable:boolean) => {
+export const DisableUser = (id: string, disable: boolean) => {
     return post(`${prefix}/DisableUser/${id}?disable=${disable}`)
 }
 
@@ -47,6 +47,17 @@ export const DisableUser = (id: string,disable:boolean) => {
  * 修改用户角色
  * @param id 用户id
  */
-export const UpdateUserRole = (id: string,role:RoleType) => {
+export const UpdateUserRole = (id: string, role: RoleType) => {
     return put(`${prefix}/Role/${id}?role=${role}`, {})
+}
+
+/**
+ * 注册用户
+ * @param data 
+ * @returns 
+ */
+export const Create = (data: any) => {
+    console.log('data', data);
+    
+    return postJson(`${prefix}`, data)
 }

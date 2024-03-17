@@ -1,23 +1,12 @@
 
 import { memo, useState } from 'react';
 import { Input, Button } from 'antd';
-import { EyeInvisibleOutlined, EyeTwoTone, GithubOutlined } from '@ant-design/icons';
-import { Footer, Logo, LogoProps, useControls, useCreateStore } from '@lobehub/ui';
+import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+import { Logo, LogoProps, useControls, useCreateStore } from '@lobehub/ui';
 import styled from 'styled-components';
-import { handleLogin } from '../features/login';
+import { handleRegister } from '../features/register';
 import { useNavigate } from 'react-router-dom';
 
-const GithubButton = styled.span`
-    transition: all 0.3s;
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    &:hover {
-        transition: all 0.3s;
-        color: #0366d6;
-        cursor: pointer;
-    }
-`;
 
 const FunctionTools = styled.div`
     display: flex;
@@ -34,12 +23,15 @@ const FunctionTools = styled.div`
     color: #0366d6;
 `;
 
-const Login = memo(() => {
+const DesktopLayout = memo(() => {
     const [loading, setLoading] = useState(false);
-    const [user, setUser] = useState('');
+    const [account, setAccount] = useState('');
     const [password, setPassword] = useState('');
-    const store = useCreateStore();
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
     const navigate = useNavigate();
+    const store = useCreateStore();
     const control: LogoProps | any = useControls(
         {
             size: {
@@ -59,18 +51,39 @@ const Login = memo(() => {
     return (
         <>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto', width: '380px', marginBottom: '20px' }}>
-                <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '50%' }}>
+                <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '20%' }}>
                     <Logo {...control} />
                     <h2>
-                        登录账号
+                        注册账号
                     </h2>
                 </div>
                 <div style={{ marginBottom: '20px', width: '100%' }}>
                     <Input
-                        value={user}
-                        onChange={(e) => setUser(e.target.value)}
+                        value={account}
+                        onChange={(e) => setAccount(e.target.value)}
                         size='large'
                         placeholder="请输入账号" />
+                </div>
+                <div style={{ marginBottom: '20px', width: '100%' }}>
+                    <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        size='large'
+                        placeholder="请输入昵称" />
+                </div>
+                <div style={{ marginBottom: '20px', width: '100%' }}>
+                    <Input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        size='large'
+                        placeholder="请输入邮箱" />
+                </div>
+                <div style={{ marginBottom: '20px', width: '100%' }}>
+                    <Input
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        size='large'
+                        placeholder="请输入手机号" />
                 </div>
                 <div style={{ width: '100%' }}></div>
                 <Input.Password
@@ -86,10 +99,11 @@ const Login = memo(() => {
                     loading={loading}
                     onClick={() => {
                         setLoading(true);
-                        handleLogin(user, password,()=>{
-                           window.location.href = '/';
+                        handleRegister(account, password, name, email, phone,()=>{
+                            navigate('/login');
                         });
                         setLoading(false);
+
                     }}
                     size='large'
                     type="primary"
@@ -98,18 +112,12 @@ const Login = memo(() => {
                 </Button>
             </div>
             <FunctionTools>
-                <span onClick={()=>navigate('/register')}>
-                    注册账号
+                <span onClick={()=>navigate('/login')}>
+                    已经有账号？去登录
                 </span>
             </FunctionTools>
-            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto', width: '380px', paddingBottom: '8px', paddingTop: '20px' }}>
-                <GithubButton rel="noopener noreferrer">
-                    <GithubOutlined /> GitHub登录
-                </GithubButton>
-            </div>
-            <Footer bottom="TokenAI © 2024" columns={[]} />
         </>
     );
 });
 
-export default Login;
+export default DesktopLayout;

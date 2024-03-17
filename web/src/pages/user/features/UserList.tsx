@@ -5,8 +5,13 @@ import { DeleteUser, DisableUser, GetUsers, UpdateUserRole } from '../../../serv
 import { Button, Dropdown, MenuProps,message } from 'antd';
 import { RoleType } from '../../../models/index.d';
 
+interface IUserListProps {
+    keyword: string;
+}
 
-export default function UserList() {
+export default function UserList({
+    keyword
+}:IUserListProps) {
     const [input, setInput] = useState({
         page: 1,
         pageSize: 10
@@ -71,7 +76,7 @@ export default function UserList() {
                         key: '4',
                         label: '取消管理员',
                         onClick: async () => {
-                            UpdateUserRole(item.id, RoleType.User);
+                            await UpdateUserRole(item.id, RoleType.User);
                             message.success('取消成功');
                             await ResetLoading();
                         }
@@ -104,7 +109,7 @@ export default function UserList() {
                         key: '2',
                         label: '删除',
                         onClick: async () => {
-                            DeleteUser(item.id);
+                            await DeleteUser(item.id);
                             message.success('删除成功');
                             await ResetLoading();
                         }
@@ -114,7 +119,7 @@ export default function UserList() {
                         key: '4',
                         label: '设为管理员',
                         onClick: async () => {
-                            UpdateUserRole(item.id, RoleType.Admin);
+                            await UpdateUserRole(item.id, RoleType.Admin);
                             message.success('设置成功');
                             await ResetLoading();
                         }
@@ -142,13 +147,17 @@ export default function UserList() {
 
     async function loadingData() {
         try {
-            const result = await GetUsers('', input.page, input.pageSize)
+            const result = await GetUsers(keyword, input.page, input.pageSize)
             setData(result.result);
             setTotal(result.total);
         } catch (error) {
 
         }
     }
+
+    useEffect(() => {
+        loadingData();
+    }, [keyword]);
 
     useEffect(() => {
         loadingData();

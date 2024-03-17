@@ -20,6 +20,11 @@ public sealed class UserQueryHandler(IUserRepository userRepository, IMapper map
         {
             throw new UserFriendlyException("密码错误");
         }
+        
+        if(dto.IsDisable)
+        {
+            throw new UserFriendlyException("账号已禁用");
+        }
 
         query.Result = mapper.Map<UserDto>(dto);
     }
