@@ -10,9 +10,9 @@ public class ChatApplicationQueryHandler(
     [EventHandler]
     public async Task ChatApplicationAsync(ChatApplicationQuery query)
     {
-        var result = await chatApplicationRepository.GetListAsync(query.Page, query.PageSize);
+        var result = await chatApplicationRepository.GetListAsync(query.Page, query.PageSize,query.userId);
 
-        var total = await chatApplicationRepository.GetCountAsync();
+        var total = await chatApplicationRepository.GetCountAsync(query.userId);
 
         query.Result = new PaginatedListBase<ChatApplicationDto>()
         {
@@ -32,7 +32,7 @@ public class ChatApplicationQueryHandler(
     [EventHandler]
     public async Task ChatDialogAsync(ChatDialogQuery query)
     {
-        var result = await chatApplicationRepository.GetChatDialogListAsync(query.chatId, query.all);
+        var result = await chatApplicationRepository.GetChatDialogListAsync(query.chatId, query.all, query.userId);
 
         query.Result = mapper.Map<List<ChatDialogDto>>(result);
     }
@@ -66,10 +66,10 @@ public class ChatApplicationQueryHandler(
     [EventHandler]
     public async Task ChatShareAsync(ChatShareQuery query)
     {
-        var result = await chatApplicationRepository.GetChatShareListAsync(userContext.GetUserId<Guid>(),
+        var result = await chatApplicationRepository.GetChatShareListAsync(query.userId,
             query.chatApplicationId, query.page, query.pageSize);
 
-        var total = await chatApplicationRepository.GetChatShareCountAsync(userContext.GetUserId<Guid>(),
+        var total = await chatApplicationRepository.GetChatShareCountAsync(query.userId,
             query.chatApplicationId);
 
 
@@ -100,10 +100,10 @@ public class ChatApplicationQueryHandler(
     public async Task GetSessionLogDialogQueryAsync(GetSessionLogDialogQuery query)
     {
         var result =
-            await chatApplicationRepository.GetSessionLogDialogListAsync(query.chatApplicationId, query.page,
+            await chatApplicationRepository.GetSessionLogDialogListAsync(query.userId,query.chatApplicationId, query.page,
                 query.pageSize);
 
-        var total = await chatApplicationRepository.GetSessionLogDialogCountAsync(query.chatApplicationId);
+        var total = await chatApplicationRepository.GetSessionLogDialogCountAsync(query.userId,query.chatApplicationId);
 
         query.Result = new PaginatedListBase<ChatDialogDto>()
         {

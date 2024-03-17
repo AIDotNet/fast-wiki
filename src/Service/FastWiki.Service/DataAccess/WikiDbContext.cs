@@ -127,7 +127,8 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
         });
 
         var user = new User("admin", "admin", "Aa123456",
-            "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", "239573049@qq.com", "13049809673", false);
+            "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", "239573049@qq.com", "13049809673", false,
+            RoleType.Admin);
 
         // 默认初始账号
         modelBuilder.Entity<User>().HasData(user);

@@ -3,9 +3,9 @@ namespace FastWiki.Service.DataAccess.Repositories.ChatApplications;
 public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork unitOfWork)
     : Repository<WikiDbContext, ChatApplication, string>(context, unitOfWork), IChatApplicationRepository
 {
-    public Task<List<ChatApplication>> GetListAsync(int page, int pageSize)
+    public Task<List<ChatApplication>> GetListAsync(int page, int pageSize, Guid userId)
     {
-        var query = CreateQueryable();
+        var query = CreateQueryable(userId);
 
         return query
             .OrderByDescending(x => x.CreationTime)
@@ -14,9 +14,9 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
             .ToListAsync();
     }
 
-    public Task<long> GetCountAsync()
+    public Task<long> GetCountAsync(Guid userId)
     {
-        var query = CreateQueryable();
+        var query = CreateQueryable(userId);
 
         return query.LongCountAsync();
     }
@@ -35,9 +35,9 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
         await Context.SaveChangesAsync();
     }
 
-    public async Task<List<ChatDialog>> GetChatDialogListAsync(string applicationId, bool all)
+    public async Task<List<ChatDialog>> GetChatDialogListAsync(string applicationId, bool all, Guid userId)
     {
-        var query = Context.ChatDialogs.Where(x => x.ApplicationId == applicationId);
+        var query = Context.ChatDialogs.Where(x => x.ApplicationId == applicationId && x.Creator == userId);
 
         if (!all)
         {
@@ -153,9 +153,12 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
                 x.SetProperty(b => b.Name, chatDialog.Name));
     }
 
-    public Task<List<ChatDialog>> GetSessionLogDialogListAsync(string chatApplicationId, int page, int pageSize)
+    public Task<List<ChatDialog>> GetSessionLogDialogListAsync(Guid userId, string chatApplicationId, int page,
+        int pageSize)
     {
-        var query = Context.ChatDialogs.Where(x => x.ApplicationId == chatApplicationId);
+        var query = Context.ChatDialogs
+            .AsNoTracking()
+            .Where(x => x.ApplicationId == chatApplicationId && x.Creator == userId);
 
         return query
             .OrderByDescending(x => x.CreationTime)
@@ -164,9 +167,11 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
             .ToListAsync();
     }
 
-    public async Task<long> GetSessionLogDialogCountAsync(string chatApplicationId)
+    public async Task<long> GetSessionLogDialogCountAsync(Guid userId, string chatApplicationId)
     {
-        var query = Context.ChatDialogs.Where(x => x.ApplicationId == chatApplicationId);
+        var query = Context.ChatDialogs
+            .AsNoTracking()
+            .Where(x => x.ApplicationId == chatApplicationId && x.Creator == userId);
 
         return await query.LongCountAsync();
     }
@@ -220,8 +225,9 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
     }
 
 
-    private IQueryable<ChatApplication> CreateQueryable()
+    private IQueryable<ChatApplication> CreateQueryable(Guid userId)
     {
-        return Context.ChatApplications;
+        return Context.ChatApplications
+            .AsNoTracking().Where(x => x.Creator == userId);
     }
 }

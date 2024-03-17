@@ -45,12 +45,17 @@ public sealed class User : FullAggregateRoot<Guid, Guid?>
     /// </summary>
     public bool IsDisable { get; private set; }
 
+    /// <summary>
+    /// 用户角色
+    /// </summary>
+    public RoleType Role { get; private set; }
+
     protected User()
     {
     }
 
     public User(string account, string name, string password, string avatar, string email, string phone,
-        bool isDisable)
+        bool isDisable, RoleType role = RoleType.User)
     {
         Id = Guid.NewGuid();
         SetPassword(password);
@@ -60,6 +65,7 @@ public sealed class User : FullAggregateRoot<Guid, Guid?>
         Avatar = avatar;
         Phone = phone;
         IsDisable = isDisable;
+        Role = role;
     }
 
     public void Disable()
@@ -70,6 +76,21 @@ public sealed class User : FullAggregateRoot<Guid, Guid?>
     public void Enable()
     {
         IsDisable = false;
+    }
+
+    public void SetAdminRole()
+    {
+        Role = RoleType.Admin;
+    }
+
+    public void SetUserRole()
+    {
+        Role = RoleType.User;
+    }
+
+    public void SetGuestRole()
+    {
+        Role = RoleType.Guest;
     }
 
     public void SetPassword(string password)

@@ -8,11 +8,12 @@ public interface IWikiRepository : IRepository<Wiki, long>
     /// <summary>
     /// 获取知识库列表
     /// </summary>
+    /// <param name="userId"></param>
     /// <param name="keyword"></param>
     /// <param name="page"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<List<Wiki>> GetListAsync(string? keyword, int page, int pageSize);
+    Task<List<Wiki>> GetListAsync(Guid userId, string? keyword, int page, int pageSize);
 
     /// <summary>
     /// 编辑知识库
@@ -20,13 +21,14 @@ public interface IWikiRepository : IRepository<Wiki, long>
     /// <param name="wiki"></param>
     /// <returns></returns>
     Task UpdateAsync(Wiki wiki);
-    
+
     /// <summary>
     /// 获取知识库数量
     /// </summary>
+    /// <param name="queryUserId"></param>
     /// <param name="keyword"></param>
     /// <returns></returns>
-    Task<long> GetCountAsync(string? keyword);
+    Task<long> GetCountAsync(Guid queryUserId, string? keyword);
 
     /// <summary>
     /// 获取知识库详情列表

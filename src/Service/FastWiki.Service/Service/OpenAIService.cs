@@ -5,7 +5,6 @@ using FastWiki.Service.Contracts.OpenAI;
 using FastWiki.Service.Domain.Storage.Aggregates;
 using FastWiki.Service.Infrastructure;
 using FastWiki.Service.Infrastructure.Helper;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace FastWiki.Service.Service;

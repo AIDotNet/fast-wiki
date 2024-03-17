@@ -2,9 +2,9 @@ namespace FastWiki.Service.Domain.ChatApplications.Repositories;
 
 public interface IChatApplicationRepository : IRepository<ChatApplication, string>
 {
-    Task<List<ChatApplication>> GetListAsync(int page, int pageSize);
+    Task<List<ChatApplication>> GetListAsync(int page, int pageSize, Guid userId);
 
-    Task<long> GetCountAsync();
+    Task<long> GetCountAsync(Guid queryUserId);
 
     /// <summary>
     /// 创建对话
@@ -25,8 +25,9 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// </summary>
     /// <param name="applicationId"></param>
     /// <param name="all"></param>
+    /// <param name="userId"></param>
     /// <returns></returns>
-    Task<List<ChatDialog>> GetChatDialogListAsync(string applicationId, bool all);
+    Task<List<ChatDialog>> GetChatDialogListAsync(string applicationId, bool all, Guid userId);
     
     /// <summary>
     /// 获取分享对话列表
@@ -135,18 +136,21 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <summary>
     /// 获取对话记录的对话列表
     /// </summary>
+    /// <param name="userId"></param>
     /// <param name="chatApplicationId"></param>
     /// <param name="page"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<List<ChatDialog>> GetSessionLogDialogListAsync(string chatApplicationId, int page, int pageSize);
+    Task<List<ChatDialog>> GetSessionLogDialogListAsync(Guid userId, string chatApplicationId, int page,
+        int pageSize);
 
     /// <summary>
     /// 获取对话记录的数量
     /// </summary>
+    /// <param name="userId"></param>
     /// <param name="chatApplicationId"></param>
     /// <returns></returns>
-    Task<long> GetSessionLogDialogCountAsync(string chatApplicationId);
+    Task<long> GetSessionLogDialogCountAsync(Guid userId, string chatApplicationId);
     
     /// <summary>
     /// 修改对话记录内容

@@ -6,7 +6,7 @@
 /// <param name="Keyword"></param>
 /// <param name="Page"></param>
 /// <param name="PageSize"></param>
-public record WikiListQuery(string? Keyword, int Page, int PageSize) : Query<PaginatedListBase<WikiDto>>()
+public record WikiListQuery(Guid userId, string? Keyword, int Page, int PageSize) : Query<PaginatedListBase<WikiDto>>()
 {
     public override PaginatedListBase<WikiDto> Result { get; set; }
 }

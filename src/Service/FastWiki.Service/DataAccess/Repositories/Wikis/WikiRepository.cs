@@ -5,9 +5,9 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
     : Repository<WikiDbContext, Wiki, long>(context, unitOfWork), IWikiRepository
 {
     /// <inheritdoc />
-    public Task<List<Wiki>> GetListAsync(string? keyword, int page, int pageSize)
+    public Task<List<Wiki>> GetListAsync(Guid userId, string? keyword, int page, int pageSize)
     {
-        var query = CreateQuery(keyword);
+        var query = CreateQuery(keyword,userId);
         return query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
     }
 
@@ -21,9 +21,9 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
     }
 
     /// <inheritdoc />
-    public Task<long> GetCountAsync(string? keyword)
+    public Task<long> GetCountAsync(Guid userId, string? keyword)
     {
-        var query = CreateQuery(keyword);
+        var query = CreateQuery(keyword,userId);
         return query.LongCountAsync();
     }
 
@@ -84,9 +84,11 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
     }
 
 
-    private IQueryable<Wiki> CreateQuery(string? keyword)
+    private IQueryable<Wiki> CreateQuery(string? keyword, Guid userId)
     {
-        var query = Context.Wikis.AsNoTracking();
+        var query = Context.Wikis
+            .AsNoTracking()
+            .Where(x => x.Creator == userId);
 
         if (!string.IsNullOrWhiteSpace(keyword))
         {
