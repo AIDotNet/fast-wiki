@@ -1,6 +1,6 @@
 namespace FastWiki.Service.Application.ChatApplications.Queries;
 
-public record GetAPIKeyChatShareQuery(string APIKey):Query<ChatShare>
+public record GetAPIKeyChatShareQuery(string APIKey):Query<ChatShareDto>
 {
-    public override ChatShare Result { get; set; }
+    public override ChatShareDto Result { get; set; }
 }

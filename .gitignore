@@ -505,3 +505,4 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 /src/Service/FastWiki.Service/wwwroot/
+/web/package-lock.json

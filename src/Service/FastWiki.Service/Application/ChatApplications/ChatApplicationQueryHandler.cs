@@ -10,7 +10,7 @@ public class ChatApplicationQueryHandler(
     [EventHandler]
     public async Task ChatApplicationAsync(ChatApplicationQuery query)
     {
-        var result = await chatApplicationRepository.GetListAsync(query.Page, query.PageSize,query.userId);
+        var result = await chatApplicationRepository.GetListAsync(query.Page, query.PageSize, query.userId);
 
         var total = await chatApplicationRepository.GetCountAsync(query.userId);
 
@@ -100,10 +100,12 @@ public class ChatApplicationQueryHandler(
     public async Task GetSessionLogDialogQueryAsync(GetSessionLogDialogQuery query)
     {
         var result =
-            await chatApplicationRepository.GetSessionLogDialogListAsync(query.userId,query.chatApplicationId, query.page,
+            await chatApplicationRepository.GetSessionLogDialogListAsync(query.userId, query.chatApplicationId,
+                query.page,
                 query.pageSize);
 
-        var total = await chatApplicationRepository.GetSessionLogDialogCountAsync(query.userId,query.chatApplicationId);
+        var total = await chatApplicationRepository.GetSessionLogDialogCountAsync(query.userId,
+            query.chatApplicationId);
 
         query.Result = new PaginatedListBase<ChatDialogDto>()
         {
@@ -115,6 +117,7 @@ public class ChatApplicationQueryHandler(
     [EventHandler]
     public async Task GetAPIKeyChatShareAsync(GetAPIKeyChatShareQuery query)
     {
-        query.Result = await chatApplicationRepository.GetAPIKeyChatShareAsync(query.APIKey);
+        var dto = mapper.Map<ChatShareDto>(await chatApplicationRepository.GetAPIKeyChatShareAsync(query.APIKey));
+        query.Result = dto;
     }
 }

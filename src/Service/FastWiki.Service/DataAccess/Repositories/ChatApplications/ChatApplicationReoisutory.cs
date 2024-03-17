@@ -213,6 +213,13 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
                 x.SetProperty(b => b.UsedToken, x => x.UsedToken + token));
     }
 
+    public async Task RemoveChatShareAsync(string id)
+    {
+        await Context.ChatShares
+            .Where(x => x.Id == id)
+            .ExecuteDeleteAsync(); 
+    }
+
     private IQueryable<ChatShare> CreateChatShareQueryable(Guid userId, string chatApplicationId)
     {
         return Context.ChatShares.AsNoTracking()

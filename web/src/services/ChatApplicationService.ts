@@ -130,6 +130,14 @@ export function GetChatShareList(chatApplicationId: string, page: number, pageSi
 
 /**
  * 删除聊天分享。
+ * @param id 需要删除的聊天分享的ID。
+ */
+export function RemoveChatShare(id:string){
+    return del(`${prefix}/ChatShare/${id}`);
+}
+
+/**
+ * 删除聊天分享。
  * @param id 
  * @returns 
  */

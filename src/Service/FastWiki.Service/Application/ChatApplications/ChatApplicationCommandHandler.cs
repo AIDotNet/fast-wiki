@@ -107,6 +107,12 @@ public class ChatApplicationCommandHandler(
     [EventHandler]
     public async Task DeductTokenAsync(DeductTokenCommand command)
     {
-        await chatApplicationRepository.DeductTokenAsync(command.Id, command.token);
+        await chatApplicationRepository.DeductTokenAsync(command.Id, command.Token);
+    }
+    
+    [EventHandler]
+    public async Task RemoveChatShareAsync(RemoveChatShareCommand command)
+    {
+        await chatApplicationRepository.RemoveChatShareAsync(command.Id);
     }
 }

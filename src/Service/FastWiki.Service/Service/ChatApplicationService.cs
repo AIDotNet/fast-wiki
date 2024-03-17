@@ -140,6 +140,14 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
     }
 
     [Authorize]
+    public Task RemoveChatShareAsync(string id)
+    {
+        var command = new RemoveChatShareCommand(id);
+
+        return EventBus.PublishAsync(command);
+    }
+
+    [Authorize]
     public async Task RemoveDialogAsync(string id)
     {
         var command = new RemoveChatDialogCommand(id);

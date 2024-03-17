@@ -175,4 +175,11 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <param name="token"></param>
     /// <returns></returns>
     Task DeductTokenAsync(string chatShareId, int token);
+    
+    /// <summary>
+    /// 删除分享
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RemoveChatShareAsync(string id);
 }

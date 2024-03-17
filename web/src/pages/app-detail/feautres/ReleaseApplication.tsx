@@ -1,10 +1,10 @@
 import { memo, useEffect, useState } from "react";
 import { ChatShareDto } from "../../../models";
 import type { TableProps } from 'antd';
-import { Button, Table ,message } from 'antd';
+import { Button, Table, message, Dropdown, MenuProps } from 'antd';
 import styled from 'styled-components';
 import CreateApplication from "./CreateApplication";
-import { GetChatShareList } from "../../../services/ChatApplicationService";
+import { GetChatShareList, RemoveChatShare } from "../../../services/ChatApplicationService";
 import { copyToClipboard } from "../../../utils/stringHelper";
 
 
@@ -42,6 +42,12 @@ export default memo((props: IReleaseApplicationProps) => {
             title: '可用Token数量',
             dataIndex: 'availableToken',
             key: 'availableToken',
+            render: (text, item) => {
+                if (text === -1) {
+                    return '无限制';
+                }
+                return text - item.usedToken;
+            }
         },
         {
             title: '可用数量',
@@ -51,26 +57,50 @@ export default memo((props: IReleaseApplicationProps) => {
         {
             title: <div style={{
                 textAlign: 'center',
-                
             }}>
-                    操作
-                </div>,
+                操作
+            </div>,
             key: 'action',
-            render: (_, item) => (
-                <>
-                    
-                <Button onClick={() => {
-                    copyToClipboard(location.origin + "/share-chat?id=" + item.id)
-                    message.success('复制成功');
-                }}>分享链接</Button>
-                <Button style={{
-                    marginLeft: 8
-                }} onClick={() => {
-                    copyToClipboard(item.apiKey)
-                    message.success('复制APIKey成功');
-                }}>复制Key</Button>
-                </>
-            ),
+            render: (_, item) => {
+
+                const items: MenuProps['items'] = [];
+                items.push({
+                    key: '1',
+                    label: '分享链接',
+                    onClick: () => {
+                        copyToClipboard(location.origin + "/share-chat?id=" + item.id)
+                        message.success('复制成功');
+                    }
+                })
+                items.push({
+                    key: '2',
+                    label: '复制Key',
+                    onClick: () => {
+                        copyToClipboard(item.apiKey)
+                        message.success('复制APIKey成功');
+                    }
+                })
+                items.push({
+                    key: '3',
+                    label: '删除',
+                    onClick: async () => {
+                        await RemoveChatShare(item.id);
+                        message.success('删除成功');
+                        setInput({
+                            ...input,
+                            page: 1
+                        })
+                    }
+                })
+
+                return (
+                    <>
+                        <Dropdown menu={{ items }} trigger={['click']}>
+                            <Button>操作</Button>
+                        </Dropdown>
+                    </>
+                )
+            },
         },
     ];
 
@@ -131,7 +161,7 @@ export default memo((props: IReleaseApplicationProps) => {
                 total: total,
                 onChange: handleTableChange,
             }}
-            scroll={{ y: 'calc(100vh - 240px)' }} 
+            scroll={{ y: 'calc(100vh - 240px)' }}
             columns={columns}
             dataSource={data} />
         <CreateApplication id={props.id} visible={visible}

@@ -80,11 +80,15 @@ public static class OpenAIService
 
             await eventBus.PublishAsync(chatShareInfoQuery);
 
+            // 如果chatShareId不存在则返回让下面扣款
+            getAPIKeyChatShareQuery.Result = chatShareInfoQuery.Result;
+            
             var chatApplicationQuery = new ChatApplicationInfoQuery(chatShareInfoQuery.Result.ChatApplicationId);
 
             await eventBus.PublishAsync(chatApplicationQuery);
 
             chatApplication = chatApplicationQuery?.Result;
+            
         }
         else
         {
@@ -111,6 +115,7 @@ public static class OpenAIService
 
 
         var content = module.messages.Last();
+        var question = content.content;
 
         var prompt = string.Empty;
 
@@ -216,7 +221,7 @@ public static class OpenAIService
             }
 
             // 如果没有过期则继续
-            if (getAPIKeyChatShareQuery.Result.Expires != null ||
+            if (getAPIKeyChatShareQuery.Result.Expires != null &&
                 getAPIKeyChatShareQuery.Result.Expires < DateTimeOffset.Now)
             {
                 await context.WriteEndAsync("Token已过期");
@@ -248,7 +253,7 @@ public static class OpenAIService
         var createChatDialogHistoryCommand = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
         {
             ChatDialogId = chatDialogId,
-            Content = module.messages.Last().content,
+            Content = question,
             ExpendToken = requestToken,
             Type = ChatDialogHistoryType.Text,
             Current = true
@@ -276,6 +281,14 @@ public static class OpenAIService
         await eventBus.PublishAsync(chatDialogHistory);
 
         #endregion
+        
+        if (getAPIKeyChatShareQuery?.Result != null)
+        {
+            var updateChatShareCommand = new DeductTokenCommand(getAPIKeyChatShareQuery.Result.Id,
+                requestToken);
+
+            await eventBus.PublishAsync(updateChatShareCommand);
+        }
     }
 
     private static bool IsVision(string model)
