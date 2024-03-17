@@ -65,7 +65,7 @@ public sealed class User : FullAggregateRoot<Guid, Guid?>
         Avatar = avatar;
         Phone = phone;
         IsDisable = isDisable;
-        Role = role;
+        SetUserRole();
     }
 
     public void Disable()

@@ -5,42 +5,42 @@ public sealed class UserDto
     public Guid Id { get; set; }
 
     /// <summary>
-    /// ÕË»§
+    /// ï¿½Ë»ï¿½
     /// </summary>
     public string Account { get; set; }
 
     /// <summary>
-    /// êÇ³Æ
+    /// ï¿½Ç³ï¿½
     /// </summary>
     public string Name { get; set; }
 
     /// <summary>
-    /// ÃÜÂë
+    /// ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     public string Password { get; set; }
 
     /// <summary>
-    /// ÃÜÂëÑÎ
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     public string Salt { get; set; }
 
     /// <summary>
-    /// Í·Ïñ
+    /// Í·ï¿½ï¿½
     /// </summary>
     public string Avatar { get; set; }
 
     /// <summary>
-    /// ÓÊÏä
+    /// ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     public string Email { get; set; }
 
     /// <summary>
-    /// ÊÖ»úºÅ
+    /// ï¿½Ö»ï¿½ï¿½ï¿½
     /// </summary>
     public string Phone { get; set; }
 
     /// <summary>
-    /// ÊÇ·ñ½ûÓÃ
+    /// ï¿½Ç·ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     public bool IsDisable { get; set; }
 
@@ -53,14 +53,14 @@ public sealed class UserDto
             switch (Role)
             {
                 case RoleType.Admin:
-                    return "¹ÜÀíÔ±";
+                    return "ç®¡ç†å‘˜";
                 case RoleType.User:
-                    return "ÓÃ»§";
+                    return "ç”¨æˆ·";
                 case RoleType.Guest:
-                    return "ÓÎ¿Í";
+                    return "æ¸¸å®¢";
             }
 
-            return "Î´Öª";
+            return "æ¸¸å®¢";
         }
     }
 }
