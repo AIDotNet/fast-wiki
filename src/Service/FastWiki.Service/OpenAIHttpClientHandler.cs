@@ -3,7 +3,7 @@
 /// <summary>
 /// 重写SemanticKernel的请求处理
 /// </summary>
-public sealed class OpenAIHttpClientHandler : HttpClientHandler
+public sealed class OpenAiHttpClientHandler : HttpClientHandler
 {
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)

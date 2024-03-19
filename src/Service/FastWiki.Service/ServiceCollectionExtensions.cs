@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
     /// <param name="builder"></param>
     public static void AddFastSemanticKernel(this WebApplicationBuilder builder)
     {
-        var handler = new OpenAIHttpClientHandler();
+        var handler = new OpenAiHttpClientHandler();
 
         builder.Services.AddScoped<Kernel>(_ =>
         {
