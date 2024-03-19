@@ -103,7 +103,7 @@ export default function FastChatInput({
                 });
             });
 
-            let url ;
+            let url;
             debugger;
 
             if (id) {
@@ -157,34 +157,35 @@ export default function FastChatInput({
     }
 
     return (
-        <div style={{ height: 300 }}>
-            <Flexbox style={{ height: 300, position: 'relative', width: '100%' }}>
-                <ChatInputArea
-                    value={value}
-                    onChange={(e: any) => {
-                        setValue(e.target.value);
-                    }}
-                    placeholder="请输入您的消息"
-                    onKeyUpCapture={(e: any) => {
-                        if (e.key === 'Enter' && !e.shiftKey && value !== '') {
-                            sendChat();
-                        }
-                    }}
-                    bottomAddons={<ChatSendButton loading={loading} onSend={() => sendChat()} />}
-                    topAddons={
-                        <ChatInputActionBar
-                            leftAddons={
-                                <>
-                                    <ActionIcon icon={Languages} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
-                                    <ActionIcon onClick={() => {
-                                        setValue('');
-                                    }} icon={Eraser} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
-                                </>
-                            }
-                        />
+        <Flexbox style={{ flex: 1, position: 'relative', width: '100%', height: "100%" }}>
+            <ChatInputArea
+                value={value}
+                onChange={(e: any) => {
+                    setValue(e.target.value);
+                }}
+                placeholder="请输入您的消息"
+                onKeyUpCapture={(e: any) => {
+                    if (e.key === 'Enter' && !e.shiftKey && value !== '') {
+                        sendChat();
                     }
-                />
-            </Flexbox>
-        </div>
+                }}
+                style={{
+                    height: '100%',
+                }}
+                bottomAddons={<ChatSendButton loading={loading} onSend={() => sendChat()} />}
+                topAddons={
+                    <ChatInputActionBar
+                        leftAddons={
+                            <>
+                                <ActionIcon icon={Languages} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
+                                <ActionIcon onClick={() => {
+                                    setValue('');
+                                }} icon={Eraser} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
+                            </>
+                        }
+                    />
+                }
+            />
+        </Flexbox>
     )
 }
