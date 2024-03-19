@@ -1,3 +1,4 @@
+using AIDotNet.OpenAI;
 using AspNetCoreRateLimit;
 using FastWiki.Service;
 using FastWiki.Service.Backgrounds;
@@ -27,9 +28,8 @@ builder
 
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimit"));
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
-builder.Services.AddInMemoryRateLimiting();
-
-var app = builder.Services.AddCors(options =>
+builder.Services.AddInMemoryRateLimiting()
+    .AddCors(options =>
     {
         options.AddPolicy("AllowAll",
             builder => builder
@@ -96,9 +96,12 @@ var app = builder.Services.AddCors(options =>
             .UseUoW<WikiDbContext>()
             .UseRepository<WikiDbContext>();
     })
-    .AddResponseCompression()
-    .AddAutoInject()
-    .AddServices(builder, option => option.MapHttpMethodsForUnmatched = ["Post"]);
+    .AddResponseCompression();
+
+builder.Services.AddAutoInject();
+
+
+var app = builder.Services.AddServices(builder, option => option.MapHttpMethodsForUnmatched = ["Post"]);
 
 app.Use((async (context, next) =>
 {

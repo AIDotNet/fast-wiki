@@ -1,11 +1,13 @@
 using System.Text;
 using System.Text.Json;
+using AIDotNet.OpenAI;
 using FastWiki.Service.Application.Storage.Queries;
 using FastWiki.Service.Contracts.OpenAI;
 using FastWiki.Service.Domain.Storage.Aggregates;
 using FastWiki.Service.Infrastructure;
 using FastWiki.Service.Infrastructure.Helper;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 namespace FastWiki.Service.Service;
 
@@ -82,13 +84,13 @@ public static class OpenAIService
 
             // 如果chatShareId不存在则返回让下面扣款
             getAPIKeyChatShareQuery.Result = chatShareInfoQuery.Result;
-            
+
             var chatApplicationQuery = new ChatApplicationInfoQuery(chatShareInfoQuery.Result.ChatApplicationId);
 
             await eventBus.PublishAsync(chatApplicationQuery);
 
             chatApplication = chatApplicationQuery?.Result;
-            
+
         }
         else
         {
@@ -177,15 +179,14 @@ public static class OpenAIService
 
                 sourceFile.AddRange(fileQuery.Result);
             }
+            // 删除最后一个消息
+            module.messages.RemoveAt(module.messages.Count - 1);
+            module.messages.Add(new ChatCompletionRequestMessage()
+            {
+                content = prompt,
+                role = "user"
+            });
         }
-
-        // 删除最后一个消息
-        module.messages.RemoveAt(module.messages.Count - 1);
-        module.messages.Add(new ChatCompletionRequestMessage()
-        {
-            content = prompt,
-            role = "user"
-        });
 
         // 添加用户输入，并且计算请求token数量
         module.messages.ForEach(x =>
@@ -229,12 +230,26 @@ public static class OpenAIService
             }
         }
 
-        var wikiMemoryService = context.RequestServices.GetRequiredService<WikiMemoryService>();
+        if (chatApplication.ChatType.IsNullOrEmpty())
+        {
+            // 防止没有设置对话类型
+            chatApplication.ChatType = OpenAIOptions.ServiceName;
+        }
+        
+        var chatStream = ModuleService.GetChatService(chatApplication.ChatType);
 
-        var chatStream = wikiMemoryService.CreateOpenAIChatCompletionService(chatApplication.ChatModel);
+        var setting = new OpenAIPromptExecutionSettings
+        {
+            MaxTokens = chatApplication.MaxResponseToken,
+            Temperature = chatApplication.Temperature,
+            ExtensionData = new Dictionary<string, object>()
+        };
+        setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_KEY, OpenAIOption.ChatToken);
+        setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_URL, OpenAIOption.ChatEndpoint);
+
 
         var output = new StringBuilder();
-        await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory))
+        await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory,setting))
         {
             if (item.Content.IsNullOrEmpty())
             {
@@ -281,7 +296,8 @@ public static class OpenAIService
         await eventBus.PublishAsync(chatDialogHistory);
 
         #endregion
-        
+
+        //对于对话扣款
         if (getAPIKeyChatShareQuery?.Result != null)
         {
             var updateChatShareCommand = new DeductTokenCommand(getAPIKeyChatShareQuery.Result.Id,
