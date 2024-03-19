@@ -23,7 +23,9 @@
 
 ### 先决条件
 
-确保你已经安装了.NET 8 SDK和PostgreSQL数据库，并且配置了相应的环境。
+确保你已经安装了.NET 8 SDK和PostgreSQL数据库和PostgreSQL的vector插件，并且配置了相应的环境。
+
+## 前端
 
 ### 安装
 
@@ -33,7 +35,20 @@
 git clone https://github.com/239573049/fast-wiki.git
 ```
 
-2. 安装依赖项：
+2. 安装好node.js，最新版本(https://nodejs.p2hp.com/)。
+
+3. 将web目录的package-lock.json文件和node_modules目录删除,
+
+4. 在web目录运行
+```
+npm i
+npm run build
+```
+5. 将web目录下的dist下的内容copy到"\fast-wiki\src\Service\FastWiki.Service\wwwroot" 目录下(如果wwwroot没有就创建个)
+
+## 后端
+
+1. 安装依赖项：
 
 在项目根目录下执行：
 
@@ -42,7 +57,7 @@ cd src/Service/FastWiki.Service
 dotnet restore
 ```
 
-3. 数据库配置：
+2. 数据库配置：
 
 确保你的PostgreSQL数据库运行正常，并且创建了必要的数据库。根据你的配置修改`appsettings.json`中的数据库连接字符串。
 
@@ -54,7 +69,7 @@ dotnet restore
 dotnet run
 ```
 
-这将启动后端服务。对于前端部分，请参照MasaBlazor文档，进行相应的构建和启动步骤。
+这将启动后端服务。访问http://localhost:5124/就可以看到前端的页面了
 
 默认账号密码：admin Aa123456
 
