@@ -1,7 +1,5 @@
 using System.Threading.Channels;
-using FastWiki.Service.Domain.Wikis.Aggregates;
 using FastWiki.Service.Service;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace FastWiki.Service.Backgrounds;
 
@@ -83,6 +81,7 @@ public sealed class QuantizeBackgroundService : BackgroundService
         {
             Interlocked.Increment(ref _currentTask);
             var wikiDetail = await WikiDetails.Reader.ReadAsync();
+            Console.WriteLine("_currentTask: " + _currentTask);
             await HandlerAsync(wikiDetail, asyncServiceScope.ServiceProvider);
             Interlocked.Decrement(ref _currentTask);
         }
