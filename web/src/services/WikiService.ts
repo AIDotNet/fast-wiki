@@ -1,4 +1,4 @@
-import { del, get, postJson, putJson } from '../utils/fetch';
+import { del, get, post, postJson, putJson } from '../utils/fetch';
 
 import { config } from '../config';
 import { PaginatedListBase, WikiDto, WikiQuantizationState } from '../models/index.d';
@@ -62,7 +62,7 @@ export function GetWikiDetailsList(wikiId: string, keyword: string, page: number
 /**
  * 提交Wiki知识库详情WebPage
  */
-export function CreateWikiDetailWebPageInput(data: any) {
+export function CreateWikiDetailWebPage(data: any) {
     return postJson(`${prefix}/WikiDetailWebPageInput`, data);
 }
 
@@ -111,4 +111,13 @@ export function DelDetailsVector(id: string) {
     id = encodeURIComponent(id);
 
     return del(`${prefix}/DetailsVector/${id}`)
+}
+
+/**
+ * 重试量化
+ * @param id 
+ * @returns 
+ */
+export function RetryVectorDetail(id:number){
+    return post(`${prefix}/RetryVectorDetail/${id}`)
 }

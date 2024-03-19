@@ -10,15 +10,14 @@ import UploadWikiFile from '../features/UploadWikiFile';
 import SearchWikiDetail from '../features/SearchWikiDetail';
 import { WikiDto } from '../../../models';
 import WikiInfo from '../features/WikiInfo';
+import UploadWikiWeb from '../features/UploadWikiWeb';
 const LeftTabs = styled.div`
     width: 190px;
     min-width: 190px;
     height: 100%;
-    /* 右边需要有一个分割线 */
     border-right: 1px solid #464545;
     display: flex;
     flex-direction: column;
-
 `;
 
 
@@ -115,7 +114,8 @@ export default memo(() => {
             </LeftTabs >
             <div style={{
                 width: '100%',
-                padding: 20
+                padding: 20,
+                overflow:'auto',
 
             }}>
                 {
@@ -129,6 +129,9 @@ export default memo(() => {
                 }
                 {
                     tab === 'upload' && <UploadWikiFile id={id} onChagePath={key => changeTab(key)} />
+                }
+                {
+                    tab === 'upload-web' && <UploadWikiWeb id={id} onChagePath={key => changeTab(key)} />
                 }
             </div>
         </>

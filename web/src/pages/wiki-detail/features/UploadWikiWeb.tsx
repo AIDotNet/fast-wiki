@@ -1,21 +1,15 @@
 
 import { Button, Steps, Upload, UploadProps, Table, Progress, Radio, Input, message, MenuProps, Dropdown } from 'antd';
 import { useState } from 'react';
-import { InboxOutlined, CloseOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
-import { bytesToSize } from '../../../utils/stringHelper';
-import { ProcessMode, TrainingPattern } from '../../../models/index.d';
-import { UploadFile as FileService } from '../../../services/StorageService';
-import { CreateWikiDetails } from '../../../services/WikiService';
-
+import { CreateWikiDetailWebPageInput, ProcessMode, TrainingPattern } from '../../../models/index.d';
+import { CreateWikiDetailWebPage } from '../../../services/WikiService';
 
 const FileItem = styled.div`
     transition: border-color 0.3s linear;
     border: 1px solid #d9d9d9;
     border-radius: 8px;
     padding: 10px;
-    margin-right: 10px;
-    display: flex;
     cursor: pointer;
     margin-bottom: 10px;
     &:hover {
@@ -25,105 +19,35 @@ const FileItem = styled.div`
     }
 `;
 
-const { Dragger } = Upload;
-
 interface IUploadWikiFileProps {
     id: string;
     onChagePath(key: any): void;
 }
 
-export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps) {
+export default function UploadWikiWeb({ id, onChagePath }: IUploadWikiFileProps) {
     const [current, setCurrent] = useState(0);
     // const [uploading, setUploading] = useState(false);
-    const [fileList, setFileList] = useState<any[]>([]);
+    const [webs, setWebs] = useState<any[]>([]);
     const [processMode, setProcessMode] = useState(ProcessMode.Auto);
     const [trainingPattern, setTrainingPattern] = useState(TrainingPattern.Subsection);
     const [subsection, setSubsection] = useState(400); // 分段长度
-    const props: UploadProps = {
-        name: 'file',
-        multiple: true,
-        showUploadList: false,
-        accept: '.md,.pdf,.docs,.txt,.json,.excel,.word,.html',
-        beforeUpload: (file: any) => {
-            fileList.push(file);
-            setFileList([...fileList]);
-            return false;
+    const [value, setValue] = useState('');
+
+    async function upload(){
+        for (let i = 0; i < webs.length; i++) {
+            const item = webs[i];
+            const input: CreateWikiDetailWebPageInput = {
+                wikiId:id as any,
+                name: webs[i],
+                trainingPattern: trainingPattern,
+                subsection: subsection,
+                mode: processMode,
+                state: '',
+                path: item,
+            }
+            await CreateWikiDetailWebPage(input)
         }
-    };
-
-    const columns = [
-        {
-            title: '文件名',
-            dataIndex: 'fileName',
-            key: 'fileName',
-        },
-        {
-            title: '文件上传进度',
-            dataIndex: 'progress',
-            key: 'progress',
-            render: (value: number) => {
-                return <Progress percent={value} size="small" />
-            }
-        },
-        {
-            title: '数据上传进度',
-            dataIndex: 'dataProgress',
-            key: 'dataProgress',
-            render: (value: number) => {
-                return <Progress percent={value} size="small" />
-            }
-        },
-        {
-            title: '操作',
-            dataIndex: 'handler',
-            key: 'handler',
-            render: (_: any, item: any) => {
-                const items: MenuProps['items'] = [];
-                items.push({
-                    key: '1',
-                    label: '删除',
-                    onClick: () => {
-                        setFileList(fileList.filter((item) => item !== item));
-                    }
-                })
-                return (
-                    <>
-                        <Dropdown menu={{ items }} trigger={['click']}>
-                            <Button>操作</Button>
-                        </Dropdown>
-                    </>
-                )
-            }
-        },
-    ];
-
-    function saveFile() {
-        fileList.forEach(async (file) => {
-            await Upload(file)
-        });
         message.success('上传成功');
-    }
-
-    async function Upload(file: any) {
-
-        const fileItem = await FileService(file);
-        file.progress = 100;
-
-        setFileList([...fileList]);
-
-        await CreateWikiDetails({
-            name: file.name,
-            wikiId: id,
-            fileId: fileItem.id,
-            filePath: fileItem.path,
-            subsection: subsection,
-            mode: processMode,
-            trainingPattern: trainingPattern
-        })
-
-        file.dataProgress = 100;
-
-        setFileList([...fileList]);
     }
 
     return (<>
@@ -152,53 +76,52 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
 
         {
             current === 0 && <>
-                <Dragger {...props} style={{
-                    padding: '20px',
-                    border: '1px dashed #d9d9d9',
-                    borderRadius: '2px',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    flexDirection: 'column'
-                }} height={200}>
-                    <p className="ant-upload-drag-icon">
-                        <InboxOutlined />
-                    </p>
-                    <p className="ant-upload-text">点击或推动文件上传</p>
-                    <p className="ant-upload-hint">
-                        支持单个或批量上传，支持 .md .pdf .docs .txt .json .excel .word .html等格式,
-                        最多支持1000个文件。单文件最大支持100M。
-                    </p>
-                </Dragger>
-                <div style={{
-                    padding: '20px',
-                    display: 'flex',
-                    flexWrap: 'wrap',
+                <textarea value={value} onChange={(e) => {
+                    setValue(e.target.value);
+                    // 换行符
+                    let webs = e.target.value.split('\n');
+                    // 过滤空字符串的和重复的
+                    webs = Array.from(new Set(webs.filter(item => item !== '')));
+                    webs = webs.map(item => {
+                        if (item.includes('http')) {
+                            return item;
+                        } else {
+                            return `http://${item}`;
+                        }
+                    });
+                    setWebs(webs);
+                }} style={{
+                    width: '100%',
+                    border: '1px solid #d9d9d9',
+                    borderRadius: 8,
+                    padding: 10,
+                    marginBottom: 20,
+                    height: 200,
                     overflow: 'auto',
-                    height: '200px',
-                    alignContent: 'flex-start'
+                    resize: 'none',
+                    fontSize: 14,
+                    color: '#666',
+                }}
+                    placeholder="请输入网页链接"
+                ></textarea>
+                <div style={{
+                    height: 'calc(100vh - 450px)',
+                    overflow: 'auto',
                 }}>
-
-                    {fileList.length > 0 && fileList.map((item, index) => {
-                        return <FileItem>
-                            <span>{item.name}</span>
-                            <span style={{
-                                marginLeft: 10
-                            }}>
-                                {bytesToSize(item.size || 0)}
-                            </span>
-                            <span style={{
-                                marginLeft: 10
-                            }}>
-                                <CloseOutlined
-                                    onClick={() => {
-                                        setFileList(fileList.filter((_, i) => i !== index));
-                                    }} />
-                            </span>
+                    {webs.map((item, index) => {
+                        return <FileItem key={index}>
+                            {item}
+                            <Button size='small' style={{
+                                float: 'right'
+                            }} onClick={() => {
+                                const newWebs = webs.filter((_, i) => i !== index);
+                                setWebs(newWebs);
+                            }}>删除</Button>
                         </FileItem>
                     })}
                 </div>
-                <Button onClick={() => {
 
+                <Button onClick={() => {
                     setCurrent(1);
                 }} style={{
                     float: 'right',
@@ -265,20 +188,30 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                         </div>
                     }
                 </div>
-                <Table dataSource={fileList.map(item => {
-                    return {
-                        fileName: item.name,
-                        progress: item.progress || 0,
-                        dataProgress: item.dataProgress || 0
-                    }
-                })} columns={columns} />
+
+                <div style={{
+                    height: 'calc(100vh - 400px)',
+                    overflow: 'auto',
+                }}>
+                    {webs.map((item, index) => {
+                        return <FileItem key={index}>
+                            {item}
+                            <Button size='small' style={{
+                                float: 'right'
+                            }} onClick={() => {
+                                const newWebs = webs.filter((_, i) => i !== index);
+                                setWebs(newWebs);
+                            }}>删除</Button>
+                        </FileItem>
+                    })}
+                </div>
                 <Button type='primary' onClick={() => {
-                    saveFile();
+                    upload();
                 }} style={{
                     float: 'right',
                     marginTop: 20,
                     marginLeft: 20,
-                }}>提交数据（{fileList.length}）</Button>
+                }}>提交数据（{webs.length}）</Button>
                 <Button onClick={() => {
                     setCurrent(0);
                 }} style={{

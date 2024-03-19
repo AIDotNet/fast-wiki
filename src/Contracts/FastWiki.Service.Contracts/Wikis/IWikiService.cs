@@ -109,4 +109,11 @@ public interface IWikiService
     /// <param name="id"></param>
     /// <returns></returns>
     Task RemoveDetailsVectorAsync(string id);
+
+    /// <summary>
+    /// 重试量化文件
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RetryVectorDetailAsync(long id);
 }

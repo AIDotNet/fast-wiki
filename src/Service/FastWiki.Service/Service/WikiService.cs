@@ -131,4 +131,10 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
 
         await EventBus.PublishAsync(command);
     }
+
+    public async Task RetryVectorDetailAsync(long id)
+    {
+        var command = new RetryVectorDetailCommand(id);
+        await EventBus.PublishAsync(command);
+    }
 }

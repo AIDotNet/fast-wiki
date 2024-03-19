@@ -217,3 +217,13 @@ export enum RoleType {
     User = 1,
     Admin = 2
 }
+
+export interface CreateWikiDetailWebPageInput {
+    wikiId: number;
+    name: string;
+    path: string;
+    state: string;
+    subsection: number;
+    mode: ProcessMode;
+    trainingPattern: TrainingPattern;
+}

@@ -35,13 +35,13 @@ public static class OpenAIService
 
         if (chatDialogId.IsNullOrEmpty())
         {
-            await context.WriteEndAsync(nameof(chatDialogId) + "²»ÄÜÎª¿Õ");
+            await context.WriteEndAsync(nameof(chatDialogId) + "ä¸èƒ½ä¸ºç©º");
             return;
         }
 
         if (chatId.IsNullOrEmpty())
         {
-            await context.WriteEndAsync(nameof(chatId) + "²»ÄÜÎª¿Õ");
+            await context.WriteEndAsync(nameof(chatId) + "ä¸èƒ½ä¸ºç©º");
             return;
         }
 
@@ -49,14 +49,14 @@ public static class OpenAIService
 
         var getAPIKeyChatShareQuery = new GetAPIKeyChatShareQuery(token);
 
-        // Èç¹ûÊÇsk-¿ªÍ·µÄtokenÔòÊÇÓ¦ÓÃtoken
+        // å¦‚æœæ˜¯sk-å¼€å¤´çš„tokenåˆ™æ˜¯åº”ç”¨token
         if (chatShareId.IsNullOrEmpty() && !token.ToString().Replace("Bearer ", "").Trim().StartsWith("sk-"))
         {
-            // ÅĞ¶Ïµ±Ç°ÓÃ»§ÊÇ·ñµÇÂ¼
+            // åˆ¤æ–­å½“å‰ç”¨æˆ·æ˜¯å¦ç™»å½•
             if (context.User.Identity?.IsAuthenticated == false)
             {
                 context.Response.StatusCode = 401;
-                await context.WriteEndAsync("Token²»ÄÜÎª¿Õ");
+                await context.WriteEndAsync("Tokenä¸èƒ½ä¸ºç©º");
                 return;
             }
         }
@@ -67,7 +67,7 @@ public static class OpenAIService
             if (getAPIKeyChatShareQuery.Result == null)
             {
                 context.Response.StatusCode = 401;
-                await context.WriteEndAsync("TokenÎŞĞ§");
+                await context.WriteEndAsync("Tokenæ— æ•ˆ");
                 return;
             }
         }
@@ -80,7 +80,7 @@ public static class OpenAIService
 
             await eventBus.PublishAsync(chatShareInfoQuery);
 
-            // Èç¹ûchatShareId²»´æÔÚÔò·µ»ØÈÃÏÂÃæ¿Û¿î
+            // å¦‚æœchatShareIdä¸å­˜åœ¨åˆ™è¿”å›è®©ä¸‹é¢æ‰£æ¬¾
             getAPIKeyChatShareQuery.Result = chatShareInfoQuery.Result;
             
             var chatApplicationQuery = new ChatApplicationInfoQuery(chatShareInfoQuery.Result.ChatApplicationId);
@@ -99,7 +99,7 @@ public static class OpenAIService
 
         if (chatApplication == null)
         {
-            await context.WriteEndAsync("Ó¦ÓÃId²»´æÔÚ");
+            await context.WriteEndAsync("åº”ç”¨Idä¸å­˜åœ¨");
             return;
         }
 
@@ -107,7 +107,7 @@ public static class OpenAIService
 
         var chatHistory = new ChatHistory();
 
-        // Èç¹ûÉèÖÃÁËPrompt£¬ÔòÌí¼Ó
+        // å¦‚æœè®¾ç½®äº†Promptï¼Œåˆ™æ·»åŠ 
         if (!chatApplication.Prompt.IsNullOrEmpty())
         {
             chatHistory.AddSystemMessage(chatApplication.Prompt);
@@ -120,7 +120,7 @@ public static class OpenAIService
         var prompt = string.Empty;
 
         var sourceFile = new List<FileStorage>();
-        // Èç¹ûÎª¿ÕÔò²»Ê¹ÓÃÖªÊ¶¿â
+        // å¦‚æœä¸ºç©ºåˆ™ä¸ä½¿ç”¨çŸ¥è¯†åº“
         if (chatApplication.WikiIds.Count != 0)
         {
             var memoryServerless = context.RequestServices.GetRequiredService<MemoryServerless>();
@@ -135,7 +135,7 @@ public static class OpenAIService
 
             result.Results.ForEach(x =>
             {
-                // »ñÈ¡fileId
+                // è·å–fileId
                 var fileId = x.Partitions.Select(x => x.Tags.FirstOrDefault(x => x.Key == "fileId"))
                     .FirstOrDefault(x => !x.Value.IsNullOrEmpty())
                     .Value.FirstOrDefault();
@@ -157,18 +157,18 @@ public static class OpenAIService
 
             var tokens = TokenHelper.GetGptEncoding().Encode(prompt);
 
-            // ÕâÀï¿ÉÒÔÓĞĞ§µÄ·ÀÖ¹tokenÊıÁ¿³¬³öÏŞÖÆ£¬µ«ÊÇÒ²»á½µµÍ»Ø¸´µÄÖÊÁ¿
+            // è¿™é‡Œå¯ä»¥æœ‰æ•ˆçš„é˜²æ­¢tokenæ•°é‡è¶…å‡ºé™åˆ¶ï¼Œä½†æ˜¯ä¹Ÿä¼šé™ä½å›å¤çš„è´¨é‡
             prompt = TokenHelper.GetGptEncoding()
                 .Decode(tokens.Take(chatApplication.MaxResponseToken).ToList());
 
-            // Èç¹ûprompt²»Îª¿Õ£¬ÔòĞèÒª½øĞĞÄ£°åÌæ»»
+            // å¦‚æœpromptä¸ä¸ºç©ºï¼Œåˆ™éœ€è¦è¿›è¡Œæ¨¡æ¿æ›¿æ¢
             if (!prompt.IsNullOrEmpty())
             {
                 prompt = chatApplication.Template.Replace("{{quote}}", prompt)
                     .Replace("{{question}}", content.content);
             }
 
-            // ÔÚÕâÀïĞèÒª»ñÈ¡Ô´ÎÄ¼ş
+            // åœ¨è¿™é‡Œéœ€è¦è·å–æºæ–‡ä»¶
             if (fileIds.Count > 0 && chatApplication.ShowSourceFile)
             {
                 var fileQuery = new StorageInfosQuery(fileIds);
@@ -179,7 +179,7 @@ public static class OpenAIService
             }
         }
 
-        // É¾³ı×îºóÒ»¸öÏûÏ¢
+        // åˆ é™¤æœ€åä¸€ä¸ªæ¶ˆæ¯
         module.messages.RemoveAt(module.messages.Count - 1);
         module.messages.Add(new ChatCompletionRequestMessage()
         {
@@ -187,7 +187,7 @@ public static class OpenAIService
             role = "user"
         });
 
-        // Ìí¼ÓÓÃ»§ÊäÈë£¬²¢ÇÒ¼ÆËãÇëÇótokenÊıÁ¿
+        // æ·»åŠ ç”¨æˆ·è¾“å…¥ï¼Œå¹¶ä¸”è®¡ç®—è¯·æ±‚tokenæ•°é‡
         module.messages.ForEach(x =>
         {
             if (!x.content.IsNullOrEmpty())
@@ -211,20 +211,20 @@ public static class OpenAIService
 
         if (getAPIKeyChatShareQuery?.Result != null)
         {
-            // Èç¹ûtoken²»×ãÔò·µ»Ø£¬Ê¹ÓÃtokenºÍµ±Ç°request×ÜºÍ´óÓÚ¿ÉÓÃtoken£¬Ôò·µ»Ø
+            // å¦‚æœtokenä¸è¶³åˆ™è¿”å›ï¼Œä½¿ç”¨tokenå’Œå½“å‰requestæ€»å’Œå¤§äºå¯ç”¨tokenï¼Œåˆ™è¿”å›
             if (getAPIKeyChatShareQuery.Result.AvailableToken != -1 &&
                 (getAPIKeyChatShareQuery.Result.UsedToken + requestToken) >=
                 getAPIKeyChatShareQuery.Result.AvailableToken)
             {
-                await context.WriteEndAsync("Token²»×ã");
+                await context.WriteEndAsync("Tokenä¸è¶³");
                 return;
             }
 
-            // Èç¹ûÃ»ÓĞ¹ıÆÚÔò¼ÌĞø
+            // å¦‚æœæ²¡æœ‰è¿‡æœŸåˆ™ç»§ç»­
             if (getAPIKeyChatShareQuery.Result.Expires != null &&
                 getAPIKeyChatShareQuery.Result.Expires < DateTimeOffset.Now)
             {
-                await context.WriteEndAsync("TokenÒÑ¹ıÆÚ");
+                await context.WriteEndAsync("Tokenå·²è¿‡æœŸ");
                 return;
             }
         }
@@ -248,7 +248,7 @@ public static class OpenAIService
 
         await context.WriteEndAsync();
 
-        #region ¼ÇÂ¼¶Ô»°ÄÚÈİ
+        #region è®°å½•å¯¹è¯å†…å®¹
 
         var createChatDialogHistoryCommand = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
         {

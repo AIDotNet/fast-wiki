@@ -1,11 +1,12 @@
 ﻿using FastWiki.Service.Application.Storage.Queries;
 using System.Diagnostics;
+using FastWiki.Service.Service;
 
 namespace FastWiki.Service.Application.Wikis;
 
 public sealed class WikiQueryHandler(
     IWikiRepository wikiRepository,
-    MemoryServerless memoryServerless,
+    WikiMemoryService wikiMemoryService,
     IEventBus eventBus)
 {
     [EventHandler]
@@ -24,9 +25,9 @@ public sealed class WikiQueryHandler(
     [EventHandler]
     public async Task GetWikiList(WikiListQuery query)
     {
-        var wikis = await wikiRepository.GetListAsync(query.userId,query.Keyword, query.Page, query.PageSize);
+        var wikis = await wikiRepository.GetListAsync(query.userId, query.Keyword, query.Page, query.PageSize);
 
-        var count = await wikiRepository.GetCountAsync(query.userId,query.Keyword);
+        var count = await wikiRepository.GetCountAsync(query.userId, query.Keyword);
 
         query.Result = new PaginatedListBase<WikiDto>()
         {
@@ -38,9 +39,10 @@ public sealed class WikiQueryHandler(
     [EventHandler]
     public async Task GetWikiDetails(WikiDetailsQuery query)
     {
-        var wikis = await wikiRepository.GetDetailsListAsync(query.WikiId,query.State, query.Keyword, query.Page, query.PageSize);
+        var wikis = await wikiRepository.GetDetailsListAsync(query.WikiId, query.State, query.Keyword, query.Page,
+            query.PageSize);
 
-        var count = await wikiRepository.GetDetailsCountAsync(query.WikiId,query.State, query.Keyword);
+        var count = await wikiRepository.GetDetailsCountAsync(query.WikiId, query.State, query.Keyword);
 
         query.Result = new PaginatedListBase<WikiDetailDto>()
         {
@@ -52,6 +54,7 @@ public sealed class WikiQueryHandler(
     [EventHandler]
     public async Task WikiDetailVectorQuantityAsync(WikiDetailVectorQuantityQuery query)
     {
+        var memoryServerless = wikiMemoryService.CreateMemoryServerless();
         var memoryDbs = memoryServerless.Orchestrator.GetMemoryDbs();
 
         var result = new PaginatedListBase<WikiDetailVectorQuantityDto>();
@@ -93,7 +96,7 @@ public sealed class WikiQueryHandler(
                 dto.Add(new WikiDetailVectorQuantityDto()
                 {
                     Content = item.Payload["text"].ToString() ?? string.Empty,
-                    FileId = item.Tags.FirstOrDefault(x=>x.Key=="fileId").Value?.FirstOrDefault() ?? string.Empty,
+                    FileId = item.Tags.FirstOrDefault(x => x.Key == "fileId").Value?.FirstOrDefault() ?? string.Empty,
                     Id = item.Id,
                     Index = size,
                     WikiDetailId = item.Tags["wikiDetailId"].FirstOrDefault() ?? string.Empty,
@@ -111,6 +114,7 @@ public sealed class WikiQueryHandler(
     public async Task SearchVectorQuantityAsync(SearchVectorQuantityQuery query)
     {
         var stopwatch = Stopwatch.StartNew();
+        var memoryServerless = wikiMemoryService.CreateMemoryServerless(new SearchClientConfig(), 400);
         var searchResult = await memoryServerless.SearchAsync(query.Search, "wiki",
             new MemoryFilter().ByTag("wikiId", query.WikiId.ToString()), minRelevance: query.MinRelevance, limit: 5);
 

@@ -176,7 +176,7 @@ public sealed class QuantizeBackgroundService : BackgroundService
                 await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Fail);
             }
 
-            await AddWikiDetailAsync(wikiDetail);
+            // await AddWikiDetailAsync(wikiDetail);
         }
 
     }

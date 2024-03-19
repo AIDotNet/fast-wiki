@@ -1,6 +1,6 @@
 import { Table, Button, Dropdown, MenuProps, message, Select } from 'antd';
 import { useEffect, useState } from 'react';
-import { DeleteWikiDetails, GetWikiDetailsList } from '../../../services/WikiService';
+import { DeleteWikiDetails, GetWikiDetailsList, RetryVectorDetail } from '../../../services/WikiService';
 import WikiDetailFile from './WikiDetailFile';
 import { WikiQuantizationState } from '../../../models/index.d';
 
@@ -40,23 +40,58 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
         {
             title: '操作',
             key: 'action',
-            render: (_: any, item: any) => (
-                <>
-                    <Button onClick={() => {
-                        setVisible(true);
-                        setOpenItem(item);
-                    }}>查看详情</Button>
-                    <Button type='primary' style={{
-                        marginLeft: 8
-                    }} onClick={() => {
-                        RemoveDeleteWikiDetails(item.id)
-                        setInput({
-                            ...input,
-                            page: 1
-                        })
-                    }}>删除</Button>
-                </>
-            ),
+            render: (_: any, item: any) => {
+                const items = [
+                    {
+                        key: '1',
+                        onClick: () => {
+                            setOpenItem(item);
+                            setVisible(true);
+                        },
+                        label: (
+                            <span>
+                                详情
+                            </span>
+                        ),
+                    },
+                    {
+                        key: '2',
+                        onClick: () => {
+                            RemoveDeleteWikiDetails(item.id);
+                        },
+                        label: (
+                            <span>
+                                删除
+                            </span>
+                        ),
+                    },]
+                // 如果失败了则显示量化。
+                if (item.state !== 0) {
+                    items.push({
+                        key: '3',
+                        onClick: () => {
+                            onRetryVectorDetail(item);
+                        },
+                        label: (
+                            <span>
+                                重试
+                            </span>
+                        ),
+                    })
+                }
+                return (
+                    <Dropdown
+                        menu={{
+                            items: items
+                        }}
+                        placement="bottomLeft"
+                    >
+                        <Button>
+                            操作
+                        </Button>
+                    </Dropdown>
+                )
+            },
         },
     ]
 
@@ -85,6 +120,9 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
         },
         {
             key: '2',
+            onClick: () => {
+                onChagePath('upload-web')
+            },
             label: (
                 <span>
                     网页链接
@@ -106,9 +144,26 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
         try {
             await DeleteWikiDetails(id);
             message.success('删除成功');
+            setInput({
+                ...input,
+                page: 1
+            })
         } catch (error) {
             message.error('删除失败');
         }
+    }
+
+    async function onRetryVectorDetail(item: any) {
+        try {
+
+            await RetryVectorDetail(item.id);
+            message.success('成功');
+            loadingData()
+        } catch (error) {
+
+            message.error('失败');
+        }
+
     }
 
 
@@ -150,11 +205,11 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
             </div>
             <Select
                 defaultValue={null}
-                style={{ 
+                style={{
                     width: 120,
                     marginLeft: 16,
                     marginRight: 16,
-                    float: 'right' 
+                    float: 'right'
                 }}
                 onChange={(v: WikiQuantizationState | null) => {
                     setInput({
@@ -180,7 +235,7 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
                 overflow: 'auto',
                 padding: 16,
                 borderRadius: 8,
-            }}/>
+            }} />
         <WikiDetailFile onClose={() => {
             setVisible(false);
         }} wikiDetail={openItem} visible={visible} />

@@ -2,9 +2,6 @@
 using FastWiki.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.KernelMemory.ContentStorage.DevTools;
-using Microsoft.KernelMemory.FileSystem.DevTools;
-using Microsoft.KernelMemory.Postgres;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Plugins.Core;
 
@@ -35,44 +32,6 @@ public static class ServiceCollectionExtensions
             kernel.ImportPluginFromObject(new TimePlugin(), "TimePlugin");
 #pragma warning restore SKEXP0050 // 类型仅用于评估，在将来的更新中可能会被更改或删除。取消此诊断以继续。
             return kernel;
-        });
-
-        //Kernel Memory
-        var searchClientConfig = new SearchClientConfig
-        {
-            MaxAskPromptSize = 128000,
-            MaxMatchesCount = 3,
-            AnswerTokens = 2000,
-            EmptyAnswer = "知识库未搜索到相关内容"
-        };
-
-        var httpclient = new HttpClient(handler);
-        builder.Services.AddScoped<MemoryServerless>((_) =>
-        {
-            var memory = new KernelMemoryBuilder()
-                .WithPostgresMemoryDb(new PostgresConfig()
-                {
-                    ConnectionString = ConnectionStringsOptions.DefaultConnection,
-                    TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
-                })
-                .WithSimpleFileStorage(new SimpleFileStorageConfig
-                    { StorageType = FileSystemTypes.Volatile, Directory = "_files" })
-                .WithSearchClientConfig(searchClientConfig)
-                .WithOpenAITextGeneration(new OpenAIConfig()
-                {
-                    APIKey = OpenAIOption.ChatToken,
-                    TextModel = OpenAIOption.ChatModel
-                }, null, httpclient)
-                .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
-                {
-                    // 如果 EmbeddingToken 为空，则使用 ChatToken
-                    APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
-                        ? OpenAIOption.ChatToken
-                        : OpenAIOption.EmbeddingToken,
-                    EmbeddingModel = OpenAIOption.EmbeddingModel,
-                }, null, false, httpclient)
-                .Build<MemoryServerless>();
-            return memory;
         });
     }
 

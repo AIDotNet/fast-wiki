@@ -6,7 +6,6 @@ namespace FastWiki.Service.Application.Wikis;
 public sealed class WikiCommandHandler(
     IWikiRepository wikiRepository,
     WikiMemoryService wikiMemoryService,
-    MemoryServerless memoryServerless,
     IMapper mapper,
     IEventBus eventBus)
 {
@@ -34,6 +33,7 @@ public sealed class WikiCommandHandler(
         {
             try
             {
+                var memoryServerless = wikiMemoryService.CreateMemoryServerless();
                 await memoryServerless.DeleteDocumentAsync(id.ToString(), "wiki");
             }
             catch (Exception e)
@@ -98,6 +98,7 @@ public sealed class WikiCommandHandler(
 
         try
         {
+            var memoryServerless = wikiMemoryService.CreateMemoryServerless();
             await memoryServerless.DeleteDocumentAsync(command.Id.ToString(), "wiki");
         }
         catch (Exception e)
@@ -109,6 +110,7 @@ public sealed class WikiCommandHandler(
     [EventHandler]
     public async Task RemoveWikiDetailVectorQuantityAsync(RemoveWikiDetailVectorQuantityCommand command)
     {
+        var memoryServerless = wikiMemoryService.CreateMemoryServerless();
         await memoryServerless.DeleteDocumentAsync(command.DocumentId, "wiki");
     }
 
@@ -123,5 +125,27 @@ public sealed class WikiCommandHandler(
     {
         var wiki = mapper.Map<Wiki>(command.Dto);
         await wikiRepository.UpdateAsync(wiki);
+    }
+
+    [EventHandler]
+    public async Task RetryVectorDetailAsync(RetryVectorDetailCommand command)
+    {
+        var wikiDetail = await wikiRepository.GetDetailsAsync(command.Id);
+
+        if (wikiDetail == null)
+        {
+            throw new UserFriendlyException("未找到数据");
+        }
+
+        await QuantizeBackgroundService.AddWikiDetailAsync(new QuantizeWikiDetail()
+        {
+            Path = wikiDetail.Path,
+            WikiId = wikiDetail.WikiId,
+            TrainingPattern = TrainingPattern.Subsection,
+            FileName = wikiDetail.FileName,
+            Type = wikiDetail.Type,
+            Subsection = 400,
+            FileId = wikiDetail.FileId,
+        });
     }
 }

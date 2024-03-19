@@ -4,7 +4,6 @@ using FastWiki.Service.Backgrounds;
 using FastWiki.Service.Service;
 using Masa.Contrib.Authentication.Identity;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.FileProviders;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
@@ -164,11 +163,11 @@ if (app.Environment.IsDevelopment())
     {
         await context!.Database.MigrateAsync();
 
-        // TODO: ´´½¨vector²å¼şÈç¹ûÊı¾İ¿âÃ»ÓĞÔòĞèÒªÌá¹©Ö§³ÖÏòÁ¿µÄÊı¾İ¿â¡£
+        // TODO: åˆ›å»ºvectoræ’ä»¶å¦‚æœæ•°æ®åº“æ²¡æœ‰åˆ™éœ€è¦æä¾›æ”¯æŒå‘é‡çš„æ•°æ®åº“ã€‚
         await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");
     }
 
     #endregion
 }
 
-app.Run();
+await app.RunAsync();
