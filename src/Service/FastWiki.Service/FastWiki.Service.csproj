@@ -40,14 +40,13 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
         <PackageReference Include="SharpToken" Version="1.2.17" />
-        <PackageReference Include="AIDotNet.OpenAI" Version="0.0.4" />
-        <PackageReference Include="AIDotNet.SparkDesk" Version="0.0.4" />
-        <PackageReference Include="AIDotNet.Abstractions" Version="0.0.4" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\..\AIDotNet.API\src\extensions\AIDotNet.OpenAI\AIDotNet.OpenAI.csproj" />
+        <ProjectReference Include="..\..\..\..\AIDotNet.API\src\extensions\AIDotNet.SparkDesk\AIDotNet.SparkDesk.csproj" />
         <ProjectReference Include="..\..\Contracts\FastWiki.Service.Contracts\FastWiki.Service.Contracts.csproj" />
         <ProjectReference Include="..\..\Infrastructure\FastWiki.Infrastructure.Common\FastWiki.Infrastructure.Common.csproj" />
     </ItemGroup>

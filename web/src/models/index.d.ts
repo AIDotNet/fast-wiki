@@ -3,6 +3,7 @@ export interface ChatApplicationDto {
     name: string;
     prompt: string;
     chatModel: string;
+    chatType: string;
     temperature: number;
     maxResponseToken: number;
     template: string;

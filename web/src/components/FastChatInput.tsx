@@ -104,7 +104,6 @@ export default function FastChatInput({
             });
 
             let url;
-            debugger;
 
             if (id) {
                 url = '/v1/chat/completions?chatId=' + application.id + "&chatDialogId=" + dialog.id + "&chatShareId=" + id;

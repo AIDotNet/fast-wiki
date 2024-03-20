@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { ChatApplicationDto } from "../../../models";
 import { PutChatApplications } from "../../../services/ChatApplicationService";
 import { GetWikisList } from "../../../services/WikiService";
+import { GetChatTypes } from "../../../services/ModelService";
 
 interface IAppDetailInfoProps {
     value: ChatApplicationDto
@@ -38,6 +39,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
     if (value === undefined) return null;
 
     const [model, setModel] = useState([] as any[]);
+    const [chatModul, setChatModul] = useState([] as any[]);
     const [wiki, setWiki] = useState([] as any[]);
     const [input,] = useState({
         keyword: '',
@@ -50,6 +52,13 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
             .then((models) => {
                 setModel(models.chatModel.map((item) => {
                     return { label: item.label, value: item.value }
+                }));
+            });
+
+        GetChatTypes()
+            .then((chatModul) => {
+                setChatModul(chatModul.map((item: string) => {
+                    return { label: item, value: item }
                 }));
             });
 
@@ -84,6 +93,26 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                 <span style={{
                     fontSize: 20,
                     marginRight: 20
+                }}>大模型类型</span>
+                <Select
+                    defaultValue={application.chatType}
+                    value={application.chatType}
+                    style={{ width: 380 }}
+                    onChange={(v:any) => {
+                        setApplication({
+                            ...application,
+                            chatType: v
+                        });
+                        console.log(application);
+                    }}
+                    options={chatModul}
+                />
+            </ListItem>
+
+            <ListItem>
+                <span style={{
+                    fontSize: 20,
+                    marginRight: 20
                 }}>对话模型</span>
                 <Select
                     defaultValue={application.chatModel}
@@ -98,12 +127,13 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                     options={model}
                 />
             </ListItem>
+
             <ListItem>
                 <span style={{
                     fontSize: 20,
                     marginRight: 20
                 }}>开场白</span>
-                <textarea value={application?.opener??""}
+                <textarea value={application?.opener ?? ""}
                     onChange={(e) => {
                         setApplication({
                             ...application,

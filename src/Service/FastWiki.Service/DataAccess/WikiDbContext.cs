@@ -1,5 +1,6 @@
 ﻿using FastWiki.Service.Domain.Storage.Aggregates;
 using System.Text.Json;
+using FastWiki.Service.Domain.Model.Aggregates;
 
 namespace FastWiki.Service.DataAccess;
 
@@ -20,6 +21,10 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
     public DbSet<ChatDialogHistory> ChatDialogHistorys { get; set; }
 
     public DbSet<ChatShare> ChatShares { get; set; }
+
+    public DbSet<FastModel> FastModels { get; set; }
+
+    public DbSet<ModelLogger> ModelLoggers { get; set; }
 
     protected override void OnModelCreatingExecuting(ModelBuilder modelBuilder)
     {
@@ -126,6 +131,40 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.HasIndex(x => x.ChatApplicationId);
         });
 
+        modelBuilder.Entity<FastModel>(entity =>
+        {
+            entity.ToTable("wiki-fast-models");
+            entity.HasKey(e => e.Id);
+
+            entity.HasIndex(x => x.Name);
+            entity.HasIndex(x => x.Type);
+            
+            entity.Property(e => e.Name).HasMaxLength(30);
+            entity.Property(e => e.Type).HasMaxLength(100);
+            entity.Property(e => e.Url).HasMaxLength(200);
+            entity.Property(e => e.ApiKey).HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.Models).HasMaxLength(-1);
+
+            entity.Property(x => x.Models)
+                .HasConversion(item => JsonSerializer.Serialize(item, new JsonSerializerOptions()),
+                    item => JsonSerializer.Deserialize<List<string>>(item, new JsonSerializerOptions()));
+        });
+
+        modelBuilder.Entity<ModelLogger>(entity =>
+        {
+            entity.ToTable("wiki-model-logger");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+            entity.HasIndex(x => x.FastModelId);
+            entity.HasIndex(x => x.UserId);
+            entity.HasIndex(x => x.ApplicationId);
+            entity.HasIndex(x => x.ApiKey);
+            entity.HasIndex(x => x.Type);
+            entity.HasIndex(x => x.CreationTime);
+        });
+        
         var user = new User("admin", "admin", "Aa123456",
             "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", "239573049@qq.com", "13049809673", false,
             RoleType.Admin);

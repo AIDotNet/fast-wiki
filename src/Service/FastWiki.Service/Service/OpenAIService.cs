@@ -236,12 +236,13 @@ public static class OpenAIService
             chatApplication.ChatType = OpenAIOptions.ServiceName;
         }
         
-        var chatStream = ModuleService.GetChatService(chatApplication.ChatType);
+        var chatStream = ModelService.GetChatService(chatApplication.ChatType);
 
         var setting = new OpenAIPromptExecutionSettings
         {
             MaxTokens = chatApplication.MaxResponseToken,
             Temperature = chatApplication.Temperature,
+            ModelId = chatApplication.ChatModel,
             ExtensionData = new Dictionary<string, object>()
         };
         setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_KEY, OpenAIOption.ChatToken);
