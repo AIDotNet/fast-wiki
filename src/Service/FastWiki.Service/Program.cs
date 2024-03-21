@@ -1,4 +1,3 @@
-using AIDotNet.OpenAI;
 using AspNetCoreRateLimit;
 using FastWiki.Service;
 using FastWiki.Service.Backgrounds;

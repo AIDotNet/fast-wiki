@@ -4,10 +4,10 @@ using FastWiki.Service.Domain.Model.Repositories;
 
 namespace FastWiki.Service.Application.Model;
 
-public sealed class ModelCommandHandler(IFastModelRepository fastModelRepository)
+public sealed class ModelCommandHandler(IFastModelRepository fastModelRepository, IMapper mapper)
 {
     [EventHandler]
-    public async Task CreateFastModeAsync(CreateFastModeCommand command)
+    public async Task CreateFastModelAsync(CreateFastModelCommand command)
     {
         if (await fastModelRepository.ExistAsync(command.Input.Name))
         {
@@ -24,5 +24,24 @@ public sealed class ModelCommandHandler(IFastModelRepository fastModelRepository
     public async Task RemoveFastModelAsync(RemoveFastModelCommand command)
     {
         await fastModelRepository.RemoveAsync(command.Id);
+    }
+    
+    [EventHandler]
+    public async Task UpdateFastModelAsync(UpdateFastModelCommand command)
+    {
+        var model = mapper.Map<FastModel>(command.Dto);
+        await fastModelRepository.UpdateAsync(model);
+    }
+    
+    [EventHandler]
+    public async Task EnableFastModelAsync(EnableFastModelCommand fastModelCommand)
+    {
+        await fastModelRepository.EnableAsync(fastModelCommand.Id, fastModelCommand.Enable);
+    }
+
+    [EventHandler]
+    public async Task FastModelComputeTokenAsync(FastModelComputeTokenCommand command)
+    {
+        await fastModelRepository.FastModelComputeTokenAsync(command.Id, command.RequestToken, command.CompleteToken);
     }
 }

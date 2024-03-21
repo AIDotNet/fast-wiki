@@ -33,4 +33,28 @@ public interface IFastModelRepository : IRepository<FastModel, string>
     /// <param name="id"></param>
     /// <returns></returns>
     Task<bool> RemoveAsync(string id);
+    
+    /// <summary>
+    /// 修改模型
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    Task UpdateAsync(FastModel model);
+
+    /// <summary>
+    /// 禁用或启用模型
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="enable"></param>
+    /// <returns></returns>
+    Task EnableAsync(string id, bool enable);
+    
+    /// <summary>
+    /// 模型计算token
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="requestToken"></param>
+    /// <param name="completeToken"></param>
+    /// <returns></returns>
+    Task FastModelComputeTokenAsync(string id,int requestToken,int completeToken);
 }

@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using AIDotNet.OpenAI;
+using FastWiki.Service.Application.Model.Commands;
 using FastWiki.Service.Application.Storage.Queries;
 using FastWiki.Service.Contracts.OpenAI;
 using FastWiki.Service.Domain.Storage.Aggregates;
@@ -8,6 +9,7 @@ using FastWiki.Service.Infrastructure;
 using FastWiki.Service.Infrastructure.Helper;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using TokenApi.Service.Exceptions;
 
 namespace FastWiki.Service.Service;
 
@@ -90,7 +92,6 @@ public static class OpenAIService
             await eventBus.PublishAsync(chatApplicationQuery);
 
             chatApplication = chatApplicationQuery?.Result;
-
         }
         else
         {
@@ -179,6 +180,7 @@ public static class OpenAIService
 
                 sourceFile.AddRange(fileQuery.Result);
             }
+
             // 删除最后一个消息
             module.messages.RemoveAt(module.messages.Count - 1);
             module.messages.Add(new ChatCompletionRequestMessage()
@@ -235,8 +237,10 @@ public static class OpenAIService
             // 防止没有设置对话类型
             chatApplication.ChatType = OpenAIOptions.ServiceName;
         }
-        
-        var chatStream = ModelService.GetChatService(chatApplication.ChatType);
+
+        var modelService = context.RequestServices.GetRequiredService<ModelService>();
+
+        var (chatStream, fastModelDto) = await modelService.GetChatService(chatApplication.ChatType);
 
         var setting = new OpenAIPromptExecutionSettings
         {
@@ -245,21 +249,44 @@ public static class OpenAIService
             ModelId = chatApplication.ChatModel,
             ExtensionData = new Dictionary<string, object>()
         };
-        setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_KEY, OpenAIOption.ChatToken);
-        setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_URL, OpenAIOption.ChatEndpoint);
+        setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_KEY, fastModelDto.ApiKey);
+        setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_URL, fastModelDto.Url);
 
 
         var output = new StringBuilder();
-        await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory,setting))
+        try
         {
-            if (item.Content.IsNullOrEmpty())
+            await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory, setting))
             {
-                continue;
-            }
+                if (item.Content.IsNullOrEmpty())
+                {
+                    continue;
+                }
 
-            output.Append(item.Content);
-            await context.WriteOpenAiResultAsync(item.Content, module.model, Guid.NewGuid().ToString("N"),
-                Guid.NewGuid().ToString("N"));
+                output.Append(item.Content);
+                await context.WriteOpenAiResultAsync(item.Content, module.model, Guid.NewGuid().ToString("N"),
+                    Guid.NewGuid().ToString("N"));
+            }
+        }
+        catch (NotModelException notModelException)
+        {
+            await context.WriteEndAsync("未找到模型兼容：" + notModelException.Message);
+            return;
+        }
+        catch (InvalidOperationException invalidOperationException)
+        {
+            await context.WriteEndAsync("对话异常：" + invalidOperationException.Message);
+            return;
+        }
+        catch (ArgumentException argumentException)
+        {
+            await context.WriteEndAsync(argumentException.Message);
+            return;
+        }
+        catch (Exception e)
+        {
+            await context.WriteEndAsync("对话异常：" + e.Message);
+            return;
         }
 
         await context.WriteEndAsync();
@@ -278,12 +305,13 @@ public static class OpenAIService
         await eventBus.PublishAsync(createChatDialogHistoryCommand);
 
         var outputContent = output.ToString();
+        var completeToken = TokenHelper.ComputeToken(outputContent);
 
         var chatDialogHistory = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
         {
             ChatDialogId = chatDialogId,
             Content = outputContent,
-            ExpendToken = TokenHelper.ComputeToken(outputContent),
+            ExpendToken = completeToken,
             Type = ChatDialogHistoryType.Text,
             Current = false,
             SourceFile = sourceFile.Select(x => new SourceFileDto()
@@ -297,6 +325,11 @@ public static class OpenAIService
         await eventBus.PublishAsync(chatDialogHistory);
 
         #endregion
+
+        var fastModelComputeTokenCommand = new FastModelComputeTokenCommand(chatApplication.ChatType, requestToken,
+            completeToken);
+
+        await eventBus.PublishAsync(fastModelComputeTokenCommand);
 
         //对于对话扣款
         if (getAPIKeyChatShareQuery?.Result != null)

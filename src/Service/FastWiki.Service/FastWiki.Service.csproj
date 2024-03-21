@@ -15,6 +15,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AIDotNet.MetaGLM" Version="0.0.5" />
+        <PackageReference Include="AIDotNet.OpenAI" Version="0.0.5" />
+        <PackageReference Include="AIDotNet.SparkDesk" Version="0.0.5" />
         <PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
         <PackageReference Include="Masa.BuildingBlocks.Data.MappingExtensions" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Authentication.Identity" Version="$(MasaFrameworkPackageVersion)" />
@@ -32,8 +35,7 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.3" />
         <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.35.240318.1" />
         <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Postgres" Version="0.35.240318.1" />
-        <PackageReference Include="Microsoft.SemanticKernel" Version="1.6.2" />
-        <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.6.2" />
+        <PackageReference Include="Microsoft.SemanticKernel" Version="1.6.3" />
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.6.2-alpha" />
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.0-Preview.1" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
@@ -45,8 +47,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\..\AIDotNet.API\src\extensions\AIDotNet.OpenAI\AIDotNet.OpenAI.csproj" />
-        <ProjectReference Include="..\..\..\..\AIDotNet.API\src\extensions\AIDotNet.SparkDesk\AIDotNet.SparkDesk.csproj" />
         <ProjectReference Include="..\..\Contracts\FastWiki.Service.Contracts\FastWiki.Service.Contracts.csproj" />
         <ProjectReference Include="..\..\Infrastructure\FastWiki.Infrastructure.Common\FastWiki.Infrastructure.Common.csproj" />
     </ItemGroup>

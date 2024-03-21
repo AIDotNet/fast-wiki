@@ -3,7 +3,7 @@ using FastWiki.Service.Contracts.Model;
 namespace FastWiki.Service.Application.Model.Commands;
 
 /// <summary>
-/// 创建模型
+/// 编辑模型
 /// </summary>
-/// <param name="Input"></param>
-public record CreateFastModeCommand(CreateFastModeInput Input) : Command;
+/// <param name="Dto"></param>
+public record UpdateFastModelCommand(FastModelDto Dto):Command;

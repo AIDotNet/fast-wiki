@@ -1,7 +1,6 @@
 using System.Threading.Channels;
 using FastWiki.Service.Domain.Wikis.Aggregates;
 using FastWiki.Service.Service;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace FastWiki.Service.Backgrounds;
 

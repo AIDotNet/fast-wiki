@@ -4,7 +4,7 @@ using FastWiki.Service.Domain.Model.Repositories;
 
 namespace FastWiki.Service.Application.Model;
 
-public sealed class ModelQueryHandler(IFastModelRepository fastModelRepository)
+public sealed class ModelQueryHandler(IFastModelRepository fastModelRepository, IMapper mapper)
 {
     [EventHandler]
     public async Task GetModelListAsync(GetModelListQuery query)
@@ -15,14 +15,23 @@ public sealed class ModelQueryHandler(IFastModelRepository fastModelRepository)
 
         query.Result = new PaginatedListBase<FastModelDto>
         {
-            Result = models.Select(x => new FastModelDto
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Type = x.Type,
-                Description = x.Description
-            }).ToList(),
+            Result = mapper.Map<List<FastModelDto>>(models),
             Total = count
         };
+    }
+
+    [EventHandler]
+    public async Task GetModelAsync(ChatModelListQuery query)
+    {
+        query.Result =
+            mapper.Map<List<GetFastModelDto>>(
+                (await fastModelRepository.GetListAsync(x => x.Enable == true)).OrderBy(x => x.Order));
+    }
+    
+    [EventHandler]
+    public async Task GetModelInfoAsync(ModelInfoQuery query)
+    {
+        var model = await fastModelRepository.FindAsync(query.Id);
+        query.Result = mapper.Map<FastModelDto>(model);
     }
 }

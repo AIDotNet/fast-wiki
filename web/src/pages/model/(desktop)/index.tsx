@@ -37,7 +37,7 @@ export default function DesktopPage() {
                     width: '260px'
                 }}>
                     <Input value={keyword}
-                        onChange={(e) => setKeyword(e.target.value)}
+                        onChange={(e:any) => setKeyword(e.target.value)}
                         style={{
                             marginRight: '20px',
                             marginTop: '5px'

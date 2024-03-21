@@ -5,47 +5,47 @@ public sealed class FastModel : FullAggregateRoot<string, Guid?>
     public string Name { get; set; }
 
     /// <summary>
-    /// Ä£ĞÍÀàĞÍ
+    /// æ¨¡å‹ç±»å‹
     /// </summary>
-    public string Type { get; set; }
+    public string? Type { get; set; }
 
     /// <summary>
-    /// Ä£ĞÍ´úÀíµØÖ·
+    /// æ¨¡å‹ä»£ç†åœ°å€
     /// </summary>
-    public string Url { get; set; }
+    public string? Url { get; set; }
 
     /// <summary>
-    /// Ä£ĞÍÃÜÔ¿
+    /// æ¨¡å‹å¯†é’¥
     /// </summary>
-    public string ApiKey { get; set; }
+    public string? ApiKey { get; set; }
 
     /// <summary>
-    /// ÃèÊö
+    /// æè¿°
     /// </summary>
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
-    /// AIÖ§³ÖµÄÄ£ĞÍ
+    /// AIæ”¯æŒçš„æ¨¡å‹
     /// </summary>
     public List<string> Models { get; set; } = [];
 
     /// <summary>
-    /// ÓÅÏÈ¼¶
+    /// ä¼˜å…ˆçº§
     /// </summary>
     public int Order { get; set; }
 
     /// <summary>
-    /// ²âÊÔÊ±¼ä
+    /// æµ‹è¯•æ—¶é—´
     /// </summary>
     public long? TestTime { get; set; }
 
     /// <summary>
-    /// ÒÑÏûºÄÅä¶î
+    /// å·²æ¶ˆè€—é…é¢
     /// </summary>
     public long UsedQuota { get; set; }
 
     /// <summary>
-    /// ÆôÓÃ
+    /// å¯ç”¨
     /// </summary>
     public bool Enable { get; private set; }
 
@@ -53,7 +53,7 @@ public sealed class FastModel : FullAggregateRoot<string, Guid?>
     {
     }
 
-    public FastModel(string name, string type, string url, string apiKey, string description, List<string> models,
+    public FastModel(string name, string? type, string? url, string? apiKey, string? description, List<string> models,
         int order)
     {
         Id = Guid.NewGuid().ToString("N");

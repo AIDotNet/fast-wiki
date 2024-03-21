@@ -1,66 +1,71 @@
 import { Modal } from "@lobehub/ui";
 import { Form, Input, Button, message, Select } from 'antd';
 import { useEffect, useState } from "react";
-import { CreateFastModel, GetChatTypes } from "../../../services/ModelService";
+import { GetChatTypes, UpdateFastModel } from "../../../services/ModelService";
 import { getModels } from "../../../store/Model";
 
-interface ICreateModelProps {
+interface IUpdateModelProps {
     visible: boolean;
     onSuccess: any;
     onCancel: any;
+    value?: any;
 }
 
-export default function CreateModel({
+export default function UpdateModel({
     visible,
     onSuccess,
     onCancel,
-}: ICreateModelProps) {
+    value
+}: IUpdateModelProps) {
 
-    const [chatModul, setChatModul] = useState([] as any[]);
+    const [chatModule, setChatModule] = useState([] as any[]);
     const [models, setModels] = useState([] as any[]);
 
     useEffect(() => {
+
         GetChatTypes()
             .then((chatModul) => {
                 const items = chatModul.map((item: string) => {
                     return { label: item, value: item }
                 });
-                setChatModul(items);
+                setChatModule(items);
             });
-            
+
         getModels()
-        .then((models: any) => {
-            const items = models.chatModel.map((item: any) => {
-                return { label: item.label, value: item.value }
-            });
+            .then((models: any) => {
+                const items = models.chatModel.map((item: any) => {
+                    return { label: item.label, value: item.value }
+                });
 
-            models.embeddingModel.map((item: any) => {
-                items.push({ label: item.label, value: item.value })
-            });
+                models.embeddingModel.map((item: any) => {
+                    items.push({ label: item.label, value: item.value })
+                });
 
-            setModels(items);
-        });
+                setModels(items);
+            });
     }, []);
 
+
     return (
-        <Modal open={visible} title="创建模型" 
+        <Modal open={visible} title="修改模型"
             footer={null}
             onCancel={onCancel}
-            >
+        >
             <Form
                 name="basic"
                 onFinish={async (values: any) => {
                     console.log(values);
-                    if(values.type === undefined || values.type === '') {
+                    if (values.type === undefined || values.type === '') {
                         message.error('模型类型是必须的');
                         return;
                     }
                     try {
-                        await CreateFastModel(values)
-                        message.success('创建成功');
+                        values.id = value.id;
+                        await UpdateFastModel(values);
+                        message.success('编辑成功');
                         onSuccess();
                     } catch (error) {
-                        message.error('创建失败');
+                        message.error('编辑失败');
                     }
                 }}
                 onFinishFailed={(errorInfo: any) => {
@@ -71,25 +76,28 @@ export default function CreateModel({
                 <Form.Item
                     label="模型名称"
                     name="name"
+                    initialValue={value?.name}
                     rules={[{ required: true, message: '请输入您的模型名称' }]}
                 >
                     <Input />
                 </Form.Item>
                 <Form.Item
                     label="模型类型"
-                    rules={[{ required: true, message: '模型类型是必须的' }]}
                     name="type"
+                    initialValue={value?.type}
+                    rules={[{ required: true, message: '模型类型是必须的' }]}
                 >
                     <Select
                         title="请选择您的模型类型"
                         style={{
                             width: '100%',
                         }}
-                        options={chatModul}
+                        options={chatModule}
                     />
                 </Form.Item>
                 <Form.Item
                     label="模型地址"
+                    initialValue={value?.url}
                     name="url"
                 >
                     <Input />
@@ -108,6 +116,7 @@ export default function CreateModel({
                 </Form.Item>
                 <Form.Item
                     label="模型描述"
+                    initialValue={value?.description}
                     name="description"
                     rules={[{ required: true, message: '描述是必须的' }]}
                 >
@@ -116,15 +125,15 @@ export default function CreateModel({
                 <Form.Item
                     label="模型优先级"
                     name="order"
-                    initialValue={-1}
+                    initialValue={value?.order}
                 >
-                    <Input 
+                    <Input
                         type='number' />
                 </Form.Item>
 
                 <Form.Item>
                     <Button block type="primary" htmlType="submit">
-                        创建
+                        保存编辑
                     </Button>
                 </Form.Item>
             </Form>

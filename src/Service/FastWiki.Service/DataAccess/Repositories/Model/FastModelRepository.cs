@@ -34,6 +34,33 @@ public sealed class FastModelRepository : Repository<WikiDbContext, FastModel, s
         return result > 0;
     }
 
+    public async Task UpdateAsync(FastModel model)
+    {
+        await Context.FastModels.Where(x => x.Id == model.Id)
+            .ExecuteUpdateAsync(item =>
+                item.SetProperty(item => item.Name, model.Name)
+                    .SetProperty(item => item.Type, model.Type)
+                    .SetProperty(item => item.Url, model.Url)
+                    .SetProperty(item => item.ApiKey, model.ApiKey)
+                    .SetProperty(item => item.Description, model.Description)
+                    .SetProperty(item => item.Models, model.Models)
+                    .SetProperty(item => item.Order, model.Order));
+    }
+
+    public async Task EnableAsync(string id, bool enable)
+    {
+        await Context.FastModels.Where(x => x.Id == id)
+            .ExecuteUpdateAsync(item => item.SetProperty(x => x.Enable, enable));
+    }
+
+    public async Task FastModelComputeTokenAsync(string id, int requestToken, int completeToken)
+    {
+        var total = completeToken + requestToken;
+        await Context.FastModels.Where(x => x.Id == id)
+            .ExecuteUpdateAsync(item =>
+                item.SetProperty(x => x.UsedQuota, x => x.UsedQuota + total));
+    }
+
     private IQueryable<FastModel> CreateModelQuery(string keyword)
     {
         var query = Context.FastModels.AsQueryable();

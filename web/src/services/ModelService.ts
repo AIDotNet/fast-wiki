@@ -1,4 +1,5 @@
-import { get, postJson } from '../utils/fetch';
+import { post } from './../utils/fetch';
+import { del, get, postJson, putJson } from '../utils/fetch';
 
 import { config } from '../config';
 
@@ -36,5 +37,30 @@ export function CreateFastModel(data: any) {
  * @param id 
  */
 export function DeleteFastModel(id: string) {
-    return get(`${prefix}/FastModel/${id}`);
+    return del(`${prefix}/FastModel/${id}`);
+}
+
+/**
+ * 更新模型
+ * @param data 
+ */
+export function UpdateFastModel(data: any) {
+    return putJson(`${prefix}/FastModel`, data);
+}
+
+/**
+ * 启用或禁用模型
+ * @param id 
+ * @param enable 
+ */
+export function EnableFastModel(id: string, enable: boolean) {
+    return post(`${prefix}/EnableFastModel/${id}?enable=${enable}`);
+}
+
+/**
+ * 获取对话模型列表
+ * @returns 
+ */
+export function ChatModelList() {
+    return get(`${prefix}/ChatModelList`);
 }

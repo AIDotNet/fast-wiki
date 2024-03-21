@@ -1,10 +1,10 @@
 ﻿using AIDotNet.Abstractions;
+using AIDotNet.MetaGLM;
 using AIDotNet.OpenAI;
 using AIDotNet.SparkDesk;
 using FastWiki.Service.Application.Model.Commands;
 using FastWiki.Service.Application.Model.Queries;
 using FastWiki.Service.Contracts.Model;
-using FastWiki.Service.Domain.Model.Aggregates;
 using Constant = FastWiki.Service.Contracts.Constant;
 
 namespace FastWiki.Service.Service;
@@ -19,6 +19,11 @@ public sealed class ModelService : ApplicationService<ModelService>
         }));
 
         ChatServices.Add(SparkDeskOptions.ServiceName, new SparkDeskService(new SparkDeskOptions()));
+
+        ChatServices.Add(MetaGLMOptions.ServiceName, new MetaGLMService(new MetaGLMOptions()
+        {
+            Client = new MetaGLMClientV4()
+        }));
     }
 
     /// <summary>
@@ -30,14 +35,17 @@ public sealed class ModelService : ApplicationService<ModelService>
 
     private static readonly Dictionary<string, IADNChatCompletionService> ChatServices = new();
 
-    public static IADNChatCompletionService GetChatService(string serviceName)
+    public async ValueTask<(IADNChatCompletionService, FastModelDto)> GetChatService(string serviceId)
     {
-        if (ChatServices.TryGetValue(serviceName, out var service))
+        var query = new ModelInfoQuery(serviceId);
+        await EventBus.PublishAsync(query);
+
+        if (ChatServices.TryGetValue(query.Result.Type, out var service))
         {
-            return service;
+            return (service, query.Result);
         }
 
-        throw new NotSupportedException($"不支持的对话类型：{serviceName}");
+        throw new NotSupportedException($"不支持的对话类型：{serviceId}");
     }
 
     /// <summary>
@@ -51,12 +59,12 @@ public sealed class ModelService : ApplicationService<ModelService>
     public async Task<PaginatedListBase<FastModelDto>> GetModelListAsync(string keyword, int page, int pageSize)
     {
         var query = new GetModelListQuery(keyword, page, pageSize);
-        
+
         await EventBus.PublishAsync(query);
-        
+
         return query.Result;
     }
-    
+
     /// <summary>
     /// 创建模型
     /// </summary>
@@ -64,11 +72,11 @@ public sealed class ModelService : ApplicationService<ModelService>
     [Authorize(Roles = Constant.Role.Admin)]
     public async Task CreateFastModelAsync(CreateFastModeInput input)
     {
-        var command = new CreateFastModeCommand(input);
-        
+        var command = new CreateFastModelCommand(input);
+
         await EventBus.PublishAsync(command);
     }
-    
+
     /// <summary>
     /// 删除指定模型
     /// </summary>
@@ -77,7 +85,46 @@ public sealed class ModelService : ApplicationService<ModelService>
     public async Task RemoveFastModelAsync(string id)
     {
         var command = new RemoveFastModelCommand(id);
-        
+
         await EventBus.PublishAsync(command);
+    }
+
+    /// <summary>
+    /// 修改模型
+    /// </summary>
+    /// <param name="dto"></param>
+    [Authorize(Roles = Constant.Role.Admin)]
+    public async Task UpdateFastModelAsync(FastModelDto dto)
+    {
+        var command = new UpdateFastModelCommand(dto);
+
+        await EventBus.PublishAsync(command);
+    }
+
+    /// <summary>
+    /// 禁用或启用模型
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="enable"></param>
+    [Authorize(Roles = Constant.Role.Admin)]
+    public async Task EnableFastModelAsync(string id, bool enable)
+    {
+        var command = new EnableFastModelCommand(id, enable);
+
+        await EventBus.PublishAsync(command);
+    }
+
+    /// <summary>
+    /// 获取可绑定的模型列表
+    /// </summary>
+    /// <returns></returns>
+    [Authorize]
+    public async Task<List<GetFastModelDto>> GetChatModelListAsync()
+    {
+        var query = new ChatModelListQuery();
+
+        await EventBus.PublishAsync(query);
+
+        return query.Result;
     }
 }
