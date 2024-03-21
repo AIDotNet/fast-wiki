@@ -123,7 +123,7 @@ public static class OpenAIService
         // 如果为空则不使用知识库
         if (chatApplication.WikiIds.Count != 0)
         {
-            var memoryServerless = context.RequestServices.GetRequiredService<MemoryServerless>();
+            var memoryServerless = context.RequestServices.GetRequiredService<WikiMemoryService>().CreateMemoryServerless();
 
             var filters = chatApplication.WikiIds
                 .Select(chatApplication => new MemoryFilter().ByTag("wikiId", chatApplication.ToString())).ToList();
