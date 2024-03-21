@@ -242,7 +242,7 @@ export default function DesktopLayout() {
             </div>
             <Divider />
 
-            <Flexbox  style={{ flex: 1 }}>
+            <Flexbox style={{ overflow: 'auto', flex: 1 }}>
                 <ChatAppList setHistory={(v: any[]) => {
                     setHistory(v);
                 }} history={history} application={application} />

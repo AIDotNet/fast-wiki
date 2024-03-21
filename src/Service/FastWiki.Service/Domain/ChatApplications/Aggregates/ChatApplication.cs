@@ -101,4 +101,9 @@ FastWiki本项目是一个高性能、基于最新技术栈的知识库系统，
     /// 显示引用文件
     /// </summary>
     public bool ShowSourceFile { get; set; }
+
+    /// <summary>
+    /// AI模型类型
+    /// </summary>
+    public string ChatType { get; set; }
 }

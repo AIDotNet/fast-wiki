@@ -3,6 +3,7 @@ using System;
 using FastWiki.Service.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FastWiki.Service.Migrations
 {
     [DbContext(typeof(WikiDbContext))]
-    partial class WikiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240319175703_AddChatType")]
+    partial class AddChatType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -242,133 +245,6 @@ namespace FastWiki.Service.Migrations
                     b.ToTable("wiki-chat-share", (string)null);
                 });
 
-            modelBuilder.Entity("FastWiki.Service.Domain.Model.Aggregates.FastModel", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ApiKey")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid?>("Creator")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<bool>("Enable")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Models")
-                        .IsRequired()
-                        .HasMaxLength(-1)
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("ModificationTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid?>("Modifier")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<long?>("TestTime")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Type")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Url")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<long>("UsedQuota")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name");
-
-                    b.HasIndex("Type");
-
-                    b.ToTable("wiki-fast-models", (string)null);
-                });
-
-            modelBuilder.Entity("FastWiki.Service.Domain.Model.Aggregates.ModelLogger", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("ApiKey")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ApplicationId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("ComplementCount")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FastModelId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Model")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("PromptCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApiKey");
-
-                    b.HasIndex("ApplicationId");
-
-                    b.HasIndex("CreationTime");
-
-                    b.HasIndex("FastModelId");
-
-                    b.HasIndex("Type");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("wiki-model-logger", (string)null);
-                });
-
             modelBuilder.Entity("FastWiki.Service.Domain.Storage.Aggregates.FileStorage", b =>
                 {
                     b.Property<long>("Id")
@@ -481,19 +357,19 @@ namespace FastWiki.Service.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("289b14a4-a5e4-409f-97ec-049313593610"),
+                            Id = new Guid("a899e701-4d58-4809-843f-a024e3bf629c"),
                             Account = "admin",
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                            CreationTime = new DateTime(2024, 3, 21, 14, 11, 35, 212, DateTimeKind.Utc).AddTicks(3429),
+                            CreationTime = new DateTime(2024, 3, 19, 17, 57, 2, 871, DateTimeKind.Utc).AddTicks(3601),
                             Email = "239573049@qq.com",
                             IsDeleted = false,
                             IsDisable = false,
-                            ModificationTime = new DateTime(2024, 3, 21, 14, 11, 35, 212, DateTimeKind.Utc).AddTicks(3431),
+                            ModificationTime = new DateTime(2024, 3, 19, 17, 57, 2, 871, DateTimeKind.Utc).AddTicks(3603),
                             Name = "admin",
-                            Password = "75746e8a1cb14fed92c6688de29bd450",
+                            Password = "2f204309fb0afa4c2bdba7b2904ea10e",
                             Phone = "13049809673",
                             Role = 1,
-                            Salt = "10604d18cf8e4475a622859a84ed5077"
+                            Salt = "ab3b086ec59a45cfbf65398ad8f64fdb"
                         });
                 });
 

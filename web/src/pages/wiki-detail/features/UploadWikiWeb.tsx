@@ -1,5 +1,5 @@
 
-import { Button, Steps, Upload, UploadProps, Table, Progress, Radio, Input, message, MenuProps, Dropdown } from 'antd';
+import { Button, Steps, Radio, Input, message, } from 'antd';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { CreateWikiDetailWebPageInput, ProcessMode, TrainingPattern } from '../../../models/index.d';

@@ -170,11 +170,14 @@ export default function DesktopLayout() {
     >
         <DraggablePanel
             placement="left"
+            mode="fixed"
             expand={expanded}
-            onExpandChange={(v)=>{
+            resize={false}
+            pin={true}
+            minWidth={0}
+            showHandlerWhenUnexpand={true}
+            onExpandChange={(v) => {
                 setExpanded(v);
-                console.log(v,expanded);
-                
             }}
         >
             <DialogList>
@@ -207,7 +210,7 @@ export default function DesktopLayout() {
 
             </DialogList>
         </DraggablePanel>
-        <Flexbox style={{ height: '100vh', position: 'relative',flex: 1 }}>
+        <Flexbox style={{ height: '100vh', position: 'relative', width: '100%' }}>
             <div style={{ height: 60 }}>
                 <div style={{
                     fontSize: 20,
@@ -219,8 +222,8 @@ export default function DesktopLayout() {
                 </div>
             </div>
             <Divider />
-            
-            <Flexbox  style={{ flex: 1 }}>
+
+            <Flexbox style={{ overflow: 'auto', flex: 1 }}>
                 <ChatAppList setHistory={(v: any[]) => {
                     setHistory(v);
                 }} history={history} application={application} />
