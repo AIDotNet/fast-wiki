@@ -3,6 +3,7 @@ using System;
 using FastWiki.Service.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FastWiki.Service.Migrations
 {
     [DbContext(typeof(WikiDbContext))]
-    partial class WikiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240320172045_AddFastModel_Logger")]
+    partial class AddFastModel_Logger
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -248,6 +251,7 @@ namespace FastWiki.Service.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("ApiKey")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -258,6 +262,7 @@ namespace FastWiki.Service.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
@@ -290,10 +295,12 @@ namespace FastWiki.Service.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Type")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Url")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
@@ -481,19 +488,19 @@ namespace FastWiki.Service.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("289b14a4-a5e4-409f-97ec-049313593610"),
+                            Id = new Guid("1bca921f-0f35-42e5-8cef-c530e36c8f54"),
                             Account = "admin",
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                            CreationTime = new DateTime(2024, 3, 21, 14, 11, 35, 212, DateTimeKind.Utc).AddTicks(3429),
+                            CreationTime = new DateTime(2024, 3, 20, 17, 20, 45, 551, DateTimeKind.Utc).AddTicks(5537),
                             Email = "239573049@qq.com",
                             IsDeleted = false,
                             IsDisable = false,
-                            ModificationTime = new DateTime(2024, 3, 21, 14, 11, 35, 212, DateTimeKind.Utc).AddTicks(3431),
+                            ModificationTime = new DateTime(2024, 3, 20, 17, 20, 45, 551, DateTimeKind.Utc).AddTicks(5538),
                             Name = "admin",
-                            Password = "75746e8a1cb14fed92c6688de29bd450",
+                            Password = "22cf0ff8fc2d1a8c008cbbdad311ed4a",
                             Phone = "13049809673",
                             Role = 1,
-                            Salt = "10604d18cf8e4475a622859a84ed5077"
+                            Salt = "19520e9012974aa7ad93a908f373a81e"
                         });
                 });
 

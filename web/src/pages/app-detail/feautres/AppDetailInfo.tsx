@@ -1,10 +1,10 @@
 import { memo, useEffect, useState } from "react";
-import { getModels } from "../../../store/Model";
 import { Select, Row, Checkbox, Button, Collapse, Col, Slider, message } from 'antd';
 import styled from 'styled-components';
 import { ChatApplicationDto } from "../../../models";
 import { PutChatApplications } from "../../../services/ChatApplicationService";
 import { GetWikisList } from "../../../services/WikiService";
+import { ChatModelList } from "../../../services/ModelService";
 
 interface IAppDetailInfoProps {
     value: ChatApplicationDto
@@ -37,7 +37,9 @@ const ListItem = styled.div`
 const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
     if (value === undefined) return null;
 
-    const [model, setModel] = useState([] as any[]);
+    const [chatModule, setChatModule] = useState([] as any[]);
+    const [chatModelType, setChatModelType] = useState([] as any[]);
+    const [selectChatModel, setSelectChatModel] = useState([] as any[]);
     const [wiki, setWiki] = useState([] as any[]);
     const [input,] = useState({
         keyword: '',
@@ -46,10 +48,11 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
     } as any);
 
     useEffect(() => {
-        getModels()
-            .then((models) => {
-                setModel(models.chatModel.map((item) => {
-                    return { label: item.label, value: item.value }
+        ChatModelList()
+            .then((chatModul) => {
+                setChatModelType(chatModul);
+                setChatModule(chatModul.map((item: any) => {
+                    return { label: item.name, value: item.id }
                 }));
             });
 
@@ -58,7 +61,6 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
     }, []);
 
     function loadingWiki() {
-        // TODO: 暂时写死
         GetWikisList(input.keyword, input.page, 100)
             .then((wiki) => {
                 setWiki(wiki.result);
@@ -71,6 +73,15 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
         setApplication(value);
     }, [value]);
 
+    useEffect(() => {
+        const models = chatModelType.find((item: any) => item.id === application.chatType);
+        if (models?.models) {
+            setSelectChatModel(models.models.map((item: any) => {
+                return { label: item, value: item }
+            }))
+        }
+    }, [application,chatModelType]);
+
     function save() {
         PutChatApplications(application)
             .then(() => {
@@ -80,6 +91,29 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
 
     return (
         <Container>
+            <ListItem>
+                <span style={{
+                    fontSize: 20,
+                    marginRight: 20
+                }}>大模型类型</span>
+                <Select
+                    defaultValue={application.chatType}
+                    value={application.chatType}
+                    style={{ width: 380 }}
+                    onChange={(v: any) => {
+                        const models = chatModelType.find((item) => item.id === v);
+                        setApplication({
+                            ...application,
+                            chatType: v,
+                        });
+                        setSelectChatModel(models.models.map((item: any) => {
+                            return { label: item.name, value: item.id }
+                        }))
+                    }}
+                    options={chatModule}
+                />
+            </ListItem>
+
             <ListItem>
                 <span style={{
                     fontSize: 20,
@@ -95,15 +129,16 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                             chatModel: v
                         });
                     }}
-                    options={model}
+                    options={selectChatModel}
                 />
             </ListItem>
+
             <ListItem>
                 <span style={{
                     fontSize: 20,
                     marginRight: 20
                 }}>开场白</span>
-                <textarea value={application?.opener??""}
+                <textarea value={application?.opener ?? ""}
                     onChange={(e) => {
                         setApplication({
                             ...application,

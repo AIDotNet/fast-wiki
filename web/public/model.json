@@ -29,12 +29,16 @@
       "value": "gpt-3.5-turbo-0125"
     },
     {
-      "label": "SparkDesk-v3.0",
-      "value": "SparkDesk-v3.0"
+      "label": "SparkDesk-v1.5",
+      "value": "SparkDesk-v1.5"
     },
     {
-      "label": "SparkDesk-v2.0",
-      "value": "SparkDesk-v2.0"
+      "label": "SparkDesk-v2.1",
+      "value": "SparkDesk-v2.1"
+    },
+    {
+      "label": "SparkDesk-v3.1",
+      "value": "SparkDesk-v3.1"
     },
     {
       "label": "SparkDesk-v3.5",

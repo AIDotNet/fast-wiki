@@ -10,9 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution items", "solution 
 		Directory.Build.props = Directory.Build.props
 		docker-compose.yml = docker-compose.yml
 		README.md = README.md
-		docker-compose-blazor.yml = docker-compose-blazor.yml
 		.dockerignore = .dockerignore
 		.gitignore = .gitignore
+		NuGet.config = NuGet.config
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{789CE025-90BF-4A37-B13A-9E6CFE9F7F4C}"
