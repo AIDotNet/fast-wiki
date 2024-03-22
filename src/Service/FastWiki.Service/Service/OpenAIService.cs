@@ -181,13 +181,16 @@ public static class OpenAIService
                 sourceFile.AddRange(fileQuery.Result);
             }
 
-            // 删除最后一个消息
-            module.messages.RemoveAt(module.messages.Count - 1);
-            module.messages.Add(new ChatCompletionRequestMessage()
+            if (!prompt.IsNullOrEmpty())
             {
-                content = prompt,
-                role = "user"
-            });
+                // 删除最后一个消息
+                module.messages.RemoveAt(module.messages.Count - 1);
+                module.messages.Add(new ChatCompletionRequestMessage()
+                {
+                    content = prompt,
+                    role = "user"
+                });
+            }
         }
 
         // 添加用户输入，并且计算请求token数量
