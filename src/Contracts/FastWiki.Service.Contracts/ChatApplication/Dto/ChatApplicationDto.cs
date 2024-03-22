@@ -67,4 +67,9 @@ public class ChatApplicationDto
     /// 匹配相似度
     /// </summary>
     public double Relevancy { get; set; } = 0.4;
+
+    /// <summary>
+    /// AI模型类型
+    /// </summary>
+    public string ChatType { get; set; }
 }

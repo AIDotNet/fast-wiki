@@ -11,6 +11,7 @@ import CreateDialog from "../feautres/CreateDialog";
 import { generateRandomString } from "../../../utils/stringHelper";
 import ChatAppList from "../../../components/ChatAppList";
 import FastChatInput from "../../../components/FastChatInput";
+import { isMobileDevice } from "../../../components/ResponsiveIndex";
 
 const DialogList = styled.div`
     margin-top: 8px;
@@ -55,7 +56,6 @@ export default function DesktopLayout() {
         guestId = generateRandomString(10)
         localStorage.setItem('ChatShare', guestId)
     }
-    // const navigate = useNavigate();
     const [application, setApplication] = useState(null as any);
     const [dialogs, setDialogs] = useState([] as any[]);
     const [createDialogVisible, setCreateDialogVisible] = useState(false);
@@ -74,8 +74,6 @@ export default function DesktopLayout() {
 
     async function loadingApplication() {
         const app = await GetChatShareApplication(id as any);
-        console.log(app);
-        
         setApplication(app)
     }
 
@@ -153,6 +151,7 @@ export default function DesktopLayout() {
 
     useEffect(() => {
         loadingDialogs();
+        setExpanded(!isMobileDevice());
     }, []);
 
 
@@ -170,10 +169,16 @@ export default function DesktopLayout() {
         width={'100%'}
     >
         <DraggablePanel
-            mode="fixed"
             placement="left"
+            mode="fixed"
             expand={expanded}
-            onExpandChange={(v)=>setExpanded(v)}
+            resize={false}
+            pin={true}
+            minWidth={0}
+            showHandlerWhenUnexpand={true}
+            onExpandChange={(v) => {
+                setExpanded(v);
+            }}
         >
             <DialogList>
                 {
@@ -217,9 +222,20 @@ export default function DesktopLayout() {
                 </div>
             </div>
             <Divider />
-            <ChatAppList history={history} setHistory={(v: any[]) => setHistory(v)} application={application} id={id} />
-            <Divider />
-            <FastChatInput history={history} setHistory={(v: any[]) => setHistory(v)} dialog={dialog} application={application} id={id} />
+
+            <Flexbox style={{ overflow: 'auto', flex: 1 }}>
+                <ChatAppList setHistory={(v: any[]) => {
+                    setHistory(v);
+                }} history={history} application={application} />
+            </Flexbox>
+            <DraggablePanel style={{
+                height: '100%'
+            }} maxHeight={600} minHeight={180} placement='bottom'>
+                <FastChatInput dialog={dialog} application={application} setHistory={(v: any[]) => {
+                    setHistory(v);
+                }} history={history} />
+            </DraggablePanel>
+
             <CreateDialog chatId={guestId} visible={createDialogVisible} id={application?.id} type={1} onClose={() => {
                 setCreateDialogVisible(false);
                 loadingDialogs();

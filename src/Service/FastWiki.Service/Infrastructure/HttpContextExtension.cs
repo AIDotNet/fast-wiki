@@ -68,10 +68,13 @@ public static class HttpContextExtension
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         }) + "\n\n", Encoding.UTF8);
         await context.Response.Body.FlushAsync();
-        await context.Response.WriteAsync("data: [DONE]\n\n");
-        await context.Response.Body.FlushAsync();
+        await context.WriteEndAsync();
     }
 
+    /// <summary>
+    /// Êä³ö½áÊø
+    /// </summary>
+    /// <param name="context"></param>
     public static async Task WriteEndAsync(this HttpContext context)
     {
         await context.Response.WriteAsync("data: [DONE]\n\n");

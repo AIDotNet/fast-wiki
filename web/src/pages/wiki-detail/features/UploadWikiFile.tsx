@@ -83,7 +83,7 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                     key: '1',
                     label: '删除',
                     onClick: () => {
-                        setFileList(fileList.filter((item) => item !== item));
+                        setFileList(fileList.filter((i) => i !== item));
                     }
                 })
                 return (

@@ -11,7 +11,7 @@ namespace FastWiki.Service.Service;
 /// </summary>
 public sealed class WikiMemoryService : ISingletonDependency
 {
-    private static readonly OpenAIHttpClientHandler HttpClientHandler = new();
+    private static readonly OpenAiHttpClientHandler HttpClientHandler = new();
 
     /// <summary>
     /// 创建知识库内存服务

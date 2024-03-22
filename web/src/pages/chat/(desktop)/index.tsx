@@ -241,13 +241,19 @@ export default function DesktopLayout() {
                 </div>
             </div>
             <Divider />
-            <ChatAppList setHistory={(v: any[]) => {
-                setHistory(v);
-            }} history={history} application={application} />
-            <Divider />
-            <FastChatInput dialog={dialog} application={application} setHistory={(v: any[]) => {
-                setHistory(v);
-            }} history={history} />
+
+            <Flexbox style={{ overflow: 'auto', flex: 1 }}>
+                <ChatAppList setHistory={(v: any[]) => {
+                    setHistory(v);
+                }} history={history} application={application} />
+            </Flexbox>
+            <DraggablePanel style={{
+                height: '100%'
+            }} maxHeight={600} minHeight={180}  placement='bottom'>
+                <FastChatInput dialog={dialog} application={application} setHistory={(v: any[]) => {
+                    setHistory(v);
+                }} history={history} />
+            </DraggablePanel>
             <CreateDialog visible={createDialogVisible} id={application?.id} type={0} onClose={() => {
                 setCreateDialogVisible(false);
                 loadingDialogs();

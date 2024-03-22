@@ -6,6 +6,8 @@ public class UpdateChatApplicationInput
 
     public string Name { get; set; }
 
+    public string ChatType { get; set; }
+    
     /// <summary>
     /// 提示词
     /// </summary>
