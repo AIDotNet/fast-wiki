@@ -62,6 +62,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         await EventBus.PublishAsync(command);
     }
 
+    [Authorize]
     public async Task CreateWikiDetailWebPageInputAsync(CreateWikiDetailWebPageInput input)
     {
         var command = new CreateWikiDetailWebPageCommand(input);
@@ -69,6 +70,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         await EventBus.PublishAsync(command);
     }
 
+    [Authorize]
     public async Task CreateWikiDetailDataAsync(CreateWikiDetailDataInput input)
     {
         var command = new CreateWikiDetailDataCommand(input);
@@ -125,6 +127,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         return query.Result;
     }
 
+    [Authorize]
     public async Task RemoveDetailsVectorAsync(string id)
     {
         var command = new RemoveDetailsVectorCommand(System.Web.HttpUtility.UrlDecode(id));
@@ -132,9 +135,17 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
         await EventBus.PublishAsync(command);
     }
 
+    [Authorize]
     public async Task RetryVectorDetailAsync(long id)
     {
         var command = new RetryVectorDetailCommand(id);
         await EventBus.PublishAsync(command);
+    }
+
+    [Authorize]
+    public Task DetailsRenameNameAsync(long id, string name)
+    {
+        var command = new DetailsRenameNameCommand(id, name);
+        return EventBus.PublishAsync(command);
     }
 }

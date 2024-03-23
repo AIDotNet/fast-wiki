@@ -148,4 +148,10 @@ public sealed class WikiCommandHandler(
             FileId = wikiDetail.FileId,
         });
     }
+    
+    [EventHandler]
+    public async Task DetailsRenameNameAsync(DetailsRenameNameCommand command)
+    {
+        await wikiRepository.DetailsRenameNameAsync(command.Id, command.Name);
+    }
 }

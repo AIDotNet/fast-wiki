@@ -116,4 +116,12 @@ public interface IWikiService
     /// <param name="id"></param>
     /// <returns></returns>
     Task RetryVectorDetailAsync(long id);
+    
+    /// <summary>
+    /// 修改知识库详情名称
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    Task DetailsRenameNameAsync(long id, string name);
 }

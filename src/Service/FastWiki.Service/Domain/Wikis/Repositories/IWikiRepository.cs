@@ -100,4 +100,6 @@ public interface IWikiRepository : IRepository<Wiki, long>
     /// <param name="id"></param>
     /// <returns></returns>
     Task RemoveDetailsVectorAsync(string index, string id);
+    
+    Task DetailsRenameNameAsync(long id, string name);
 }

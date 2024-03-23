@@ -1,6 +1,6 @@
 import { Table, Button, Dropdown, MenuProps, message, Select } from 'antd';
 import { useEffect, useState } from 'react';
-import { DeleteWikiDetails, GetWikiDetailsList, RetryVectorDetail } from '../../../services/WikiService';
+import { DeleteWikiDetails, DetailsRenameName, GetWikiDetailsList, RetryVectorDetail } from '../../../services/WikiService';
 import WikiDetailFile from './WikiDetailFile';
 import { WikiQuantizationState } from '../../../models/index.d';
 
@@ -11,11 +11,39 @@ interface IWikiDataProps {
 
 export default function WikiData({ id, onChagePath }: IWikiDataProps) {
 
+
     const columns = [
         {
             title: '文件名',
             dataIndex: 'fileName',
             key: 'fileName',
+            render: (text: string, item: any) => {
+                return item.isedit ? <input
+                    autoFocus
+                    style={{
+                        width: '100%',
+                        border: 'none',
+                        outline: 'none',
+                        background: 'transparent',
+                        fontSize: 14
+                    }}
+                    onBlur={async (el) => {
+                        item.isedit = false;
+                        if (el.target.value !== text) {
+                            item.fileName = el.target.value;
+                        }
+                        setData([...data]);
+
+                        try {
+                            await DetailsRenameName(item.id, el.target.value);
+                            message.success('修改成功');
+                        } catch (error) {
+                            message.error('修改失败');
+                        }
+                    }}
+                    defaultValue={text}
+                ></input> : <span onDoubleClick={() => handleDoubleClick(item)}>{text}</span>;
+            },
         },
         {
             title: '索引数量',
@@ -139,6 +167,11 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
         },
     ];
 
+    function handleDoubleClick(item: any) {
+        item.isedit = true;
+        // 修改更新
+        setData([...data]);
+    }
 
     async function RemoveDeleteWikiDetails(id: string) {
         try {
