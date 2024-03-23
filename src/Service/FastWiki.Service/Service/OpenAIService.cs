@@ -244,6 +244,18 @@ public static class OpenAIService
         var modelService = context.RequestServices.GetRequiredService<ModelService>();
 
         var (chatStream, fastModelDto) = await modelService.GetChatService(chatApplication.ChatType);
+        
+        if(fastModelDto.Enable != true)
+        {
+            await context.WriteEndAsync("模型未启用");
+            return;
+        }
+        
+        if(fastModelDto.Models.Any(x=>x == chatApplication.ChatModel) == false)
+        {
+            await context.WriteEndAsync($"模型渠道并未找到 {chatApplication.ChatModel} 模型的支持！");
+            return;
+        }
 
         var setting = new OpenAIPromptExecutionSettings
         {
@@ -252,13 +264,16 @@ public static class OpenAIService
             ModelId = chatApplication.ChatModel,
             ExtensionData = new Dictionary<string, object>()
         };
+        
         setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_KEY, fastModelDto.ApiKey);
         setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_URL, fastModelDto.Url);
 
-
+        var responseId = Guid.NewGuid().ToString("N");
+        var requestId = Guid.NewGuid().ToString("N");
         var output = new StringBuilder();
         try
         {
+            
             await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory, setting))
             {
                 if (item.Content.IsNullOrEmpty())
@@ -267,8 +282,8 @@ public static class OpenAIService
                 }
 
                 output.Append(item.Content);
-                await context.WriteOpenAiResultAsync(item.Content, module.model, Guid.NewGuid().ToString("N"),
-                    Guid.NewGuid().ToString("N"));
+                await context.WriteOpenAiResultAsync(item.Content, module.model, requestId,
+                    responseId);
             }
         }
         catch (NotModelException notModelException)
@@ -299,6 +314,7 @@ public static class OpenAIService
         var createChatDialogHistoryCommand = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
         {
             ChatDialogId = chatDialogId,
+            Id = requestId,
             Content = question,
             ExpendToken = requestToken,
             Type = ChatDialogHistoryType.Text,
@@ -314,10 +330,11 @@ public static class OpenAIService
         {
             ChatDialogId = chatDialogId,
             Content = outputContent,
+            Id = responseId,
             ExpendToken = completeToken,
             Type = ChatDialogHistoryType.Text,
             Current = false,
-            SourceFile = sourceFile.Select(x => new SourceFileDto()
+            ReferenceFile = sourceFile.Select(x => new SourceFileDto()
             {
                 Name = x.Name,
                 FileId = x.Id.ToString(),

@@ -2,6 +2,8 @@ namespace FastWiki.Service.Contracts.ChatApplication.Dto;
 
 public sealed class CreateChatDialogHistoryInput 
 {
+    public string? Id { get; set; }
+    
     /// <summary>
     /// 对话id
     /// </summary>
@@ -30,5 +32,5 @@ public sealed class CreateChatDialogHistoryInput
     /// <summary>
     /// 源文件引用
     /// </summary>
-    public List<SourceFileDto> SourceFile { get; set; } = [];
+    public List<SourceFileDto> ReferenceFile { get; set; } = [];
 }

@@ -1,4 +1,4 @@
-import { Footer, FooterProps, Header, Layout, Logo, LogoProps, useControls, useCreateStore } from '@lobehub/ui';
+import { Footer, FooterProps, Header, Layout, Avatar, LogoProps, useControls, useCreateStore } from '@lobehub/ui';
 import { Button, Flex } from 'antd';
 import { Publicity } from '../features/Publicity';
 
@@ -55,9 +55,7 @@ export default () => {
         }
         header={
           <Header
-            logo={<Logo {...control} style={{
-              marginLeft: '20px'
-            }} />}
+            logo={<Avatar src="/vite.svg" alt="logo"  />}
             nav={
               <Flex wrap="wrap" gap="small" className="site-button-ghost-wrapper">
                 <Button type="text" onClick={() => {

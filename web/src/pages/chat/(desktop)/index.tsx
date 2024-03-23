@@ -101,7 +101,9 @@ export default function DesktopLayout() {
                 return {
                     content: item.content,
                     createAt: item.createAt,
-                    extra: {},
+                    extra: {
+                        referenceFile: item.referenceFile,
+                    },
                     id: item.id,
                     meta: {
                         avatar: item.current ? "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg" : "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/chatgpt.png",

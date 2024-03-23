@@ -1,5 +1,5 @@
-import { ActionIcon, Logo, SideNav, Tooltip } from "@lobehub/ui";
-import { Album, Settings2, Box, User, BotMessageSquare ,Brain} from 'lucide-react';
+import { ActionIcon, Avatar, Logo, SideNav, Tooltip } from "@lobehub/ui";
+import { Album, Settings2, Box, User, BotMessageSquare, Brain } from 'lucide-react';
 import { memo, useEffect, useState } from "react";
 import { Flexbox } from 'react-layout-kit';
 import { Outlet } from "react-router-dom";
@@ -103,7 +103,7 @@ const DesktopLayout = memo(() => {
     width={'100%'}
   >
     <SideNav
-      avatar={<Logo size={40} />}
+      avatar={<Avatar src="/vite.svg" alt="logo" size={40} />}
       bottomActions={
         <Dropdown menu={{ items }} placement="topRight">
           <ActionIcon icon={Settings2} />

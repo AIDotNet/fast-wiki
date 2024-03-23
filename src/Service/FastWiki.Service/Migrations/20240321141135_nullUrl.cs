@@ -59,7 +59,7 @@ namespace FastWiki.Service.Migrations
             migrationBuilder.InsertData(
                 table: "wiki-users",
                 columns: new[] { "Id", "Account", "Avatar", "CreationTime", "Creator", "Email", "IsDeleted", "IsDisable", "ModificationTime", "Modifier", "Name", "Password", "Phone", "Role", "Salt" },
-                values: new object[] { new Guid("289b14a4-a5e4-409f-97ec-049313593610"), "admin", "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", new DateTime(2024, 3, 21, 14, 11, 35, 212, DateTimeKind.Utc).AddTicks(3429), null, "239573049@qq.com", false, false, new DateTime(2024, 3, 21, 14, 11, 35, 212, DateTimeKind.Utc).AddTicks(3431), null, "admin", "75746e8a1cb14fed92c6688de29bd450", "13049809673", 1, "10604d18cf8e4475a622859a84ed5077" });
+                values: new object[] { new Guid("289b14a4-a5e4-409f-97ec-049313593610"), "admin", "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", new DateTime(2024, 3, 21, 14, 11, 35, 212, DateTimeKind.Utc).AddTicks(3429), null, "239573049@qq.com", false, false, new DateTime(2024, 3, 21, 14, 11, 35, 212, DateTimeKind.Utc).AddTicks(3431), null, "admin", "75746e8a1cb14fed92c6688de29bd450", "13049809673", 2, "10604d18cf8e4475a622859a84ed5077" });
         }
 
         /// <inheritdoc />
@@ -121,7 +121,7 @@ namespace FastWiki.Service.Migrations
             migrationBuilder.InsertData(
                 table: "wiki-users",
                 columns: new[] { "Id", "Account", "Avatar", "CreationTime", "Creator", "Email", "IsDeleted", "IsDisable", "ModificationTime", "Modifier", "Name", "Password", "Phone", "Role", "Salt" },
-                values: new object[] { new Guid("1bca921f-0f35-42e5-8cef-c530e36c8f54"), "admin", "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", new DateTime(2024, 3, 20, 17, 20, 45, 551, DateTimeKind.Utc).AddTicks(5537), null, "239573049@qq.com", false, false, new DateTime(2024, 3, 20, 17, 20, 45, 551, DateTimeKind.Utc).AddTicks(5538), null, "admin", "22cf0ff8fc2d1a8c008cbbdad311ed4a", "13049809673", 1, "19520e9012974aa7ad93a908f373a81e" });
+                values: new object[] { new Guid("1bca921f-0f35-42e5-8cef-c530e36c8f54"), "admin", "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", new DateTime(2024, 3, 20, 17, 20, 45, 551, DateTimeKind.Utc).AddTicks(5537), null, "239573049@qq.com", false, false, new DateTime(2024, 3, 20, 17, 20, 45, 551, DateTimeKind.Utc).AddTicks(5538), null, "admin", "22cf0ff8fc2d1a8c008cbbdad311ed4a", "13049809673", 2, "19520e9012974aa7ad93a908f373a81e" });
         }
     }
 }

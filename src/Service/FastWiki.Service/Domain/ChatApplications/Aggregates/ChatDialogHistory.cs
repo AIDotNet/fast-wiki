@@ -38,6 +38,11 @@ public sealed class ChatDialogHistory : Entity<string>, IFullAggregateRoot<Guid>
     public DateTime ModificationTime { get; set; }
     public bool IsDeleted { get; set; }
 
+    public void SetId(string id)
+    {
+        Id = id;
+    }
+
     protected ChatDialogHistory()
     {
     }
