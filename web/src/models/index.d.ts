@@ -14,6 +14,7 @@ export interface ChatApplicationDto {
     noReplyFoundTemplate: string | null;
     showSourceFile: boolean;
     relevancy: number;
+    extend: { [key: string]: string; };
 }
 
 export interface ChatDialogDto {

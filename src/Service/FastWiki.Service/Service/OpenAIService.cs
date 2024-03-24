@@ -1,5 +1,3 @@
-using System.Text;
-using System.Text.Json;
 using AIDotNet.OpenAI;
 using FastWiki.Service.Application.Model.Commands;
 using FastWiki.Service.Application.Storage.Queries;
@@ -9,6 +7,8 @@ using FastWiki.Service.Infrastructure;
 using FastWiki.Service.Infrastructure.Helper;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using System.Text;
+using System.Text.Json;
 using TokenApi.Service.Exceptions;
 
 namespace FastWiki.Service.Service;
@@ -360,7 +360,6 @@ public static class OpenAIService
             await eventBus.PublishAsync(updateChatShareCommand);
         }
     }
-
     private static bool IsVision(string model)
     {
         if (model.Contains("vision") || model.Contains("image"))

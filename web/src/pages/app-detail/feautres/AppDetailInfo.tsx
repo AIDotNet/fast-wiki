@@ -5,6 +5,7 @@ import { ChatApplicationDto } from "../../../models";
 import { PutChatApplications } from "../../../services/ChatApplicationService";
 import { GetWikisList } from "../../../services/WikiService";
 import { ChatModelList } from "../../../services/ModelService";
+import { Input } from "@lobehub/ui";
 
 interface IAppDetailInfoProps {
     value: ChatApplicationDto
@@ -80,7 +81,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                 return { label: item, value: item }
             }))
         }
-    }, [application,chatModelType]);
+    }, [application, chatModelType]);
 
     function save() {
         PutChatApplications(application)
@@ -323,8 +324,81 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                             </textarea>
                         </ListItem>
                     </>
+                }, {
+                    key: '2',
+                    label: '飞书设置',
+                    children: <>
+                        <Row style={{
+                            marginLeft: 20,
+                            marginTop: 20,
+                        }}>
+                            <span style={{
+                                marginRight: 20
+                            }}>飞书机器人名称</span>
+                            <Col span={12}>
+                                <Input value={application.extend?.BotName ?? ""}
+                                    defaultValue={application.extend?.BotName ?? ""}
+                                    onChange={(e) => {
+                                        setApplication({
+                                            ...application,
+                                            extend: {
+                                                ...application.extend,
+                                                BotName: e.target.value
+                                            }
+                                        });
+                                    }}
+                                    style={{ width: 380 }}></Input>
+                            </Col>
+                        </Row>
+                        <Row style={{
+                            marginLeft: 20,
+                            marginTop: 20,
+                        }}>
+                            <span style={{
+                                marginRight: 20
+                            }}>飞书AppId</span>
+                            <Col span={12}>
+                                <Input value={application.extend?.FeishuAppId ?? ""}
+                                    defaultValue={application.extend?.FeishuAppId ?? ""}
+                                    onChange={(e) => {
+                                        setApplication({
+                                            ...application,
+                                            extend: {
+                                                ...application.extend,
+                                                FeishuAppId: e.target.value
+                                            }
+                                        });
+                                    }}
+                                    style={{ width: 380 }}></Input>
+                            </Col>
+                        </Row>
+                        <Row style={{
+                            marginLeft: 20,
+                            marginTop: 20,
+                        }}>
+                            <span style={{
+                                marginRight: 20
+                            }}>飞书AppSecret</span>
+                            <Col span={12}>
+                                <Input value={application.extend?.FeishuAppSecret ?? ""}
+                                    defaultValue={application.extend?.FeishuAppSecret ?? ""}
+                                    onChange={(e) => {
+                                        setApplication({
+                                            ...application,
+                                            extend: {
+                                                ...application.extend,
+                                                FeishuAppSecret: e.target.value
+                                            }
+                                        });
+                                    }}
+                                    style={{ width: 380 }}></Input>
+                            </Col>
+                        </Row>
+                    </>
                 }]}
             />
+
+
             <Checkbox defaultChecked={application.showSourceFile} checked={application.showSourceFile} value={application.showSourceFile} onChange={(v) => {
                 setApplication({
                     ...application,

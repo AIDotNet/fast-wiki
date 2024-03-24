@@ -96,6 +96,13 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
                     v => JsonSerializer.Deserialize<List<long>>(v, new JsonSerializerOptions()));
+
+            entity.Property(x => x.Extend)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => v.IsNullOrEmpty()
+                        ? new Dictionary<string, string>()
+                        : JsonSerializer.Deserialize<Dictionary<string, string>>(v, new JsonSerializerOptions()));
         });
 
         modelBuilder.Entity<ChatDialog>(entity =>
@@ -169,9 +176,9 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
         var user = new User("admin", "admin", "Aa123456",
             "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", "239573049@qq.com", "13049809673", false);
-        
+
         user.SetAdminRole();
-        
+
         // 默认初始账号
         modelBuilder.Entity<User>().HasData(user);
 
