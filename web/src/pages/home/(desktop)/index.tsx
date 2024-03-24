@@ -1,24 +1,8 @@
-import { Footer, FooterProps, Header, Layout, Avatar, LogoProps, useControls, useCreateStore } from '@lobehub/ui';
+import { Footer, FooterProps, Header, Layout, Avatar } from '@lobehub/ui';
 import { Button, Flex } from 'antd';
 import { Publicity } from '../features/Publicity';
 
 export default () => {
-  const store = useCreateStore();
-  const control: LogoProps | any = useControls(
-    {
-      size: {
-        max: 240,
-        min: 16,
-        step: 4,
-        value: 45,
-      },
-      type: {
-        options: ['3d', 'flat', 'high-contrast', 'text', 'combine'],
-        value: '3d',
-      },
-    },
-    { store },
-  );
 
   const columns: FooterProps['columns'] = [
     {

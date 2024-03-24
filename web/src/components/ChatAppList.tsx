@@ -5,8 +5,6 @@ import { message } from "antd";
 import {
     ActionsBar,
 } from '@lobehub/ui';
-import { useState } from "react";
-import ShowReferenceFile from "./ShowReferenceFile";
 
 interface IChatAppListProps {
     application: any;
@@ -21,9 +19,6 @@ export default function ChatAppList({
     setHistory,
     id,
 }: IChatAppListProps) {
-
-    const [showReferenceFile, setShowReferenceFile] = useState(false);
-    const [referenceFile, setReferenceFile] = useState({} as any);
 
     async function ActionsClick(e: any, item: any) {
         if (e.key === 'del') {

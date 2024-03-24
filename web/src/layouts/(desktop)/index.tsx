@@ -1,4 +1,4 @@
-import { ActionIcon, Avatar, Logo, SideNav, Tooltip } from "@lobehub/ui";
+import { ActionIcon, Avatar,SideNav, Tooltip } from "@lobehub/ui";
 import { Album, Settings2, Box, User, BotMessageSquare, Brain } from 'lucide-react';
 import { memo, useEffect, useState } from "react";
 import { Flexbox } from 'react-layout-kit';
