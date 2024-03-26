@@ -66,7 +66,6 @@ public sealed class WikiMemoryService : ISingletonDependency
                 ConnectionString = ConnectionStringsOptions.DefaultConnection,
                 TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
             })
-            .WithCustomTextPartitioningOptions(new TextPartitioningOptions())
             .WithOpenAITextGeneration(new OpenAIConfig()
             {
                 APIKey = OpenAIOption.ChatToken,

@@ -1,6 +1,7 @@
 ﻿using AIDotNet.Abstractions;
 using AIDotNet.MetaGLM;
 using AIDotNet.OpenAI;
+using AIDotNet.Qiansail;
 using AIDotNet.SparkDesk;
 using FastWiki.Service.Application.Model.Commands;
 using FastWiki.Service.Application.Model.Queries;
@@ -9,6 +10,9 @@ using Constant = FastWiki.Service.Contracts.Constant;
 
 namespace FastWiki.Service.Service;
 
+/// <summary>
+/// 模型服务
+/// </summary>
 public sealed class ModelService : ApplicationService<ModelService>
 {
     static ModelService()
@@ -24,13 +28,15 @@ public sealed class ModelService : ApplicationService<ModelService>
         {
             Client = new MetaGLMClientV4()
         }));
+
+        ChatServices.Add(QiansailOptions.ServiceName, new QiansailService(new QiansailOptions()));
     }
 
     /// <summary>
     /// 获取所有支持的对话类型
     /// </summary>
     /// <returns></returns>
-    public List<string> GetChatTypes()
+    public Dictionary<string, string> GetChatTypes()
         => IADNChatCompletionService.ServiceNames;
 
     private static readonly Dictionary<string, IADNChatCompletionService> ChatServices = new();
