@@ -220,6 +220,12 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
             .ExecuteDeleteAsync(); 
     }
 
+    public Task<ChatDialogHistory> GetChatDialogHistoryAsync(string id)
+    {
+        return Context.ChatDialogHistorys.AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     private IQueryable<ChatShare> CreateChatShareQueryable(Guid userId, string chatApplicationId)
     {
         return Context.ChatShares.AsNoTracking()

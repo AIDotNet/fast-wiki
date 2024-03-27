@@ -72,4 +72,39 @@ public class ChatApplicationDto
     /// AI模型类型
     /// </summary>
     public string ChatType { get; set; }
+    
+    /// <summary>
+    /// 扩展字段
+    /// </summary>
+    public Dictionary<string, string> Extend { get; set; } = new();
+    
+    public void SetFeishuAppId(string appId)
+    {
+        Extend["FeishuAppId"] = appId;
+    }
+
+    public string? GetFeishuAppId()
+    {
+        return Extend.TryGetValue("FeishuAppId", out var appId) ? appId : null;
+    }
+
+    public void SetFeishuAppSecret(string appSecret)
+    {
+        Extend["FeishuAppSecret"] = appSecret;
+    }
+
+    public string? GetFeishuAppSecret()
+    {
+        return Extend.TryGetValue("FeishuAppSecret", out var appSecret) ? appSecret : null;
+    }
+
+    public string SetBotName(string botName)
+    {
+        return Extend["BotName"] = botName;
+    }
+
+    public string? GetBotName()
+    {
+        return Extend.TryGetValue("BotName", out var botName) ? botName : null;
+    }
 }

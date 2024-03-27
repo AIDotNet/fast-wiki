@@ -182,4 +182,11 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <param name="id"></param>
     /// <returns></returns>
     Task RemoveChatShareAsync(string id);
+    
+    /// <summary>
+    /// 获取对话记录
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<ChatDialogHistory> GetChatDialogHistoryAsync(string id);
 }

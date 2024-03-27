@@ -154,6 +154,12 @@ app.MapPost("/v1/chat/completions", OpenAIService.Completions)
     .WithDescription("OpenAI Completions")
     .WithOpenApi();
 
+app.MapPost("/v1/feishu/completions/{id}", FeishuService.Completions)
+    .WithTags("Feishu")
+    .WithGroupName("Feishu")
+    .WithDescription("飞书对话接入处理")
+    .WithOpenApi();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger()

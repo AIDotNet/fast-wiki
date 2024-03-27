@@ -1,5 +1,3 @@
-using System.Text;
-using System.Text.Json;
 using AIDotNet.OpenAI;
 using FastWiki.Service.Application.Model.Commands;
 using FastWiki.Service.Application.Storage.Queries;
@@ -9,6 +7,8 @@ using FastWiki.Service.Infrastructure;
 using FastWiki.Service.Infrastructure.Helper;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using System.Text;
+using System.Text.Json;
 using TokenApi.Service.Exceptions;
 
 namespace FastWiki.Service.Service;
@@ -181,13 +181,16 @@ public static class OpenAIService
                 sourceFile.AddRange(fileQuery.Result);
             }
 
-            // 删除最后一个消息
-            module.messages.RemoveAt(module.messages.Count - 1);
-            module.messages.Add(new ChatCompletionRequestMessage()
+            if (!prompt.IsNullOrEmpty())
             {
-                content = prompt,
-                role = "user"
-            });
+                // 删除最后一个消息
+                module.messages.RemoveAt(module.messages.Count - 1);
+                module.messages.Add(new ChatCompletionRequestMessage()
+                {
+                    content = prompt,
+                    role = "user"
+                });
+            }
         }
 
         // 添加用户输入，并且计算请求token数量
@@ -241,6 +244,18 @@ public static class OpenAIService
         var modelService = context.RequestServices.GetRequiredService<ModelService>();
 
         var (chatStream, fastModelDto) = await modelService.GetChatService(chatApplication.ChatType);
+        
+        if(fastModelDto.Enable != true)
+        {
+            await context.WriteEndAsync("模型未启用");
+            return;
+        }
+        
+        if(fastModelDto.Models.Any(x=>x == chatApplication.ChatModel) == false)
+        {
+            await context.WriteEndAsync($"模型渠道并未找到 {chatApplication.ChatModel} 模型的支持！");
+            return;
+        }
 
         var setting = new OpenAIPromptExecutionSettings
         {
@@ -249,13 +264,16 @@ public static class OpenAIService
             ModelId = chatApplication.ChatModel,
             ExtensionData = new Dictionary<string, object>()
         };
+        
         setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_KEY, fastModelDto.ApiKey);
         setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_URL, fastModelDto.Url);
 
-
+        var responseId = Guid.NewGuid().ToString("N");
+        var requestId = Guid.NewGuid().ToString("N");
         var output = new StringBuilder();
         try
         {
+            
             await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory, setting))
             {
                 if (item.Content.IsNullOrEmpty())
@@ -264,8 +282,8 @@ public static class OpenAIService
                 }
 
                 output.Append(item.Content);
-                await context.WriteOpenAiResultAsync(item.Content, module.model, Guid.NewGuid().ToString("N"),
-                    Guid.NewGuid().ToString("N"));
+                await context.WriteOpenAiResultAsync(item.Content, module.model, requestId,
+                    responseId);
             }
         }
         catch (NotModelException notModelException)
@@ -296,6 +314,7 @@ public static class OpenAIService
         var createChatDialogHistoryCommand = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
         {
             ChatDialogId = chatDialogId,
+            Id = requestId,
             Content = question,
             ExpendToken = requestToken,
             Type = ChatDialogHistoryType.Text,
@@ -311,10 +330,11 @@ public static class OpenAIService
         {
             ChatDialogId = chatDialogId,
             Content = outputContent,
+            Id = responseId,
             ExpendToken = completeToken,
             Type = ChatDialogHistoryType.Text,
             Current = false,
-            SourceFile = sourceFile.Select(x => new SourceFileDto()
+            ReferenceFile = sourceFile.Select(x => new SourceFileDto()
             {
                 Name = x.Name,
                 FileId = x.Id.ToString(),
@@ -340,7 +360,6 @@ public static class OpenAIService
             await eventBus.PublishAsync(updateChatShareCommand);
         }
     }
-
     private static bool IsVision(string model)
     {
         if (model.Contains("vision") || model.Contains("image"))

@@ -191,3 +191,12 @@ export function GetSessionLogDialog(chatApplicationId: string, page: number, pag
 export function PutChatHistory(data: any) {
     return putJson(`${prefix}/ChatHistory`, data);
 }
+
+/**
+ * 获取聊天记录详情
+ * @param chatId 
+ * @returns 
+ */
+export function GetChatDialogHistoryInfo(historyId: string) {
+    return get(`${prefix}/ChatDialogHistoryInfo?historyId=${historyId}`);
+}

@@ -22,36 +22,36 @@ export default function CreateModel({
     useEffect(() => {
         GetChatTypes()
             .then((chatModul) => {
-                const items = chatModul.map((item: string) => {
-                    return { label: item, value: item }
+                const items =  Object.entries(chatModul).map((item: any) => {
+                    return { label: item[0], value: item[1] }
                 });
                 setChatModul(items);
             });
-            
+
         getModels()
-        .then((models: any) => {
-            const items = models.chatModel.map((item: any) => {
-                return { label: item.label, value: item.value }
-            });
+            .then((models: any) => {
+                const items = models.chatModel.map((item: any) => {
+                    return { label: item.label, value: item.value }
+                });
 
-            models.embeddingModel.map((item: any) => {
-                items.push({ label: item.label, value: item.value })
-            });
+                models.embeddingModel.map((item: any) => {
+                    items.push({ label: item.label, value: item.value })
+                });
 
-            setModels(items);
-        });
+                setModels(items);
+            });
     }, []);
 
     return (
-        <Modal open={visible} title="创建模型" 
+        <Modal open={visible} title="创建模型"
             footer={null}
-            onCancel={onCancel}
-            >
+            onCancel={() => onCancel()}
+        >
             <Form
                 name="basic"
                 onFinish={async (values: any) => {
                     console.log(values);
-                    if(values.type === undefined || values.type === '') {
+                    if (values.type === undefined || values.type === '') {
                         message.error('模型类型是必须的');
                         return;
                     }
@@ -118,7 +118,7 @@ export default function CreateModel({
                     name="order"
                     initialValue={-1}
                 >
-                    <Input 
+                    <Input
                         type='number' />
                 </Form.Item>
 

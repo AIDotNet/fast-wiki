@@ -1,4 +1,4 @@
-import { ChatList, ChatListProps } from "@lobehub/ui";
+import { ChatList, ChatListProps, Tag } from "@lobehub/ui";
 import { DeleteDialogHistory, PutChatHistory } from "../services/ChatApplicationService";
 import { message } from "antd";
 
@@ -79,7 +79,20 @@ export default function ChatAppList({
                     setHistory([...history]);
                 }}
                 renderMessages={{
-                    default: ({ id, editableContent }) => <div id={id}>{editableContent}</div>,
+                    default: ({ id, editableContent }) => {
+                        const v = history.find((i) => i.id === id);
+                        if (v?.extra?.referenceFile) {
+                            return (<div id={id}>
+                                {editableContent}
+                                {v.extra.referenceFile.map((item: any) => <Tag onClick={()=>{
+                                    window.open(item.filePath, '_blank');
+                                }} style={{
+                                    marginTop: 8,
+                                }}>{item.name}</Tag>)}
+                            </div>)
+                        }
+                        return (<div id={id}>{editableContent}</div>)
+                    },
                 }}
                 style={{ width: '100%' }}
                 {...control}

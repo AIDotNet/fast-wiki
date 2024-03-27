@@ -7,7 +7,7 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
     /// <inheritdoc />
     public Task<List<Wiki>> GetListAsync(Guid userId, string? keyword, int page, int pageSize)
     {
-        var query = CreateQuery(keyword,userId);
+        var query = CreateQuery(keyword, userId);
         return query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
     }
 
@@ -23,7 +23,7 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
     /// <inheritdoc />
     public Task<long> GetCountAsync(Guid userId, string? keyword)
     {
-        var query = CreateQuery(keyword,userId);
+        var query = CreateQuery(keyword, userId);
         return query.LongCountAsync();
     }
 
@@ -81,6 +81,12 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
     {
         await Context.Database.ExecuteSqlRawAsync(
             $"delete from \"{ConnectionStringsOptions.TableNamePrefix + index}\" where id='{id}';");
+    }
+
+    public Task DetailsRenameNameAsync(long id, string name)
+    {
+        return Context.WikiDetails.Where(x => x.Id == id)
+            .ExecuteUpdateAsync(s => s.SetProperty(b => b.FileName, b => name));
     }
 
 

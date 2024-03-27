@@ -10,4 +10,8 @@
     <PackageReference Include="Masa.Utils.Models.Config" Version="$(MasaFrameworkPackageVersion)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Feishu\" />
+  </ItemGroup>
+
 </Project>

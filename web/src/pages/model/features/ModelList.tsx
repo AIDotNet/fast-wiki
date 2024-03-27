@@ -170,7 +170,7 @@ export default function ModelList(updateData: any) {
             <UpdateModel visible={updateVisible} onSuccess={() => {
                 setUpdateVisible(false);
                 loadingData();
-            }} value={updateValue} onCancel={() => setUpdateVisible(true)} />
+            }} value={updateValue} onCancel={() => setUpdateVisible(false)} />
         </>
     );
 }

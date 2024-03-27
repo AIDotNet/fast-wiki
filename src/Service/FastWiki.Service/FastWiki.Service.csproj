@@ -15,9 +15,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AIDotNet.MetaGLM" Version="0.0.5" />
-        <PackageReference Include="AIDotNet.OpenAI" Version="0.0.5" />
-        <PackageReference Include="AIDotNet.SparkDesk" Version="0.0.5" />
+        <PackageReference Include="AIDotNet.MetaGLM" Version="0.0.6" />
+        <PackageReference Include="AIDotNet.OpenAI" Version="0.0.6" />
+        <PackageReference Include="AIDotNet.Qiansail" Version="0.0.6" />
+        <PackageReference Include="AIDotNet.SparkDesk" Version="0.0.6" />
         <PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
         <PackageReference Include="Masa.BuildingBlocks.Data.MappingExtensions" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Authentication.Identity" Version="$(MasaFrameworkPackageVersion)" />

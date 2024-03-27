@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import CreateApplication from "./CreateApplication";
 import { GetChatShareList, RemoveChatShare } from "../../../services/ChatApplicationService";
 import { copyToClipboard } from "../../../utils/stringHelper";
+import { config } from "../../../config";
 
 
 const Title = styled.div`
@@ -80,8 +81,26 @@ export default memo((props: IReleaseApplicationProps) => {
                         message.success('复制APIKey成功');
                     }
                 })
+
                 items.push({
                     key: '3',
+                    label: '复制飞书对接地址',
+                    onClick: async () => {
+                        let url = config.FAST_API_URL;
+                        if(!url){
+                            url = location.origin;
+                        }
+                        // 删除最后的/
+                        if(url.endsWith('/')){
+                            url = url.slice(0, url.length - 1);
+                        }
+                        copyToClipboard(url + "/v1/feishu/completions/" + item.id)
+                        message.success('复制成功');
+                    }
+                })
+
+                items.push({
+                    key: '4',
                     label: '删除',
                     onClick: async () => {
                         await RemoveChatShare(item.id);
@@ -92,7 +111,6 @@ export default memo((props: IReleaseApplicationProps) => {
                         })
                     }
                 })
-
                 return (
                     <>
                         <Dropdown menu={{ items }} trigger={['click']}>
