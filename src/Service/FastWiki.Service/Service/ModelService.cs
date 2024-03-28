@@ -13,25 +13,8 @@ namespace FastWiki.Service.Service;
 /// <summary>
 /// 模型服务
 /// </summary>
-public sealed class ModelService : ApplicationService<ModelService>
+public sealed class ModelService(IServiceProvider serviceProvider) : ApplicationService<ModelService>
 {
-    static ModelService()
-    {
-        ChatServices.Add(OpenAIOptions.ServiceName, new OpenAiService(new OpenAIOptions()
-        {
-            Client = new HttpClient(),
-        }));
-
-        ChatServices.Add(SparkDeskOptions.ServiceName, new SparkDeskService(new SparkDeskOptions()));
-
-        ChatServices.Add(MetaGLMOptions.ServiceName, new MetaGLMService(new MetaGLMOptions()
-        {
-            Client = new MetaGLMClientV4()
-        }));
-
-        ChatServices.Add(QiansailOptions.ServiceName, new QiansailService(new QiansailOptions()));
-    }
-
     /// <summary>
     /// 获取所有支持的对话类型
     /// </summary>
@@ -39,14 +22,15 @@ public sealed class ModelService : ApplicationService<ModelService>
     public Dictionary<string, string> GetChatTypes()
         => IADNChatCompletionService.ServiceNames;
 
-    private static readonly Dictionary<string, IADNChatCompletionService> ChatServices = new();
 
     public async ValueTask<(IADNChatCompletionService, FastModelDto)> GetChatService(string serviceId)
     {
         var query = new ModelInfoQuery(serviceId);
         await EventBus.PublishAsync(query);
 
-        if (ChatServices.TryGetValue(query.Result.Type, out var service))
+        var service = serviceProvider.GetKeyedService<IADNChatCompletionService>(query.Result.Type);
+
+        if (service != null)
         {
             return (service, query.Result);
         }

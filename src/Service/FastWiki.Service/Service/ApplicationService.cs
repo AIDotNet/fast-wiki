@@ -9,4 +9,6 @@ public abstract class ApplicationService<TService> : ServiceBase where TService 
     protected ILogger<TService> Logger => GetRequiredService<ILogger<TService>>();
 
     protected IUserContext UserContext => GetRequiredService<IUserContext>();
+    
+    
 }

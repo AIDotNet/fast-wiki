@@ -1,3 +1,4 @@
+using AIDotNet.Qiansail;
 using AspNetCoreRateLimit;
 using FastWiki.Service;
 using FastWiki.Service.Backgrounds;
@@ -24,6 +25,11 @@ builder
 
 builder
     .AddFastSemanticKernel();
+
+builder.Services.AddOpenAIService()
+    .AddSparkDeskService()
+    .AddMetaGLMClientV4()
+    .AddQiansail();
 
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimit"));
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
