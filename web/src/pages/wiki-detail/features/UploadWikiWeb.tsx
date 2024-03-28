@@ -168,20 +168,10 @@ export default function UploadWikiWeb({ id, onChagePath }: IUploadWikiFileProps)
                                 <Radio value={ProcessMode.Custom}>自定义</Radio>
                             </Radio.Group>
                             {
-                                processMode === ProcessMode.Custom && <div style={{
-                                    marginTop: 10
-                                }}>
-                                    <span>理想：</span>
-                                    <Input
-                                        placeholder="请输入分段长度"
-                                        value={subsection}
-                                        onChange={(e: any) => {
-                                            setSubsection(Number(e.target.value));
-                                        }}
-                                        style={{
-                                            width: 200
-                                        }} />
-                                </div>
+                                processMode === ProcessMode.Custom && 
+                                <>
+                                
+                                </>
                             }
 
                         </div>
