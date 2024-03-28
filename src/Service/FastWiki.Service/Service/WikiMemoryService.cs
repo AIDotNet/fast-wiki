@@ -18,11 +18,16 @@ public sealed class WikiMemoryService : ISingletonDependency
     /// </summary>
     /// <param name="searchClientConfig"></param>
     /// <param name="maxTokensPerLine"></param>
+    /// <param name="maxTokensPerParagraph"></param>
+    /// <param name="overlappingTokens"></param>
     /// <param name="chatModel"></param>
     /// <param name="embeddingModel"></param>
     /// <returns></returns>
     public MemoryServerless CreateMemoryServerless(SearchClientConfig searchClientConfig,
-        int maxTokensPerLine, string? chatModel = null, string? embeddingModel = null)
+        int maxTokensPerLine,
+        int maxTokensPerParagraph,
+        int overlappingTokens,
+        string? chatModel = null, string? embeddingModel = null)
     {
         var memory = new KernelMemoryBuilder()
             .WithPostgresMemoryDb(new PostgresConfig()
@@ -39,6 +44,8 @@ public sealed class WikiMemoryService : ISingletonDependency
             .WithCustomTextPartitioningOptions(new TextPartitioningOptions()
             {
                 MaxTokensPerLine = maxTokensPerLine,
+                MaxTokensPerParagraph = maxTokensPerParagraph,
+                OverlappingTokens = overlappingTokens
             })
             .WithOpenAITextGeneration(new OpenAIConfig()
             {

@@ -114,7 +114,7 @@ public sealed class WikiQueryHandler(
     public async Task SearchVectorQuantityAsync(SearchVectorQuantityQuery query)
     {
         var stopwatch = Stopwatch.StartNew();
-        var memoryServerless = wikiMemoryService.CreateMemoryServerless(new SearchClientConfig(), 400);
+        var memoryServerless = wikiMemoryService.CreateMemoryServerless();
         var searchResult = await memoryServerless.SearchAsync(query.Search, "wiki",
             new MemoryFilter().ByTag("wikiId", query.WikiId.ToString()), minRelevance: query.MinRelevance, limit: 5);
 

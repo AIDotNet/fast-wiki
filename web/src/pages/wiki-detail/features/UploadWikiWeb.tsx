@@ -30,7 +30,9 @@ export default function UploadWikiWeb({ id, onChagePath }: IUploadWikiFileProps)
     const [webs, setWebs] = useState<any[]>([]);
     const [processMode, setProcessMode] = useState(ProcessMode.Auto);
     const [trainingPattern, setTrainingPattern] = useState(TrainingPattern.Subsection);
-    const [subsection, setSubsection] = useState(400); // 分段长度
+    const [maxTokensPerParagraph, setMaxTokensPerParagraph] = useState(1000); // 每个段落标记的最大数量。当对文档进行分区时，每个分区通常包含一个段落。
+    const [maxTokensPerLine, setMaxTokensPerLine] = useState(300); // 每行，也就是每个句子的最大标记数。当分割一个文本块时，文本将被分割成句子，然后被分组成段落。注意，这适用于任何文本格式，包括表格、代码、聊天记录、日志文件等。
+    const [overlappingTokens, setOverlappingTokens] = useState(100); // 重叠标记数。当对文档进行分区时，每个分区的开始和结束部分将重叠。这有助于确保模型在分区之间保持上下文一致性。
     const [value, setValue] = useState('');
 
     async function upload(){
@@ -40,7 +42,9 @@ export default function UploadWikiWeb({ id, onChagePath }: IUploadWikiFileProps)
                 wikiId:id as any,
                 name: webs[i],
                 trainingPattern: trainingPattern,
-                subsection: subsection,
+                maxTokensPerParagraph: maxTokensPerParagraph,
+                maxTokensPerLine: maxTokensPerLine,
+                overlappingTokens: overlappingTokens,
                 mode: processMode,
                 state: '',
                 path: item,

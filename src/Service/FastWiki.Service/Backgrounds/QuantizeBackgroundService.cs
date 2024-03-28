@@ -61,7 +61,7 @@ public sealed class QuantizeBackgroundService : BackgroundService
         {
             tasks.Add(Task.Factory.StartNew(WikiDetailHandlerAsync, stoppingToken));
         }
-        
+
         await Task.WhenAll(tasks);
     }
 
@@ -97,15 +97,19 @@ public sealed class QuantizeBackgroundService : BackgroundService
         var fileStorageRepository = service.GetRequiredService<IFileStorageRepository>();
         var wikiRepository = service.GetRequiredService<IWikiRepository>();
         var wikiMemoryService = service.GetRequiredService<WikiMemoryService>();
+
         var wiki = await wikiRepository.FindAsync(x => x.Id == wikiDetail.WikiId);
-        if (wikiDetail.Subsection == 0)
+        if (wikiDetail.Mode == ProcessMode.Auto)
         {
-            wikiDetail.Subsection = 512;
+            wikiDetail.MaxTokensPerLine = 300;
+            wikiDetail.MaxTokensPerParagraph = 1000;
+            wikiDetail.OverlappingTokens = 100;
         }
 
         // 获取知识库配置的模型，如果没有则使用默认模型
         var serverless = wikiMemoryService.CreateMemoryServerless(new SearchClientConfig(),
-        wikiDetail.Mode == ProcessMode.Auto ? 512 : wikiDetail.Subsection, wiki?.Model, wiki?.EmbeddingModel);
+            wikiDetail.MaxTokensPerLine, wikiDetail.MaxTokensPerParagraph, wikiDetail.OverlappingTokens, wiki?.Model,
+            wiki?.EmbeddingModel);
         try
         {
             Console.WriteLine($"开始量化：ʼ{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId}");
@@ -117,17 +121,17 @@ public sealed class QuantizeBackgroundService : BackgroundService
 
                 result = await serverless.ImportDocumentAsync(fileInfoQuery.FullName,
                     wikiDetail.Id.ToString(),
-                tags: new TagCollection()
-                {
-                            {
-                                "wikiId", wikiDetail.WikiId.ToString()
-                    },
-                            {
-                                "fileId", wikiDetail.FileId.ToString()
-                    },
-                            {
-                                "wikiDetailId", wikiDetail.Id.ToString()
-                    }
+                    tags: new TagCollection()
+                    {
+                        {
+                            "wikiId", wikiDetail.WikiId.ToString()
+                        },
+                        {
+                            "fileId", wikiDetail.FileId.ToString()
+                        },
+                        {
+                            "wikiDetailId", wikiDetail.Id.ToString()
+                        }
                     }, "wiki");
             }
             else if (wikiDetail.Type == "web")
@@ -137,25 +141,25 @@ public sealed class QuantizeBackgroundService : BackgroundService
                     tags: new TagCollection()
                     {
                         {
-                                "wikiId", wikiDetail.WikiId.ToString()
+                            "wikiId", wikiDetail.WikiId.ToString()
                         },
                         {
-                                "wikiDetailId", wikiDetail.Id.ToString()
-                            }
+                            "wikiDetailId", wikiDetail.Id.ToString()
+                        }
                     }, "wiki");
             }
             else if (wikiDetail.Type == "data")
             {
                 result = await serverless.ImportDocumentAsync(wikiDetail.Path,
-                                       wikiDetail.Id.ToString(),
-                                                          tags: new TagCollection()
-                                                          {
-                                                              {
-                                "wikiId", wikiDetail.WikiId.ToString()
+                    wikiDetail.Id.ToString(),
+                    tags: new TagCollection()
+                    {
+                        {
+                            "wikiId", wikiDetail.WikiId.ToString()
                         },
-                                                              {
-                                "wikiDetailId", wikiDetail.Id.ToString()
-                            }
+                        {
+                            "wikiDetailId", wikiDetail.Id.ToString()
+                        }
                     }, "wiki");
             }
 
@@ -165,18 +169,13 @@ public sealed class QuantizeBackgroundService : BackgroundService
         catch (Exception e)
         {
             Console.WriteLine(
-            $"量化失败{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {Environment.NewLine + e.Message}");
-
-            // TODO: 由于api可能存在限流，如果出现异常大概率是限流导致，在这里等待一会
-            await Task.Delay(500);
+                $"量化失败{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {Environment.NewLine + e.Message}");
 
             if (wikiDetail.State != WikiQuantizationState.Fail)
             {
                 await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Fail);
             }
-
         }
-
     }
 
     private async Task LoadingWikiDetailAsync()
@@ -194,7 +193,11 @@ public sealed class QuantizeBackgroundService : BackgroundService
 
 public sealed class QuantizeWikiDetail : WikiDetail
 {
-    public int Subsection { get; set; }
+    public int MaxTokensPerParagraph { get; set; }
+
+    public int MaxTokensPerLine { get; set; }
+
+    public int OverlappingTokens { get; set; }
 
     public ProcessMode Mode { get; set; } = ProcessMode.Auto;
 

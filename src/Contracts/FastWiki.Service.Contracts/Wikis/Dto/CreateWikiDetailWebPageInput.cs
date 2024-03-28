@@ -21,8 +21,12 @@ public sealed class CreateWikiDetailWebPageInput
     /// 状态
     /// </summary>
     public string State { get; set; }
-    
-    public int Subsection { get; set; }
+
+    public int MaxTokensPerParagraph { get; set; }
+
+    public int MaxTokensPerLine { get; set; }
+
+    public int OverlappingTokens { get; set; }
 
     public ProcessMode Mode { get; set; } = ProcessMode.Auto;
 

@@ -52,7 +52,9 @@ public sealed class WikiCommandHandler(
         wikiDetail = await wikiRepository.AddDetailsAsync(wikiDetail);
 
         QuantizeWikiDetail quantizeWikiDetail = mapper.Map<QuantizeWikiDetail>(wikiDetail);
-        quantizeWikiDetail.Subsection = command.Input.Subsection;
+        quantizeWikiDetail.OverlappingTokens = command.Input.OverlappingTokens;
+        quantizeWikiDetail.MaxTokensPerLine = command.Input.MaxTokensPerLine;
+        quantizeWikiDetail.MaxTokensPerParagraph = command.Input.MaxTokensPerParagraph;
         quantizeWikiDetail.Mode = command.Input.Mode;
         quantizeWikiDetail.TrainingPattern = command.Input.TrainingPattern;
 
@@ -68,7 +70,9 @@ public sealed class WikiCommandHandler(
         wikiDetail = await wikiRepository.AddDetailsAsync(wikiDetail);
 
         var quantizeWikiDetail = mapper.Map<QuantizeWikiDetail>(wikiDetail);
-        quantizeWikiDetail.Subsection = command.Input.Subsection;
+        quantizeWikiDetail.OverlappingTokens = command.Input.OverlappingTokens;
+        quantizeWikiDetail.MaxTokensPerLine = command.Input.MaxTokensPerLine;
+        quantizeWikiDetail.MaxTokensPerParagraph = command.Input.MaxTokensPerParagraph;
         quantizeWikiDetail.Mode = command.Input.Mode;
         quantizeWikiDetail.TrainingPattern = command.Input.TrainingPattern;
 
@@ -84,7 +88,9 @@ public sealed class WikiCommandHandler(
         wikiDetail = await wikiRepository.AddDetailsAsync(wikiDetail);
 
         var quantizeWikiDetail = mapper.Map<QuantizeWikiDetail>(wikiDetail);
-        quantizeWikiDetail.Subsection = command.Input.Subsection;
+        quantizeWikiDetail.OverlappingTokens = command.Input.OverlappingTokens;
+        quantizeWikiDetail.MaxTokensPerLine = command.Input.MaxTokensPerLine;
+        quantizeWikiDetail.MaxTokensPerParagraph = command.Input.MaxTokensPerParagraph;
         quantizeWikiDetail.Mode = command.Input.Mode;
         quantizeWikiDetail.TrainingPattern = command.Input.TrainingPattern;
 
@@ -144,11 +150,13 @@ public sealed class WikiCommandHandler(
             TrainingPattern = TrainingPattern.Subsection,
             FileName = wikiDetail.FileName,
             Type = wikiDetail.Type,
-            Subsection = 400,
+            MaxTokensPerParagraph = 1000,
+            MaxTokensPerLine = 300,
+            OverlappingTokens = 100,
             FileId = wikiDetail.FileId,
         });
     }
-    
+
     [EventHandler]
     public async Task DetailsRenameNameAsync(DetailsRenameNameCommand command)
     {
