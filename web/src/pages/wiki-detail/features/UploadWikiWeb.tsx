@@ -39,7 +39,7 @@ export default function UploadWikiWeb({ id, onChagePath }: IUploadWikiFileProps)
         for (let i = 0; i < webs.length; i++) {
             const item = webs[i];
             const input: CreateWikiDetailWebPageInput = {
-                wikiId:id as any,
+                wikiId: id as any,
                 name: webs[i],
                 trainingPattern: trainingPattern,
                 maxTokensPerParagraph: maxTokensPerParagraph,
@@ -168,20 +168,43 @@ export default function UploadWikiWeb({ id, onChagePath }: IUploadWikiFileProps)
                                 <Radio value={ProcessMode.Custom}>自定义</Radio>
                             </Radio.Group>
                             {
-                                processMode === ProcessMode.Custom && <div style={{
+                                processMode === ProcessMode.Custom && <>
+                                <div style={{
                                     marginTop: 10
                                 }}>
-                                    <span>理想：</span>
+                                    <span>段落最大Token：</span>
                                     <Input
-                                        placeholder="请输入分段长度"
-                                        value={subsection}
+                                        value={maxTokensPerParagraph}
                                         onChange={(e: any) => {
-                                            setSubsection(Number(e.target.value));
+                                            setMaxTokensPerParagraph(Number(e.target.value));
                                         }}
                                         style={{
-                                            width: 200
+                                            width: 200,
+                                            marginRight: 10
+                                        }} />
+
+                                    <span>每行最大Tokens：</span>
+                                    <Input
+                                        value={maxTokensPerLine}
+                                        onChange={(e: any) => {
+                                            setMaxTokensPerLine(Number(e.target.value));
+                                        }}
+                                        style={{
+                                            width: 200,
+                                            marginRight: 10
+                                        }} />
+                                    <span>段落之间重叠标记的数目：</span>
+                                    <Input
+                                        value={overlappingTokens}
+                                        onChange={(e: any) => {
+                                            setOverlappingTokens(Number(e.target.value));
+                                        }}
+                                        style={{
+                                            width: 200,
+                                            marginRight: 10
                                         }} />
                                 </div>
+                            </>
                             }
 
                         </div>
