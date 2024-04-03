@@ -231,7 +231,9 @@ export interface CreateWikiDetailWebPageInput {
     name: string;
     path: string;
     state: string;
-    subsection: number;
+    maxTokensPerParagraph: number;
+    maxTokensPerLine: number;
+    overlappingTokens: number;
     mode: ProcessMode;
     trainingPattern: TrainingPattern;
 }
