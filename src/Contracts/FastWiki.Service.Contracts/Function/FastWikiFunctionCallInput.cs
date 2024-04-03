@@ -1,7 +1,8 @@
-﻿namespace FastWiki.Service.Domain.Function.Aggregates;
+﻿namespace FastWiki.Service.Contracts.Function;
 
-public sealed class FastWikiFunctionCall : FullAggregateRoot<long,Guid>
+public class FastWikiFunctionCallInput
 {
+    
     public string Name { get; set; }
 
     public string Description { get; set; }
@@ -22,13 +23,7 @@ public sealed class FastWikiFunctionCall : FullAggregateRoot<long,Guid>
     public Dictionary<string,object> Items { get; set; }
 
     /// <summary>
-    /// 是否启用
-    /// </summary>
-    public bool Enable { get; set; }
-
-    /// <summary>
     /// 引用的库
     /// </summary>
     public List<string> Imports { get; set; }
-    
 }
