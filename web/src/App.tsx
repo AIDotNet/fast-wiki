@@ -69,10 +69,14 @@ const router = createBrowserRouter([{
   element: <Login />
 }, {
   path: '/register',
-  element: <Register />
+  element: <Suspense fallback={'加载中'}>
+    <Register />
+  </Suspense>
 }, {
   path: '/share-chat',
-  element: <ShareChat />
+  element: <Suspense fallback={'加载中'}>
+    <ShareChat />
+  </Suspense>
 }])
 
 
