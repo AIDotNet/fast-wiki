@@ -7,8 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.JavaScript.Hermes" Version="0.1.19" />
-      <PackageReference Include="Microsoft.JavaScript.NodeApi" Version="0.6.2" />
+        <PackageReference Include="Microsoft.ClearScript.V8" Version="7.4.5" />
+        <PackageReference Include="Microsoft.ClearScript.V8.Native.linux-x64" Version="7.4.5" />
+        <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.4.5" />
     </ItemGroup>
 
 </Project>

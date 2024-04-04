@@ -190,7 +190,7 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
 
             if (result == null)
             {
-                throw new UserFriendlyException("·ÖÏí¶Ô»°²»´æÔÚ");
+                throw new UserFriendlyException("ï¿½ï¿½ï¿½ï¿½Ô»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
             }
 
             await Context.ChatDialogHistorys.Where(x => x.Id == id)
@@ -217,13 +217,27 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
     {
         await Context.ChatShares
             .Where(x => x.Id == id)
-            .ExecuteDeleteAsync(); 
+            .ExecuteDeleteAsync();
     }
 
     public Task<ChatDialogHistory> GetChatDialogHistoryAsync(string id)
     {
         return Context.ChatDialogHistorys.AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task UpdateFunctionCall(string applicationId, params long[] ids)
+    {
+        // åˆ é™¤åŽŸæœ‰çš„
+        await Context.ChatApplicationForFunctionCalls
+            .Where(x => x.ChatApplicationId == applicationId).ExecuteDeleteAsync();
+
+        // æ·»åŠ æ–°çš„
+        Context.ChatApplicationForFunctionCalls.AddRange(ids.Select(x => new ChatApplicationForFunctionCall
+        {
+            ChatApplicationId = applicationId,
+            FunctionCallId = x
+        }));
     }
 
     private IQueryable<ChatShare> CreateChatShareQueryable(Guid userId, string chatApplicationId)
