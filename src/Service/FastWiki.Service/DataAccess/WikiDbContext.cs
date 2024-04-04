@@ -196,6 +196,23 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
             entity.HasIndex(x => x.CreationTime);
+            
+            entity.Property(x => x.Parameters)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<Dictionary<string, string>>(v, new JsonSerializerOptions()));
+            
+            entity.Property(x => x.Items)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<Dictionary<string,object>>(v, new JsonSerializerOptions()));
+            
+            
+            entity.Property(x => x.Imports)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<string>>(v, new JsonSerializerOptions()));
+            
         });
 
         var user = new User("admin", "admin", "Aa123456",
