@@ -60,4 +60,6 @@ public class UpdateChatApplicationInput
     /// 扩展字段
     /// </summary>
     public Dictionary<string, string> Extend { get; set; } = new();
+    
+    public List<long> FunctionIds { get; set; } = new();
 }

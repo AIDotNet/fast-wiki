@@ -45,6 +45,10 @@ namespace FastWiki.Service.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("FunctionIds")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -246,6 +250,67 @@ namespace FastWiki.Service.Migrations
                     b.ToTable("wiki-chat-share", (string)null);
                 });
 
+            modelBuilder.Entity("FastWiki.Service.Domain.Function.Aggregates.FastWikiFunctionCall", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("Creator")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Enable")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Imports")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Items")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Main")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ModificationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("Modifier")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Parameters")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreationTime");
+
+                    b.ToTable("wiki-function-calls", (string)null);
+                });
+
             modelBuilder.Entity("FastWiki.Service.Domain.Model.Aggregates.FastModel", b =>
                 {
                     b.Property<string>("Id")
@@ -315,14 +380,14 @@ namespace FastWiki.Service.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "adf1fe462e7a4f7a93ee6951ca31d63c",
+                            Id = "ee2e461ab124432485c4688ca569e174",
                             ApiKey = "",
-                            CreationTime = new DateTime(2024, 3, 24, 14, 44, 52, 662, DateTimeKind.Utc).AddTicks(7163),
+                            CreationTime = new DateTime(2024, 4, 5, 10, 24, 24, 310, DateTimeKind.Utc).AddTicks(6603),
                             Description = "OpenAI",
                             Enable = true,
                             IsDeleted = false,
                             Models = "[\"gpt-3.5-turbo\",\"gpt-3.5-turbo-0125\",\"gpt-3.5-turbo-1106\",\"gpt-3.5-turbo-16k\",\"gpt-3.5-turbo-0613\",\"gpt-3.5-turbo-16k-0613\",\"gpt-4-0125-preview\",\"gpt-4-turbo-preview\",\"gpt-4-1106-preview\",\"gpt-4-vision-preview\",\"gpt-4-1106-vision-preview\",\"gpt-4\",\"gpt-4-0613\",\"gpt-4-32k\",\"gpt-4-32k-0613\"]",
-                            ModificationTime = new DateTime(2024, 3, 24, 14, 44, 52, 662, DateTimeKind.Utc).AddTicks(7165),
+                            ModificationTime = new DateTime(2024, 4, 5, 10, 24, 24, 310, DateTimeKind.Utc).AddTicks(6604),
                             Name = "OpenAI",
                             Order = 1,
                             Type = "OpenAI",
@@ -331,14 +396,14 @@ namespace FastWiki.Service.Migrations
                         },
                         new
                         {
-                            Id = "e124eb014a944dd79f3e4823461086d2",
+                            Id = "d114f3219d8c4398be2b66af4edbe85e",
                             ApiKey = "",
-                            CreationTime = new DateTime(2024, 3, 24, 14, 44, 52, 662, DateTimeKind.Utc).AddTicks(7196),
+                            CreationTime = new DateTime(2024, 4, 5, 10, 24, 24, 310, DateTimeKind.Utc).AddTicks(6618),
                             Description = "星火大模型",
                             Enable = true,
                             IsDeleted = false,
                             Models = "[\"SparkDesk-v3.5\",\"SparkDesk-v3.1\",\"SparkDesk-v1.5\",\"SparkDesk-v2.1\"]",
-                            ModificationTime = new DateTime(2024, 3, 24, 14, 44, 52, 662, DateTimeKind.Utc).AddTicks(7197),
+                            ModificationTime = new DateTime(2024, 4, 5, 10, 24, 24, 310, DateTimeKind.Utc).AddTicks(6619),
                             Name = "SparkDesk",
                             Order = 1,
                             Type = "SparkDesk",
@@ -519,19 +584,19 @@ namespace FastWiki.Service.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("f0b2b97a-1f5f-4741-8110-7dc382b52025"),
+                            Id = new Guid("c2e43fc3-d870-48ea-a7e2-62586ee6b7ca"),
                             Account = "admin",
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                            CreationTime = new DateTime(2024, 3, 24, 14, 44, 52, 662, DateTimeKind.Utc).AddTicks(5388),
+                            CreationTime = new DateTime(2024, 4, 5, 10, 24, 24, 310, DateTimeKind.Utc).AddTicks(5260),
                             Email = "239573049@qq.com",
                             IsDeleted = false,
                             IsDisable = false,
-                            ModificationTime = new DateTime(2024, 3, 24, 14, 44, 52, 662, DateTimeKind.Utc).AddTicks(5390),
+                            ModificationTime = new DateTime(2024, 4, 5, 10, 24, 24, 310, DateTimeKind.Utc).AddTicks(5262),
                             Name = "admin",
-                            Password = "2a2e3a0f18f38c8ba99bee8e499ed572",
+                            Password = "949de09c9cac12c3f5ceb79f9c49fe3b",
                             Phone = "13049809673",
                             Role = 2,
-                            Salt = "124dc3dc26674fad9ea6adea9eb231b6"
+                            Salt = "524fcf01d6bd4b1fb9289d3e41ec0044"
                         });
                 });
 

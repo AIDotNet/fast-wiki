@@ -2,6 +2,7 @@
 using System.Text.Json;
 using AIDotNet.OpenAI;
 using AIDotNet.SparkDesk;
+using FastWiki.Service.Domain.Function.Aggregates;
 using FastWiki.Service.Domain.Model.Aggregates;
 
 namespace FastWiki.Service.DataAccess;
@@ -27,6 +28,8 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
     public DbSet<FastModel> FastModels { get; set; }
 
     public DbSet<ModelLogger> ModelLoggers { get; set; }
+    
+    public DbSet<FastWikiFunctionCall> FunctionCalls { get; set; }
 
     protected override void OnModelCreatingExecuting(ModelBuilder modelBuilder)
     {
@@ -103,6 +106,11 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
                     v => v.IsNullOrEmpty()
                         ? new Dictionary<string, string>()
                         : JsonSerializer.Deserialize<Dictionary<string, string>>(v, new JsonSerializerOptions()));
+            
+            entity.Property(x=>x.FunctionIds)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<long>>(v, new JsonSerializerOptions()));
         });
 
         modelBuilder.Entity<ChatDialog>(entity =>
@@ -173,6 +181,32 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.HasIndex(x => x.Type);
             entity.HasIndex(x => x.CreationTime);
         });
+        
+        modelBuilder.Entity<FastWikiFunctionCall>(entity =>
+        {
+            entity.ToTable("wiki-function-calls");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+            entity.HasIndex(x => x.CreationTime);
+            
+            entity.Property(x => x.Parameters)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<FunctionItem>>(v, new JsonSerializerOptions()));
+            
+            entity.Property(x => x.Items)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<FunctionItem>>(v, new JsonSerializerOptions()));
+            
+            
+            entity.Property(x => x.Imports)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<string>>(v, new JsonSerializerOptions()));
+            
+        });
 
         var user = new User("admin", "admin", "Aa123456",
             "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", "239573049@qq.com", "13049809673", false);
@@ -183,8 +217,7 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
         modelBuilder.Entity<User>().HasData(user);
 
         var openAI = new FastModel("OpenAI", OpenAIOptions.ServiceName, "https://api.openai.com/", string.Empty,
-            "OpenAI", new List<string>()
-            {
+            "OpenAI", [
                 "gpt-3.5-turbo",
                 "gpt-3.5-turbo-0125",
                 "gpt-3.5-turbo-1106",
@@ -200,7 +233,8 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
                 "gpt-4-0613",
                 "gpt-4-32k",
                 "gpt-4-32k-0613"
-            }, 1);
+
+            ], 1);
 
         var sparkDesk = new FastModel("SparkDesk", SparkDeskOptions.ServiceName, "", string.Empty, "星火大模型",
         [

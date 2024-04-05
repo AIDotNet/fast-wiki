@@ -1,5 +1,5 @@
 import { ActionIcon, Avatar,SideNav, Tooltip } from "@lobehub/ui";
-import { Album, Settings2, Box, User, BotMessageSquare, Brain } from 'lucide-react';
+import { Album, Settings2, Box, User, BotMessageSquare,SquareFunction, Brain } from 'lucide-react';
 import { memo, useEffect, useState } from "react";
 import { Flexbox } from 'react-layout-kit';
 import { Outlet } from "react-router-dom";
@@ -38,6 +38,12 @@ const DesktopLayout = memo(() => {
     description: '模型管理',
     path: '/model',
     role: 'admin'
+  }, {
+    icon: SquareFunction,
+    key: 'function-call',
+    description: '函数管理',
+    path: '/function-call',
+    role: 'admin,user'
   }, {
     icon: User,
     key: 'user',

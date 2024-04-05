@@ -112,4 +112,5 @@ public sealed class ChatApplication : FullAggregateRoot<string, Guid?>
     /// </summary>
     public Dictionary<string, string> Extend { get; set; } = new();
 
+    public List<long> FunctionIds { get; set; } = new();
 }
