@@ -31,15 +31,18 @@ monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
     allowNonTsExtensions: true
 });
 
-// @ts-ignore
-const result = await get('/api/v1/monaco');
-
-// 便利result字典
-for (const key in result) {
-	if (Object.prototype.hasOwnProperty.call(result, key)) {
-		const element = result[key];
-		monaco.languages.typescript.javascriptDefaults.addExtraLib(element, key);
+async function loadLibrary() {
+	const result = await get('/api/v1/monaco');
+	
+	// 便利result字典
+	for (const key in result) {
+		if (Object.prototype.hasOwnProperty.call(result, key)) {
+			const element = result[key];
+			monaco.languages.typescript.javascriptDefaults.addExtraLib(element, key);
+		}
 	}
+	monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 }
 
-monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
+loadLibrary();
+
