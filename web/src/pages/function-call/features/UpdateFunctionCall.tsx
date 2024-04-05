@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { Button, message } from 'antd';
-import { CreateFunction, PutFunction } from "../../../services/FunctionService";
+import {  PutFunction } from "../../../services/FunctionService";
 import { FastWikiFunctionCallInput } from "../../../models";
 
 interface IUpdateFunctionCallProps {

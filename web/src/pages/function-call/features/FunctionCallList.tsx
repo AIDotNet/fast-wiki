@@ -36,7 +36,7 @@ export default function FunctionCallList({
             title: '是否启用',
             dataIndex: 'enable',
             key: 'enable',
-            render: (text: any, record: any) => {
+            render: (_text: any, record: any) => {
                 return record.enable ? '启用' : '禁用';
             }
         },
@@ -49,7 +49,7 @@ export default function FunctionCallList({
             title: '操作',
             dataIndex: 'action',
             key: 'action',
-            render: (text: any, record: any) => {
+            render: (_text: any, record: any) => {
                 const items = [
                     {
                         label: '编辑',
