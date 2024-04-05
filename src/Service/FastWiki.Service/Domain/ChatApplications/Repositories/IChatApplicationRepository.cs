@@ -190,11 +190,4 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <returns></returns>
     Task<ChatDialogHistory> GetChatDialogHistoryAsync(string id);
 
-    /// <summary>
-    /// 绑定Function Call
-    /// </summary>
-    /// <param name="applicationId"></param>
-    /// <param name="ids"></param>
-    /// <returns></returns>
-    Task UpdateFunctionCall(string applicationId, params long[] ids);
 }

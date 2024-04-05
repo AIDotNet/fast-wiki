@@ -166,6 +166,23 @@ app.MapPost("/v1/feishu/completions/{id}", FeishuService.Completions)
     .WithDescription("飞书对话接入处理")
     .WithOpenApi();
 
+app.MapGet("/api/v1/monaco", (async context =>
+{
+    // 获取monaco目录下的所有文件
+    var files = Directory.GetFiles("monaco", "*.ts");
+
+    var dic = new Dictionary<string, string>();
+
+    foreach (var file in files)
+    {
+        var info = new FileInfo(file);
+        var content = await File.ReadAllTextAsync(file);
+        dic.Add(info.Name, content);
+    }
+
+    await context.Response.WriteAsJsonAsync(dic);
+})).RequireAuthorization();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger()

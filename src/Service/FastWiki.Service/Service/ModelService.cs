@@ -25,17 +25,24 @@ public sealed class ModelService(IServiceProvider serviceProvider) : Application
 
     public async ValueTask<(IADNChatCompletionService, FastModelDto)> GetChatService(string serviceId)
     {
-        var query = new ModelInfoQuery(serviceId);
-        await EventBus.PublishAsync(query);
-
-        var service = serviceProvider.GetKeyedService<IADNChatCompletionService>(query.Result.Type);
-
-        if (service != null)
+        try
         {
-            return (service, query.Result);
-        }
+            var query = new ModelInfoQuery(serviceId);
+            await EventBus.PublishAsync(query);
 
-        throw new NotSupportedException($"不支持的对话类型：{serviceId}");
+            var service = serviceProvider.GetKeyedService<IADNChatCompletionService>(query.Result.Type);
+
+            if (service != null)
+            {
+                return (service, query.Result);
+            }
+
+            throw new NotSupportedException($"不支持的对话类型：{serviceId}");
+        }
+        catch (Exception e)
+        {
+            throw new NotSupportedException($"不支持的对话类型：{serviceId}");
+        }
     }
 
     /// <summary>

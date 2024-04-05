@@ -1,7 +1,10 @@
+using FastWiki.FunctionCall;
+using FastWiki.Service.Domain.Function.Aggregates;
 using Microsoft.KernelMemory.Configuration;
 using Microsoft.KernelMemory.ContentStorage.DevTools;
 using Microsoft.KernelMemory.FileSystem.DevTools;
 using Microsoft.KernelMemory.Postgres;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 namespace FastWiki.Service.Service;
@@ -11,6 +14,9 @@ namespace FastWiki.Service.Service;
 /// </summary>
 public sealed class WikiMemoryService : ISingletonDependency
 {
+    private static readonly OpenAiHttpClientHandler Handler = new();
+    private static FastWikiFunctionContext _context = new();
+
     private static readonly OpenAiHttpClientHandler HttpClientHandler = new();
 
     /// <summary>
@@ -95,5 +101,34 @@ public sealed class WikiMemoryService : ISingletonDependency
     {
         return new OpenAIChatCompletionService(modelId, OpenAIOption.ChatToken, organization,
             new HttpClient(HttpClientHandler));
+    }
+
+    public Kernel CreateFunctionKernel(List<FastWikiFunctionCall> fastWikiFunctionCalls,string apiKey,string modelId,string uri)
+    {
+        var kernel = Kernel.CreateBuilder()
+            .AddOpenAIChatCompletion(
+                modelId: OpenAIOption.ChatModel,
+                apiKey: OpenAIOption.ChatToken,
+                httpClient: new HttpClient(new OpenAiHttpClientHandler(uri)))
+            .Build();
+
+        foreach (var fastWikiFunctionCall in fastWikiFunctionCalls)
+        {
+            var function = kernel.CreateFunctionFromMethod(async (dynamic value) =>
+                {
+                    return await _context.FunctionCall(fastWikiFunctionCall.Content, fastWikiFunctionCall.Main, value);
+                },
+                fastWikiFunctionCall.Main, fastWikiFunctionCall.Description,
+                fastWikiFunctionCall.Parameters.Select(x => new KernelParameterMetadata(x.Key)
+                {
+                    Description = x.Value,
+                    Name = x.Key
+                }));
+
+            kernel.Plugins.AddFromFunctions(fastWikiFunctionCall.Main, fastWikiFunctionCall.Description,
+                new[] { function });
+        }
+
+        return kernel;
     }
 }

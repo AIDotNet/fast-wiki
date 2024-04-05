@@ -28,8 +28,6 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
     public DbSet<FastModel> FastModels { get; set; }
 
     public DbSet<ModelLogger> ModelLoggers { get; set; }
-
-    public DbSet<ChatApplicationForFunctionCall> ChatApplicationForFunctionCalls { get; set; }
     
     public DbSet<FastWikiFunctionCall> FunctionCalls { get; set; }
 
@@ -108,6 +106,11 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
                     v => v.IsNullOrEmpty()
                         ? new Dictionary<string, string>()
                         : JsonSerializer.Deserialize<Dictionary<string, string>>(v, new JsonSerializerOptions()));
+            
+            entity.Property(x=>x.FunctionIds)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<long>>(v, new JsonSerializerOptions()));
         });
 
         modelBuilder.Entity<ChatDialog>(entity =>
@@ -179,16 +182,6 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.HasIndex(x => x.CreationTime);
         });
         
-        modelBuilder.Entity<ChatApplicationForFunctionCall>(entity =>
-        {
-            entity.ToTable("wiki-chat-application-for-function-call");
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).ValueGeneratedOnAdd();
-
-            entity.HasIndex(x => x.FunctionCallId);
-            entity.HasIndex(x => x.ChatApplicationId);
-        });
-        
         modelBuilder.Entity<FastWikiFunctionCall>(entity =>
         {
             entity.ToTable("wiki-function-calls");
@@ -200,12 +193,12 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.Property(x => x.Parameters)
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
-                    v => JsonSerializer.Deserialize<Dictionary<string, string>>(v, new JsonSerializerOptions()));
+                    v => JsonSerializer.Deserialize<List<FunctionItem>>(v, new JsonSerializerOptions()));
             
             entity.Property(x => x.Items)
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
-                    v => JsonSerializer.Deserialize<Dictionary<string,object>>(v, new JsonSerializerOptions()));
+                    v => JsonSerializer.Deserialize<List<FunctionItem>>(v, new JsonSerializerOptions()));
             
             
             entity.Property(x => x.Imports)

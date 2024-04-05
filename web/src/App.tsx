@@ -7,6 +7,7 @@ import Login from './pages/login/page'
 import App from './pages/app/page'
 
 import { ThemeProvider } from '@lobehub/ui'
+import FunctionCall from './pages/function-call/page'
 const Chat = lazy(() => import('./pages/chat/page'));
 const User = lazy(() => import('./pages/user/page'));
 
@@ -61,6 +62,11 @@ const router = createBrowserRouter([{
     {
       path: '/model', element: <Suspense fallback={'加载中'}>
         <Model />
+      </Suspense>
+    },
+    {
+      path: '/function-call', element: <Suspense fallback={'加载中'}>
+        <FunctionCall />
       </Suspense>
     },
   ]

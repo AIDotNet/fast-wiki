@@ -9,6 +9,10 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using System.Text;
 using System.Text.Json;
+using Azure.AI.OpenAI;
+using DocumentFormat.OpenXml.Office2013.PowerPoint.Roaming;
+using FastWiki.Service.Application.Function.Queries;
+using Microsoft.SemanticKernel;
 using TokenApi.Service.Exceptions;
 
 namespace FastWiki.Service.Service;
@@ -123,11 +127,12 @@ public static class OpenAIService
         var prompt = string.Empty;
 
         var sourceFile = new List<FileStorage>();
+        var wikiMemoryService = context.RequestServices.GetRequiredService<WikiMemoryService>();
+        var memoryServerless = wikiMemoryService.CreateMemoryServerless();
+
         // 如果为空则不使用知识库
         if (chatApplication.WikiIds.Count != 0)
         {
-            var memoryServerless = context.RequestServices.GetRequiredService<WikiMemoryService>().CreateMemoryServerless();
-
             var filters = chatApplication.WikiIds
                 .Select(chatApplication => new MemoryFilter().ByTag("wikiId", chatApplication.ToString())).ToList();
 
@@ -244,14 +249,14 @@ public static class OpenAIService
         var modelService = context.RequestServices.GetRequiredService<ModelService>();
 
         var (chatStream, fastModelDto) = await modelService.GetChatService(chatApplication.ChatType);
-        
-        if(fastModelDto.Enable != true)
+
+        if (fastModelDto.Enable != true)
         {
             await context.WriteEndAsync("模型未启用");
             return;
         }
-        
-        if(fastModelDto.Models.Any(x=>x == chatApplication.ChatModel) == false)
+
+        if (fastModelDto.Models.Any(x => x == chatApplication.ChatModel) == false)
         {
             await context.WriteEndAsync($"模型渠道并未找到 {chatApplication.ChatModel} 模型的支持！");
             return;
@@ -264,7 +269,7 @@ public static class OpenAIService
             ModelId = chatApplication.ChatModel,
             ExtensionData = new Dictionary<string, object>()
         };
-        
+
         setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_KEY, fastModelDto.ApiKey);
         setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_URL, fastModelDto.Url);
 
@@ -273,17 +278,109 @@ public static class OpenAIService
         var output = new StringBuilder();
         try
         {
-            
-            await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory, setting))
+            var functionCall = new ChatApplicationFunctionCallQuery(chatApplication.FunctionIds.ToArray());
+
+            if (chatApplication.FunctionIds.Any())
             {
-                if (item.Content.IsNullOrEmpty())
+                await eventBus.PublishAsync(functionCall);
+            }
+
+            // 如果有函数调用
+            if (chatApplication.FunctionIds.Any() && functionCall.Result.Any())
+            {
+                // 只支持OpenAI
+                if(fastModelDto.Type != OpenAIOptions.ServiceName)
                 {
-                    continue;
+                    await context.WriteEndAsync("Function Call目前仅支持OpenAI模型");
+                    return;
+                }
+                
+                var kernel = wikiMemoryService.CreateFunctionKernel(functionCall.Result.ToList(), fastModelDto.ApiKey,
+                    chatApplication.ChatModel, fastModelDto.Url);
+
+                OpenAIPromptExecutionSettings settings = new()
+                {
+                    ToolCallBehavior = ToolCallBehavior.EnableKernelFunctions
+                };
+
+                var chat = kernel.GetRequiredService<IChatCompletionService>();
+
+                var result =
+                    (OpenAIChatMessageContent)await chat.GetChatMessageContentAsync(chatHistory, settings,
+                        kernel);
+
+                List<ChatCompletionsFunctionToolCall> toolCalls =
+                    result.ToolCalls.OfType<ChatCompletionsFunctionToolCall>().ToList();
+
+                if (toolCalls.Count == 0)
+                {
+                    await context.WriteEndAsync("未找到函数");
+                    return;
                 }
 
-                output.Append(item.Content);
-                await context.WriteOpenAiResultAsync(item.Content, module.model, requestId,
-                    responseId);
+                foreach (var toolCall in toolCalls)
+                {
+                    kernel.Plugins.TryGetFunctionAndArguments(toolCall, out var function,
+                        out KernelArguments? arguments);
+
+                    if (function == null)
+                    {
+                        await context.WriteEndAsync("未找到函数");
+                        return;
+                    }
+
+                    try
+                    {
+                        var functionResult = await function.InvokeAsync(kernel, new KernelArguments()
+                        {
+                            {
+                                "value", arguments?.Select(x => x.Value).ToArray()
+                            }
+                        });
+                        // 判断ValueType是否为值类型
+                        if (functionResult.ValueType?.IsValueType == true || functionResult.ValueType == typeof(string))
+                        {
+                            chatHistory.AddAssistantMessage(functionResult.GetValue<object>().ToString());
+                        }
+                        else
+                        {
+                            // 记录函数调用
+                            chatHistory.AddAssistantMessage(
+                                JsonSerializer.Serialize(functionResult.GetValue<object>()));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        await context.WriteEndAsync("函数调用异常：" + e.Message);
+                        return;
+                    }
+                }
+
+                await foreach (var item in chat.GetStreamingChatMessageContentsAsync(chatHistory, setting))
+                {
+                    if (item.Content.IsNullOrEmpty())
+                    {
+                        continue;
+                    }
+
+                    output.Append(item.Content);
+                    await context.WriteOpenAiResultAsync(item.Content, module.model, requestId,
+                        responseId);
+                }
+            }
+            else
+            {
+                await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory, setting))
+                {
+                    if (item.Content.IsNullOrEmpty())
+                    {
+                        continue;
+                    }
+
+                    output.Append(item.Content);
+                    await context.WriteOpenAiResultAsync(item.Content, module.model, requestId,
+                        responseId);
+                }
             }
         }
         catch (NotModelException notModelException)
@@ -360,6 +457,7 @@ public static class OpenAIService
             await eventBus.PublishAsync(updateChatShareCommand);
         }
     }
+
     private static bool IsVision(string model)
     {
         if (model.Contains("vision") || model.Contains("image"))

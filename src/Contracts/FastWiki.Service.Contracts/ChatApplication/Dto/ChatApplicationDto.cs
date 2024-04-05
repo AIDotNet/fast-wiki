@@ -73,6 +73,8 @@ public class ChatApplicationDto
     /// </summary>
     public string ChatType { get; set; }
     
+    public List<long> FunctionIds { get; set; } = new();
+    
     /// <summary>
     /// 扩展字段
     /// </summary>

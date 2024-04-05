@@ -10,6 +10,7 @@ export interface ChatApplicationDto {
     parameter: { [key: string]: string; };
     opener: string;
     wikiIds: number[];
+    functionIds:number[];
     referenceUpperLimit: number;
     noReplyFoundTemplate: string | null;
     showSourceFile: boolean;
@@ -236,4 +237,31 @@ export interface CreateWikiDetailWebPageInput {
     overlappingTokens: number;
     mode: ProcessMode;
     trainingPattern: TrainingPattern;
+}
+
+export interface FastWikiFunctionCallDto {
+    id: number;
+    name: string;
+    description: string;
+    content: string;
+    parameters: FunctionItemDto[];
+    items: FunctionItemDto[];
+    enable: boolean;
+    imports: string[];
+    creationTime: string;
+}
+
+export interface FunctionItemDto {
+    key: string;
+    value: string;
+}
+
+export interface FastWikiFunctionCallInput {
+    name: string;
+    description: string;
+    content: string;
+    parameters: FunctionItemDto[];
+    main: string;
+    items: FunctionItemDto[];
+    imports: string[];
 }

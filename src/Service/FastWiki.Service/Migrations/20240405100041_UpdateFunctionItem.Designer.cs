@@ -3,6 +3,7 @@ using System;
 using FastWiki.Service.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FastWiki.Service.Migrations
 {
     [DbContext(typeof(WikiDbContext))]
-    partial class WikiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240405100041_UpdateFunctionItem")]
+    partial class UpdateFunctionItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,10 +45,6 @@ namespace FastWiki.Service.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Extend")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FunctionIds")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -105,6 +104,30 @@ namespace FastWiki.Service.Migrations
                     b.HasIndex("Name");
 
                     b.ToTable("wiki-chat-application", (string)null);
+                });
+
+            modelBuilder.Entity("FastWiki.Service.Domain.ChatApplications.Aggregates.ChatApplicationForFunctionCall", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ChatApplicationId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("FunctionCallId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatApplicationId");
+
+                    b.HasIndex("FunctionCallId");
+
+                    b.ToTable("wiki-chat-application-for-function-call", (string)null);
                 });
 
             modelBuilder.Entity("FastWiki.Service.Domain.ChatApplications.Aggregates.ChatDialog", b =>
@@ -380,14 +403,14 @@ namespace FastWiki.Service.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "ee2e461ab124432485c4688ca569e174",
+                            Id = "0d0d82112fd34726b5b4dba0aad5ac56",
                             ApiKey = "",
-                            CreationTime = new DateTime(2024, 4, 5, 10, 24, 24, 310, DateTimeKind.Utc).AddTicks(6603),
+                            CreationTime = new DateTime(2024, 4, 5, 10, 0, 41, 182, DateTimeKind.Utc).AddTicks(9398),
                             Description = "OpenAI",
                             Enable = true,
                             IsDeleted = false,
                             Models = "[\"gpt-3.5-turbo\",\"gpt-3.5-turbo-0125\",\"gpt-3.5-turbo-1106\",\"gpt-3.5-turbo-16k\",\"gpt-3.5-turbo-0613\",\"gpt-3.5-turbo-16k-0613\",\"gpt-4-0125-preview\",\"gpt-4-turbo-preview\",\"gpt-4-1106-preview\",\"gpt-4-vision-preview\",\"gpt-4-1106-vision-preview\",\"gpt-4\",\"gpt-4-0613\",\"gpt-4-32k\",\"gpt-4-32k-0613\"]",
-                            ModificationTime = new DateTime(2024, 4, 5, 10, 24, 24, 310, DateTimeKind.Utc).AddTicks(6604),
+                            ModificationTime = new DateTime(2024, 4, 5, 10, 0, 41, 182, DateTimeKind.Utc).AddTicks(9399),
                             Name = "OpenAI",
                             Order = 1,
                             Type = "OpenAI",
@@ -396,14 +419,14 @@ namespace FastWiki.Service.Migrations
                         },
                         new
                         {
-                            Id = "d114f3219d8c4398be2b66af4edbe85e",
+                            Id = "0f6df89aec924c25ad1a258c422930d9",
                             ApiKey = "",
-                            CreationTime = new DateTime(2024, 4, 5, 10, 24, 24, 310, DateTimeKind.Utc).AddTicks(6618),
+                            CreationTime = new DateTime(2024, 4, 5, 10, 0, 41, 182, DateTimeKind.Utc).AddTicks(9441),
                             Description = "星火大模型",
                             Enable = true,
                             IsDeleted = false,
                             Models = "[\"SparkDesk-v3.5\",\"SparkDesk-v3.1\",\"SparkDesk-v1.5\",\"SparkDesk-v2.1\"]",
-                            ModificationTime = new DateTime(2024, 4, 5, 10, 24, 24, 310, DateTimeKind.Utc).AddTicks(6619),
+                            ModificationTime = new DateTime(2024, 4, 5, 10, 0, 41, 182, DateTimeKind.Utc).AddTicks(9442),
                             Name = "SparkDesk",
                             Order = 1,
                             Type = "SparkDesk",
@@ -584,19 +607,19 @@ namespace FastWiki.Service.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c2e43fc3-d870-48ea-a7e2-62586ee6b7ca"),
+                            Id = new Guid("7b3c7ef1-eef1-4b75-a86c-5d57ab00f041"),
                             Account = "admin",
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                            CreationTime = new DateTime(2024, 4, 5, 10, 24, 24, 310, DateTimeKind.Utc).AddTicks(5260),
+                            CreationTime = new DateTime(2024, 4, 5, 10, 0, 41, 182, DateTimeKind.Utc).AddTicks(8122),
                             Email = "239573049@qq.com",
                             IsDeleted = false,
                             IsDisable = false,
-                            ModificationTime = new DateTime(2024, 4, 5, 10, 24, 24, 310, DateTimeKind.Utc).AddTicks(5262),
+                            ModificationTime = new DateTime(2024, 4, 5, 10, 0, 41, 182, DateTimeKind.Utc).AddTicks(8124),
                             Name = "admin",
-                            Password = "949de09c9cac12c3f5ceb79f9c49fe3b",
+                            Password = "d709a005a9b59b7265d7de556d7bbf83",
                             Phone = "13049809673",
                             Role = 2,
-                            Salt = "524fcf01d6bd4b1fb9289d3e41ec0044"
+                            Salt = "f557e936db0a44eb870f14a24dbc7723"
                         });
                 });
 

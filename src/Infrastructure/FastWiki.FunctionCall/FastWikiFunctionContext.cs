@@ -8,10 +8,11 @@ public sealed class FastWikiFunctionContext : IDisposable
 
     public FastWikiFunctionContext()
     {
-        Engine.AddHostType("console", typeof(Console));
+        Engine.AddHostType("Console", typeof(Console));
+        Engine.AddHostType("HttpClient", typeof(HttpClient));
     }
 
-    public void AddHostObject(string name, object obj)
+    public async Task AddHostObject(string name, object obj)
     {
         Engine.AddHostObject(name, obj);
     }

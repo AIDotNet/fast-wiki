@@ -226,20 +226,6 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task UpdateFunctionCall(string applicationId, params long[] ids)
-    {
-        // 删除原有的
-        await Context.ChatApplicationForFunctionCalls
-            .Where(x => x.ChatApplicationId == applicationId).ExecuteDeleteAsync();
-
-        // 添加新的
-        Context.ChatApplicationForFunctionCalls.AddRange(ids.Select(x => new ChatApplicationForFunctionCall
-        {
-            ChatApplicationId = applicationId,
-            FunctionCallId = x
-        }));
-    }
-
     private IQueryable<ChatShare> CreateChatShareQueryable(Guid userId, string chatApplicationId)
     {
         return Context.ChatShares.AsNoTracking()
