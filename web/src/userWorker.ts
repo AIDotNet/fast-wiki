@@ -31,6 +31,7 @@ monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
     allowNonTsExtensions: true
 });
 
+// @ts-ignore
 const result = await get('/api/v1/monaco');
 
 // 便利result字典
