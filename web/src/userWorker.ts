@@ -25,24 +25,21 @@ self.MonacoEnvironment = {
 	}
 };
 
-
 monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
     noLib: true,
     allowNonTsExtensions: true
 });
 
-async function loadLibrary() {
-	const result = await get('/api/v1/monaco');
+
+
+const result = await get('/api/v1/monaco');
 	
-	// 便利result字典
-	for (const key in result) {
-		if (Object.prototype.hasOwnProperty.call(result, key)) {
-			const element = result[key];
-			monaco.languages.typescript.javascriptDefaults.addExtraLib(element, key);
-		}
+// 便利result字典
+for (const key in result) {
+	if (Object.prototype.hasOwnProperty.call(result, key)) {
+		const element = result[key];
+		monaco.languages.typescript.javascriptDefaults.addExtraLib(element, key);
 	}
-	monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 }
 
-loadLibrary();
-
+monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);

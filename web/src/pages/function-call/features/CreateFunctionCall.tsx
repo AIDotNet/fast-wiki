@@ -38,13 +38,16 @@ export default function CreateFunctionCall({
                 // 判断是否有monacoEl，如果没有就返回
                 if (!monacoEl.current) return editor;
 
-                return monaco.editor.create(monacoEl.current!, {
-                    value: ['function functionCall(x:number,y:number) {', '\tconsole.log(x);', '\treturn x+y;', '} '].join('\n'),
+                const e = monaco.editor.create(monacoEl.current!, {
+                    value: ['function Test(x,y) {', '\treturn x+y;', '} '].join('\n'),
                     language: 'typescript',
                     theme: 'vs-dark',
                     automaticLayout: true,
 
                 });
+
+
+                return e;
             });
         }
 

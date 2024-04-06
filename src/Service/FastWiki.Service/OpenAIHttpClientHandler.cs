@@ -13,7 +13,6 @@ public sealed class OpenAiHttpClientHandler : HttpClientHandler
 
     public OpenAiHttpClientHandler(string uri)
     {
-        _uri = uri;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
@@ -32,6 +31,10 @@ public sealed class OpenAiHttpClientHandler : HttpClientHandler
             request.RequestUri = uriBuilder.Uri;
         }
 
-        return await base.SendAsync(request, cancellationToken);
+        var c = await request.Content.ReadAsStringAsync();
+
+        var response = await base.SendAsync(request, cancellationToken);
+        
+        return response;
     }
 }

@@ -20,6 +20,9 @@ export default defineConfig({
         drop_debugger: true,
       },
     },
+    target:[
+      "chrome89", "edge89", "firefox89", "safari15"
+    ],
     reportCompressedSize: false,
     sourcemap: false,
     chunkSizeWarningLimit: 2000,

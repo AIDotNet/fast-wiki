@@ -181,7 +181,7 @@ app.MapGet("/api/v1/monaco", (async context =>
     }
 
     await context.Response.WriteAsJsonAsync(dic);
-})).RequireAuthorization();
+}));
 
 if (app.Environment.IsDevelopment())
 {

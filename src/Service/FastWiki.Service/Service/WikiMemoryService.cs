@@ -107,8 +107,8 @@ public sealed class WikiMemoryService : ISingletonDependency
     {
         var kernel = Kernel.CreateBuilder()
             .AddOpenAIChatCompletion(
-                modelId: modelId,
-                apiKey: apiKey,
+                modelId: OpenAIOption.ChatModel,
+                apiKey: "sk-aseR1QOiRfVjD4eV734785F13a5f479e86805b740dA9E375",
                 httpClient: new HttpClient(new OpenAiHttpClientHandler(uri)))
             .Build();
 
@@ -118,7 +118,8 @@ public sealed class WikiMemoryService : ISingletonDependency
                 {
                     return await _context.FunctionCall(fastWikiFunctionCall.Content, fastWikiFunctionCall.Main, value);
                 },
-                fastWikiFunctionCall.Main, fastWikiFunctionCall.Description,
+                fastWikiFunctionCall.Main, 
+                fastWikiFunctionCall.Description,
                 fastWikiFunctionCall.Parameters.Select(x => new KernelParameterMetadata(x.Key)
                 {
                     Description = x.Value,
