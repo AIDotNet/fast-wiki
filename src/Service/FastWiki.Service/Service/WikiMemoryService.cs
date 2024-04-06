@@ -107,8 +107,8 @@ public sealed class WikiMemoryService : ISingletonDependency
     {
         var kernel = Kernel.CreateBuilder()
             .AddOpenAIChatCompletion(
-                modelId: OpenAIOption.ChatModel,
-                apiKey: "sk-aseR1QOiRfVjD4eV734785F13a5f479e86805b740dA9E375",
+                modelId: modelId,
+                apiKey: apiKey,
                 httpClient: new HttpClient(new OpenAiHttpClientHandler(uri)))
             .Build();
 
