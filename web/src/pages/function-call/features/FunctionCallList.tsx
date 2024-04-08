@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Table } from "antd";
 import { DeleteFunction, EnableFunctionCall, GetFunctionList } from "../../../services/FunctionService";
 import { Button, Dropdown, message } from "antd";
+import { render } from "react-dom";
+import ShowCode from "./ShowCode";
 
 interface IFunctionCallListProps {
     updateFunctionCall: any;
@@ -16,6 +18,8 @@ export default function FunctionCallList({
 }: IFunctionCallListProps) {
     const [functionCallList, setFunctionCallList] = useState([] as any[]);
     const [total, setTotal] = useState(0);
+    const [showCode, setShowCode] = useState(false);
+    const [record, setRecord] = useState(null as any);
     const columns = [
         {
             title: '名称',
@@ -31,6 +35,18 @@ export default function FunctionCallList({
             title: 'js function',
             dataIndex: 'content',
             key: 'content',
+            render: (_text: any, record: any) => {
+                return (
+                    <Button
+                        onClick={() => {
+                            setRecord(record)
+                            setShowCode(true)
+                        }}
+                    >
+                        查看源码
+                    </Button>
+                )
+            }
         },
         {
             title: '是否启用',
@@ -125,6 +141,10 @@ export default function FunctionCallList({
                 }}
                 columns={columns}
                 dataSource={functionCallList} />
+            <ShowCode visible={showCode} setVisible={()=>{
+                setRecord(null);
+                setShowCode(false);
+            }} record={record}/>
         </>
     )
 }

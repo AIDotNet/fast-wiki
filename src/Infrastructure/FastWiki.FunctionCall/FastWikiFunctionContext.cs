@@ -1,3 +1,4 @@
+using Microsoft.ClearScript;
 using Microsoft.ClearScript.V8;
 
 namespace FastWiki.FunctionCall;
@@ -26,7 +27,15 @@ public sealed class FastWikiFunctionContext : IDisposable
     {
         Engine.Execute(script);
 
-        object v = Engine.Invoke(functionName, args);
+        dynamic v = Engine.Invoke(functionName, args);
+
+        var t = v?.GetType();
+
+        // ÅÐ¶ÏvÊÇ·ñ¿Õ   
+        if (t == Undefined.Value.GetType())
+        {
+            return null;
+        }
 
         return v;
     }

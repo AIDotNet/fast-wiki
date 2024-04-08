@@ -1,7 +1,7 @@
 import { DraggablePanel, Tooltip, } from "@lobehub/ui";
 import { Select } from 'antd';
 import { useEffect, useState } from "react";
-import { CreateChatDialog, DeleteDialog, GetChatApplicationsList, GetChatDialog, GetChatDialogHistory } from "../../../services/ChatApplicationService";
+import { GetChatApplicationsList, GetChatDialogHistory } from "../../../services/ChatApplicationService";
 import Divider from "@lobehub/ui/es/Form/components/FormDivider";
 import { Button, message } from 'antd'
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,22 @@ import CreateDialog from "../feautres/CreateDialog";
 import { Flexbox } from 'react-layout-kit';
 import FastChatInput from "../../../components/FastChatInput";
 import ChatAppList from "../../../components/ChatAppList";
+
+import { IndexedDBWrapper } from "../../../utils/IndexedDBWrapper";
+
+const sessionName = 'fast-wiki-dialog';
+const sessionVersion = 1;
+const sessionStoreName = 'sessions';
+const sessionDB = new IndexedDBWrapper(sessionName, sessionVersion, sessionStoreName);
+sessionDB.open();
+
+const fileName = 'fast-wiki-file';
+const fileVersion = 1;
+const fileStoreName = 'files';
+const fileDB = new IndexedDBWrapper(fileName, fileVersion, fileStoreName);
+fileDB.open();
+
+
 
 const DialogList = styled.div`
     margin-top: 8px;
@@ -71,14 +87,18 @@ export default function DesktopLayout() {
 
     async function loadingDialogs() {
         try {
+            if (application.id === undefined) {
+                return;
+            }
 
-            const result = (await GetChatDialog(application.id, false)) as any[];
+            const result = (await sessionDB.getAll()) as any[];
             setDialogs(result);
             if (result.length === 0) {
-                await AddChatDialog({
+                sessionDB.add({
                     name: '默认对话',
                     description: '默认创建的对话',
                     applicationId: application.id,
+                    id: Math.random().toString(36).slice(-8),
                     type: 0
                 })
                 loadingDialogs();
@@ -127,18 +147,10 @@ export default function DesktopLayout() {
         }
     }
 
-    async function AddChatDialog(data: any) {
-        try {
-            await CreateChatDialog(data)
-        } catch (error) {
-            message.error('创建失败');
-        }
-    }
-
-
     useEffect(() => {
         if (application) {
             loadingDialogs();
+
         }
     }, [application]);
 
@@ -159,11 +171,9 @@ export default function DesktopLayout() {
         }
     }
 
-    function deleteDialog(id: string) {
-        DeleteDialog(id)
-            .then(() => {
-                loadingDialogs();
-            })
+    async function deleteDialog(id: string) {
+        await sessionDB.deleteStr(id);
+        loadingDialogs();
     }
 
     return <>
@@ -245,18 +255,19 @@ export default function DesktopLayout() {
             <Divider />
 
             <Flexbox style={{ overflow: 'auto', flex: 1 }}>
-                <ChatAppList setHistory={(v: any[]) => {
-                    setHistory(v);
+                <ChatAppList setHistory={(v: any) => {
+                    setHistory([...v]);
                 }} history={history} application={application} />
             </Flexbox>
             <DraggablePanel style={{
                 height: '100%'
-            }} maxHeight={600} minHeight={180}  placement='bottom'>
-                <FastChatInput dialog={dialog} application={application} setHistory={(v: any[]) => {
+            }} maxHeight={600} minHeight={180} placement='bottom'>
+                <FastChatInput dialog={dialog} application={application} setHistory={(v: any) => {
                     setHistory(v);
-                }} history={history} />
+                }
+                } history={history} />
             </DraggablePanel>
-            <CreateDialog visible={createDialogVisible} id={application?.id} type={0} onClose={() => {
+            <CreateDialog db={sessionDB} visible={createDialogVisible} id={application?.id} type={0} onClose={() => {
                 setCreateDialogVisible(false);
                 loadingDialogs();
             }} onSucess={() => {

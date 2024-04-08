@@ -1,19 +1,19 @@
+using System.Text;
+using System.Text.Json;
 using AIDotNet.OpenAI;
+using Azure.AI.OpenAI;
+using FastWiki.Service.Application.Function.Queries;
 using FastWiki.Service.Application.Model.Commands;
 using FastWiki.Service.Application.Storage.Queries;
 using FastWiki.Service.Contracts.OpenAI;
 using FastWiki.Service.Domain.Storage.Aggregates;
 using FastWiki.Service.Infrastructure;
 using FastWiki.Service.Infrastructure.Helper;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using System.Text;
-using System.Text.Json;
-using Azure.AI.OpenAI;
-using DocumentFormat.OpenXml.Office2013.PowerPoint.Roaming;
-using FastWiki.Service.Application.Function.Queries;
-using Microsoft.SemanticKernel;
 using TokenApi.Service.Exceptions;
+using Constant = AIDotNet.Abstractions.Constant;
 
 namespace FastWiki.Service.Service;
 
@@ -39,13 +39,6 @@ public static class OpenAIService
         var chatId = context.Request.Query["ChatId"];
         var token = context.Request.Headers.Authorization;
         var chatShareId = context.Request.Query["ChatShareId"];
-
-
-        if (chatDialogId.IsNullOrEmpty())
-        {
-            await context.WriteEndAsync(nameof(chatDialogId) + "不能为空");
-            return;
-        }
 
         if (chatId.IsNullOrEmpty())
         {
@@ -270,8 +263,16 @@ public static class OpenAIService
             ExtensionData = new Dictionary<string, object>()
         };
 
-        setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_KEY, fastModelDto.ApiKey);
-        setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_URL, fastModelDto.Url);
+        setting.ExtensionData.TryAdd(Constant.API_KEY, fastModelDto.ApiKey);
+        setting.ExtensionData.TryAdd(Constant.API_URL, fastModelDto.Url);
+
+        // 判断apikey和url是否为空
+
+        if (fastModelDto.ApiKey.IsNullOrEmpty() || fastModelDto.Url.IsNullOrEmpty())
+        {
+            await context.WriteEndAsync("API Key 或 Url 不能为空");
+            return;
+        }
 
         var responseId = Guid.NewGuid().ToString("N");
         var requestId = Guid.NewGuid().ToString("N");
@@ -289,12 +290,12 @@ public static class OpenAIService
             if (chatApplication.FunctionIds.Any() && functionCall.Result.Any())
             {
                 // 只支持OpenAI
-                if(fastModelDto.Type != OpenAIOptions.ServiceName)
+                if (fastModelDto.Type != OpenAIOptions.ServiceName)
                 {
                     await context.WriteEndAsync("Function Call目前仅支持OpenAI模型");
                     return;
                 }
-                
+
                 var kernel = wikiMemoryService.CreateFunctionKernel(functionCall.Result.ToList(), fastModelDto.ApiKey,
                     chatApplication.ChatModel, fastModelDto.Url);
 
@@ -314,6 +315,7 @@ public static class OpenAIService
 
                 if (toolCalls.Count == 0)
                 {
+                    // TODO: 如果这里跳过则会进入对话？
                     await context.WriteEndAsync("未找到函数");
                     return;
                 }
@@ -325,8 +327,8 @@ public static class OpenAIService
 
                     if (function == null)
                     {
-                        await context.WriteEndAsync("未找到函数");
-                        return;
+                        // TODO: 是否需要跳过？
+                        continue;
                     }
 
                     try
@@ -337,6 +339,12 @@ public static class OpenAIService
                                 "value", arguments?.Select(x => x.Value).ToArray()
                             }
                         });
+
+                        if (functionResult.ValueType == null)
+                        {
+                            continue;
+                        }
+                        
                         // 判断ValueType是否为值类型
                         if (functionResult.ValueType?.IsValueType == true || functionResult.ValueType == typeof(string))
                         {
@@ -408,38 +416,45 @@ public static class OpenAIService
 
         #region 记录对话内容
 
-        var createChatDialogHistoryCommand = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
+        if (!string.IsNullOrEmpty(chatDialogId))
         {
-            ChatDialogId = chatDialogId,
-            Id = requestId,
-            Content = question,
-            ExpendToken = requestToken,
-            Type = ChatDialogHistoryType.Text,
-            Current = true
-        });
+            var createChatDialogHistoryCommand = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
+            {
+                ChatDialogId = chatDialogId!,
+                Id = requestId,
+                Content = question,
+                ExpendToken = requestToken,
+                Type = ChatDialogHistoryType.Text,
+                Current = true
+            });
 
-        await eventBus.PublishAsync(createChatDialogHistoryCommand);
+            await eventBus.PublishAsync(createChatDialogHistoryCommand);
+        }
+
 
         var outputContent = output.ToString();
         var completeToken = TokenHelper.ComputeToken(outputContent);
 
-        var chatDialogHistory = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
+        if (!string.IsNullOrEmpty(chatDialogId))
         {
-            ChatDialogId = chatDialogId,
-            Content = outputContent,
-            Id = responseId,
-            ExpendToken = completeToken,
-            Type = ChatDialogHistoryType.Text,
-            Current = false,
-            ReferenceFile = sourceFile.Select(x => new SourceFileDto()
+            var chatDialogHistory = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
             {
-                Name = x.Name,
-                FileId = x.Id.ToString(),
-                FilePath = x.Path
-            }).ToList()
-        });
+                ChatDialogId = chatDialogId!,
+                Content = outputContent,
+                Id = responseId,
+                ExpendToken = completeToken,
+                Type = ChatDialogHistoryType.Text,
+                Current = false,
+                ReferenceFile = sourceFile.Select(x => new SourceFileDto()
+                {
+                    Name = x.Name,
+                    FileId = x.Id.ToString(),
+                    FilePath = x.Path
+                }).ToList()
+            });
 
-        await eventBus.PublishAsync(chatDialogHistory);
+            await eventBus.PublishAsync(chatDialogHistory);
+        }
 
         #endregion
 

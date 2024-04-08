@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { Dropdown, message } from "antd";
 import ChangePassword from "../../components/ChangePassword";
 
-
 const DesktopLayout = memo(() => {
   const [tab, setTab] = useState<string>('chat');
   const [ChangePasswordVisible, setChangePasswordVisible] = useState<boolean>(false);
