@@ -45,19 +45,11 @@ public static class OpenAIService
 
         var getAPIKeyChatShareQuery = new GetAPIKeyChatShareQuery(token);
 
-        // 如果是sk-开头的token则是应用token
-        if (chatShareId.IsNullOrEmpty() && !token.ToString().Replace("Bearer ", "").Trim().StartsWith("sk-"))
+        ChatApplicationDto chatApplication = null;
+
+        if (token.ToString().Replace("Bearer ", "").Trim().StartsWith("sk-"))
         {
-            // 判断当前用户是否登录
-            if (context.User.Identity?.IsAuthenticated == false)
-            {
-                context.Response.StatusCode = 401;
-                await context.WriteEndAsync("Token不能为空");
-                return;
-            }
-        }
-        else if (chatShareId.IsNullOrEmpty())
-        {
+            getAPIKeyChatShareQuery = new GetAPIKeyChatShareQuery(token.ToString().Replace("Bearer ", "").Trim());
             await eventBus.PublishAsync(getAPIKeyChatShareQuery);
 
             if (getAPIKeyChatShareQuery.Result == null)
@@ -66,20 +58,8 @@ public static class OpenAIService
                 await context.WriteEndAsync("Token无效");
                 return;
             }
-        }
-
-        ChatApplicationDto chatApplication = null;
-
-        if (!chatShareId.IsNullOrEmpty())
-        {
-            var chatShareInfoQuery = new ChatShareInfoQuery(chatShareId);
-
-            await eventBus.PublishAsync(chatShareInfoQuery);
-
-            // 如果chatShareId不存在则返回让下面扣款
-            getAPIKeyChatShareQuery.Result = chatShareInfoQuery.Result;
-
-            var chatApplicationQuery = new ChatApplicationInfoQuery(chatShareInfoQuery.Result.ChatApplicationId);
+            
+            var chatApplicationQuery = new ChatApplicationInfoQuery(getAPIKeyChatShareQuery.Result.ChatApplicationId);
 
             await eventBus.PublishAsync(chatApplicationQuery);
 
@@ -87,21 +67,47 @@ public static class OpenAIService
         }
         else
         {
-            if (chatId.IsNullOrEmpty())
+            // 如果不是sk则校验用户 并且不是分享链接
+            if (chatShareId.IsNullOrEmpty())
             {
-                await context.WriteEndAsync(nameof(chatId) + "不能为空");
-                return;
+                // 判断当前用户是否登录
+                if (context.User.Identity?.IsAuthenticated == false)
+                {
+                    context.Response.StatusCode = 401;
+                    await context.WriteEndAsync("Token不能为空");
+                    return;
+                }
             }
 
-            var chatApplicationQuery = new ChatApplicationInfoQuery(chatId);
-            await eventBus.PublishAsync(chatApplicationQuery);
-            chatApplication = chatApplicationQuery?.Result;
-        }
+            // 如果是分享链接则获取分享信息
+            if (!chatShareId.IsNullOrEmpty())
+            {
+                var chatShareInfoQuery = new ChatShareInfoQuery(chatShareId);
 
-        if (chatApplication == null)
-        {
-            await context.WriteEndAsync("应用Id不存在");
-            return;
+                await eventBus.PublishAsync(chatShareInfoQuery);
+
+                // 如果chatShareId不存在则返回让下面扣款
+                getAPIKeyChatShareQuery.Result = chatShareInfoQuery.Result;
+
+                var chatApplicationQuery = new ChatApplicationInfoQuery(chatShareInfoQuery.Result.ChatApplicationId);
+
+                await eventBus.PublishAsync(chatApplicationQuery);
+
+                chatApplication = chatApplicationQuery?.Result;
+            }
+            // 如果是应用Id则获取应用信息
+            else if (!chatId.IsNullOrEmpty())
+            {
+                var chatApplicationQuery = new ChatApplicationInfoQuery(chatId);
+                await eventBus.PublishAsync(chatApplicationQuery);
+                chatApplication = chatApplicationQuery?.Result;
+            }
+
+            if (chatApplication == null)
+            {
+                await context.WriteEndAsync("应用Id不存在");
+                return;
+            }
         }
 
         int requestToken = 0;
