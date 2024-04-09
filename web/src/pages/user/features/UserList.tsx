@@ -25,7 +25,6 @@ export default function UserList({
             pageSize: pageSize,
         });
         
-        await loadingData();
     }
 
     const columns = [
@@ -163,7 +162,7 @@ export default function UserList({
 
     useEffect(() => {
         loadingData();
-    }, []);
+    }, [input]);
 
 
     return (

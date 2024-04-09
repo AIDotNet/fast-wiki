@@ -7,7 +7,8 @@ import {
     OpenAIOutlined, 
     RadarChartOutlined, 
     CoffeeOutlined,
-    BugOutlined
+    BugOutlined,
+    JavaScriptOutlined
 } from "@ant-design/icons";
 
 const Title = styled.span`
@@ -75,6 +76,12 @@ export function Publicity() {
                 '拥有搜索测试，引用修改，数据AI分析等多种功能，让您的调试更加直观',
             icon: BugOutlined,
             title: '可视化调试',
+        },
+        {
+            description:
+                '利用了Monaco在Web界面编辑JS动态Funntion，让您的知识库更加接近智能体！',
+            icon: JavaScriptOutlined,
+            title: 'JS动态Function',
         },
     ];
 

@@ -7,6 +7,7 @@
 
 - 前端框架：react+lobeUI+ts
 - 后端框架：MasaFramework 基于 .NET 8
+- 基于JS V8引擎实现动态Function
 - 向量搜索引擎：使用 PostgreSQL 的向量插件，优化搜索性能
 - 深度学习与NLP：微软Semantic Kernel，提升搜索的语义理解能力
 - 许可证：Apache-2.0，鼓励社区贡献和使用

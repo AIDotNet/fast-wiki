@@ -13,6 +13,7 @@ public sealed class OpenAiHttpClientHandler : HttpClientHandler
 
     public OpenAiHttpClientHandler(string uri)
     {
+        _uri = uri;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,

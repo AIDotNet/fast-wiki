@@ -1,6 +1,7 @@
-import { ChatList, ChatListProps, Tag } from "@lobehub/ui";
+import { ChatList, ChatListProps,  Tag } from "@lobehub/ui";
 import { DeleteDialogHistory, PutChatHistory } from "../services/ChatApplicationService";
 import { message } from "antd";
+import { Button } from "antd";
 
 import {
     ActionsBar,
@@ -42,7 +43,7 @@ export default function ChatAppList({
     return (
         <div id='chat-layout' style={{ overflow: 'auto', flex: 1 }}>
             <ChatList
-                data={(history.length === 0 || history === null) ? [{
+                data={(history === null || history.length === 0) ? [{
                     content: application?.opener ?? "",
                     createAt: new Date().toISOString(),
                     extra: {},
@@ -79,19 +80,24 @@ export default function ChatAppList({
                     setHistory([...history]);
                 }}
                 renderMessages={{
-                    default: ({ id, editableContent }) => {
-                        const v = history.find((i) => i.id === id);
-                        if (v?.extra?.referenceFile) {
-                            return (<div id={id}>
-                                {editableContent}
-                                {v.extra.referenceFile.map((item: any) => <Tag onClick={()=>{
-                                    window.open(item.filePath, '_blank');
-                                }} style={{
-                                    marginTop: 8,
-                                }}>{item.name}</Tag>)}
-                            </div>)
+                    default: ({ id, editableContent }: any) => {
+                        if (editableContent.props.value) {
+                            const v = history.find((i) => i.id === id);
+                            if (v?.extra?.referenceFile) {
+                                return (<div id={id}>
+                                    {editableContent}
+                                    {v.extra.referenceFile.map((item: any) => <Tag onClick={() => {
+                                        window.open(item.filePath, '_blank');
+                                    }} style={{
+                                        marginTop: 8,
+                                    }}>{item.name}</Tag>)}
+                                </div>)
+                            }
+                            return (<div id={id}>{editableContent}</div>)
+                        }else{
+                            return (<Button type='text' loading={true} icon={<></>} />)
                         }
-                        return (<div id={id}>{editableContent}</div>)
+
                     },
                 }}
                 style={{ width: '100%' }}

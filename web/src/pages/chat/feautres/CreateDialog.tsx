@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Modal } from "antd";
 import { Input } from "@lobehub/ui";
-import { CreateChatDialog } from "../../../services/ChatApplicationService";
+import { IndexedDBWrapper } from "../../../utils/IndexedDBWrapper";
 
 interface IAppHeaderProps {
     id: string; // 应用ID
@@ -9,6 +9,7 @@ interface IAppHeaderProps {
     visible: boolean; // 是否显示
     onClose: () => void; // 关闭回调
     type: number; // 类型
+    db: IndexedDBWrapper;
 }
 
 export default function CreateDialog({
@@ -17,23 +18,22 @@ export default function CreateDialog({
     visible,
     onClose,
     type,
+    db
 }: IAppHeaderProps) {
 
     const [data, setData] = useState({
-        name:"",
-        description:'',
+        name: "",
+        description: '',
         type: type,
     });
 
-    function createDialog() {
-
-        CreateChatDialog({
+    async function createDialog() {
+        await db.add({
             ...data,
             applicationId: id
         })
-            .then(() => {
-                onSucess();
-            })
+
+        onSucess();
     }
 
     return (
@@ -46,19 +46,19 @@ export default function CreateDialog({
                             name: e.target.value
                         })
                     }}
-                    placeholder="对话名称"/>
+                    placeholder="对话名称" />
             </div>
             <div style={{
                 marginTop: 16
             }}>
-                <Input value={data.description} 
+                <Input value={data.description}
                     onChange={(e) => {
                         setData({
                             ...data,
                             description: e.target.value
                         })
                     }}
-                    placeholder="对话描述"/>
+                    placeholder="对话描述" />
             </div>
         </Modal>
     )
