@@ -35,23 +35,11 @@ public static class OpenAIService
             return;
         }
 
-        var chatDialogId = context.Request.Query["ChatDialogId"];
+        var chatDialogId = context.Request.Query["ChatDialogId"].ToString();
         var chatId = context.Request.Query["ChatId"];
         var token = context.Request.Headers.Authorization;
         var chatShareId = context.Request.Query["ChatShareId"];
 
-
-        if (chatDialogId.IsNullOrEmpty())
-        {
-            await context.WriteEndAsync(nameof(chatDialogId) + "不能为空");
-            return;
-        }
-
-        if (chatId.IsNullOrEmpty())
-        {
-            await context.WriteEndAsync(nameof(chatId) + "不能为空");
-            return;
-        }
 
         var eventBus = context.RequestServices.GetRequiredService<IEventBus>();
 
@@ -99,6 +87,12 @@ public static class OpenAIService
         }
         else
         {
+            if (chatId.IsNullOrEmpty())
+            {
+                await context.WriteEndAsync(nameof(chatId) + "不能为空");
+                return;
+            }
+
             var chatApplicationQuery = new ChatApplicationInfoQuery(chatId);
             await eventBus.PublishAsync(chatApplicationQuery);
             chatApplication = chatApplicationQuery?.Result;
@@ -289,12 +283,12 @@ public static class OpenAIService
             if (chatApplication.FunctionIds.Any() && functionCall.Result.Any())
             {
                 // 只支持OpenAI
-                if(fastModelDto.Type != OpenAIOptions.ServiceName)
+                if (fastModelDto.Type != OpenAIOptions.ServiceName)
                 {
                     await context.WriteEndAsync("Function Call目前仅支持OpenAI模型");
                     return;
                 }
-                
+
                 var kernel = wikiMemoryService.CreateFunctionKernel(functionCall.Result.ToList(), fastModelDto.ApiKey,
                     chatApplication.ChatModel, fastModelDto.Url);
 
@@ -408,38 +402,45 @@ public static class OpenAIService
 
         #region 记录对话内容
 
-        var createChatDialogHistoryCommand = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
+        if (!chatDialogId.IsNullOrEmpty())
         {
-            ChatDialogId = chatDialogId,
-            Id = requestId,
-            Content = question,
-            ExpendToken = requestToken,
-            Type = ChatDialogHistoryType.Text,
-            Current = true
-        });
+            var createChatDialogHistoryCommand = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
+            {
+                ChatDialogId = chatDialogId ?? string.Empty,
+                Id = requestId,
+                Content = question,
+                ExpendToken = requestToken,
+                Type = ChatDialogHistoryType.Text,
+                Current = true
+            });
 
-        await eventBus.PublishAsync(createChatDialogHistoryCommand);
+            await eventBus.PublishAsync(createChatDialogHistoryCommand);
+        }
+
 
         var outputContent = output.ToString();
         var completeToken = TokenHelper.ComputeToken(outputContent);
 
-        var chatDialogHistory = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
+        if (!chatDialogId.IsNullOrEmpty())
         {
-            ChatDialogId = chatDialogId,
-            Content = outputContent,
-            Id = responseId,
-            ExpendToken = completeToken,
-            Type = ChatDialogHistoryType.Text,
-            Current = false,
-            ReferenceFile = sourceFile.Select(x => new SourceFileDto()
+            var chatDialogHistory = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
             {
-                Name = x.Name,
-                FileId = x.Id.ToString(),
-                FilePath = x.Path
-            }).ToList()
-        });
+                ChatDialogId = chatDialogId,
+                Content = outputContent,
+                Id = responseId,
+                ExpendToken = completeToken,
+                Type = ChatDialogHistoryType.Text,
+                Current = false,
+                ReferenceFile = sourceFile.Select(x => new SourceFileDto()
+                {
+                    Name = x.Name,
+                    FileId = x.Id.ToString(),
+                    FilePath = x.Path
+                }).ToList()
+            });
 
-        await eventBus.PublishAsync(chatDialogHistory);
+            await eventBus.PublishAsync(chatDialogHistory);
+        }
 
         #endregion
 
