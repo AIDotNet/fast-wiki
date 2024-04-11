@@ -15,19 +15,19 @@ class IndexedDBWrapper {
       return new Promise((resolve, reject) => {
         const request = indexedDB.open(this.dbName, this.dbVersion);
   
-        request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
+        request.onupgradeneeded = () => {
           this.db = request.result;
           if (!this.db.objectStoreNames.contains(this.storeName)) {
             this.db.createObjectStore(this.storeName, { keyPath: 'id', autoIncrement: true });
           }
         };
   
-        request.onsuccess = (event: Event) => {
+        request.onsuccess = () => {
           this.db = request.result;
           resolve(this.db);
         };
   
-        request.onerror = (event: Event) => {
+        request.onerror = () => {
           reject(request.error);
         };
       });
@@ -44,11 +44,11 @@ class IndexedDBWrapper {
         const store = transaction.objectStore(this.storeName);
         const request = store.add(data);
   
-        request.onsuccess = (event: Event) => {
+        request.onsuccess = () => {
           resolve(request.result as number);
         };
   
-        request.onerror = (event: Event) => {
+        request.onerror = () => {
           reject(request.error);
         };
       });
@@ -60,11 +60,11 @@ class IndexedDBWrapper {
         const store = transaction.objectStore(this.storeName);
         const request = store.get(id);
   
-        request.onsuccess = (event: Event) => {
+        request.onsuccess = () => {
           resolve(request.result as T);
         };
   
-        request.onerror = (event: Event) => {
+        request.onerror = () => {
           reject(request.error);
         };
       });
@@ -76,11 +76,11 @@ class IndexedDBWrapper {
         const store = transaction.objectStore(this.storeName);
         const request = store.getAll();
   
-        request.onsuccess = (event: Event) => {
+        request.onsuccess = () => {
           resolve(request.result as T[]);
         };
   
-        request.onerror = (event: Event) => {
+        request.onerror = () => {
           reject(request.error);
         };
       });
@@ -92,11 +92,11 @@ class IndexedDBWrapper {
         const store = transaction.objectStore(this.storeName);
         const request = store.put(data, id);
   
-        request.onsuccess = (event: Event) => {
+        request.onsuccess = () => {
           resolve();
         };
   
-        request.onerror = (event: Event) => {
+        request.onerror = () => {
           reject(request.error);
         };
       });
@@ -109,21 +109,21 @@ class IndexedDBWrapper {
             const store = transaction.objectStore(this.storeName);
             const request = store.get(id);
     
-            request.onsuccess = (event: Event) => {
+            request.onsuccess = () => {
                 const oldData = request.result;
                 const newData = { ...oldData, ...data };
                 const requestUpdate = store.put(newData, id);
     
-                requestUpdate.onsuccess = (event: Event) => {
+                requestUpdate.onsuccess = () => {
                     resolve();
                 };
     
-                requestUpdate.onerror = (event: Event) => {
+                requestUpdate.onerror = () => {
                     reject(requestUpdate.error);
                 };
             };
     
-            request.onerror = (event: Event) => {
+            request.onerror = () => {
                 reject(request.error);
             };
         });
@@ -136,11 +136,11 @@ class IndexedDBWrapper {
         const store = transaction.objectStore(this.storeName);
         const request = store.delete(id);
   
-        request.onsuccess = (event: Event) => {
+        request.onsuccess = () => {
           resolve();
         };
   
-        request.onerror = (event: Event) => {
+        request.onerror = () => {
           reject(request.error);
         };
       });
@@ -152,11 +152,11 @@ class IndexedDBWrapper {
             const store = transaction.objectStore(this.storeName);
             const request = store.delete(id);
     
-            request.onsuccess = (event: Event) => {
+            request.onsuccess = () => {
             resolve();
             };
     
-            request.onerror = (event: Event) => {
+            request.onerror = () => {
             reject(request.error);
             };
         });

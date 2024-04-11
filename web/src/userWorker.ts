@@ -25,43 +25,6 @@ self.MonacoEnvironment = {
 	}
 };
 
-monaco.languages.register({ id: 'javascript' });
-
-monaco.languages.setLanguageConfiguration('javascript', {
-	indentationRules: {
-		increaseIndentPattern: /^(.*\bcase\b\s*.*|.*\bdefault\b\s*.*)$/,
-		decreaseIndentPattern: /^\s*[\}\]].*$/,
-	},
-	folding: {
-		markers: {
-			start: new RegExp('^\\s*//\\s*#?region\\b'),
-			end: new RegExp('^\\s*//\\s*#?endregion\\b'),
-		},
-	},
-	brackets: [
-		['{', '}'],
-		['[', ']'],
-		['(', ')'],
-	],
-	wordPattern: /(-?\d*\.\d\w*)|([^`~!@#%^&*()=+[{\]}\\|;:'",.<>\/?\s]+)/g,
-});
-const formatCommand = {
-	id: 'format-command',
-	label: 'Format',
-	keybindings: [
-		monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK, monaco.KeyCode.KeyF) // 绑定到 Ctrl + K, Ctrl + F
-	],
-	run: function (editor: any) {
-		// 格式化代码逻辑
-		const model = editor.getModel();
-		const range = model.getFullModelRange();
-		editor.executeEdits('format-command', [{
-			range: range,
-			text: '格式化代码'
-		}]);
-	}
-};
-
 monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
 	target: monaco.languages.typescript.ScriptTarget.ES2015,
 	allowNonTsExtensions: true
