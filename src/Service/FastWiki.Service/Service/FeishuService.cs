@@ -14,6 +14,8 @@ using Microsoft.SemanticKernel.Connectors.OpenAI;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using AIDotNet.Abstractions;
+using AIDotNet.Abstractions.Dto;
 using FastWiki.Service.Contracts.Feishu.Dto;
 using TokenApi.Service.Exceptions;
 
@@ -307,7 +309,7 @@ public class FeishuService
         if (chatApplication.ChatType.IsNullOrEmpty())
         {
             // 防止没有设置对话类型
-            chatApplication.ChatType = OpenAIOptions.ServiceName;
+            chatApplication.ChatType = OpenAIServiceOptions.ServiceName;
         }
 
         var modelService = context.RequestServices.GetRequiredService<ModelService>();
@@ -342,16 +344,30 @@ public class FeishuService
         var output = new StringBuilder();
         try
         {
-            await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(history, setting))
+            var streamInput = new OpenAIChatCompletionInput<OpenAIChatCompletionRequestInput>
             {
-                if (item.Content.IsNullOrEmpty())
+                MaxTokens = chatApplication.MaxResponseToken,
+                Temperature = chatApplication.Temperature,
+                Model = chatApplication.ChatModel,
+                Messages = history.Select(x => new OpenAIChatCompletionRequestInput(x.Role.ToString(), x.Content))
+                    .ToList(),
+            };
+
+            await foreach (var item in chatStream.StreamChatAsync(streamInput, new ChatOptions()
+                           {
+                               Key = fastModelDto.ApiKey,
+                               Address = fastModelDto.Url
+                           }))
+            {
+                var message = item.Choices.FirstOrDefault()?.Delta.Content;
+                if (string.IsNullOrEmpty(message))
                 {
                     continue;
                 }
 
-                output.Append(item.Content);
+                output.Append(message);
 
-                chatResponse.Invoke(item.Content);
+                chatResponse.Invoke(message);
             }
         }
         catch (NotModelException notModelException)

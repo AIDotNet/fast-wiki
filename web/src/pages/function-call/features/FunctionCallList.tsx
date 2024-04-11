@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Table } from "antd";
 import { DeleteFunction, EnableFunctionCall, GetFunctionList } from "../../../services/FunctionService";
 import { Button, Dropdown, message } from "antd";
-import { render } from "react-dom";
 import ShowCode from "./ShowCode";
 
 interface IFunctionCallListProps {

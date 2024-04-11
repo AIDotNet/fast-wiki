@@ -33,7 +33,7 @@
 1. 克隆仓库：
 
 ```
-git clone https://github.com/239573049/fast-wiki.git
+git clone https://github.com/AIDotNet/fast-wiki.git
 ```
 
 2. 安装好node.js，最新版本(https://nodejs.p2hp.com/)。

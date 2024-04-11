@@ -190,4 +190,10 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <returns></returns>
     Task<ChatDialogHistory> GetChatDialogHistoryAsync(string id);
 
+    /// <summary>
+    /// 删除指定对话所有记录
+    /// </summary>
+    /// <param name="chatDialogId"></param>
+    /// <returns></returns>
+    Task RemovesChatDialogHistoryAsync(string chatDialogId);
 }

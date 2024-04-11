@@ -6,7 +6,7 @@ using FastWiki.Service.Infrastructure.Helper;
 namespace FastWiki.Service.Service;
 
 /// <summary>
-/// ÊÚÈ¨·şÎñ
+/// æˆæƒæœåŠ¡
 /// </summary>
 public sealed class AuthorizeService : ApplicationService<AuthorizeService>, IAuthorizeService
 {

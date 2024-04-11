@@ -200,4 +200,12 @@ public sealed class ChatApplicationService
 
         return EventBus.PublishAsync(command);
     }
+    
+    [Authorize]
+    public async Task PurgeMessageHistoryAsync(string dialogId)
+    {
+        var command = new RemovesChatDialogHistoryCommand(dialogId);
+
+        await EventBus.PublishAsync(command);
+    }
 }

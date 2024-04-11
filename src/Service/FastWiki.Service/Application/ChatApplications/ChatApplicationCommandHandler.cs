@@ -61,7 +61,7 @@ public class ChatApplicationCommandHandler(
             command.Input.Content, TokenHelper.ComputeToken(command.Input.Content), command.Input.Current,
             command.Input.Type);
 
-        // 如果有id则设置id
+        // 濡傛灉鏈塱d鍒欒缃甶d
         if (!command.Input.Id.IsNullOrEmpty())
             chatDialogHistory.SetId(command.Input.Id);
 
@@ -121,5 +121,11 @@ public class ChatApplicationCommandHandler(
     public async Task RemoveChatShareAsync(RemoveChatShareCommand command)
     {
         await chatApplicationRepository.RemoveChatShareAsync(command.Id);
+    }
+
+    [EventHandler]
+    public async Task UpdateChatShareAsync(RemovesChatDialogHistoryCommand command)
+    {
+        await chatApplicationRepository.RemovesChatDialogHistoryAsync(command.dialogId);
     }
 }

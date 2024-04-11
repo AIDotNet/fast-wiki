@@ -3,9 +3,8 @@ import styled from "styled-components"
 import { Button } from 'antd'
 import { useState } from "react";
 import FunctionCallList from "../features/FunctionCallList";
-import CreateFunctionCall from "../features/CreateFunctionCall";
 import UpdateFunctionCall from "../features/UpdateFunctionCall";
-
+import { useNavigate } from 'react-router-dom'
 
 
 const FunctionCallWrapper = styled.div`
@@ -17,7 +16,7 @@ const FunctionCallWrapper = styled.div`
 
 export default function DesktopLayout() {
     const [keyword, setKeyword] = useState('');
-    const [createVisible, setCreateVisible] = useState(false);
+    const navigate = useNavigate();
     const [input, setInput] = useState({
         page: 1,
         pageSize: 10,
@@ -54,7 +53,9 @@ export default function DesktopLayout() {
                         marginRight: '20px',
                         marginTop: '5px'
                     }} placeholder="请输入名称或描述的内容搜索" />
-                <Button onClick={() => { setCreateVisible(true) }} style={{
+                <Button onClick={() => 
+                    navigate('/function-call/create')
+                } style={{
                     marginRight: '20px',
                     marginTop: '5px'
                 }} >
@@ -69,12 +70,6 @@ export default function DesktopLayout() {
                 visible: true,
                 value: v
             });
-        }} />
-        <CreateFunctionCall visible={createVisible} onCancel={() => {
-            setCreateVisible(false);
-        }} onSuccess={() => {
-            setCreateVisible(false);
-
         }} />
         <UpdateFunctionCall
             visible={updateData.visible}

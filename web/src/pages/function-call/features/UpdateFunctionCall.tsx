@@ -46,46 +46,6 @@ export default function UpdateFunctionCall({
                     automaticLayout: true
                 });
 
-
-                monaco.languages.registerCompletionItemProvider('javascript', {
-                    provideCompletionItems: () => {
-                        // 定义console的扩展
-                        const suggestions = [
-                            {
-                                label: 'log',
-                                kind: monaco.languages.CompletionItemKind.Function,
-                                insertText: 'console.WriteLine(${1:arg1})',
-                                documentation: '控制台日志输出'
-                            },
-                            {
-                                label: 'WriteLine',
-                                kind: monaco.languages.CompletionItemKind.Function,
-                                insertText: 'console.log(${1:arg1})',
-                                documentation: '控制台日志输出'
-                            },
-                            {
-                                label: 'Write',
-                                kind: monaco.languages.CompletionItemKind.Function,
-                                insertText: 'console.log(${1:arg1})',
-                                documentation: '控制台日志输出'
-                            },
-                            {
-                                label: 'ReadLine',
-                                kind: monaco.languages.CompletionItemKind.Function,
-                                insertText: 'prompt(${1:arg1})',
-                                documentation: '控制台日志输出'
-                            },
-                            {
-                                label: 'Read',
-                                kind: monaco.languages.CompletionItemKind.Function,
-                                insertText: 'prompt(${1:arg1})',
-                                documentation: '控制台日志输出'
-                            }
-                        ];
-                        return { suggestions: suggestions } as any;
-                    },
-                });
-
                 return e;
             });
         }
@@ -135,8 +95,10 @@ export default function UpdateFunctionCall({
     }
 
     return (
-        <Modal allowFullscreen={true} open={visible} title="创建函数调用"
+        <Modal 
+            open={visible} title="创建函数调用"
             footer={null}
+            width={'100%'}
             onCancel={() => onCancel()}
         >
             <SInput

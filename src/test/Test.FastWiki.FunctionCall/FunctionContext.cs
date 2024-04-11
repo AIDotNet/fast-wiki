@@ -10,20 +10,29 @@ public class FunctionContext
     }
 
     [Test]
-    public void TestConsole()
+    public async Task TaskGetCity()
     {
         using var function = new FastWikiFunctionContext();
 
-        var result = function.FunctionCall("function print(x) { console.WriteLine(x); return x; }", "print",
-            "Hello World!");
+        var result = await function.FunctionCall(
+"""
+
+async function GetCity(city) {
+	const str = `https://api.seniverse.com/v3/weather/now.json?key=SqskMHsGbF6Ctge2D&location=${city}&language=zh-Hans&unit=c`;
+	const data = await HttpClientHelper.GetAsync(str)
+	return data;
+} 
+            
+""", "GetCity",
+            "深圳");
     }
 
     [Test]
-    public void TestAdd()
+    public async Task TestAdd()
     {
         using var function = new FastWikiFunctionContext();
 
-        var result = function.FunctionCall<int>("function add(x) { x=x +1;return x; }", "add", 2);
+        var result = await function.FunctionCall("function add(x) { x=x +1;return x; }", "add", 2);
         Assert.AreEqual(3, result);
     }
 }

@@ -1,4 +1,6 @@
 
+// @ts-ignore
+
 namespace System {
    /** Specifies constants that define foreground and background colors for the console. */
    enum ConsoleColor {
@@ -546,6 +548,7 @@ namespace System {
 }
 
 
+// @ts-ignore
 declare namespace Console {
 
    /** Gets or sets the background color of the console. */
@@ -679,21 +682,27 @@ declare namespace Console {
 
 
    /** Acquires the standard error stream. */
+   // @ts-ignore
    function OpenStandardError(): Duplex;
 
    /** Acquires the standard error stream, which is set to a specified buffer size. */
+   // @ts-ignore
    function OpenStandardError(bufferSize: number): Duplex;
 
    /** Acquires the standard input stream. */
+   // @ts-ignore
    function OpenStandardInput(): Duplex;
 
    /** Acquires the standard input stream, which is set to a specified buffer size. */
+   // @ts-ignore
    function OpenStandardInput(bufferSize: number): Duplex;
 
    /** Acquires the standard output stream. */
+   // @ts-ignore
    function OpenStandardOutput(): Duplex;
 
    /** 获取设置为指定缓冲区大小的标准输出流。 */
+   // @ts-ignore
    function OpenStandardOutput(bufferSize: number): Duplex;
 
    /** 从标准输入流中读取下一个字符。 */
@@ -873,4 +882,5 @@ declare namespace Console {
 }
 
 
+// @ts-ignore
 declare var Console: Console;

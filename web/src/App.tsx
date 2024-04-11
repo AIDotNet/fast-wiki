@@ -23,6 +23,8 @@ const Register = lazy(() => import('./pages/register/page'));
 
 const Model = lazy(() => import('./pages/model/page'));
 
+const CreateFunctionCall = lazy(() => import('./pages/function-call/features/CreateFunctionCall'));
+
 const router = createBrowserRouter([{
   path: '/',
   element: <Home />
@@ -69,6 +71,11 @@ const router = createBrowserRouter([{
         <FunctionCall />
       </Suspense>
     },
+    {
+      path: '/function-call/create', element: <Suspense fallback={'加载中'}>
+        <CreateFunctionCall />
+      </Suspense>
+    }
   ]
 }, {
   path: '/login',

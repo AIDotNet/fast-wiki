@@ -64,7 +64,7 @@ export default function DesktopLayout() {
     const [history, setHistory] = useState([] as any[]);
     const [input] = useState({
         page: 1,
-        pageSize: 5
+        pageSize: 20
     });
 
     async function loadingApplications() {

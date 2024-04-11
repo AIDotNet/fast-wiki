@@ -9,6 +9,8 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using System.Text;
 using System.Text.Json;
+using AIDotNet.Abstractions;
+using AIDotNet.Abstractions.Dto;
 using Azure.AI.OpenAI;
 using DocumentFormat.OpenXml.Office2013.PowerPoint.Roaming;
 using FastWiki.Service.Application.Function.Queries;
@@ -58,7 +60,7 @@ public static class OpenAIService
                 await context.WriteEndAsync("Token无效");
                 return;
             }
-            
+
             var chatApplicationQuery = new ChatApplicationInfoQuery(getAPIKeyChatShareQuery.Result.ChatApplicationId);
 
             await eventBus.PublishAsync(chatApplicationQuery);
@@ -243,7 +245,7 @@ public static class OpenAIService
         if (chatApplication.ChatType.IsNullOrEmpty())
         {
             // 防止没有设置对话类型
-            chatApplication.ChatType = OpenAIOptions.ServiceName;
+            chatApplication.ChatType = OpenAIServiceOptions.ServiceName;
         }
 
         var modelService = context.RequestServices.GetRequiredService<ModelService>();
@@ -289,7 +291,7 @@ public static class OpenAIService
             if (chatApplication.FunctionIds.Any() && functionCall.Result.Any())
             {
                 // 只支持OpenAI
-                if (fastModelDto.Type != OpenAIOptions.ServiceName)
+                if (fastModelDto.Type != OpenAIServiceOptions.ServiceName)
                 {
                     await context.WriteEndAsync("Function Call目前仅支持OpenAI模型");
                     return;
@@ -303,6 +305,7 @@ public static class OpenAIService
                     ToolCallBehavior = ToolCallBehavior.EnableKernelFunctions
                 };
 
+                // TODO: 这里目前还只能支持OpenAI
                 var chat = kernel.GetRequiredService<IChatCompletionService>();
 
                 var result =
@@ -325,8 +328,9 @@ public static class OpenAIService
 
                     if (function == null)
                     {
-                        await context.WriteEndAsync("未找到函数");
-                        return;
+                        // await context.WriteEndAsync("未找到函数");
+                        // return;
+                        continue;
                     }
 
                     try
@@ -356,29 +360,59 @@ public static class OpenAIService
                     }
                 }
 
-                await foreach (var item in chat.GetStreamingChatMessageContentsAsync(chatHistory, setting))
+                var streamInput = new OpenAIChatCompletionInput<OpenAIChatCompletionRequestInput>
                 {
-                    if (item.Content.IsNullOrEmpty())
+                    MaxTokens = chatApplication.MaxResponseToken,
+                    Temperature = chatApplication.Temperature,
+                    Model = chatApplication.ChatModel,
+                    Messages = chatHistory
+                        .Select(x => new OpenAIChatCompletionRequestInput(x.Role.ToString(), x.Content))
+                        .ToList(),
+                };
+
+                await foreach (var item in chatStream.StreamChatAsync(streamInput, new ChatOptions()
+                               {
+                                   Address = fastModelDto.Url,
+                                   Key = fastModelDto.ApiKey
+                               }))
+                {
+                    var message = item.Choices.FirstOrDefault()?.Delta.Content;
+                    if (string.IsNullOrEmpty(message))
                     {
                         continue;
                     }
 
-                    output.Append(item.Content);
-                    await context.WriteOpenAiResultAsync(item.Content, module.model, requestId,
+                    output.Append(message);
+                    await context.WriteOpenAiResultAsync(message, module.model, requestId,
                         responseId);
                 }
             }
             else
             {
-                await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory, setting))
+                var streamInput = new OpenAIChatCompletionInput<OpenAIChatCompletionRequestInput>
                 {
-                    if (item.Content.IsNullOrEmpty())
+                    MaxTokens = chatApplication.MaxResponseToken,
+                    Temperature = chatApplication.Temperature,
+                    Model = chatApplication.ChatModel,
+                    Messages = chatHistory
+                        .Select(x => new OpenAIChatCompletionRequestInput(x.Role.ToString(), x.Content))
+                        .ToList(),
+                };
+
+                await foreach (var item in chatStream.StreamChatAsync(streamInput, new ChatOptions()
+                               {
+                                   Address = fastModelDto.Url,
+                                   Key = fastModelDto.ApiKey
+                               }))
+                {
+                    var message = item.Choices.FirstOrDefault()?.Delta.Content;
+                    if (string.IsNullOrEmpty(message))
                     {
                         continue;
                     }
 
-                    output.Append(item.Content);
-                    await context.WriteOpenAiResultAsync(item.Content, module.model, requestId,
+                    output.Append(message);
+                    await context.WriteOpenAiResultAsync(message, module.model, requestId,
                         responseId);
                 }
             }

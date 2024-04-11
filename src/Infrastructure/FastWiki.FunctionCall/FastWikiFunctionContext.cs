@@ -1,4 +1,6 @@
+using System.Runtime.InteropServices.JavaScript;
 using Microsoft.ClearScript;
+using Microsoft.ClearScript.JavaScript;
 using Microsoft.ClearScript.V8;
 
 namespace FastWiki.FunctionCall;
@@ -10,7 +12,7 @@ public sealed class FastWikiFunctionContext : IDisposable
     public FastWikiFunctionContext()
     {
         Engine.AddHostType("Console", typeof(Console));
-        Engine.AddHostType("HttpClient", typeof(HttpClient));
+        Engine.AddHostType("HttpClientHelper", typeof(HttpClientHelper));
     }
 
     public async Task AddHostObject(string name, object obj)
@@ -23,26 +25,47 @@ public sealed class FastWikiFunctionContext : IDisposable
         Engine.AddHostType(name, type);
     }
 
-    public object FunctionCall(string script, string functionName, params object[] args)
+    public async Task<object> FunctionCall(string script, string functionName, params object[] args)
     {
+        
         Engine.Execute(script);
+        dynamic resultOrPromise = Engine.Invoke(functionName, args);
 
-        dynamic v = Engine.Invoke(functionName, args);
+        var t = resultOrPromise?.GetType();
 
-        var t = v?.GetType();
-
-        // �ж�v�Ƿ��   
+        // 判断v是否空   
         if (t == Undefined.Value.GetType())
         {
             return null;
         }
 
-        return v;
+        bool isPromise = Engine.Script.Object.prototype.toString.call(resultOrPromise) == "[object Promise]";
+        if (isPromise)
+        {
+            
+            // 获取返回的结果
+            var tcs = new TaskCompletionSource<object>();
+            resultOrPromise.then(
+                new Action<object>(value =>
+                {
+                    // 如果value返回的是Task 或Task<T>类型
+                    value = value.GetType().GetProperty("Result")?.GetValue(value) ?? value;
+                    
+                    tcs.SetResult(value);
+                })
+            );
+
+            return tcs.Task.GetAwaiter().GetResult();
+        }
+        else
+        {
+            return resultOrPromise;
+        }
     }
 
-    public T FunctionCall<T>(string script, string functionName, params object[] args)
+    public async Task<T> FunctionCall<T>(string script, string functionName, params object[] args)
     {
-        var result = FunctionCall(script, functionName, args);
+        var result = await FunctionCall(script, functionName, args);
 
         if (result is T t)
         {

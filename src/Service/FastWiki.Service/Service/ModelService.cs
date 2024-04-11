@@ -1,8 +1,4 @@
 ﻿using AIDotNet.Abstractions;
-using AIDotNet.MetaGLM;
-using AIDotNet.OpenAI;
-using AIDotNet.Qiansail;
-using AIDotNet.SparkDesk;
 using FastWiki.Service.Application.Model.Commands;
 using FastWiki.Service.Application.Model.Queries;
 using FastWiki.Service.Contracts.Model;
@@ -20,17 +16,16 @@ public sealed class ModelService(IServiceProvider serviceProvider) : Application
     /// </summary>
     /// <returns></returns>
     public Dictionary<string, string> GetChatTypes()
-        => IADNChatCompletionService.ServiceNames;
+        => IApiChatCompletionService.ServiceNames;
 
-
-    public async ValueTask<(IADNChatCompletionService, FastModelDto)> GetChatService(string serviceId)
+    public async ValueTask<(IApiChatCompletionService, FastModelDto)> GetChatService(string serviceId)
     {
         try
         {
             var query = new ModelInfoQuery(serviceId);
             await EventBus.PublishAsync(query);
 
-            var service = serviceProvider.GetKeyedService<IADNChatCompletionService>(query.Result.Type);
+            var service = serviceProvider.GetKeyedService<IApiChatCompletionService>(query.Result.Type);
 
             if (service != null)
             {

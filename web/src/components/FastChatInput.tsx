@@ -6,7 +6,7 @@ import { Flexbox } from 'react-layout-kit';
 import { Eraser, Languages } from 'lucide-react';
 import React from "react";
 import { message } from "antd";
-import { GetChatDialogHistoryInfo } from "../services/ChatApplicationService";
+import { GetChatDialogHistoryInfo, PurageMessageHistory } from "../services/ChatApplicationService";
 
 interface IFastChatInputProps {
     dialog: any;
@@ -199,7 +199,11 @@ export default function FastChatInput({
                             <>
                                 <ActionIcon icon={Languages} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
                                 <ActionIcon onClick={() => {
-                                    setValue('');
+                                    PurageMessageHistory(dialog.id)
+                                        .then(()=>{
+                                            setHistory([]);
+                                            message.success('清空成功');
+                                        });
                                 }} icon={Eraser} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
                             </>
                         }

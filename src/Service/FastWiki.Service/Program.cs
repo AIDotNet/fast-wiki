@@ -1,4 +1,9 @@
+using AIDotNet.Abstractions;
+using AIDotNet.Claudia;
+using AIDotNet.MetaGLM;
+using AIDotNet.OpenAI;
 using AIDotNet.Qiansail;
+using AIDotNet.SparkDesk;
 using AspNetCoreRateLimit;
 using FastWiki.Service;
 using FastWiki.Service.Backgrounds;
@@ -26,10 +31,17 @@ builder
 builder
     .AddFastSemanticKernel();
 
-builder.Services.AddOpenAIService()
+builder.Services
+    .AddOpenAIService()
     .AddSparkDeskService()
     .AddMetaGLMClientV4()
-    .AddQiansail();
+    .AddClaudia()
+    .AddQiansail()
+    .AddKeyedSingleton<IApiChatCompletionService, OpenAiService>(OpenAIServiceOptions.ServiceName)
+    .AddKeyedSingleton<IApiChatCompletionService, MetaGLMService>(MetaGLMOptions.ServiceName)
+    .AddKeyedSingleton<IApiChatCompletionService, SparkDeskService>(SparkDeskOptions.ServiceName)
+    .AddKeyedSingleton<IApiChatCompletionService, ClaudiaService>(ClaudiaOptions.ServiceName)
+    .AddKeyedSingleton<IApiChatCompletionService, QiansailService>(QiansailOptions.ServiceName);
 
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimit"));
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();

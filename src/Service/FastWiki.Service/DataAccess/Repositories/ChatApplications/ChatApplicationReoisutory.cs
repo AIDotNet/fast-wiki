@@ -226,6 +226,13 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
+    public async Task RemovesChatDialogHistoryAsync(string chatDialogId)
+    {
+        await Context.ChatDialogHistorys
+            .Where(x => x.ChatDialogId == chatDialogId)
+            .ExecuteDeleteAsync();
+    }
+
     private IQueryable<ChatShare> CreateChatShareQueryable(Guid userId, string chatApplicationId)
     {
         return Context.ChatShares.AsNoTracking()

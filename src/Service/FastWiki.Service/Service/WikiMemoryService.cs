@@ -116,7 +116,7 @@ public sealed class WikiMemoryService : ISingletonDependency
         {
             var function = kernel.CreateFunctionFromMethod(async (dynamic value) =>
                 {
-                    var result =  _context.FunctionCall(fastWikiFunctionCall.Content, fastWikiFunctionCall.Main, value);
+                    var result = await _context.FunctionCall(fastWikiFunctionCall.Content, fastWikiFunctionCall.Main, value);
                     
                     return result;
                 },

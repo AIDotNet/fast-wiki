@@ -1,19 +1,11 @@
-import { Input, Modal } from "@lobehub/ui";
+import { Form, Input } from "@lobehub/ui";
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { Button, message } from 'antd';
 import { CreateFunction } from "../../../services/FunctionService";
 import { FastWikiFunctionCallInput } from "../../../models";
-
-interface ICreateFunctionCallProps {
-    visible: boolean;
-    onSuccess: any;
-    onCancel: any;
-
-}
-
-
+import { useNavigate } from "react-router-dom";
 const SInput = styled(Input)`
     margin-bottom: 20px;
 `
@@ -24,35 +16,29 @@ const SButton = styled(Button)`
 `
 
 
-export default function CreateFunctionCall({
-    visible,
-    onSuccess,
-    onCancel
-}: ICreateFunctionCallProps) {
+export default function CreateFunctionCall() {
     const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
+    const navigate = useNavigate();
     const monacoEl = useRef(null);
     useEffect(() => {
-        if (visible) {
-            setEditor((editor) => {
-                // if (editor) return editor;
-                // 判断是否有monacoEl，如果没有就返回
-                if (!monacoEl.current) return editor;
+        setEditor((editor) => {
+            // if (editor) return editor;
+            // 判断是否有monacoEl，如果没有就返回
+            if (!monacoEl.current) return editor;
 
-                const e = monaco.editor.create(monacoEl.current!, {
-                    value: ['function Test(x,y) {', '\treturn x+y;', '} '].join('\n'),
-                    language: 'typescript',
-                    theme: 'vs-dark',
-                    automaticLayout: true,
+            const e = monaco.editor.create(monacoEl.current!, {
+                value: ['function Test(x,y) {', '\treturn x+y;', '} '].join('\n'),
+                language: 'typescript',
+                theme: 'vs-dark',
+                automaticLayout: true,
 
-                });
-
-
-                return e;
             });
-        }
 
+
+            return e;
+        });
         return () => editor?.dispose();
-    }, [visible]);
+    }, []);
     const [functionCall, setFunctionCall] = useState<FastWikiFunctionCallInput>({
         name: '',
         description: '',
@@ -90,7 +76,6 @@ export default function CreateFunctionCall({
         CreateFunction(functionCall)
             .then(() => {
                 message.success('创建成功');
-                onSuccess();
             })
             .catch(() => {
                 message.error('创建失败');
@@ -98,10 +83,25 @@ export default function CreateFunctionCall({
     }
 
     return (
-        <Modal allowFullscreen={true} open={visible} title="创建函数调用"
-            footer={null}
-            onCancel={() => onCancel()}
-        >
+        <Form style={{
+            padding: '20px',
+
+        }}>
+            <Button
+            onClick={()=>{
+                navigate('/function-call')
+            }}
+            style={{
+                width: '200px',
+            }}>
+                返回
+            </Button>
+            <h2 style={{
+                textAlign: 'center',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                marginBottom: '20px',
+            }}>创建Function</h2>
             <SInput
                 value={functionCall.name}
                 onChange={(e: any) => {
@@ -227,6 +227,6 @@ export default function CreateFunctionCall({
             <SButton onClick={() => onSumit()} block>
                 保存
             </SButton>
-        </Modal>
+        </Form>
     );
 }
