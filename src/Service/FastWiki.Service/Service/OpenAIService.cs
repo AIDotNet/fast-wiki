@@ -14,6 +14,7 @@ using AIDotNet.Abstractions.Dto;
 using Azure.AI.OpenAI;
 using DocumentFormat.OpenXml.Office2013.PowerPoint.Roaming;
 using FastWiki.Service.Application.Function.Queries;
+using Microsoft.KernelMemory.DataFormats.Text;
 using Microsoft.SemanticKernel;
 using TokenApi.Service.Exceptions;
 
@@ -499,21 +500,29 @@ public static class OpenAIService
         }
     }
 
-    public static async ValueTask<string> QAAsync(string prompt, string value, string model, string apiKey, string url,
+    public static async IAsyncEnumerable<string> QAAsync(string prompt, string value, string model, string apiKey,
+        string url,
         WikiMemoryService memoryService)
     {
         var kernel = memoryService.CreateFunctionKernel(apiKey, model, url);
 
         var qaFunction = kernel.CreateFunctionFromPrompt(prompt, functionName: "QA", description: "QA问答");
 
-        var result = await kernel.InvokeAsync(qaFunction, new KernelArguments()
-        {
-            {
-                "input", value
-            }
-        });
 
-        return result.GetValue<string>();
+        var lines = TextChunker.SplitPlainTextLines(value, 299);
+        var paragraphs = TextChunker.SplitPlainTextParagraphs(lines, 4000);
+
+        foreach (var paragraph in paragraphs)
+        {
+            var result = await kernel.InvokeAsync(qaFunction, new KernelArguments()
+            {
+                {
+                    "input", paragraph
+                }
+            });
+
+            yield return result.GetValue<string>();
+        }
     }
 
     private static bool IsVision(string model)
