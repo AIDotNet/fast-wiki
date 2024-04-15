@@ -499,6 +499,23 @@ public static class OpenAIService
         }
     }
 
+    public static async ValueTask<string> QAAsync(string prompt, string value, string model, string apiKey, string url,
+        WikiMemoryService memoryService)
+    {
+        var kernel = memoryService.CreateFunctionKernel(apiKey, model, url);
+
+        var qaFunction = kernel.CreateFunctionFromPrompt(prompt, functionName: "QA", description: "QA问答");
+
+        var result = await kernel.InvokeAsync(qaFunction, new KernelArguments()
+        {
+            {
+                "input", value
+            }
+        });
+
+        return result.GetValue<string>();
+    }
+
     private static bool IsVision(string model)
     {
         if (model.Contains("vision") || model.Contains("image"))
