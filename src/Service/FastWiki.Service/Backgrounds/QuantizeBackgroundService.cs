@@ -1,5 +1,8 @@
+using System.Collections.Concurrent;
 using System.Threading.Channels;
+using FastWiki.Service.Infrastructure.KM;
 using FastWiki.Service.Service;
+using Microsoft.KernelMemory.Handlers;
 
 namespace FastWiki.Service.Backgrounds;
 
@@ -8,6 +11,11 @@ namespace FastWiki.Service.Backgrounds;
 /// </summary>
 public sealed class QuantizeBackgroundService : BackgroundService
 {
+    /// <summary>
+    /// 线程安全字典
+    /// </summary>
+    public static ConcurrentDictionary<string, (WikiDetail, Wiki)> CacheWikiDetails { get; } = new();
+
     private readonly IServiceProvider _serviceProvider;
 
     /// <summary>
@@ -20,7 +28,7 @@ public sealed class QuantizeBackgroundService : BackgroundService
     /// </summary>
     private static int _maxTask = 1;
 
-    private static readonly Channel<QuantizeWikiDetail> WikiDetails = Channel.CreateBounded<QuantizeWikiDetail>(
+    private static readonly Channel<WikiDetail> WikiDetails = Channel.CreateBounded<WikiDetail>(
         new BoundedChannelOptions(1000)
         {
             SingleReader = true,
@@ -69,7 +77,7 @@ public sealed class QuantizeBackgroundService : BackgroundService
     /// 
     /// </summary>
     /// <param name="wikiDetail"></param>
-    public static async Task AddWikiDetailAsync(QuantizeWikiDetail wikiDetail)
+    public static async Task AddWikiDetailAsync(WikiDetail wikiDetail)
     {
         await WikiDetails.Writer.WriteAsync(wikiDetail);
     }
@@ -92,13 +100,16 @@ public sealed class QuantizeBackgroundService : BackgroundService
     /// </summary>
     /// <param name="wikiDetail"></param>
     /// <param name="service"></param>
-    private static async ValueTask HandlerAsync(QuantizeWikiDetail wikiDetail, IServiceProvider service)
+    private static async ValueTask HandlerAsync(WikiDetail wikiDetail, IServiceProvider service)
     {
         var fileStorageRepository = service.GetRequiredService<IFileStorageRepository>();
         var wikiRepository = service.GetRequiredService<IWikiRepository>();
         var wikiMemoryService = service.GetRequiredService<WikiMemoryService>();
 
         var wiki = await wikiRepository.FindAsync(x => x.Id == wikiDetail.WikiId);
+
+        CacheWikiDetails.TryAdd(wikiDetail.Id.ToString(), new ValueTuple<WikiDetail, Wiki>(wikiDetail, wiki));
+
         if (wikiDetail.Mode == ProcessMode.Auto)
         {
             wikiDetail.MaxTokensPerLine = 300;
@@ -113,6 +124,19 @@ public sealed class QuantizeBackgroundService : BackgroundService
         try
         {
             Console.WriteLine($"开始量化：ʼ{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId}");
+            List<string> step = new List<string>();
+            if (wikiDetail.TrainingPattern == TrainingPattern.QA)
+            {
+                var stepName = wikiDetail.Id.ToString();
+                serverless.Orchestrator.AddHandler<TextExtractionHandler>("extract_text");
+                serverless.Orchestrator.AddHandler<QAHandler>(stepName);
+                serverless.Orchestrator.AddHandler<GenerateEmbeddingsHandler>("generate_embeddings");
+                serverless.Orchestrator.AddHandler<SaveRecordsHandler>("save_memory_records");
+                step.Add("extract_text");
+                step.Add(stepName);
+                step.Add("generate_embeddings");
+                step.Add("save_memory_records");
+            }
 
             string result = string.Empty;
             if (wikiDetail.Type == "file")
@@ -132,7 +156,7 @@ public sealed class QuantizeBackgroundService : BackgroundService
                         {
                             "wikiDetailId", wikiDetail.Id.ToString()
                         }
-                    }, "wiki");
+                    }, "wiki", steps: step.ToArray());
             }
             else if (wikiDetail.Type == "web")
             {
@@ -146,7 +170,7 @@ public sealed class QuantizeBackgroundService : BackgroundService
                         {
                             "wikiDetailId", wikiDetail.Id.ToString()
                         }
-                    }, "wiki");
+                    }, "wiki", steps: step.ToArray());
             }
             else if (wikiDetail.Type == "data")
             {
@@ -160,7 +184,7 @@ public sealed class QuantizeBackgroundService : BackgroundService
                         {
                             "wikiDetailId", wikiDetail.Id.ToString()
                         }
-                    }, "wiki");
+                    }, "wiki", steps: step.ToArray());
             }
 
             await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Accomplish);
@@ -176,7 +200,12 @@ public sealed class QuantizeBackgroundService : BackgroundService
                 await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Fail);
             }
         }
+        finally
+        {
+            CacheWikiDetails.Remove(wikiDetail.Id.ToString(), out _);
+        }
     }
+
 
     private async Task LoadingWikiDetailAsync()
     {
@@ -186,20 +215,7 @@ public sealed class QuantizeBackgroundService : BackgroundService
         var mapper = asyncServiceScope.ServiceProvider.GetRequiredService<IMapper>();
         foreach (var wikiDetail in await wikiRepository.GetFailedDetailsAsync())
         {
-            await AddWikiDetailAsync(mapper.Map<QuantizeWikiDetail>(wikiDetail));
+            await AddWikiDetailAsync(wikiDetail);
         }
     }
-}
-
-public sealed class QuantizeWikiDetail : WikiDetail
-{
-    public int MaxTokensPerParagraph { get; set; }
-
-    public int MaxTokensPerLine { get; set; }
-
-    public int OverlappingTokens { get; set; }
-
-    public ProcessMode Mode { get; set; } = ProcessMode.Auto;
-
-    public TrainingPattern TrainingPattern { get; set; } = TrainingPattern.Subsection;
 }

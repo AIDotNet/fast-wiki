@@ -20,9 +20,9 @@ using TokenApi.Service.Exceptions;
 
 namespace FastWiki.Service.Service;
 
-public static class OpenAIService
+public class OpenAIService
 {
-    public static async Task Completions(HttpContext context)
+    public async Task Completions(HttpContext context)
     {
         using var stream = new StreamReader(context.Request.Body);
 
@@ -500,7 +500,7 @@ public static class OpenAIService
         }
     }
 
-    public static async IAsyncEnumerable<string> QAAsync(string prompt, string value, string model, string apiKey,
+    public async IAsyncEnumerable<string> QAAsync(string prompt, string value, string model, string apiKey,
         string url,
         WikiMemoryService memoryService)
     {

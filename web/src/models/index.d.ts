@@ -10,7 +10,7 @@ export interface ChatApplicationDto {
     parameter: { [key: string]: string; };
     opener: string;
     wikiIds: number[];
-    functionIds:number[];
+    functionIds: number[];
     referenceUpperLimit: number;
     noReplyFoundTemplate: string | null;
     showSourceFile: boolean;
@@ -57,7 +57,7 @@ export interface ChatShareDto {
     availableQuantity: number;
     apiKey: string;
     usedToken: number;
-    
+
 }
 export interface CompletionsDto {
     content: string;
@@ -166,6 +166,7 @@ export interface CreateWikiDetailWebPageInput {
     overlappingTokens: number;
     mode: ProcessMode;
     trainingPattern: TrainingPattern;
+    qAPromptTemplate: string;
 }
 
 export interface PaginatedListBase<TEntity> {
@@ -237,6 +238,7 @@ export interface CreateWikiDetailWebPageInput {
     overlappingTokens: number;
     mode: ProcessMode;
     trainingPattern: TrainingPattern;
+    qAPromptTemplate: string;
 }
 
 export interface FastWikiFunctionCallDto {
