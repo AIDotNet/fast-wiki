@@ -14,7 +14,6 @@ namespace FastWiki.Service.Service;
 /// </summary>
 public sealed class WikiMemoryService : ISingletonDependency
 {
-    private static readonly OpenAiHttpClientHandler Handler = new();
     private static FastWikiFunctionContext _context = new();
 
     private static readonly OpenAiHttpClientHandler HttpClientHandler = new();
@@ -66,6 +65,8 @@ public sealed class WikiMemoryService : ISingletonDependency
                     : OpenAIOption.EmbeddingToken,
                 EmbeddingModel = string.IsNullOrEmpty(embeddingModel) ? OpenAIOption.EmbeddingModel : embeddingModel,
             }, null, false, new HttpClient(HttpClientHandler))
+            .AddSingleton(new OpenAIService())
+            .AddSingleton(new WikiMemoryService())
             .Build<MemoryServerless>();
 
         return memory;
@@ -103,7 +104,8 @@ public sealed class WikiMemoryService : ISingletonDependency
             new HttpClient(HttpClientHandler));
     }
 
-    public Kernel CreateFunctionKernel(List<FastWikiFunctionCall> fastWikiFunctionCalls,string apiKey,string modelId,string uri)
+    public Kernel CreateFunctionKernel(List<FastWikiFunctionCall> fastWikiFunctionCalls, string apiKey, string modelId,
+        string uri)
     {
         var kernel = Kernel.CreateBuilder()
             .AddOpenAIChatCompletion(
@@ -116,11 +118,12 @@ public sealed class WikiMemoryService : ISingletonDependency
         {
             var function = kernel.CreateFunctionFromMethod(async (dynamic value) =>
                 {
-                    var result = await _context.FunctionCall(fastWikiFunctionCall.Content, fastWikiFunctionCall.Main, value);
-                    
+                    var result = await _context.FunctionCall(fastWikiFunctionCall.Content, fastWikiFunctionCall.Main,
+                        value);
+
                     return result;
                 },
-                fastWikiFunctionCall.Main, 
+                fastWikiFunctionCall.Main,
                 fastWikiFunctionCall.Description,
                 fastWikiFunctionCall.Parameters.Select(x => new KernelParameterMetadata(x.Key)
                 {
@@ -131,6 +134,18 @@ public sealed class WikiMemoryService : ISingletonDependency
             kernel.Plugins.AddFromFunctions(fastWikiFunctionCall.Main, fastWikiFunctionCall.Description,
                 new[] { function });
         }
+
+        return kernel;
+    }
+
+    public Kernel CreateFunctionKernel(string apiKey, string modelId, string uri)
+    {
+        var kernel = Kernel.CreateBuilder()
+            .AddOpenAIChatCompletion(
+                modelId: modelId,
+                apiKey: apiKey,
+                httpClient: new HttpClient(new OpenAiHttpClientHandler(uri)))
+            .Build();
 
         return kernel;
     }

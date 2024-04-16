@@ -19,4 +19,6 @@ public sealed class CreateWikiDetailsInput
     public ProcessMode Mode { get; set; } = ProcessMode.Auto;
 
     public TrainingPattern TrainingPattern { get; set; } = TrainingPattern.Subsection;
+    
+    public string? QAPromptTemplate { get; set; }
 }

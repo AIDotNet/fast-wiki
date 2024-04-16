@@ -7,6 +7,7 @@ import { bytesToSize } from '../../../utils/stringHelper';
 import { ProcessMode, TrainingPattern } from '../../../models/index.d';
 import { UploadFile as FileService } from '../../../services/StorageService';
 import { CreateWikiDetails } from '../../../services/WikiService';
+import { TextArea } from '@lobehub/ui';
 
 
 const FileItem = styled.div`
@@ -41,6 +42,20 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
     const [maxTokensPerParagraph, setMaxTokensPerParagraph] = useState(1000); // 每个段落标记的最大数量。当对文档进行分区时，每个分区通常包含一个段落。
     const [maxTokensPerLine, setMaxTokensPerLine] = useState(300); // 每行，也就是每个句子的最大标记数。当分割一个文本块时，文本将被分割成句子，然后被分组成段落。注意，这适用于任何文本格式，包括表格、代码、聊天记录、日志文件等。
     const [overlappingTokens, setOverlappingTokens] = useState(100); // 重叠标记数。当对文档进行分区时，每个分区的开始和结束部分将重叠。这有助于确保模型在分区之间保持上下文一致性。
+    const [qAPromptTemplate, setQAPromptTemplate] = useState(`
+    我会给你一段文本，学习它们，并整理学习成果，要求为：
+    1. 提出最多 20 个问题。
+    2. 给出每个问题的答案。
+    3. 答案要详细完整，答案可以包含普通文字、链接、代码、表格、公示、媒体链接等 markdown 元素。
+    4. 按格式返回多个问题和答案:
+
+    Q1: 问题。
+    A1: 答案。
+    Q2:
+    A2:
+    ……
+
+    我的文本："""{{$input}}"""`); // QA问答模板
     const props: UploadProps = {
         name: 'file',
         multiple: true,
@@ -121,6 +136,7 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
             maxTokensPerParagraph: maxTokensPerParagraph,
             maxTokensPerLine: maxTokensPerLine,
             overlappingTokens: overlappingTokens,
+            qAPromptTemplate: qAPromptTemplate,
             mode: processMode,
             trainingPattern: trainingPattern
         })
@@ -287,9 +303,13 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                         </div>
                     }
                     {
-                        trainingPattern === TrainingPattern.QA && <div>
-                            暂时不支持
-                        </div>
+                        trainingPattern === TrainingPattern.QA && <>
+                            <span>QA问答模板：</span>
+                            <TextArea value={qAPromptTemplate} onChange={(v) => {
+                                setQAPromptTemplate(v.target.value);
+                            }}>
+                            </TextArea>
+                        </>
                     }
                 </div>
                 <Table dataSource={fileList.map(item => {

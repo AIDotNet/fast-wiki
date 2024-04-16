@@ -41,7 +41,8 @@ builder.Services
     .AddKeyedSingleton<IApiChatCompletionService, MetaGLMService>(MetaGLMOptions.ServiceName)
     .AddKeyedSingleton<IApiChatCompletionService, SparkDeskService>(SparkDeskOptions.ServiceName)
     .AddKeyedSingleton<IApiChatCompletionService, ClaudiaService>(ClaudiaOptions.ServiceName)
-    .AddKeyedSingleton<IApiChatCompletionService, QiansailService>(QiansailOptions.ServiceName);
+    .AddKeyedSingleton<IApiChatCompletionService, QiansailService>(QiansailOptions.ServiceName)
+    .AddSingleton<OpenAIService>();
 
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimit"));
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
@@ -166,7 +167,8 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapPost("/v1/chat/completions", OpenAIService.Completions)
+app.MapPost("/v1/chat/completions",
+        async (OpenAIService openAiService, HttpContext context) => await openAiService.Completions(context))
     .WithTags("OpenAI")
     .WithGroupName("OpenAI")
     .WithDescription("OpenAI Completions")
