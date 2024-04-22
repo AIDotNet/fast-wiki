@@ -252,12 +252,12 @@ public static class OpenAIService
                 await eventBus.PublishAsync(functionCall);
             }
 
+            var kernel =
+                wikiMemoryService.CreateFunctionKernel(functionCall.Result.ToList(), chatApplication.ChatModel);
+
             // 如果有函数调用
             if (chatApplication.FunctionIds.Any() && functionCall.Result.Any())
             {
-
-                var kernel = wikiMemoryService.CreateFunctionKernel(functionCall.Result.ToList());
-
                 OpenAIPromptExecutionSettings settings = new()
                 {
                     ToolCallBehavior = ToolCallBehavior.EnableKernelFunctions
@@ -333,20 +333,8 @@ public static class OpenAIService
             }
             else
             {
-                var streamInput = new OpenAIChatCompletionInput<OpenAIChatCompletionRequestInput>
-                {
-                    MaxTokens = chatApplication.MaxResponseToken,
-                    Temperature = chatApplication.Temperature,
-                    Model = chatApplication.ChatModel,
-                    Messages = chatHistory
-                        .Select(x => new OpenAIChatCompletionRequestInput(x.Role.ToString(), x.Content))
-                        .ToList(),
-                };
-                
-                var kernel = context.RequestServices.GetRequiredService<Kernel>();
-
                 var chat = kernel.GetRequiredService<IChatCompletionService>();
-                
+
                 await foreach (var item in chat.GetStreamingChatMessageContentsAsync(chatHistory))
                 {
                     var message = item.Content;
@@ -427,7 +415,7 @@ public static class OpenAIService
         }
 
         #endregion
-        
+
         //对于对话扣款
         if (getAPIKeyChatShareQuery?.Result != null)
         {
@@ -462,6 +450,7 @@ public static class OpenAIService
             yield return result.GetValue<string>();
         }
     }
+
     private static bool IsVision(string model)
     {
         if (model.Contains("vision") || model.Contains("image"))

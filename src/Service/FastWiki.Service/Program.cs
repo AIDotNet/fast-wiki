@@ -22,9 +22,6 @@ builder.Configuration.GetSection(ConnectionStringsOptions.Name)
 builder
     .AddLoadEnvironment();
 
-builder
-    .AddFastSemanticKernel();
-
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimit"));
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 

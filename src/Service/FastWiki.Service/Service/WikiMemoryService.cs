@@ -52,7 +52,7 @@ public sealed class WikiMemoryService : ISingletonDependency
                 .WithOpenAITextGeneration(new OpenAIConfig()
                 {
                     APIKey = OpenAIOption.ChatToken,
-                    TextModel = string.IsNullOrEmpty(chatModel) ? OpenAIOption.ChatModel : chatModel
+                    TextModel = chatModel
                 }, null, new HttpClient(HttpClientHandler))
                 .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
                 {
@@ -89,7 +89,7 @@ public sealed class WikiMemoryService : ISingletonDependency
                 .WithOpenAITextGeneration(new OpenAIConfig()
                 {
                     APIKey = OpenAIOption.ChatToken,
-                    TextModel = string.IsNullOrEmpty(chatModel) ? OpenAIOption.ChatModel : chatModel
+                    TextModel = chatModel
                 }, null, new HttpClient(HttpClientHandler))
                 .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
                 {
@@ -120,7 +120,7 @@ public sealed class WikiMemoryService : ISingletonDependency
             .WithOpenAITextGeneration(new OpenAIConfig()
             {
                 APIKey = OpenAIOption.ChatToken,
-                TextModel = OpenAIOption.ChatModel
+                TextModel = "sk-test"
             }, null, new HttpClient(HttpClientHandler))
             .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
             {
@@ -133,11 +133,12 @@ public sealed class WikiMemoryService : ISingletonDependency
             .Build<MemoryServerless>();
     }
 
-    public Kernel CreateFunctionKernel(List<FastWikiFunctionCall> fastWikiFunctionCalls)
+    public Kernel CreateFunctionKernel(List<FastWikiFunctionCall> fastWikiFunctionCalls,
+        string chatModel)
     {
         var kernel = Kernel.CreateBuilder()
             .AddOpenAIChatCompletion(
-                modelId: OpenAIOption.ChatModel,
+                modelId: chatModel,
                 apiKey: OpenAIOption.ChatToken,
                 httpClient: new HttpClient(new OpenAiHttpClientHandler(OpenAIOption.ChatEndpoint)))
             .Build();
