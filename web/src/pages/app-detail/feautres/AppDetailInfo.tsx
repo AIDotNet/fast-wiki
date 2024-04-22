@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { ChatApplicationDto } from "../../../models";
 import { PutChatApplications } from "../../../services/ChatApplicationService";
 import { GetWikisList } from "../../../services/WikiService";
-import { ChatModelList } from "../../../services/ModelService";
 import { Input } from "@lobehub/ui";
 import { FunctionCallSelect } from "../../../services/FunctionService";
 
@@ -39,8 +38,6 @@ const ListItem = styled.div`
 const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
     if (value === undefined) return null;
 
-    const [chatModule, setChatModule] = useState([] as any[]);
-    const [chatModelType, setChatModelType] = useState([] as any[]);
     const [selectChatModel, setSelectChatModel] = useState([] as any[]);
     const [wiki, setWiki] = useState([] as any[]);
     const [functionCallSelect, setFunctionCallSelect] = useState([] as any[]);
@@ -51,13 +48,6 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
     } as any);
 
     useEffect(() => {
-        ChatModelList()
-            .then((chatModul) => {
-                setChatModelType(chatModul);
-                setChatModule(chatModul.map((item: any) => {
-                    return { label: item.name, value: item.id }
-                }));
-            });
 
         loadingWiki();
         loadFunctionCallSelect();
@@ -84,15 +74,6 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
         setApplication(value);
     }, [value]);
 
-    useEffect(() => {
-        const models = chatModelType.find((item: any) => item.id === application.chatType);
-        if (models?.models) {
-            setSelectChatModel(models.models.map((item: any) => {
-                return { label: item, value: item }
-            }))
-        }
-    }, [application, chatModelType]);
-
     function save() {
         PutChatApplications(application)
             .then(() => {
@@ -106,31 +87,10 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                 <span style={{
                     fontSize: 20,
                     marginRight: 20
-                }}>大模型类型</span>
-                <Select
-                    defaultValue={application.chatType}
-                    value={application.chatType}
-                    style={{ width: 380 }}
-                    onChange={(v: any) => {
-                        const models = chatModelType.find((item) => item.id === v);
-                        setApplication({
-                            ...application,
-                            chatType: v,
-                        });
-                        setSelectChatModel(models.models.map((item: any) => {
-                            return { label: item.name, value: item.id }
-                        }))
-                    }}
-                    options={chatModule}
-                />
-            </ListItem>
-
-            <ListItem>
-                <span style={{
-                    fontSize: 20,
-                    marginRight: 20
                 }}>对话模型</span>
                 <Select
+                    mode="tags"
+                    maxCount={1}
                     defaultValue={application.chatModel}
                     value={application.chatModel}
                     style={{ width: 380 }}

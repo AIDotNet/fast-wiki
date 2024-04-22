@@ -5,7 +5,6 @@ import { Button } from 'antd';
 
 import styled from 'styled-components';
 import { GetChatApplications } from '../../../services/ChatApplicationService';
-import SessionLog from '../feautres/SessionLog';
 import ReleaseApplication from '../feautres/ReleaseApplication';
 
 const LeftTabs = styled.div`
@@ -46,9 +45,6 @@ export default memo(() => {
         const tabs = [{
             key: 1,
             label: '应用配置'
-        }, {
-            key: 2,
-            label: '对话记录'
         }, {
             key: 3,
             label: '发布应用'

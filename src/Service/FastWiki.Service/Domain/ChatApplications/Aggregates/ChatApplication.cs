@@ -103,11 +103,6 @@ public sealed class ChatApplication : FullAggregateRoot<string, Guid?>
     public bool ShowSourceFile { get; set; }
 
     /// <summary>
-    /// AI模型类型
-    /// </summary>
-    public string ChatType { get; set; }
-
-    /// <summary>
     /// 扩展字段
     /// </summary>
     public Dictionary<string, string> Extend { get; set; } = new();

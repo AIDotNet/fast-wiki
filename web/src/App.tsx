@@ -21,8 +21,6 @@ const Wiki = lazy(() => import('./pages/wiki/page'));
 
 const Register = lazy(() => import('./pages/register/page'));
 
-const Model = lazy(() => import('./pages/model/page'));
-
 const CreateFunctionCall = lazy(() => import('./pages/function-call/features/CreateFunctionCall'));
 
 const router = createBrowserRouter([{
@@ -59,11 +57,6 @@ const router = createBrowserRouter([{
     {
       path: '/user', element: <Suspense fallback={'加载中'}>
         <User />
-      </Suspense>
-    },
-    {
-      path: '/model', element: <Suspense fallback={'加载中'}>
-        <Model />
       </Suspense>
     },
     {

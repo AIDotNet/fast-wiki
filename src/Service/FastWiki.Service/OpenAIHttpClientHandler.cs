@@ -31,11 +31,7 @@ public sealed class OpenAiHttpClientHandler : HttpClientHandler
             uriBuilder = _uri.IsNullOrWhiteSpace() ? new UriBuilder(OpenAIOption.EmbeddingEndpoint.TrimEnd('/') + "/v1/embeddings") : new UriBuilder(_uri.TrimEnd('/') + "/v1/embeddings");
             request.RequestUri = uriBuilder.Uri;
         }
-
-        var c = await request.Content.ReadAsStringAsync();
-
-        var response = await base.SendAsync(request, cancellationToken);
         
-        return response;
+        return await base.SendAsync(request, cancellationToken);
     }
 }

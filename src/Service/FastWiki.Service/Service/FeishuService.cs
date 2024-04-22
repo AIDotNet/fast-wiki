@@ -1,22 +1,18 @@
-﻿using System.Collections.Concurrent;
-using System.Net.Http.Headers;
-using AIDotNet.OpenAI;
-using FastWiki.Service.Application.Model.Commands;
-using FastWiki.Service.Application.Storage.Queries;
+﻿using FastWiki.Service.Application.Storage.Queries;
+using FastWiki.Service.Contracts.Feishu.Dto;
 using FastWiki.Service.Contracts.Model.Dto;
 using FastWiki.Service.Domain.Storage.Aggregates;
 using FastWiki.Service.Infrastructure;
 using FastWiki.Service.Infrastructure.Helper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
+using System.Collections.Concurrent;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using AIDotNet.Abstractions;
-using AIDotNet.Abstractions.Dto;
-using FastWiki.Service.Contracts.Feishu.Dto;
 using TokenApi.Service.Exceptions;
 
 namespace FastWiki.Service.Service;
@@ -306,60 +302,18 @@ public class FeishuService
             }
         }
 
-        if (chatApplication.ChatType.IsNullOrEmpty())
-        {
-            // 防止没有设置对话类型
-            chatApplication.ChatType = OpenAIServiceOptions.ServiceName;
-        }
-
-        var modelService = context.RequestServices.GetRequiredService<ModelService>();
-
-        var (chatStream, fastModelDto) = await modelService.GetChatService(chatApplication.ChatType);
-
-        if (fastModelDto.Enable != true)
-        {
-            await context.WriteEndAsync("模型未启用");
-            return;
-        }
-
-        if (fastModelDto.Models.Any(x => x == chatApplication.ChatModel) == false)
-        {
-            await context.WriteEndAsync($"模型渠道并未找到 {chatApplication.ChatModel} 模型的支持！");
-            return;
-        }
-
-        var setting = new OpenAIPromptExecutionSettings
-        {
-            MaxTokens = chatApplication.MaxResponseToken,
-            Temperature = chatApplication.Temperature,
-            ModelId = chatApplication.ChatModel,
-            ExtensionData = new Dictionary<string, object>()
-        };
-
-        setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_KEY, fastModelDto.ApiKey);
-        setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_URL, fastModelDto.Url);
-
         var responseId = Guid.NewGuid().ToString("N");
         var requestId = Guid.NewGuid().ToString("N");
         var output = new StringBuilder();
         try
         {
-            var streamInput = new OpenAIChatCompletionInput<OpenAIChatCompletionRequestInput>
-            {
-                MaxTokens = chatApplication.MaxResponseToken,
-                Temperature = chatApplication.Temperature,
-                Model = chatApplication.ChatModel,
-                Messages = history.Select(x => new OpenAIChatCompletionRequestInput(x.Role.ToString(), x.Content))
-                    .ToList(),
-            };
+            var kernel = context.RequestServices.GetRequiredService<Kernel>();
 
-            await foreach (var item in chatStream.StreamChatAsync(streamInput, new ChatOptions()
-                           {
-                               Key = fastModelDto.ApiKey,
-                               Address = fastModelDto.Url
-                           }))
+            var chat = kernel.GetRequiredService<IChatCompletionService>();
+
+            await foreach (var item in chat.GetStreamingChatMessageContentsAsync(history))
             {
-                var message = item.Choices.FirstOrDefault()?.Delta.Content;
+                var message = item.Content;
                 if (string.IsNullOrEmpty(message))
                 {
                     continue;
@@ -427,11 +381,6 @@ public class FeishuService
         await eventBus.PublishAsync(chatDialogHistory);
 
         #endregion
-
-        var fastModelComputeTokenCommand = new FastModelComputeTokenCommand(chatApplication.ChatType, requestToken,
-            completeToken);
-
-        await eventBus.PublishAsync(fastModelComputeTokenCommand);
 
         //对于对话扣款
         if (getAPIKeyChatShareQuery?.Result != null)

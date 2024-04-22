@@ -14,7 +14,6 @@ public class ChatApplicationCommandHandler(
         var chatApplication = new ChatApplication(Guid.NewGuid().ToString("N"))
         {
             Name = command.Input.Name,
-            ChatType = string.Empty
         };
 
         await chatApplicationRepository.AddAsync(chatApplication);

@@ -14,6 +14,7 @@ namespace FastWiki.Service.Service;
 /// </summary>
 public sealed class WikiMemoryService : ISingletonDependency
 {
+    private static readonly OpenAiHttpClientHandler Handler = new();
     private static FastWikiFunctionContext _context = new();
 
     private static readonly OpenAiHttpClientHandler HttpClientHandler = new();
@@ -65,8 +66,6 @@ public sealed class WikiMemoryService : ISingletonDependency
                     : OpenAIOption.EmbeddingToken,
                 EmbeddingModel = string.IsNullOrEmpty(embeddingModel) ? OpenAIOption.EmbeddingModel : embeddingModel,
             }, null, false, new HttpClient(HttpClientHandler))
-            .AddSingleton(new OpenAIService())
-            .AddSingleton(new WikiMemoryService())
             .Build<MemoryServerless>();
 
         return memory;
@@ -104,14 +103,13 @@ public sealed class WikiMemoryService : ISingletonDependency
             new HttpClient(HttpClientHandler));
     }
 
-    public Kernel CreateFunctionKernel(List<FastWikiFunctionCall> fastWikiFunctionCalls, string apiKey, string modelId,
-        string uri)
+    public Kernel CreateFunctionKernel(List<FastWikiFunctionCall> fastWikiFunctionCalls)
     {
         var kernel = Kernel.CreateBuilder()
             .AddOpenAIChatCompletion(
-                modelId: modelId,
-                apiKey: apiKey,
-                httpClient: new HttpClient(new OpenAiHttpClientHandler(uri)))
+                modelId: OpenAIOption.ChatModel,
+                apiKey: OpenAIOption.ChatToken,
+                httpClient: new HttpClient(new OpenAiHttpClientHandler(OpenAIOption.ChatEndpoint)))
             .Build();
 
         foreach (var fastWikiFunctionCall in fastWikiFunctionCalls)

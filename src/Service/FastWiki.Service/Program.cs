@@ -1,9 +1,3 @@
-using AIDotNet.Abstractions;
-using AIDotNet.Claudia;
-using AIDotNet.MetaGLM;
-using AIDotNet.OpenAI;
-using AIDotNet.Qiansail;
-using AIDotNet.SparkDesk;
 using AspNetCoreRateLimit;
 using FastWiki.Service;
 using FastWiki.Service.Backgrounds;
@@ -30,19 +24,6 @@ builder
 
 builder
     .AddFastSemanticKernel();
-
-builder.Services
-    .AddOpenAIService()
-    .AddSparkDeskService()
-    .AddMetaGLMClientV4()
-    .AddClaudia()
-    .AddQiansail()
-    .AddKeyedSingleton<IApiChatCompletionService, OpenAiService>(OpenAIServiceOptions.ServiceName)
-    .AddKeyedSingleton<IApiChatCompletionService, MetaGLMService>(MetaGLMOptions.ServiceName)
-    .AddKeyedSingleton<IApiChatCompletionService, SparkDeskService>(SparkDeskOptions.ServiceName)
-    .AddKeyedSingleton<IApiChatCompletionService, ClaudiaService>(ClaudiaOptions.ServiceName)
-    .AddKeyedSingleton<IApiChatCompletionService, QiansailService>(QiansailOptions.ServiceName)
-    .AddSingleton<OpenAIService>();
 
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimit"));
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
@@ -118,7 +99,6 @@ builder.Services.AddInMemoryRateLimiting()
 
 builder.Services.AddAutoInject();
 
-
 var app = builder.Services.AddServices(builder, option => option.MapHttpMethodsForUnmatched = ["Post"]);
 
 app.Use((async (context, next) =>
@@ -167,8 +147,7 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapPost("/v1/chat/completions",
-        async (OpenAIService openAiService, HttpContext context) => await openAiService.Completions(context))
+app.MapPost("/v1/chat/completions", OpenAIService.Completions)
     .WithTags("OpenAI")
     .WithGroupName("OpenAI")
     .WithDescription("OpenAI Completions")

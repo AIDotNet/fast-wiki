@@ -31,13 +31,7 @@ const DesktopLayout = memo(() => {
     description: '知识库',
     path: '/wiki',
     role: 'admin, user'
-  }, {
-    icon: Brain,
-    key: 'model',
-    description: '模型管理',
-    path: '/model',
-    role: 'admin'
-  }, {
+  },{
     icon: SquareFunction,
     key: 'function-call',
     description: '函数管理',

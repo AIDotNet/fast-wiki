@@ -16,7 +16,6 @@ public class QAHandler : IPipelineStepHandler
 {
     private readonly TextPartitioningOptions _options;
     private readonly IPipelineOrchestrator _orchestrator;
-    private readonly OpenAIService _openAiService;
     private readonly WikiMemoryService _wikiMemoryService;
     private readonly ILogger<QAHandler> _log;
     private readonly TextChunker.TokenCounter _tokenCounter;
@@ -24,14 +23,13 @@ public class QAHandler : IPipelineStepHandler
     /// </inheritdoc>
     public QAHandler(
         string stepName,
-        IPipelineOrchestrator orchestrator, OpenAIService openAiService, WikiMemoryService wikiMemoryService,
+        IPipelineOrchestrator orchestrator, WikiMemoryService wikiMemoryService,
         TextPartitioningOptions? options = null,
         ILogger<QAHandler>? log = null
     )
     {
         this.StepName = stepName;
         this._orchestrator = orchestrator;
-        _openAiService = openAiService;
         _wikiMemoryService = wikiMemoryService;
         this._options = options ?? new TextPartitioningOptions();
         this._options.Validate();
@@ -100,8 +98,9 @@ public class QAHandler : IPipelineStepHandler
 
                         if (QuantizeBackgroundService.CacheWikiDetails.TryGetValue(StepName, out var wikiDetail))
                         {
-                            await foreach (var item in _openAiService
-                                               .QAAsync(wikiDetail.Item1.QAPromptTemplate, content, wikiDetail.Item2.Model, OpenAIOption.ChatToken,
+                            await foreach (var item in OpenAIService
+                                               .QAAsync(wikiDetail.Item1.QAPromptTemplate, content,
+                                                   wikiDetail.Item2.Model, OpenAIOption.ChatToken,
                                                    OpenAIOption.ChatEndpoint, _wikiMemoryService)
                                                .WithCancellation(cancellationToken))
                             {

@@ -66,6 +66,11 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+
+    /// <summary>
+    /// 加载环境变量
+    /// </summary>
+    /// <param name="builder"></param>
     public static void AddLoadEnvironment(this WebApplicationBuilder builder)
     {
         var OPENAI_CHAT_ENDPOINT = Environment.GetEnvironmentVariable("OPENAI_CHAT_ENDPOINT");
