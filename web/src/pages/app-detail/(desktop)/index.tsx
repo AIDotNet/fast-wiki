@@ -81,7 +81,7 @@ export default memo(() => {
             }}>
                 {
                     tab?.key === 1 ? <AppDetailInfo value={application} /> : (
-                        tab?.key === 2 ? <SessionLog id={application.id} /> :
+                        tab?.key === 2 ? <></> :
                             (
                                 tab?.key === 3 ? <ReleaseApplication id={application.id} /> : null
                             )

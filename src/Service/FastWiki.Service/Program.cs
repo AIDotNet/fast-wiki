@@ -27,6 +27,27 @@ builder
 
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimit"));
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
+if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
+{
+    builder.Services.AddMasaDbContext<SqliteContext>(opt =>
+    {
+        // 兼容多数据库
+        if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
+        {
+            // 创建目录data
+            if (!Directory.Exists("./data"))
+                Directory.CreateDirectory("./data");
+
+            opt.UseSqlite("Data Source=./data/wiki.db");
+        }
+        else
+        {
+            opt.UseNpgsql();
+        }
+    });
+}
+
 builder.Services.AddInMemoryRateLimiting()
     .AddCors(options =>
     {
@@ -87,7 +108,22 @@ builder.Services.AddInMemoryRateLimiting()
             options.IncludeXmlComments(item, true);
         options.DocInclusionPredicate((docName, action) => true);
     })
-    .AddMasaDbContext<WikiDbContext>(opt => { opt.UseNpgsql(); })
+    .AddMasaDbContext<WikiDbContext>(opt =>
+    {
+        // 兼容多数据库
+        if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
+        {
+            // 创建目录data
+            if (!Directory.Exists("./data"))
+                Directory.CreateDirectory("./data");
+
+            opt.UseSqlite("Data Source=./data/wiki.db");
+        }
+        else
+        {
+            opt.UseNpgsql();
+        }
+    })
     .AddDomainEventBus(dispatcherOptions =>
     {
         dispatcherOptions
@@ -183,12 +219,22 @@ if (app.Environment.IsDevelopment())
 
     #region MigrationDb
 
-    await using var context = app.Services.CreateScope().ServiceProvider.GetService<WikiDbContext>();
+    if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
     {
-        await context!.Database.MigrateAsync();
+        await using var context = app.Services.CreateScope().ServiceProvider.GetService<SqliteContext>();
+        {
+            await context!.Database.MigrateAsync();
+        }
+    }
+    else
+    {
+        await using var context = app.Services.CreateScope().ServiceProvider.GetService<WikiDbContext>();
+        {
+            await context!.Database.MigrateAsync();
 
-        // TODO: 创建vector插件如果数据库没有则需要提供支持向量的数据库。
-        await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");
+            // TODO: 创建vector插件如果数据库没有则需要提供支持向量的数据库。
+            await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");
+        }
     }
 
     #endregion

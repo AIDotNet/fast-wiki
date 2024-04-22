@@ -1,11 +1,12 @@
 import { memo, useEffect, useState } from "react";
-import { Select, Row, Checkbox, Button, Collapse, Col, Slider, message } from 'antd';
+import { AutoComplete, Row, Select, Checkbox, Button, Collapse, Col, Slider, message } from 'antd';
 import styled from 'styled-components';
 import { ChatApplicationDto } from "../../../models";
 import { PutChatApplications } from "../../../services/ChatApplicationService";
 import { GetWikisList } from "../../../services/WikiService";
 import { Input } from "@lobehub/ui";
 import { FunctionCallSelect } from "../../../services/FunctionService";
+import { getModels } from "../../../store/Model";
 
 interface IAppDetailInfoProps {
     value: ChatApplicationDto
@@ -48,7 +49,12 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
     } as any);
 
     useEffect(() => {
-
+        getModels()
+            .then((models) => {
+                setSelectChatModel(models.chatModel.map((item) => {
+                    return { label: item.label, value: item.value }
+                }));
+            });
         loadingWiki();
         loadFunctionCallSelect();
 
@@ -88,9 +94,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                     fontSize: 20,
                     marginRight: 20
                 }}>对话模型</span>
-                <Select
-                    mode="tags"
-                    maxCount={1}
+                <AutoComplete
                     defaultValue={application.chatModel}
                     value={application.chatModel}
                     style={{ width: 380 }}
@@ -164,7 +168,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                 placeholder="绑定知识库"
                 defaultValue={application.wikiIds}
                 value={application.wikiIds}
-                onChange={(v:any) => {
+                onChange={(v: any) => {
                     setApplication({
                         ...application,
                         wikiIds: v
@@ -378,7 +382,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                             placeholder="绑定FunctionCall"
                             defaultValue={application.functionIds}
                             value={application.functionIds}
-                            onChange={(v:any) => {
+                            onChange={(v: any) => {
                                 setApplication({
                                     ...application,
                                     functionIds: v
@@ -397,7 +401,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                 }]}
             />
 
-            <Checkbox defaultChecked={application.showSourceFile} checked={application.showSourceFile} value={application.showSourceFile} onChange={(v:any) => {
+            <Checkbox defaultChecked={application.showSourceFile} checked={application.showSourceFile} value={application.showSourceFile} onChange={(v: any) => {
                 setApplication({
                     ...application,
                     showSourceFile: v.target.checked

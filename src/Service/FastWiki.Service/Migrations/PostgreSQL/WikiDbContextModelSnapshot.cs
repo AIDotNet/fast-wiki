@@ -3,20 +3,17 @@ using System;
 using FastWiki.Service.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace FastWiki.Service.Migrations
+namespace FastWiki.Service.Migrations.PostgreSQL
 {
     [DbContext(typeof(WikiDbContext))]
-    [Migration("20240320172045_AddFastModel_Logger")]
-    partial class AddFastModel_Logger
+    partial class WikiDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,15 +31,19 @@ namespace FastWiki.Service.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ChatType")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("Creator")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Extend")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FunctionIds")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -245,78 +246,7 @@ namespace FastWiki.Service.Migrations
                     b.ToTable("wiki-chat-share", (string)null);
                 });
 
-            modelBuilder.Entity("FastWiki.Service.Domain.Model.Aggregates.FastModel", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ApiKey")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid?>("Creator")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<bool>("Enable")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Models")
-                        .IsRequired()
-                        .HasMaxLength(-1)
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("ModificationTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid?>("Modifier")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<long?>("TestTime")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<long>("UsedQuota")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name");
-
-                    b.HasIndex("Type");
-
-                    b.ToTable("wiki-fast-models", (string)null);
-                });
-
-            modelBuilder.Entity("FastWiki.Service.Domain.Model.Aggregates.ModelLogger", b =>
+            modelBuilder.Entity("FastWiki.Service.Domain.Function.Aggregates.FastWikiFunctionCall", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -324,56 +254,57 @@ namespace FastWiki.Service.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("ApiKey")
+                    b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ApplicationId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("ComplementCount")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("Creator")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("FastModelId")
+                    b.Property<bool>("Enable")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Imports")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Model")
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Items")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("PromptCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Type")
+                    b.Property<string>("Main")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<DateTime>("ModificationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("Modifier")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Parameters")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApiKey");
-
-                    b.HasIndex("ApplicationId");
-
                     b.HasIndex("CreationTime");
 
-                    b.HasIndex("FastModelId");
-
-                    b.HasIndex("Type");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("wiki-model-logger", (string)null);
+                    b.ToTable("wiki-function-calls", (string)null);
                 });
 
             modelBuilder.Entity("FastWiki.Service.Domain.Storage.Aggregates.FileStorage", b =>
@@ -488,19 +419,19 @@ namespace FastWiki.Service.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1bca921f-0f35-42e5-8cef-c530e36c8f54"),
+                            Id = new Guid("81ba41a1-27df-4f6c-b327-dfec1bce8c85"),
                             Account = "admin",
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                            CreationTime = new DateTime(2024, 3, 20, 17, 20, 45, 551, DateTimeKind.Utc).AddTicks(5537),
+                            CreationTime = new DateTime(2024, 4, 22, 14, 36, 39, 431, DateTimeKind.Utc).AddTicks(7635),
                             Email = "239573049@qq.com",
                             IsDeleted = false,
                             IsDisable = false,
-                            ModificationTime = new DateTime(2024, 3, 20, 17, 20, 45, 551, DateTimeKind.Utc).AddTicks(5538),
+                            ModificationTime = new DateTime(2024, 4, 22, 14, 36, 39, 431, DateTimeKind.Utc).AddTicks(7638),
                             Name = "admin",
-                            Password = "22cf0ff8fc2d1a8c008cbbdad311ed4a",
+                            Password = "ae322a2c4c237df3b8683703e51442aa",
                             Phone = "13049809673",
-                            Role = 1,
-                            Salt = "19520e9012974aa7ad93a908f373a81e"
+                            Role = 2,
+                            Salt = "19ea5ff625024a1d80bbf86c054e132c"
                         });
                 });
 
@@ -576,18 +507,36 @@ namespace FastWiki.Service.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<int>("MaxTokensPerLine")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxTokensPerParagraph")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Mode")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("ModificationTime")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<long>("Modifier")
                         .HasColumnType("bigint");
 
+                    b.Property<int>("OverlappingTokens")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Path")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("QAPromptTemplate")
+                        .HasColumnType("text");
+
                     b.Property<int>("State")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TrainingPattern")
                         .HasColumnType("integer");
 
                     b.Property<string>("Type")

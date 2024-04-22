@@ -14,6 +14,7 @@ services:
       - postgres
     volumes:
       - ./wwwroot/uploads:/app/wwwroot/uploads
+      - ./data:/app/data
     environment:
       - OPENAI_CHAT_ENDPOINT=https://api.openai.com
       - OPENAI_CHAT_EMBEDDING_ENDPOINT=https://api.openai.com

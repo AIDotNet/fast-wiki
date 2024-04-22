@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace FastWiki.Service.Migrations
+namespace FastWiki.Service.Migrations.PostgreSQL
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -28,6 +28,10 @@ namespace FastWiki.Service.Migrations
                     WikiIds = table.Column<string>(type: "text", nullable: false),
                     ReferenceUpperLimit = table.Column<int>(type: "integer", nullable: false),
                     Relevancy = table.Column<double>(type: "double precision", nullable: false),
+                    NoReplyFoundTemplate = table.Column<string>(type: "text", nullable: true),
+                    ShowSourceFile = table.Column<bool>(type: "boolean", nullable: false),
+                    Extend = table.Column<string>(type: "text", nullable: false),
+                    FunctionIds = table.Column<string>(type: "text", nullable: false),
                     Creator = table.Column<Guid>(type: "uuid", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     Modifier = table.Column<Guid>(type: "uuid", nullable: true),
@@ -45,7 +49,8 @@ namespace FastWiki.Service.Migrations
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    ChatId = table.Column<string>(type: "text", nullable: false),
+                    ChatId = table.Column<string>(type: "text", nullable: true),
+                    ApplicationId = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     Type = table.Column<int>(type: "integer", nullable: false),
                     Creator = table.Column<Guid>(type: "uuid", nullable: false),
@@ -69,6 +74,7 @@ namespace FastWiki.Service.Migrations
                     TokenConsumption = table.Column<int>(type: "integer", nullable: false),
                     Current = table.Column<bool>(type: "boolean", nullable: false),
                     Type = table.Column<int>(type: "integer", nullable: false),
+                    ReferenceFile = table.Column<string>(type: "text", nullable: false),
                     Creator = table.Column<Guid>(type: "uuid", nullable: false),
                     CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     Modifier = table.Column<Guid>(type: "uuid", nullable: false),
@@ -87,9 +93,11 @@ namespace FastWiki.Service.Migrations
                     Id = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     ChatApplicationId = table.Column<string>(type: "text", nullable: false),
-                    Expires = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    Expires = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    UsedToken = table.Column<long>(type: "bigint", nullable: false),
                     AvailableToken = table.Column<long>(type: "bigint", nullable: false),
                     AvailableQuantity = table.Column<int>(type: "integer", nullable: false),
+                    APIKey = table.Column<string>(type: "text", nullable: true),
                     Creator = table.Column<Guid>(type: "uuid", nullable: false),
                     CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     Modifier = table.Column<Guid>(type: "uuid", nullable: false),
@@ -123,6 +131,31 @@ namespace FastWiki.Service.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "wiki-function-calls",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    Parameters = table.Column<string>(type: "text", nullable: false),
+                    Items = table.Column<string>(type: "text", nullable: false),
+                    Enable = table.Column<bool>(type: "boolean", nullable: false),
+                    Imports = table.Column<string>(type: "text", nullable: false),
+                    Main = table.Column<string>(type: "text", nullable: false),
+                    Creator = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    Modifier = table.Column<Guid>(type: "uuid", nullable: false),
+                    ModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_wiki-function-calls", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "wiki-users",
                 columns: table => new
                 {
@@ -135,6 +168,7 @@ namespace FastWiki.Service.Migrations
                     Email = table.Column<string>(type: "text", nullable: false),
                     Phone = table.Column<string>(type: "text", nullable: false),
                     IsDisable = table.Column<bool>(type: "boolean", nullable: false),
+                    Role = table.Column<int>(type: "integer", nullable: false),
                     Creator = table.Column<Guid>(type: "uuid", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     Modifier = table.Column<Guid>(type: "uuid", nullable: true),
@@ -158,10 +192,17 @@ namespace FastWiki.Service.Migrations
                     FileId = table.Column<long>(type: "bigint", nullable: false),
                     DataCount = table.Column<int>(type: "integer", nullable: false),
                     Type = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    State = table.Column<int>(type: "integer", nullable: false),
                     Creator = table.Column<long>(type: "bigint", nullable: false),
                     CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     Modifier = table.Column<long>(type: "bigint", nullable: false),
-                    ModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    ModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    MaxTokensPerParagraph = table.Column<int>(type: "integer", nullable: false),
+                    MaxTokensPerLine = table.Column<int>(type: "integer", nullable: false),
+                    OverlappingTokens = table.Column<int>(type: "integer", nullable: false),
+                    Mode = table.Column<int>(type: "integer", nullable: false),
+                    TrainingPattern = table.Column<int>(type: "integer", nullable: false),
+                    QAPromptTemplate = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -177,6 +218,7 @@ namespace FastWiki.Service.Migrations
                     Icon = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Model = table.Column<string>(type: "text", nullable: false),
+                    EmbeddingModel = table.Column<string>(type: "text", nullable: false),
                     Creator = table.Column<Guid>(type: "uuid", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     Modifier = table.Column<Guid>(type: "uuid", nullable: true),
@@ -190,8 +232,8 @@ namespace FastWiki.Service.Migrations
 
             migrationBuilder.InsertData(
                 table: "wiki-users",
-                columns: new[] { "Id", "Account", "Avatar", "CreationTime", "Creator", "Email", "IsDeleted", "IsDisable", "ModificationTime", "Modifier", "Name", "Password", "Phone", "Salt" },
-                values: new object[] { new Guid("62769e54-0b0a-4a28-b3a5-b642c52ce8e5"), "admin", "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", new DateTime(2024, 2, 29, 17, 59, 24, 403, DateTimeKind.Utc).AddTicks(1510), null, "239573049@qq.com", false, false, new DateTime(2024, 2, 29, 17, 59, 24, 403, DateTimeKind.Utc).AddTicks(1512), null, "admin", "a7eeba6911945963ce0eafa6352a7a89", "13049809673", "51111786de5e4809b4f72c9670f2c294" });
+                columns: new[] { "Id", "Account", "Avatar", "CreationTime", "Creator", "Email", "IsDeleted", "IsDisable", "ModificationTime", "Modifier", "Name", "Password", "Phone", "Role", "Salt" },
+                values: new object[] { new Guid("81ba41a1-27df-4f6c-b327-dfec1bce8c85"), "admin", "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", new DateTime(2024, 4, 22, 14, 36, 39, 431, DateTimeKind.Utc).AddTicks(7635), null, "239573049@qq.com", false, false, new DateTime(2024, 4, 22, 14, 36, 39, 431, DateTimeKind.Utc).AddTicks(7638), null, "admin", "ae322a2c4c237df3b8683703e51442aa", "13049809673", 2, "19ea5ff625024a1d80bbf86c054e132c" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_wiki-chat-application_Name",
@@ -219,6 +261,11 @@ namespace FastWiki.Service.Migrations
                 column: "ChatApplicationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_wiki-function-calls_CreationTime",
+                table: "wiki-function-calls",
+                column: "CreationTime");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_wiki-wikis_Name",
                 table: "wiki-wikis",
                 column: "Name");
@@ -241,6 +288,9 @@ namespace FastWiki.Service.Migrations
 
             migrationBuilder.DropTable(
                 name: "wiki-file-storages");
+
+            migrationBuilder.DropTable(
+                name: "wiki-function-calls");
 
             migrationBuilder.DropTable(
                 name: "wiki-users");

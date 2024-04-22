@@ -3,6 +3,7 @@ using FastWiki.Service.Domain.Function.Aggregates;
 using Microsoft.KernelMemory.Configuration;
 using Microsoft.KernelMemory.ContentStorage.DevTools;
 using Microsoft.KernelMemory.FileSystem.DevTools;
+using Microsoft.KernelMemory.MemoryStorage.DevTools;
 using Microsoft.KernelMemory.Postgres;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
@@ -35,40 +36,77 @@ public sealed class WikiMemoryService : ISingletonDependency
         int overlappingTokens,
         string? chatModel = null, string? embeddingModel = null)
     {
-        var memory = new KernelMemoryBuilder()
-            .WithPostgresMemoryDb(new PostgresConfig()
-            {
-                ConnectionString = ConnectionStringsOptions.DefaultConnection,
-                TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
-            })
-            .WithSimpleFileStorage(new SimpleFileStorageConfig
-            {
-                StorageType = FileSystemTypes.Volatile,
-                Directory = "_files"
-            })
-            .WithSearchClientConfig(searchClientConfig)
-            .WithCustomTextPartitioningOptions(new TextPartitioningOptions()
-            {
-                MaxTokensPerLine = maxTokensPerLine,
-                MaxTokensPerParagraph = maxTokensPerParagraph,
-                OverlappingTokens = overlappingTokens
-            })
-            .WithOpenAITextGeneration(new OpenAIConfig()
-            {
-                APIKey = OpenAIOption.ChatToken,
-                TextModel = string.IsNullOrEmpty(chatModel) ? OpenAIOption.ChatModel : chatModel
-            }, null, new HttpClient(HttpClientHandler))
-            .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
-            {
-                // 如果 EmbeddingToken 为空，则使用 ChatToken
-                APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
-                    ? OpenAIOption.ChatToken
-                    : OpenAIOption.EmbeddingToken,
-                EmbeddingModel = string.IsNullOrEmpty(embeddingModel) ? OpenAIOption.EmbeddingModel : embeddingModel,
-            }, null, false, new HttpClient(HttpClientHandler))
-            .Build<MemoryServerless>();
 
-        return memory;
+        if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
+        {
+            var memory = new KernelMemoryBuilder()
+                .WithSimpleVectorDb(new SimpleVectorDbConfig
+                {
+                    StorageType = FileSystemTypes.Disk,
+                    Directory = "./data"
+                })
+                .WithSearchClientConfig(searchClientConfig)
+                .WithCustomTextPartitioningOptions(new TextPartitioningOptions()
+                {
+                    MaxTokensPerLine = maxTokensPerLine,
+                    MaxTokensPerParagraph = maxTokensPerParagraph,
+                    OverlappingTokens = overlappingTokens
+                })
+                .WithOpenAITextGeneration(new OpenAIConfig()
+                {
+                    APIKey = OpenAIOption.ChatToken,
+                    TextModel = string.IsNullOrEmpty(chatModel) ? OpenAIOption.ChatModel : chatModel
+                }, null, new HttpClient(HttpClientHandler))
+                .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
+                {
+                    // 如果 EmbeddingToken 为空，则使用 ChatToken
+                    APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
+                        ? OpenAIOption.ChatToken
+                        : OpenAIOption.EmbeddingToken,
+                    EmbeddingModel = string.IsNullOrEmpty(embeddingModel) ? OpenAIOption.EmbeddingModel : embeddingModel,
+                }, null, false, new HttpClient(HttpClientHandler))
+                .Build<MemoryServerless>();
+
+            return memory;
+        }
+        else
+        {
+            
+            var memory = new KernelMemoryBuilder()
+                .WithPostgresMemoryDb(new PostgresConfig()
+                {
+                    ConnectionString = ConnectionStringsOptions.DefaultConnection,
+                    TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
+                })
+                .WithSimpleFileStorage(new SimpleFileStorageConfig
+                {
+                    StorageType = FileSystemTypes.Volatile,
+                    Directory = "_files"
+                })
+                .WithSearchClientConfig(searchClientConfig)
+                .WithCustomTextPartitioningOptions(new TextPartitioningOptions()
+                {
+                    MaxTokensPerLine = maxTokensPerLine,
+                    MaxTokensPerParagraph = maxTokensPerParagraph,
+                    OverlappingTokens = overlappingTokens
+                })
+                .WithOpenAITextGeneration(new OpenAIConfig()
+                {
+                    APIKey = OpenAIOption.ChatToken,
+                    TextModel = string.IsNullOrEmpty(chatModel) ? OpenAIOption.ChatModel : chatModel
+                }, null, new HttpClient(HttpClientHandler))
+                .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
+                {
+                    // 如果 EmbeddingToken 为空，则使用 ChatToken
+                    APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
+                        ? OpenAIOption.ChatToken
+                        : OpenAIOption.EmbeddingToken,
+                    EmbeddingModel = string.IsNullOrEmpty(embeddingModel) ? OpenAIOption.EmbeddingModel : embeddingModel,
+                }, null, false, new HttpClient(HttpClientHandler))
+                .Build<MemoryServerless>();
+
+            return memory;
+        }
     }
 
     public MemoryServerless CreateMemoryServerless()

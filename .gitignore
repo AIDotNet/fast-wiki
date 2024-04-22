@@ -507,3 +507,4 @@ yarn-error.log*
 /src/Service/FastWiki.Service/wwwroot/
 /web/package-lock.json
 web/stats.html
+/src/Service/FastWiki.Service/data/
