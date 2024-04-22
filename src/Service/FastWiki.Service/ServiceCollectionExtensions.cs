@@ -100,11 +100,6 @@ public static class ServiceCollectionExtensions
             OpenAIOption.ChatModel = OPENAI_CHAT_MODEL;
         }
 
-        if (!OPENAI_EMBEDDING_MODEL.IsNullOrWhiteSpace())
-        {
-            OpenAIOption.EmbeddingModel = OPENAI_EMBEDDING_MODEL;
-        }
-
         if (!OPENAI_EMBEDDING_TOKEN.IsNullOrWhiteSpace())
         {
             OpenAIOption.EmbeddingToken = OPENAI_EMBEDDING_TOKEN;

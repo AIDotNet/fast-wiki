@@ -28,9 +28,4 @@ public class OpenAIOption
     /// 对话模型
     /// </summary>
     public static string ChatModel { get; set; } = "gpt-3.5-turbo";
-
-    /// <summary>
-    /// 量化模型
-    /// </summary>
-    public static string EmbeddingModel { get; set; } = "text-embedding-3-small";
 }

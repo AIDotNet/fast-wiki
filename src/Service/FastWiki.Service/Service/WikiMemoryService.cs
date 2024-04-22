@@ -6,7 +6,6 @@ using Microsoft.KernelMemory.FileSystem.DevTools;
 using Microsoft.KernelMemory.MemoryStorage.DevTools;
 using Microsoft.KernelMemory.Postgres;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 namespace FastWiki.Service.Service;
 
@@ -15,8 +14,7 @@ namespace FastWiki.Service.Service;
 /// </summary>
 public sealed class WikiMemoryService : ISingletonDependency
 {
-    private static readonly OpenAiHttpClientHandler Handler = new();
-    private static FastWikiFunctionContext _context = new();
+    private static readonly FastWikiFunctionContext Context = new();
 
     private static readonly OpenAiHttpClientHandler HttpClientHandler = new();
 
@@ -34,9 +32,8 @@ public sealed class WikiMemoryService : ISingletonDependency
         int maxTokensPerLine,
         int maxTokensPerParagraph,
         int overlappingTokens,
-        string? chatModel = null, string? embeddingModel = null)
+        string? chatModel, string? embeddingModel)
     {
-
         if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
         {
             var memory = new KernelMemoryBuilder()
@@ -63,7 +60,7 @@ public sealed class WikiMemoryService : ISingletonDependency
                     APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
                         ? OpenAIOption.ChatToken
                         : OpenAIOption.EmbeddingToken,
-                    EmbeddingModel = string.IsNullOrEmpty(embeddingModel) ? OpenAIOption.EmbeddingModel : embeddingModel,
+                    EmbeddingModel = embeddingModel,
                 }, null, false, new HttpClient(HttpClientHandler))
                 .Build<MemoryServerless>();
 
@@ -71,7 +68,6 @@ public sealed class WikiMemoryService : ISingletonDependency
         }
         else
         {
-            
             var memory = new KernelMemoryBuilder()
                 .WithPostgresMemoryDb(new PostgresConfig()
                 {
@@ -101,7 +97,7 @@ public sealed class WikiMemoryService : ISingletonDependency
                     APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
                         ? OpenAIOption.ChatToken
                         : OpenAIOption.EmbeddingToken,
-                    EmbeddingModel = string.IsNullOrEmpty(embeddingModel) ? OpenAIOption.EmbeddingModel : embeddingModel,
+                    EmbeddingModel = embeddingModel,
                 }, null, false, new HttpClient(HttpClientHandler))
                 .Build<MemoryServerless>();
 
@@ -109,6 +105,10 @@ public sealed class WikiMemoryService : ISingletonDependency
         }
     }
 
+    /// <summary>
+    /// 创建用于操作的内存服务（不要用于向量搜索）
+    /// </summary>
+    /// <returns></returns>
     public MemoryServerless CreateMemoryServerless()
     {
         return new KernelMemoryBuilder()
@@ -128,17 +128,9 @@ public sealed class WikiMemoryService : ISingletonDependency
                 APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
                     ? OpenAIOption.ChatToken
                     : OpenAIOption.EmbeddingToken,
-                EmbeddingModel = OpenAIOption.EmbeddingModel
+                EmbeddingModel = string.Empty,
             }, null, false, new HttpClient(HttpClientHandler))
             .Build<MemoryServerless>();
-    }
-
-    public OpenAIChatCompletionService CreateOpenAIChatCompletionService(
-        string modelId,
-        string? organization = null)
-    {
-        return new OpenAIChatCompletionService(modelId, OpenAIOption.ChatToken, organization,
-            new HttpClient(HttpClientHandler));
     }
 
     public Kernel CreateFunctionKernel(List<FastWikiFunctionCall> fastWikiFunctionCalls)
@@ -154,7 +146,7 @@ public sealed class WikiMemoryService : ISingletonDependency
         {
             var function = kernel.CreateFunctionFromMethod(async (dynamic value) =>
                 {
-                    var result = await _context.FunctionCall(fastWikiFunctionCall.Content, fastWikiFunctionCall.Main,
+                    var result = await Context.FunctionCall(fastWikiFunctionCall.Content, fastWikiFunctionCall.Main,
                         value);
 
                     return result;
