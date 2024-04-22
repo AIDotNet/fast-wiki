@@ -1,5 +1,5 @@
 import { ActionIcon, Avatar,SideNav, Tooltip } from "@lobehub/ui";
-import { Album, Settings2, Box, User, BotMessageSquare,SquareFunction, Brain } from 'lucide-react';
+import { Album, Settings2, Box, User, BotMessageSquare,SquareFunction } from 'lucide-react';
 import { memo, useEffect, useState } from "react";
 import { Flexbox } from 'react-layout-kit';
 import { Outlet } from "react-router-dom";
