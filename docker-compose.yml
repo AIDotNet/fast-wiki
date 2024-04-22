@@ -19,6 +19,7 @@ services:
       - OPENAI_CHAT_ENDPOINT=https://api.openai.com
       - OPENAI_CHAT_EMBEDDING_ENDPOINT=https://api.openai.com
       - OPENAI_CHAT_TOKEN=您的TokenKey
+      - OPENAI_EMBEDDING_MODEL=text-embedding-3-small
       - ASPNETCORE_ENVIRONMENT=Development
 
   postgres: # 当前compose服务名

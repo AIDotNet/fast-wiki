@@ -2,14 +2,11 @@
 using FastWiki.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Plugins.Core;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-
     /// <summary>
     /// 注册JWT Bearer认证服务的静态扩展方法
     /// </summary>
@@ -50,7 +47,6 @@ public static class ServiceCollectionExtensions
         var OPENAI_CHAT_ENDPOINT = Environment.GetEnvironmentVariable("OPENAI_CHAT_ENDPOINT");
         var OPENAI_CHAT_EMBEDDING_ENDPOINT = Environment.GetEnvironmentVariable("OPENAI_CHAT_EMBEDDING_ENDPOINT");
         var OPENAI_CHAT_TOKEN = Environment.GetEnvironmentVariable("OPENAI_CHAT_TOKEN");
-        var OPENAI_CHAT_MODEL = Environment.GetEnvironmentVariable("OPENAI_CHAT_MODEL");
         var OPENAI_EMBEDDING_MODEL = Environment.GetEnvironmentVariable("OPENAI_EMBEDDING_MODEL");
         var OPENAI_EMBEDDING_TOKEN = Environment.GetEnvironmentVariable("OPENAI_EMBEDDING_TOKEN");
 
@@ -67,6 +63,11 @@ public static class ServiceCollectionExtensions
         if (!OPENAI_CHAT_TOKEN.IsNullOrWhiteSpace())
         {
             OpenAIOption.ChatToken = OPENAI_CHAT_TOKEN;
+        }
+
+        if (!OPENAI_EMBEDDING_MODEL.IsNullOrWhiteSpace())
+        {
+            OpenAIOption.EmbeddingModel = OPENAI_EMBEDDING_MODEL;
         }
 
         if (!OPENAI_EMBEDDING_TOKEN.IsNullOrWhiteSpace())

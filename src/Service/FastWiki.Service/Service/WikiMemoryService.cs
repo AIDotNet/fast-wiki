@@ -109,31 +109,57 @@ public sealed class WikiMemoryService : ISingletonDependency
     /// 创建用于操作的内存服务（不要用于向量搜索）
     /// </summary>
     /// <returns></returns>
-    public MemoryServerless CreateMemoryServerless()
+    public MemoryServerless CreateMemoryServerless(string? model = null)
     {
-        return new KernelMemoryBuilder()
-            .WithPostgresMemoryDb(new PostgresConfig()
-            {
-                ConnectionString = ConnectionStringsOptions.DefaultConnection,
-                TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
-            })
-            .WithOpenAITextGeneration(new OpenAIConfig()
-            {
-                APIKey = OpenAIOption.ChatToken,
-                TextModel = "sk-test"
-            }, null, new HttpClient(HttpClientHandler))
-            .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
-            {
-                // 如果 EmbeddingToken 为空，则使用 ChatToken
-                APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
-                    ? OpenAIOption.ChatToken
-                    : OpenAIOption.EmbeddingToken,
-                EmbeddingModel = string.Empty,
-            }, null, false, new HttpClient(HttpClientHandler))
-            .Build<MemoryServerless>();
+        if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
+        {
+            return new KernelMemoryBuilder()
+                .WithSimpleVectorDb(new SimpleVectorDbConfig
+                {
+                    StorageType = FileSystemTypes.Disk,
+                    Directory = "./data"
+                })
+                .WithOpenAITextGeneration(new OpenAIConfig()
+                {
+                    APIKey = OpenAIOption.ChatToken,
+                    TextModel = model ?? string.Empty
+                }, null, new HttpClient(HttpClientHandler))
+                .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
+                {
+                    // 如果 EmbeddingToken 为空，则使用 ChatToken
+                    APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
+                        ? OpenAIOption.ChatToken
+                        : OpenAIOption.EmbeddingToken,
+                    EmbeddingModel = OpenAIOption.EmbeddingModel,
+                }, null, false, new HttpClient(HttpClientHandler))
+                .Build<MemoryServerless>();
+        }
+        else
+        {
+            return new KernelMemoryBuilder()
+                .WithPostgresMemoryDb(new PostgresConfig()
+                {
+                    ConnectionString = ConnectionStringsOptions.DefaultConnection,
+                    TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
+                })
+                .WithOpenAITextGeneration(new OpenAIConfig()
+                {
+                    APIKey = OpenAIOption.ChatToken,
+                    TextModel = model ?? string.Empty
+                }, null, new HttpClient(HttpClientHandler))
+                .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
+                {
+                    // 如果 EmbeddingToken 为空，则使用 ChatToken
+                    APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
+                        ? OpenAIOption.ChatToken
+                        : OpenAIOption.EmbeddingToken,
+                    EmbeddingModel = OpenAIOption.EmbeddingModel,
+                }, null, false, new HttpClient(HttpClientHandler))
+                .Build<MemoryServerless>();
+        }
     }
 
-    public Kernel CreateFunctionKernel(List<FastWikiFunctionCall> fastWikiFunctionCalls,
+    public Kernel CreateFunctionKernel(List<FastWikiFunctionCall>? fastWikiFunctionCalls,
         string chatModel)
     {
         var kernel = Kernel.CreateBuilder()
@@ -143,25 +169,28 @@ public sealed class WikiMemoryService : ISingletonDependency
                 httpClient: new HttpClient(new OpenAiHttpClientHandler(OpenAIOption.ChatEndpoint)))
             .Build();
 
-        foreach (var fastWikiFunctionCall in fastWikiFunctionCalls)
+        if (fastWikiFunctionCalls != null)
         {
-            var function = kernel.CreateFunctionFromMethod(async (dynamic value) =>
-                {
-                    var result = await Context.FunctionCall(fastWikiFunctionCall.Content, fastWikiFunctionCall.Main,
-                        value);
+            foreach (var fastWikiFunctionCall in fastWikiFunctionCalls)
+            {
+                var function = kernel.CreateFunctionFromMethod(async (dynamic value) =>
+                    {
+                        var result = await Context.FunctionCall(fastWikiFunctionCall.Content, fastWikiFunctionCall.Main,
+                            value);
 
-                    return result;
-                },
-                fastWikiFunctionCall.Main,
-                fastWikiFunctionCall.Description,
-                fastWikiFunctionCall.Parameters.Select(x => new KernelParameterMetadata(x.Key)
-                {
-                    Description = x.Value,
-                    Name = x.Key
-                }));
+                        return result;
+                    },
+                    fastWikiFunctionCall.Main,
+                    fastWikiFunctionCall.Description,
+                    fastWikiFunctionCall.Parameters.Select(x => new KernelParameterMetadata(x.Key)
+                    {
+                        Description = x.Value,
+                        Name = x.Key
+                    }));
 
-            kernel.Plugins.AddFromFunctions(fastWikiFunctionCall.Main, fastWikiFunctionCall.Description,
-                new[] { function });
+                kernel.Plugins.AddFromFunctions(fastWikiFunctionCall.Main, fastWikiFunctionCall.Description,
+                    new[] { function });
+            }
         }
 
         return kernel;

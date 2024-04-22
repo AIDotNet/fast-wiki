@@ -127,7 +127,7 @@ public static class OpenAIService
 
         var sourceFile = new List<FileStorage>();
         var wikiMemoryService = context.RequestServices.GetRequiredService<WikiMemoryService>();
-        var memoryServerless = wikiMemoryService.CreateMemoryServerless();
+        var memoryServerless = wikiMemoryService.CreateMemoryServerless(chatApplication.ChatModel);
 
         // 如果为空则不使用知识库
         if (chatApplication.WikiIds.Count != 0)
@@ -253,7 +253,7 @@ public static class OpenAIService
             }
 
             var kernel =
-                wikiMemoryService.CreateFunctionKernel(functionCall.Result.ToList(), chatApplication.ChatModel);
+                wikiMemoryService.CreateFunctionKernel(functionCall?.Result?.ToList(), chatApplication.ChatModel);
 
             // 如果有函数调用
             if (chatApplication.FunctionIds.Any() && functionCall.Result.Any())
