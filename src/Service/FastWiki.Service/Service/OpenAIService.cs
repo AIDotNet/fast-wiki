@@ -33,6 +33,8 @@ public static class OpenAIService
 
             return;
         }
+        
+        var logger = context.RequestServices.GetRequiredService<ILogger>();
 
         var chatDialogId = context.Request.Query["ChatDialogId"].ToString();
         var chatId = context.Request.Query["ChatId"];
@@ -288,6 +290,7 @@ public static class OpenAIService
                     {
                         // await context.WriteEndAsync("未找到函数");
                         // return;
+                        logger.LogError("未找到函数");
                         continue;
                     }
 
@@ -314,6 +317,7 @@ public static class OpenAIService
                     catch (Exception e)
                     {
                         await context.WriteEndAsync("函数调用异常：" + e.Message);
+                        logger.LogError(e, "函数调用异常");
                         return;
                     }
                 }
@@ -352,20 +356,24 @@ public static class OpenAIService
         catch (NotModelException notModelException)
         {
             await context.WriteEndAsync("未找到模型兼容：" + notModelException.Message);
+            logger.LogError(notModelException, "未找到模型兼容");
             return;
         }
         catch (InvalidOperationException invalidOperationException)
         {
             await context.WriteEndAsync("对话异常：" + invalidOperationException.Message);
+            logger.LogError(invalidOperationException, "对话异常");
             return;
         }
         catch (ArgumentException argumentException)
         {
             await context.WriteEndAsync(argumentException.Message);
+            logger.LogError(argumentException, "对话异常");
             return;
         }
         catch (Exception e)
         {
+            logger.LogError(e, "对话异常");
             await context.WriteEndAsync("对话异常：" + e.Message);
             return;
         }
