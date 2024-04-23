@@ -5,18 +5,18 @@ using FastWiki.Service.Service;
 using Masa.Contrib.Authentication.Identity;
 using Microsoft.AspNetCore.StaticFiles;
 using Serilog;
-using Serilog.Formatting.Json;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .CreateLogger();
-
-builder.Host.UseSerilog();
+// TODO: 由于引用Serilog导致数据库存储失败，暂时注释掉
+// Log.Logger = new LoggerConfiguration()
+//     .ReadFrom.Configuration(builder.Configuration)
+//     .CreateLogger();
+//
+// builder.Host.UseSerilog();
 
 builder.Configuration.GetSection(OpenAIOption.Name)
     .Get<OpenAIOption>();
