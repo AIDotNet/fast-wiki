@@ -1,4 +1,4 @@
-import { Modal, SpotlightCard } from "@lobehub/ui";
+import { Markdown, Modal, SpotlightCard } from "@lobehub/ui";
 import { useEffect, useState } from "react";
 import { DelDetailsVector, GetWikiDetailVectorQuantity } from "../../../services/WikiService";
 import { WikiDetailVectorQuantityDto } from "../../../models";
@@ -20,6 +20,9 @@ export default function WikiDetailFile({
     visible,
     onClose
 }: IWikiDetailProps) {
+
+    const [showValue, setShowValue] = useState('')
+
     const [wikiDetailInfo, setWikiDetailInfo] = useState([] as WikiDetailVectorQuantityDto[]);
     const [taotal, setTotal] = useState(0);
     const [input, setInput] = useState({
@@ -71,6 +74,12 @@ export default function WikiDetailFile({
                 right: 16,
                 bottom: 16
             }}>删除</Button>
+            <Button onClick={() => {
+                setShowValue(item.content)
+            }} type='primary' size='small' style={{
+                position: 'absolute',
+                bottom: 16
+            }}>查看</Button>
         </Flexbox>
     }
 
@@ -89,6 +98,17 @@ export default function WikiDetailFile({
             <SpotlightCard renderItem={renderItem} items={wikiDetailInfo}>
             </SpotlightCard>
             {taotal}
+
+            <Modal
+                title='查看'
+                onCancel={() => setShowValue('')}
+                footer={[]}
+                open={showValue !== ''}
+            >
+                <Markdown>
+                    {showValue}
+                </Markdown>
+            </Modal>
         </Modal>
     )
 }

@@ -1,7 +1,10 @@
 ﻿namespace FastWiki.Service.DataAccess.Repositories.Wikis;
 
 /// <inheritdoc />
-public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork)
+public sealed class WikiRepository(
+    WikiDbContext context,
+    IConfiguration configuration,
+    IUnitOfWork unitOfWork)
     : Repository<WikiDbContext, Wiki, long>(context, unitOfWork), IWikiRepository
 {
     /// <inheritdoc />
@@ -79,8 +82,15 @@ public sealed class WikiRepository(WikiDbContext context, IUnitOfWork unitOfWork
 
     public async Task RemoveDetailsVectorAsync(string index, string id)
     {
-        await Context.Database.ExecuteSqlRawAsync(
-            $"delete from \"{ConnectionStringsOptions.TableNamePrefix + index}\" where id='{id}';");
+        if (configuration.GetConnectionString("DefaultConnection").IsNullOrEmpty())
+        {
+            // TODO: 磁盘不支持删除单个向量
+        }
+        else
+        {
+            await Context.Database.ExecuteSqlRawAsync(
+                $"delete from \"{ConnectionStringsOptions.TableNamePrefix + index}\" where id='{id}';");
+        }
     }
 
     public Task DetailsRenameNameAsync(long id, string name)
