@@ -1,4 +1,6 @@
-﻿namespace FastWiki.Service.Service;
+﻿using FastWiki.Service.Backgrounds;
+
+namespace FastWiki.Service.Service;
 
 /// <summary>
 /// 知识库服务
@@ -37,7 +39,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
     [Authorize]
     public async Task<PaginatedListBase<WikiDto>> GetWikiListAsync(string? keyword, int page, int pageSize)
     {
-        var query = new WikiListQuery(UserContext.GetUserId<Guid>(),keyword, page, pageSize);
+        var query = new WikiListQuery(UserContext.GetUserId<Guid>(), keyword, page, pageSize);
 
         await EventBus.PublishAsync(query);
 
@@ -147,5 +149,28 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
     {
         var command = new DetailsRenameNameCommand(id, name);
         return EventBus.PublishAsync(command);
+    }
+
+    /// <summary>
+    /// 量化状态检查
+    /// </summary>
+    /// <param name="wikiId"></param>
+    /// <returns></returns>
+    [Authorize]
+    public async Task<List<CheckQuantizationStateDto>> CheckQuantizationStateAsync(long wikiId)
+    {
+        var values = QuantizeBackgroundService.CacheWikiDetails.Values.Where(x => x.Item1.WikiId == wikiId).ToList();
+
+        if (values.Any())
+        {
+            return values.Select(x => new CheckQuantizationStateDto
+            {
+                WikiId = x.Item1.WikiId,
+                FileName = x.Item1.FileName,
+                State = x.Item1.State
+            }).ToList();
+        }
+
+        return [];
     }
 }

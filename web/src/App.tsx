@@ -8,7 +8,7 @@ import App from './pages/app/page'
 
 import { ThemeProvider } from '@lobehub/ui'
 import FunctionCall from './pages/function-call/page'
-const Chat = lazy(() => import('./pages/chat/page'));
+const Chat = lazy(() => import('./pages/oid-chat/page'));
 const User = lazy(() => import('./pages/user/page'));
 
 const AppDetail = lazy(() => import('./pages/app-detail/page'));

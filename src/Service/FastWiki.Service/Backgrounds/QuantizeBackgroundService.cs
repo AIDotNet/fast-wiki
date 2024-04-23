@@ -17,11 +17,12 @@ public sealed class QuantizeBackgroundService : BackgroundService
     public static ConcurrentDictionary<string, (WikiDetail, Wiki)> CacheWikiDetails { get; } = new();
 
     private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<QuantizeBackgroundService> _logger;
 
     /// <summary>
     /// 当前任务数量
     /// </summary>
-    private static int _currentTask = 0;
+    private static int _currentTask;
 
     /// <summary>
     /// 最大量化任务数量
@@ -38,9 +39,10 @@ public sealed class QuantizeBackgroundService : BackgroundService
     /// <summary>
     /// 构造
     /// </summary>
-    public QuantizeBackgroundService(IServiceProvider serviceProvider)
+    public QuantizeBackgroundService(IServiceProvider serviceProvider, ILogger<QuantizeBackgroundService> logger)
     {
         _serviceProvider = serviceProvider;
+        _logger = logger;
     }
 
     /// <summary>
@@ -88,8 +90,8 @@ public sealed class QuantizeBackgroundService : BackgroundService
         while (await WikiDetails.Reader.WaitToReadAsync())
         {
             Interlocked.Increment(ref _currentTask);
+            _logger.LogInformation($"当前任务数量：{_currentTask}");
             var wikiDetail = await WikiDetails.Reader.ReadAsync();
-            Console.WriteLine("_currentTask: " + _currentTask);
             await HandlerAsync(wikiDetail, asyncServiceScope.ServiceProvider);
             Interlocked.Decrement(ref _currentTask);
         }
@@ -100,7 +102,7 @@ public sealed class QuantizeBackgroundService : BackgroundService
     /// </summary>
     /// <param name="wikiDetail"></param>
     /// <param name="service"></param>
-    private static async ValueTask HandlerAsync(WikiDetail wikiDetail, IServiceProvider service)
+    private async ValueTask HandlerAsync(WikiDetail wikiDetail, IServiceProvider service)
     {
         var fileStorageRepository = service.GetRequiredService<IFileStorageRepository>();
         var wikiRepository = service.GetRequiredService<IWikiRepository>();
@@ -123,8 +125,8 @@ public sealed class QuantizeBackgroundService : BackgroundService
             wiki?.EmbeddingModel);
         try
         {
-            Console.WriteLine($"开始量化：ʼ{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId}");
-            List<string> step = new List<string>();
+            _logger.LogInformation($"开始量化：{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId}");
+            List<string> step = [];
             if (wikiDetail.TrainingPattern == TrainingPattern.QA)
             {
                 var stepName = wikiDetail.Id.ToString();
@@ -188,12 +190,11 @@ public sealed class QuantizeBackgroundService : BackgroundService
             }
 
             await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Accomplish);
-            Console.WriteLine($"量化成功：{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {result}");
+            _logger.LogInformation($"量化成功：{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {result}");
         }
         catch (Exception e)
         {
-            Console.WriteLine(
-                $"量化失败{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {Environment.NewLine + e.Message}");
+            _logger.LogError(e, $"量化失败{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId}");
 
             if (wikiDetail.State != WikiQuantizationState.Fail)
             {

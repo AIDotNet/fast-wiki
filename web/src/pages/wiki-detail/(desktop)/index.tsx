@@ -1,10 +1,11 @@
 import { memo, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button } from 'antd';
+import { Button, List } from 'antd';
 
 import styled from 'styled-components';
-import { GetWikis } from '../../../services/WikiService';
-import { Avatar } from '@lobehub/ui';
+import { CheckQuantizationState, GetWikis } from '../../../services/WikiService';
+import { Avatar, Tag, } from '@lobehub/ui';
+
 import WikiData from '../features/WikiData';
 import UploadWikiFile from '../features/UploadWikiFile';
 import SearchWikiDetail from '../features/SearchWikiDetail';
@@ -28,6 +29,8 @@ export default memo(() => {
     const [wiki, setWiki] = useState({} as WikiDto);
 
     const [tabs, setTabs] = useState([] as any[]);
+
+    const [quantizationState, setQuantizationState] = useState([]) as any;
 
     const [tab, setTab] = useState() as any;
 
@@ -73,6 +76,22 @@ export default memo(() => {
         setTab(key);
     }
 
+    useEffect(() => {
+        // 写一个定时器，每1s刷新一次
+        const timer = setInterval(() => {
+            CheckQuantizationState(id as string)
+                .then((res) => {
+                    setQuantizationState(res);
+                });
+
+        }, 1000);
+
+        return () => {
+            clearInterval(timer);
+        }
+
+    }, []);
+
     return (
         <>
             <LeftTabs>
@@ -111,11 +130,42 @@ export default memo(() => {
                         }} size='large'>{item.label}</Button>
                     })}
                 </div>
+                <div style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    padding: 8,
+                    height: '20%',
+                    overflow: 'auto',
+                    width: 190,
+                    justifyContent: 'space-around',
+                }}>
+                    <List
+                        itemLayout='vertical'
+                        locale={{ emptyText: '暂无量化任务' }}
+                        dataSource={quantizationState}
+                        renderItem={(item: any, index: number) => (
+                            <List.Item style={{
+                                height: 45,
+                            }}>
+                                <List.Item.Meta
+                                    title={
+                                        <>
+                                            <span>{index}：</span>
+                                            <span>{item.fileName}</span>
+                                            <Tag style={{float: 'right'
+                                            }}>量化中</Tag>
+                                        </>
+                                    }
+                                />
+                            </List.Item>
+                        )}
+                    />
+                </div>
             </LeftTabs >
             <div style={{
                 width: '100%',
                 padding: 20,
-                overflow:'auto',
+                overflow: 'auto',
 
             }}>
                 {

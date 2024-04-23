@@ -131,3 +131,11 @@ export function RetryVectorDetail(id:number){
 export function DetailsRenameName(id: string, name: string) {
     return post(`${prefix}/DetailsRenameName/${id}?name=${name}`)
 }
+
+/**
+ * 检查知识库向量状态
+ * @returns 
+ */
+export function CheckQuantizationState(wikiId: string) {
+    return post(`${prefix}/CheckQuantizationState?wikiId=${wikiId}`)
+}

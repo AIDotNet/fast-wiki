@@ -99,7 +99,7 @@ public class QAHandler : IPipelineStepHandler
                         if (QuantizeBackgroundService.CacheWikiDetails.TryGetValue(StepName, out var wikiDetail))
                         {
                             await foreach (var item in OpenAIService
-                                               .QAAsync(wikiDetail.Item1.QAPromptTemplate, content,
+                                               .QaAsync(wikiDetail.Item1.QAPromptTemplate, content,
                                                    wikiDetail.Item2.Model, OpenAIOption.ChatToken,
                                                    OpenAIOption.ChatEndpoint, _wikiMemoryService)
                                                .WithCancellation(cancellationToken))

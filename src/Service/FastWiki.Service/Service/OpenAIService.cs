@@ -434,7 +434,17 @@ public class OpenAIService
         }
     }
 
-    public static async IAsyncEnumerable<string> QAAsync(string prompt, string value, string model, string apiKey,
+    /// <summary>
+    /// QA问答解析大文本拆分多个段落
+    /// </summary>
+    /// <param name="prompt"></param>
+    /// <param name="value"></param>
+    /// <param name="model"></param>
+    /// <param name="apiKey"></param>
+    /// <param name="url"></param>
+    /// <param name="memoryService"></param>
+    /// <returns></returns>
+    public static async IAsyncEnumerable<string> QaAsync(string prompt, string value, string model, string apiKey,
         string url,
         WikiMemoryService memoryService)
     {

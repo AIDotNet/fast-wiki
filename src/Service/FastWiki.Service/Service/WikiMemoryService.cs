@@ -160,6 +160,12 @@ public sealed class WikiMemoryService : ISingletonDependency
         }
     }
 
+    /// <summary>
+    /// 创建Function Kernel
+    /// </summary>
+    /// <param name="fastWikiFunctionCalls"></param>
+    /// <param name="chatModel"></param>
+    /// <returns></returns>
     public Kernel CreateFunctionKernel(List<FastWikiFunctionCall>? fastWikiFunctionCalls,
         string chatModel)
     {
@@ -197,6 +203,13 @@ public sealed class WikiMemoryService : ISingletonDependency
         return kernel;
     }
 
+    /// <summary>
+    /// 创建Function Kernel
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="modelId"></param>
+    /// <param name="uri"></param>
+    /// <returns></returns>
     public Kernel CreateFunctionKernel(string apiKey, string modelId, string uri)
     {
         var kernel = Kernel.CreateBuilder()
