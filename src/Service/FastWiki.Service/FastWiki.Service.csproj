@@ -17,19 +17,19 @@
     <ItemGroup>
         <PackageReference Include="AIDotNet.Abstractions" Version="0.0.9" />
         <PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
-        <PackageReference Include="Masa.BuildingBlocks.Data.MappingExtensions" Version="1.0.1-preview.17" />
-        <PackageReference Include="Masa.Contrib.Authentication.Identity" Version="1.0.1-preview.17" />
-        <PackageReference Include="Masa.BuildingBlocks.Data.UoW" Version="1.0.1-preview.17" />
-        <PackageReference Include="Masa.Contrib.Data.EFCore.PostgreSql" Version="1.0.1-preview.17" />
+        <PackageReference Include="Masa.BuildingBlocks.Data.MappingExtensions" Version="$(MasaFrameworkPackageVersion)" />
+        <PackageReference Include="Masa.Contrib.Authentication.Identity" Version="$(MasaFrameworkPackageVersion)" />
+        <PackageReference Include="Masa.BuildingBlocks.Data.UoW" Version="$(MasaFrameworkPackageVersion)" />
+        <PackageReference Include="Masa.Contrib.Data.EFCore.PostgreSql" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Data.EFCore.Sqlite" Version="1.0.1-preview.16" />
-        <PackageReference Include="Masa.Contrib.Data.Mapping.Mapster" Version="1.0.1-preview.17" />
-        <PackageReference Include="Masa.Contrib.Data.UoW.EFCore" Version="1.0.1-preview.17" />
-        <PackageReference Include="Masa.Contrib.Ddd.Domain" Version="1.0.1-preview.17" />
-        <PackageReference Include="Masa.Contrib.Ddd.Domain.Repository.EFCore" Version="1.0.1-preview.17" />
-        <PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="1.0.1-preview.17" />
-        <PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EFCore" Version="1.0.1-preview.17" />
-        <PackageReference Include="Masa.Contrib.Exceptions" Version="1.0.1-preview.17" />
-        <PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="1.0.1-preview.17" />
+        <PackageReference Include="Masa.Contrib.Data.Mapping.Mapster" Version="$(MasaFrameworkPackageVersion)" />
+        <PackageReference Include="Masa.Contrib.Data.UoW.EFCore" Version="$(MasaFrameworkPackageVersion)" />
+        <PackageReference Include="Masa.Contrib.Ddd.Domain" Version="$(MasaFrameworkPackageVersion)" />
+        <PackageReference Include="Masa.Contrib.Ddd.Domain.Repository.EFCore" Version="$(MasaFrameworkPackageVersion)" />
+        <PackageReference Include="Masa.Contrib.Dispatcher.Events" Version="$(MasaFrameworkPackageVersion)" />
+        <PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EFCore" Version="$(MasaFrameworkPackageVersion)" />
+        <PackageReference Include="Masa.Contrib.Exceptions" Version="$(MasaFrameworkPackageVersion)" />
+        <PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EFCore" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.3" />
         <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.37.240420.2" />
