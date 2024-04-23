@@ -11,7 +11,7 @@ export default () => {
           description: 'Fast Wiki文档',
           openExternal: true,
           title: 'Fast Wiki文档',
-          url: 'https://docs.token-ai.cn/',
+          url: 'https://ai-dotnet.com/',
         },
       ],
       title: '文档',
@@ -48,7 +48,7 @@ export default () => {
                   商务合作
                 </Button>
                 <Button type="text" onClick={() => {
-                  window.open('https://docs.token-ai.cn')
+                  window.open('https://ai-dotnet.com/')
                 }}>
                   文档
                 </Button>
