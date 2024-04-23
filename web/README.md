@@ -6,6 +6,12 @@
 yarn
 ```
 
+再当前目录下创建`.env`然后添加内容
+
+```env
+VITE_FAST_API_URL=http://localhost:5124
+```
+
 启动项目
 
 ```sh
