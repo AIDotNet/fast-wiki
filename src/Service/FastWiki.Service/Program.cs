@@ -220,27 +220,29 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger()
         .UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "FastWiki.ServiceApp"));
 
-    #region MigrationDb
-
-    if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
-    {
-        await using var context = app.Services.CreateScope().ServiceProvider.GetService<SqliteContext>();
-        {
-            await context!.Database.MigrateAsync();
-        }
-    }
-    else
-    {
-        await using var context = app.Services.CreateScope().ServiceProvider.GetService<WikiDbContext>();
-        {
-            await context!.Database.MigrateAsync();
-
-            // TODO: 创建vector插件如果数据库没有则需要提供支持向量的数据库。
-            await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");
-        }
-    }
-
-    #endregion
 }
+
+
+#region MigrationDb
+
+if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
+{
+    await using var context = app.Services.CreateScope().ServiceProvider.GetService<SqliteContext>();
+    {
+        await context!.Database.MigrateAsync();
+    }
+}
+else
+{
+    await using var context = app.Services.CreateScope().ServiceProvider.GetService<WikiDbContext>();
+    {
+        await context!.Database.MigrateAsync();
+
+        // TODO: 创建vector插件如果数据库没有则需要提供支持向量的数据库。
+        await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");
+    }
+}
+
+#endregion
 
 await app.RunAsync();

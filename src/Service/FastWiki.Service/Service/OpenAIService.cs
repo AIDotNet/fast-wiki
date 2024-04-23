@@ -16,7 +16,7 @@ using TokenApi.Service.Exceptions;
 
 namespace FastWiki.Service.Service;
 
-public static class OpenAIService
+public class OpenAIService
 {
     public static async Task Completions(HttpContext context)
     {
@@ -33,8 +33,8 @@ public static class OpenAIService
 
             return;
         }
-        
-        var logger = context.RequestServices.GetRequiredService<ILogger>();
+
+        var logger = context.RequestServices.GetRequiredService<ILogger<OpenAIService>>();
 
         var chatDialogId = context.Request.Query["ChatDialogId"].ToString();
         var chatId = context.Request.Query["ChatId"];
