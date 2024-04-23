@@ -4,11 +4,19 @@ using FastWiki.Service.Backgrounds;
 using FastWiki.Service.Service;
 using Masa.Contrib.Authentication.Identity;
 using Microsoft.AspNetCore.StaticFiles;
+using Serilog;
+using Serilog.Formatting.Json;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 builder.Configuration.GetSection(OpenAIOption.Name)
     .Get<OpenAIOption>();
@@ -219,7 +227,6 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger()
         .UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "FastWiki.ServiceApp"));
-
 }
 
 
@@ -246,3 +253,5 @@ else
 #endregion
 
 await app.RunAsync();
+
+Log.CloseAndFlush();
