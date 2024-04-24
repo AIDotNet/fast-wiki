@@ -100,6 +100,7 @@ public sealed class WikiMemoryService : ISingletonDependency
                         : OpenAIOption.EmbeddingToken,
                     EmbeddingModel = embeddingModel,
                 }, null, false, new HttpClient(HttpClientHandler))
+                .AddSingleton(new WikiMemoryService())
                 .Build<MemoryServerless>();
 
             return memory;
