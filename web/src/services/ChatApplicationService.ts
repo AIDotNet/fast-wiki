@@ -1,4 +1,4 @@
-import { postJson, get, del, putJson } from '../utils/fetch';
+import { postJson, get, del, putJson, post } from '../utils/fetch';
 import { config } from '../config';
 import { ChatApplicationDto, ChatDialogDto, PaginatedListBase } from '../models';
 
@@ -190,4 +190,20 @@ export function GetSessionLogDialog(chatApplicationId: string, page: number, pag
  */
 export function PutChatHistory(data: any) {
     return putJson(`${prefix}/ChatHistory`, data);
+}
+
+/**
+ * 获取聊天记录详情
+ * @param chatId 
+ * @returns 
+ */
+export function GetChatDialogHistoryInfo(historyId: string) {
+    return get(`${prefix}/ChatDialogHistoryInfo?historyId=${historyId}`);
+}
+
+/**
+ * 删除指定对话框所有历史记录
+ */
+export function PurageMessageHistory(dialogId:string){
+    return post(`${prefix}/PurgeMessageHistory?dialogId=${dialogId}`);
 }

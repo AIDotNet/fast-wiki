@@ -1,12 +1,11 @@
-import { ActionIcon, Logo, SideNav, Tooltip } from "@lobehub/ui";
-import { Album, Settings2, Box, User, BotMessageSquare ,Brain} from 'lucide-react';
+import { ActionIcon, Avatar,SideNav, Tooltip } from "@lobehub/ui";
+import { Album, Settings2, Box, User, BotMessageSquare,SquareFunction } from 'lucide-react';
 import { memo, useEffect, useState } from "react";
 import { Flexbox } from 'react-layout-kit';
 import { Outlet } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Dropdown, message } from "antd";
 import ChangePassword from "../../components/ChangePassword";
-
 
 const DesktopLayout = memo(() => {
   const [tab, setTab] = useState<string>('chat');
@@ -32,12 +31,12 @@ const DesktopLayout = memo(() => {
     description: '知识库',
     path: '/wiki',
     role: 'admin, user'
-  }, {
-    icon: Brain,
-    key: 'model',
-    description: '模型管理',
-    path: '/model',
-    role: 'admin'
+  },{
+    icon: SquareFunction,
+    key: 'function-call',
+    description: '函数管理',
+    path: '/function-call',
+    role: 'admin,user'
   }, {
     icon: User,
     key: 'user',
@@ -103,7 +102,7 @@ const DesktopLayout = memo(() => {
     width={'100%'}
   >
     <SideNav
-      avatar={<Logo size={40} />}
+      avatar={<Avatar src="/vite.svg" alt="logo" size={40} />}
       bottomActions={
         <Dropdown menu={{ items }} placement="topRight">
           <ActionIcon icon={Settings2} />

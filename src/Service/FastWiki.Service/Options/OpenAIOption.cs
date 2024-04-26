@@ -23,12 +23,7 @@ public class OpenAIOption
     /// 量化模型的 API Key
     /// </summary>
     public static string EmbeddingToken { get; set; }
-
-    /// <summary>
-    /// 对话模型
-    /// </summary>
-    public static string ChatModel { get; set; } = "gpt-3.5-turbo";
-
+    
     /// <summary>
     /// 量化模型
     /// </summary>

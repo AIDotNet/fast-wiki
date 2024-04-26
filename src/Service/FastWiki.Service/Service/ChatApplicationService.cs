@@ -1,9 +1,7 @@
-using Microsoft.Extensions.Caching.Memory;
-
 namespace FastWiki.Service.Service;
 
 /// <inheritdoc />
-public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, IMemoryCache memoryCache)
+public sealed class ChatApplicationService
     : ApplicationService<ChatApplicationService>, IChatApplicationService
 {
     /// <inheritdoc />
@@ -113,6 +111,15 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
         return query.Result;
     }
 
+    public async Task<ChatDialogHistoryDto> GetChatDialogHistoryInfoAsync(string historyId)
+    {
+        var query = new GetHistoryInfoQuery(historyId);
+        
+        await EventBus.PublishAsync(query);
+        
+        return query.Result;
+    }
+
     public async Task RemoveDialogHistoryAsync(string id)
     {
         var command = new RemoveChatDialogHistoryCommand(id);
@@ -192,5 +199,13 @@ public sealed class ChatApplicationService(WikiMemoryService wikiMemoryService, 
         var command = new PutChatHistoryCommand(input);
 
         return EventBus.PublishAsync(command);
+    }
+    
+    [Authorize]
+    public async Task PurgeMessageHistoryAsync(string dialogId)
+    {
+        var command = new RemovesChatDialogHistoryCommand(dialogId);
+
+        await EventBus.PublishAsync(command);
     }
 }

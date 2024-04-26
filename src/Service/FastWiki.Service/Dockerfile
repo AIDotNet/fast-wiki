@@ -24,8 +24,9 @@ RUN dotnet publish "./FastWiki.Service.csproj" -c $BUILD_CONFIGURATION -o /app/p
 FROM node:alpine as builder
 WORKDIR /src
 COPY ["web","."]
+RUN yarn
 RUN npm i
-RUN npm run build
+RUN yarn run build
 
 
 FROM base AS final

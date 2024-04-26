@@ -1,8 +1,6 @@
-﻿using FastWiki.Service.Domain.Storage.Aggregates;
-using System.Text.Json;
-using AIDotNet.OpenAI;
-using AIDotNet.SparkDesk;
-using FastWiki.Service.Domain.Model.Aggregates;
+﻿using System.Text.Json;
+using FastWiki.Service.Domain.Function.Aggregates;
+using FastWiki.Service.Domain.Storage.Aggregates;
 
 namespace FastWiki.Service.DataAccess;
 
@@ -24,9 +22,7 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
     public DbSet<ChatShare> ChatShares { get; set; }
 
-    public DbSet<FastModel> FastModels { get; set; }
-
-    public DbSet<ModelLogger> ModelLoggers { get; set; }
+    public DbSet<FastWikiFunctionCall> FunctionCalls { get; set; }
 
     protected override void OnModelCreatingExecuting(ModelBuilder modelBuilder)
     {
@@ -96,6 +92,18 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
                     v => JsonSerializer.Deserialize<List<long>>(v, new JsonSerializerOptions()));
+
+            entity.Property(x => x.Extend)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => v.IsNullOrEmpty()
+                        ? new Dictionary<string, string>()
+                        : JsonSerializer.Deserialize<Dictionary<string, string>>(v, new JsonSerializerOptions()));
+
+            entity.Property(x => x.FunctionIds)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<long>>(v, new JsonSerializerOptions()));
         });
 
         modelBuilder.Entity<ChatDialog>(entity =>
@@ -133,76 +141,38 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.HasIndex(x => x.ChatApplicationId);
         });
 
-        modelBuilder.Entity<FastModel>(entity =>
+
+        modelBuilder.Entity<FastWikiFunctionCall>(entity =>
         {
-            entity.ToTable("wiki-fast-models");
-            entity.HasKey(e => e.Id);
-
-            entity.HasIndex(x => x.Name);
-            entity.HasIndex(x => x.Type);
-
-            entity.Property(e => e.Name).HasMaxLength(30);
-            entity.Property(e => e.Type).HasMaxLength(100);
-            entity.Property(e => e.Url).HasMaxLength(200);
-            entity.Property(e => e.ApiKey).HasMaxLength(100);
-            entity.Property(e => e.Description).HasMaxLength(200);
-            entity.Property(e => e.Models).HasMaxLength(-1);
-
-            entity.Property(x => x.Models)
-                .HasConversion(item => JsonSerializer.Serialize(item, new JsonSerializerOptions()),
-                    item => JsonSerializer.Deserialize<List<string>>(item, new JsonSerializerOptions()));
-        });
-
-        modelBuilder.Entity<ModelLogger>(entity =>
-        {
-            entity.ToTable("wiki-model-logger");
+            entity.ToTable("wiki-function-calls");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
-            entity.HasIndex(x => x.FastModelId);
-            entity.HasIndex(x => x.UserId);
-            entity.HasIndex(x => x.ApplicationId);
-            entity.HasIndex(x => x.ApiKey);
-            entity.HasIndex(x => x.Type);
             entity.HasIndex(x => x.CreationTime);
+
+            entity.Property(x => x.Parameters)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<FunctionItem>>(v, new JsonSerializerOptions()));
+
+            entity.Property(x => x.Items)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<FunctionItem>>(v, new JsonSerializerOptions()));
+
+
+            entity.Property(x => x.Imports)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<string>>(v, new JsonSerializerOptions()));
         });
 
         var user = new User("admin", "admin", "Aa123456",
             "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", "239573049@qq.com", "13049809673", false);
-        
+
         user.SetAdminRole();
-        
+
         // 默认初始账号
         modelBuilder.Entity<User>().HasData(user);
-
-        var openAI = new FastModel("OpenAI", OpenAIOptions.ServiceName, "https://api.openai.com/", string.Empty,
-            "OpenAI", new List<string>()
-            {
-                "gpt-3.5-turbo",
-                "gpt-3.5-turbo-0125",
-                "gpt-3.5-turbo-1106",
-                "gpt-3.5-turbo-16k",
-                "gpt-3.5-turbo-0613",
-                "gpt-3.5-turbo-16k-0613",
-                "gpt-4-0125-preview",
-                "gpt-4-turbo-preview",
-                "gpt-4-1106-preview",
-                "gpt-4-vision-preview",
-                "gpt-4-1106-vision-preview",
-                "gpt-4",
-                "gpt-4-0613",
-                "gpt-4-32k",
-                "gpt-4-32k-0613"
-            }, 1);
-
-        var sparkDesk = new FastModel("SparkDesk", SparkDeskOptions.ServiceName, "", string.Empty, "星火大模型",
-        [
-            "SparkDesk-v3.5",
-            "SparkDesk-v3.1",
-            "SparkDesk-v1.5",
-            "SparkDesk-v2.1"
-        ], 1);
-
-        modelBuilder.Entity<FastModel>().HasData(openAI, sparkDesk);
     }
 }

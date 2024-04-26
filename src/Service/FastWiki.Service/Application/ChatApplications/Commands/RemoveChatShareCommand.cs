@@ -1,7 +1,7 @@
 namespace FastWiki.Service.Application.ChatApplications.Commands;
 
 /// <summary>
-/// É¾³ı·ÖÏí¶Ô»°
+/// åˆ é™¤åˆ†äº«å¯¹è¯
 /// </summary>
 /// <param name="Id"></param>
 public record RemoveChatShareCommand(string Id) : Command;

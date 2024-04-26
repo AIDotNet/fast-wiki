@@ -1,10 +1,11 @@
 import styled from 'styled-components';
 import { WikiDto } from '../../../models';
-import { Select } from 'antd';
+import { AutoComplete } from 'antd';
 import { useEffect, useState } from 'react';
 import { getModels } from '../../../store/Model';
 import { Button, message, Input } from 'antd';
 import { GetWikis, PutWikis } from '../../../services/WikiService';
+import { Tooltip } from '@lobehub/ui';
 
 const Container = styled.div`
     display: grid;
@@ -75,7 +76,7 @@ export default function WikiInfo(props: IWikiInfoProps) {
                     marginRight: 20,
                     width: 100
                 }}>名称</span>
-                <Input value={wikiInfo.name} onChange={(e)=>{
+                <Input value={wikiInfo.name} onChange={(e) => {
                     setWikiInfo({
                         ...wikiInfo,
                         name: e.target.value
@@ -88,7 +89,7 @@ export default function WikiInfo(props: IWikiInfoProps) {
                     fontSize: 20,
                     marginRight: 20
                 }}>对话模型</span>
-                <Select
+                <AutoComplete
                     defaultValue={wikiInfo.model}
                     value={wikiInfo.model}
                     style={{ width: 380 }}
@@ -102,11 +103,13 @@ export default function WikiInfo(props: IWikiInfoProps) {
                 />
             </ListItem>
             <ListItem>
-                <span style={{
-                    fontSize: 20,
-                    marginRight: 20
-                }}>对话模型</span>
-                <Select
+                <Tooltip title="用于将内容量化的模型" trigger='hover'>
+                    <span style={{
+                        fontSize: 20,
+                        marginRight: 20
+                    }}>嵌入模型</span>
+                </Tooltip>
+                <AutoComplete
                     defaultValue={wikiInfo.embeddingModel}
                     value={wikiInfo.embeddingModel}
                     style={{ width: 380 }}

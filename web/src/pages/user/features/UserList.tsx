@@ -18,12 +18,13 @@ export default function UserList({
     });
     const [total, setTotal] = useState(0);
     const [data, setData] = useState([]);
-    function handleTableChange(page: number, pageSize: number) {
+    async function handleTableChange(page: number, pageSize: number) {
         setInput({
             ...input,
             page: page,
             pageSize: pageSize,
         });
+        
     }
 
     const columns = [
@@ -161,7 +162,7 @@ export default function UserList({
 
     useEffect(() => {
         loadingData();
-    }, []);
+    }, [input]);
 
 
     return (

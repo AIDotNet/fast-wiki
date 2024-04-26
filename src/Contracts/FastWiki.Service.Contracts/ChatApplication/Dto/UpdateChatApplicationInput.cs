@@ -55,4 +55,11 @@ public class UpdateChatApplicationInput
     /// 关联的知识库
     /// </summary>
     public List<long> WikiIds { get; set; }
+    
+    /// <summary>
+    /// 扩展字段
+    /// </summary>
+    public Dictionary<string, string> Extend { get; set; } = new();
+    
+    public List<long> FunctionIds { get; set; } = new();
 }

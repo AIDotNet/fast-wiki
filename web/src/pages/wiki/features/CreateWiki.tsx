@@ -1,5 +1,5 @@
 import { Modal } from "@lobehub/ui";
-import { Form, Input, Button, message, Select, Upload } from 'antd';
+import { Form, Input, Button, message, AutoComplete, Upload } from 'antd';
 import { useEffect, useState } from "react";
 import { getModels } from "../../../store/Model";
 import { CreateWikis } from "../../../services/WikiService";
@@ -138,16 +138,17 @@ export function CreateApp(props: ICreateAppProps) {
                 <Form.Item
                     label="模型"
                     name="model"
+                    
                     rules={[{ required: true, message: '请选择模型' }]}>
-                    <Select
+                    <AutoComplete
                         options={model}
                     />
                 </Form.Item>
                 <Form.Item
-                    label="量化模型"
+                    label="嵌入模型"
                     name="embeddingModel"
                     rules={[{ required: true, message: '请选择模型' }]}>
-                    <Select
+                    <AutoComplete
                         options={embeddingModel}
                     />
                 </Form.Item>

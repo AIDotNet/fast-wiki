@@ -1,7 +1,7 @@
 namespace FastWiki.Service.Application.ChatApplications.Queries;
 
 /// <summary>
-/// 获取对话记录查询
+/// 鑾峰彇瀵硅瘽璁板綍鏌ヨ
 /// </summary>
 /// <param name="ChatDialogId"></param>
 /// <param name="Page"></param>

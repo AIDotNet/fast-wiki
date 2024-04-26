@@ -120,4 +120,17 @@ public class ChatApplicationQueryHandler(
         var dto = mapper.Map<ChatShareDto>(await chatApplicationRepository.GetAPIKeyChatShareAsync(query.APIKey));
         query.Result = dto;
     }
+
+    [EventHandler]
+    public async Task GetChatDialogHistoryInfoAsync(GetHistoryInfoQuery query)
+    {
+        var result = await chatApplicationRepository.GetChatDialogHistoryAsync(query.historyId);
+
+        if(result == null)
+        {
+            query.Result = new ChatDialogHistoryDto();
+            return;
+        }
+        query.Result = mapper.Map<ChatDialogHistoryDto>(result);
+    }
 }

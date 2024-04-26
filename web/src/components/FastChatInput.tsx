@@ -6,6 +6,7 @@ import { Flexbox } from 'react-layout-kit';
 import { Eraser, Languages } from 'lucide-react';
 import React from "react";
 import { message } from "antd";
+import { GetChatDialogHistoryInfo, PurageMessageHistory } from "../services/ChatApplicationService";
 
 interface IFastChatInputProps {
     dialog: any;
@@ -52,7 +53,7 @@ export default function FastChatInput({
             setLoading(true);
             const chatlayout = document.getElementById('chat-layout');
 
-            history.push({
+            let userChat = {
                 content: data,
                 createAt: new Date().toISOString(),
                 extra: {},
@@ -62,14 +63,16 @@ export default function FastChatInput({
                     title: "我",
                 },
                 role: 'user',
-            })
+            };
+
+            history.push(userChat)
 
             setHistory([...history]);
 
             let chat = {
                 content: '',
                 createAt: new Date().toISOString(),
-                extra: {},
+                extra: {} as any,
                 id: generateRandomString(10),
                 meta: {
                     avatar: "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/chatgpt.png",
@@ -90,13 +93,13 @@ export default function FastChatInput({
 
                 ],
                 max_tokens: 2000,
-                temperature: 0.7,
+                temperature: 0.5,
                 top_p: 1,
                 stream: true,
             } as any;
 
-            // 携带俩条上文消息 用于生成对话
-            history.slice(-2).forEach(x => {
+            // 携带上文消息 用于生成对话
+            history.slice(-4).forEach(x => {
                 requestInput.messages.push({
                     content: x.content,
                     role: x.role
@@ -128,12 +131,23 @@ export default function FastChatInput({
                         // 如果是结束标志，停止接收数据
                         if (jsonString === "[DONE]") {
                             setLoading(false);
-                            return;
+                            break;
                         }
                         const jsonData = JSON.parse(jsonString);
 
                         // 提取所需要的内容
                         const content = jsonData.choices[0].delta.content;
+
+                        if(userChat)
+
+
+                        // 更新用户对话id
+                        if(userChat.id !== jsonData.system_fingerprint) {
+                            userChat.id = jsonData.system_fingerprint;
+                            setHistory([...history, userChat]);
+                        }
+
+                        chat.id = jsonData.id;
 
                         chat.content += content;
 
@@ -148,6 +162,13 @@ export default function FastChatInput({
                 }
             }
 
+
+            // 通过对话id获取源数据
+            const hisotryInfo = await GetChatDialogHistoryInfo(chat.id);
+            
+            chat.extra.referenceFile = hisotryInfo.referenceFile;
+
+            setHistory([...history, chat]);
         } catch (error) {
             console.error(error);
         } finally {
@@ -178,7 +199,11 @@ export default function FastChatInput({
                             <>
                                 <ActionIcon icon={Languages} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
                                 <ActionIcon onClick={() => {
-                                    setValue('');
+                                    PurageMessageHistory(dialog.id)
+                                        .then(()=>{
+                                            setHistory([]);
+                                            message.success('清空成功');
+                                        });
                                 }} icon={Eraser} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
                             </>
                         }

@@ -10,10 +10,12 @@ export interface ChatApplicationDto {
     parameter: { [key: string]: string; };
     opener: string;
     wikiIds: number[];
+    functionIds: number[];
     referenceUpperLimit: number;
     noReplyFoundTemplate: string | null;
     showSourceFile: boolean;
     relevancy: number;
+    extend: { [key: string]: string; };
 }
 
 export interface ChatDialogDto {
@@ -55,7 +57,7 @@ export interface ChatShareDto {
     availableQuantity: number;
     apiKey: string;
     usedToken: number;
-    
+
 }
 export interface CompletionsDto {
     content: string;
@@ -134,7 +136,9 @@ export interface CreateWikiDetailDataInput {
     fileId: number;
     filePath: string;
     state: string;
-    subsection: number;
+    maxTokensPerParagraph: number;
+    maxTokensPerLine: number;
+    overlappingTokens: number;
     mode: ProcessMode;
     trainingPattern: TrainingPattern;
 }
@@ -144,7 +148,9 @@ export interface CreateWikiDetailsInput {
     name: string;
     fileId: number;
     filePath: string;
-    subsection: number;
+    maxTokensPerParagraph: number;
+    maxTokensPerLine: number;
+    overlappingTokens: number;
     mode: ProcessMode;
     trainingPattern: TrainingPattern;
 }
@@ -155,9 +161,12 @@ export interface CreateWikiDetailWebPageInput {
     name: string;
     path: string;
     state: string;
-    subsection: number;
+    maxTokensPerParagraph: number;
+    maxTokensPerLine: number;
+    overlappingTokens: number;
     mode: ProcessMode;
     trainingPattern: TrainingPattern;
+    qAPromptTemplate: string;
 }
 
 export interface PaginatedListBase<TEntity> {
@@ -224,7 +233,37 @@ export interface CreateWikiDetailWebPageInput {
     name: string;
     path: string;
     state: string;
-    subsection: number;
+    maxTokensPerParagraph: number;
+    maxTokensPerLine: number;
+    overlappingTokens: number;
     mode: ProcessMode;
     trainingPattern: TrainingPattern;
+    qAPromptTemplate: string;
+}
+
+export interface FastWikiFunctionCallDto {
+    id: number;
+    name: string;
+    description: string;
+    content: string;
+    parameters: FunctionItemDto[];
+    items: FunctionItemDto[];
+    enable: boolean;
+    imports: string[];
+    creationTime: string;
+}
+
+export interface FunctionItemDto {
+    key: string;
+    value: string;
+}
+
+export interface FastWikiFunctionCallInput {
+    name: string;
+    description: string;
+    content: string;
+    parameters: FunctionItemDto[];
+    main: string;
+    items: FunctionItemDto[];
+    imports: string[];
 }

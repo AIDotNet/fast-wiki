@@ -1,19 +1,22 @@
 using System.Text;
 using System.Text.Json;
-using AIDotNet.OpenAI;
-using FastWiki.Service.Application.Model.Commands;
+using AIDotNet.Abstractions.Dto;
+using Azure.AI.OpenAI;
+using FastWiki.Service.Application.Function.Queries;
 using FastWiki.Service.Application.Storage.Queries;
 using FastWiki.Service.Contracts.OpenAI;
 using FastWiki.Service.Domain.Storage.Aggregates;
 using FastWiki.Service.Infrastructure;
 using FastWiki.Service.Infrastructure.Helper;
+using Microsoft.KernelMemory.DataFormats.Text;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using TokenApi.Service.Exceptions;
 
 namespace FastWiki.Service.Service;
 
-public static class OpenAIService
+public class OpenAIService
 {
     public static async Task Completions(HttpContext context)
     {
@@ -31,41 +34,23 @@ public static class OpenAIService
             return;
         }
 
-        var chatDialogId = context.Request.Query["ChatDialogId"];
+        var logger = context.RequestServices.GetRequiredService<ILogger<OpenAIService>>();
+
+        var chatDialogId = context.Request.Query["ChatDialogId"].ToString();
         var chatId = context.Request.Query["ChatId"];
         var token = context.Request.Headers.Authorization;
         var chatShareId = context.Request.Query["ChatShareId"];
 
 
-        if (chatDialogId.IsNullOrEmpty())
-        {
-            await context.WriteEndAsync(nameof(chatDialogId) + "不能为空");
-            return;
-        }
-
-        if (chatId.IsNullOrEmpty())
-        {
-            await context.WriteEndAsync(nameof(chatId) + "不能为空");
-            return;
-        }
-
         var eventBus = context.RequestServices.GetRequiredService<IEventBus>();
 
         var getAPIKeyChatShareQuery = new GetAPIKeyChatShareQuery(token);
 
-        // 如果是sk-开头的token则是应用token
-        if (chatShareId.IsNullOrEmpty() && !token.ToString().Replace("Bearer ", "").Trim().StartsWith("sk-"))
+        ChatApplicationDto chatApplication = null;
+
+        if (token.ToString().Replace("Bearer ", "").Trim().StartsWith("sk-"))
         {
-            // 判断当前用户是否登录
-            if (context.User.Identity?.IsAuthenticated == false)
-            {
-                context.Response.StatusCode = 401;
-                await context.WriteEndAsync("Token不能为空");
-                return;
-            }
-        }
-        else if (chatShareId.IsNullOrEmpty())
-        {
+            getAPIKeyChatShareQuery = new GetAPIKeyChatShareQuery(token.ToString().Replace("Bearer ", "").Trim());
             await eventBus.PublishAsync(getAPIKeyChatShareQuery);
 
             if (getAPIKeyChatShareQuery.Result == null)
@@ -74,20 +59,8 @@ public static class OpenAIService
                 await context.WriteEndAsync("Token无效");
                 return;
             }
-        }
 
-        ChatApplicationDto chatApplication = null;
-
-        if (!chatShareId.IsNullOrEmpty())
-        {
-            var chatShareInfoQuery = new ChatShareInfoQuery(chatShareId);
-
-            await eventBus.PublishAsync(chatShareInfoQuery);
-
-            // 如果chatShareId不存在则返回让下面扣款
-            getAPIKeyChatShareQuery.Result = chatShareInfoQuery.Result;
-
-            var chatApplicationQuery = new ChatApplicationInfoQuery(chatShareInfoQuery.Result.ChatApplicationId);
+            var chatApplicationQuery = new ChatApplicationInfoQuery(getAPIKeyChatShareQuery.Result.ChatApplicationId);
 
             await eventBus.PublishAsync(chatApplicationQuery);
 
@@ -95,15 +68,47 @@ public static class OpenAIService
         }
         else
         {
-            var chatApplicationQuery = new ChatApplicationInfoQuery(chatId);
-            await eventBus.PublishAsync(chatApplicationQuery);
-            chatApplication = chatApplicationQuery?.Result;
-        }
+            // 如果不是sk则校验用户 并且不是分享链接
+            if (chatShareId.IsNullOrEmpty())
+            {
+                // 判断当前用户是否登录
+                if (context.User.Identity?.IsAuthenticated == false)
+                {
+                    context.Response.StatusCode = 401;
+                    await context.WriteEndAsync("Token不能为空");
+                    return;
+                }
+            }
 
-        if (chatApplication == null)
-        {
-            await context.WriteEndAsync("应用Id不存在");
-            return;
+            // 如果是分享链接则获取分享信息
+            if (!chatShareId.IsNullOrEmpty())
+            {
+                var chatShareInfoQuery = new ChatShareInfoQuery(chatShareId);
+
+                await eventBus.PublishAsync(chatShareInfoQuery);
+
+                // 如果chatShareId不存在则返回让下面扣款
+                getAPIKeyChatShareQuery.Result = chatShareInfoQuery.Result;
+
+                var chatApplicationQuery = new ChatApplicationInfoQuery(chatShareInfoQuery.Result.ChatApplicationId);
+
+                await eventBus.PublishAsync(chatApplicationQuery);
+
+                chatApplication = chatApplicationQuery?.Result;
+            }
+            // 如果是应用Id则获取应用信息
+            else if (!chatId.IsNullOrEmpty())
+            {
+                var chatApplicationQuery = new ChatApplicationInfoQuery(chatId);
+                await eventBus.PublishAsync(chatApplicationQuery);
+                chatApplication = chatApplicationQuery?.Result;
+            }
+
+            if (chatApplication == null)
+            {
+                await context.WriteEndAsync("应用Id不存在");
+                return;
+            }
         }
 
         int requestToken = 0;
@@ -123,11 +128,12 @@ public static class OpenAIService
         var prompt = string.Empty;
 
         var sourceFile = new List<FileStorage>();
+        var wikiMemoryService = context.RequestServices.GetRequiredService<WikiMemoryService>();
+        var memoryServerless = wikiMemoryService.CreateMemoryServerless(chatApplication.ChatModel);
+
         // 如果为空则不使用知识库
         if (chatApplication.WikiIds.Count != 0)
         {
-            var memoryServerless = context.RequestServices.GetRequiredService<WikiMemoryService>().CreateMemoryServerless();
-
             var filters = chatApplication.WikiIds
                 .Select(chatApplication => new MemoryFilter().ByTag("wikiId", chatApplication.ToString())).ToList();
 
@@ -235,59 +241,139 @@ public static class OpenAIService
             }
         }
 
-        if (chatApplication.ChatType.IsNullOrEmpty())
-        {
-            // 防止没有设置对话类型
-            chatApplication.ChatType = OpenAIOptions.ServiceName;
-        }
 
-        var modelService = context.RequestServices.GetRequiredService<ModelService>();
-
-        var (chatStream, fastModelDto) = await modelService.GetChatService(chatApplication.ChatType);
-
-        var setting = new OpenAIPromptExecutionSettings
-        {
-            MaxTokens = chatApplication.MaxResponseToken,
-            Temperature = chatApplication.Temperature,
-            ModelId = chatApplication.ChatModel,
-            ExtensionData = new Dictionary<string, object>()
-        };
-        setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_KEY, fastModelDto.ApiKey);
-        setting.ExtensionData.TryAdd(AIDotNet.Abstractions.Constant.API_URL, fastModelDto.Url);
-
-
+        var responseId = Guid.NewGuid().ToString("N");
+        var requestId = Guid.NewGuid().ToString("N");
         var output = new StringBuilder();
         try
         {
-            await foreach (var item in chatStream.GetStreamingChatMessageContentsAsync(chatHistory, setting))
+            var functionCall = new ChatApplicationFunctionCallQuery(chatApplication.FunctionIds.ToArray());
+
+            if (chatApplication.FunctionIds.Any())
             {
-                if (item.Content.IsNullOrEmpty())
+                await eventBus.PublishAsync(functionCall);
+            }
+
+            var kernel =
+                wikiMemoryService.CreateFunctionKernel(functionCall?.Result?.ToList(), chatApplication.ChatModel);
+
+            // 如果有函数调用
+            if (chatApplication.FunctionIds.Any() && functionCall.Result.Any())
+            {
+                OpenAIPromptExecutionSettings settings = new()
                 {
-                    continue;
+                    ToolCallBehavior = ToolCallBehavior.EnableKernelFunctions
+                };
+
+                // TODO: 这里目前还只能支持OpenAI
+                var chat = kernel.GetRequiredService<IChatCompletionService>();
+
+                var result =
+                    (OpenAIChatMessageContent)await chat.GetChatMessageContentAsync(chatHistory, settings,
+                        kernel);
+
+                List<ChatCompletionsFunctionToolCall> toolCalls =
+                    result.ToolCalls.OfType<ChatCompletionsFunctionToolCall>().ToList();
+
+                if (toolCalls.Count == 0)
+                {
+                    await context.WriteEndAsync("未找到函数");
+                    return;
                 }
 
-                output.Append(item.Content);
-                await context.WriteOpenAiResultAsync(item.Content, module.model, Guid.NewGuid().ToString("N"),
-                    Guid.NewGuid().ToString("N"));
+                foreach (var toolCall in toolCalls)
+                {
+                    kernel.Plugins.TryGetFunctionAndArguments(toolCall, out var function,
+                        out KernelArguments? arguments);
+
+                    if (function == null)
+                    {
+                        // await context.WriteEndAsync("未找到函数");
+                        // return;
+                        logger.LogError("未找到函数");
+                        continue;
+                    }
+
+                    try
+                    {
+                        var functionResult = await function.InvokeAsync(kernel, new KernelArguments()
+                        {
+                            {
+                                "value", arguments?.Select(x => x.Value).ToArray()
+                            }
+                        });
+                        // 判断ValueType是否为值类型
+                        if (functionResult.ValueType?.IsValueType == true || functionResult.ValueType == typeof(string))
+                        {
+                            chatHistory.AddAssistantMessage(functionResult.GetValue<object>().ToString());
+                        }
+                        else
+                        {
+                            // 记录函数调用
+                            chatHistory.AddAssistantMessage(
+                                JsonSerializer.Serialize(functionResult.GetValue<object>()));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        await context.WriteEndAsync("函数调用异常：" + e.Message);
+                        logger.LogError(e, "函数调用异常");
+                        return;
+                    }
+                }
+
+                await foreach (var item in chat.GetStreamingChatMessageContentsAsync(chatHistory))
+                {
+                    var message = item.Content;
+                    if (string.IsNullOrEmpty(message))
+                    {
+                        continue;
+                    }
+
+                    output.Append(message);
+                    await context.WriteOpenAiResultAsync(message, module.model, requestId,
+                        responseId);
+                }
+            }
+            else
+            {
+                var chat = kernel.GetRequiredService<IChatCompletionService>();
+
+                await foreach (var item in chat.GetStreamingChatMessageContentsAsync(chatHistory))
+                {
+                    var message = item.Content;
+                    if (string.IsNullOrEmpty(message))
+                    {
+                        continue;
+                    }
+
+                    output.Append(message);
+                    await context.WriteOpenAiResultAsync(message, module.model, requestId,
+                        responseId);
+                }
             }
         }
         catch (NotModelException notModelException)
         {
             await context.WriteEndAsync("未找到模型兼容：" + notModelException.Message);
+            logger.LogError(notModelException, "未找到模型兼容");
             return;
         }
         catch (InvalidOperationException invalidOperationException)
         {
             await context.WriteEndAsync("对话异常：" + invalidOperationException.Message);
+            logger.LogError(invalidOperationException, "对话异常");
             return;
         }
         catch (ArgumentException argumentException)
         {
             await context.WriteEndAsync(argumentException.Message);
+            logger.LogError(argumentException, "对话异常");
             return;
         }
         catch (Exception e)
         {
+            logger.LogError(e, "对话异常");
             await context.WriteEndAsync("对话异常：" + e.Message);
             return;
         }
@@ -296,43 +382,47 @@ public static class OpenAIService
 
         #region 记录对话内容
 
-        var createChatDialogHistoryCommand = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
+        if (!chatDialogId.IsNullOrEmpty())
         {
-            ChatDialogId = chatDialogId,
-            Content = question,
-            ExpendToken = requestToken,
-            Type = ChatDialogHistoryType.Text,
-            Current = true
-        });
+            var createChatDialogHistoryCommand = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
+            {
+                ChatDialogId = chatDialogId ?? string.Empty,
+                Id = requestId,
+                Content = question,
+                ExpendToken = requestToken,
+                Type = ChatDialogHistoryType.Text,
+                Current = true
+            });
 
-        await eventBus.PublishAsync(createChatDialogHistoryCommand);
+            await eventBus.PublishAsync(createChatDialogHistoryCommand);
+        }
+
 
         var outputContent = output.ToString();
         var completeToken = TokenHelper.ComputeToken(outputContent);
 
-        var chatDialogHistory = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
+        if (!chatDialogId.IsNullOrEmpty())
         {
-            ChatDialogId = chatDialogId,
-            Content = outputContent,
-            ExpendToken = completeToken,
-            Type = ChatDialogHistoryType.Text,
-            Current = false,
-            SourceFile = sourceFile.Select(x => new SourceFileDto()
+            var chatDialogHistory = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
             {
-                Name = x.Name,
-                FileId = x.Id.ToString(),
-                FilePath = x.Path
-            }).ToList()
-        });
+                ChatDialogId = chatDialogId,
+                Content = outputContent,
+                Id = responseId,
+                ExpendToken = completeToken,
+                Type = ChatDialogHistoryType.Text,
+                Current = false,
+                ReferenceFile = sourceFile.Select(x => new SourceFileDto()
+                {
+                    Name = x.Name,
+                    FileId = x.Id.ToString(),
+                    FilePath = x.Path
+                }).ToList()
+            });
 
-        await eventBus.PublishAsync(chatDialogHistory);
+            await eventBus.PublishAsync(chatDialogHistory);
+        }
 
         #endregion
-
-        var fastModelComputeTokenCommand = new FastModelComputeTokenCommand(chatApplication.ChatType, requestToken,
-            completeToken);
-
-        await eventBus.PublishAsync(fastModelComputeTokenCommand);
 
         //对于对话扣款
         if (getAPIKeyChatShareQuery?.Result != null)
@@ -341,6 +431,41 @@ public static class OpenAIService
                 requestToken);
 
             await eventBus.PublishAsync(updateChatShareCommand);
+        }
+    }
+
+    /// <summary>
+    /// QA问答解析大文本拆分多个段落
+    /// </summary>
+    /// <param name="prompt"></param>
+    /// <param name="value"></param>
+    /// <param name="model"></param>
+    /// <param name="apiKey"></param>
+    /// <param name="url"></param>
+    /// <param name="memoryService"></param>
+    /// <returns></returns>
+    public static async IAsyncEnumerable<string> QaAsync(string prompt, string value, string model, string apiKey,
+        string url,
+        WikiMemoryService memoryService)
+    {
+        var kernel = memoryService.CreateFunctionKernel(apiKey, model, url);
+
+        var qaFunction = kernel.CreateFunctionFromPrompt(prompt, functionName: "QA", description: "QA问答");
+
+
+        var lines = TextChunker.SplitPlainTextLines(value, 299);
+        var paragraphs = TextChunker.SplitPlainTextParagraphs(lines, 4000);
+
+        foreach (var paragraph in paragraphs)
+        {
+            var result = await kernel.InvokeAsync(qaFunction, new KernelArguments()
+            {
+                {
+                    "input", paragraph
+                }
+            });
+
+            yield return result.GetValue<string>();
         }
     }
 

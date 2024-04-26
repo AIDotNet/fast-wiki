@@ -7,7 +7,8 @@ import {
     OpenAIOutlined, 
     RadarChartOutlined, 
     CoffeeOutlined,
-    BugOutlined
+    BugOutlined,
+    JavaScriptOutlined
 } from "@ant-design/icons";
 
 const Title = styled.span`
@@ -76,6 +77,12 @@ export function Publicity() {
             icon: BugOutlined,
             title: '可视化调试',
         },
+        {
+            description:
+                '利用了Monaco在Web界面编辑JS动态Funntion，让您的知识库更加接近智能体！',
+            icon: JavaScriptOutlined,
+            title: 'JS动态Function',
+        },
     ];
 
     return (
@@ -84,12 +91,12 @@ export function Publicity() {
             <SubTitle>基于LLM大模型的智能化管理平台</SubTitle>
             <GithubStar>
                 <Button onClick={() => {
-                    window.open('https://github.com/239573049/fast-wiki')
+                    window.open('https://github.com/AIDotNet/fast-wiki')
                 }} style={{
                     display: 'flex',
                 }}>
                     <div style={{
-                        backgroundImage: "url('https://img.shields.io/github/stars/239573049%2Ffast-wiki')",
+                        backgroundImage: "url('https://img.shields.io/github/stars/AIDotNet%2Ffast-wiki')",
                         backgroundRepeat: 'no-repeat',
                         backgroundSize: 'contain',
                         width: '100px',

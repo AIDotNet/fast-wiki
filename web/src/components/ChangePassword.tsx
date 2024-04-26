@@ -53,7 +53,7 @@ export default function ChangePassword({
 
     }
 
-    return (<Modal title='修改密码' width={400} open={visible} onOk={()=>ChangePasswordHandler()} onCancel={() => onClose}>
+    return (<Modal title='修改密码' width={400} open={visible} onOk={()=>ChangePasswordHandler()} onCancel={() => onClose()}>
         <Divider />
         <Input style={{
             marginBottom: 20

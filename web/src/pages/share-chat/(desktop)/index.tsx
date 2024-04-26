@@ -1,8 +1,8 @@
 import { DraggablePanel, Tooltip, } from "@lobehub/ui";
 import { useEffect, useState } from "react";
-import { CreateChatDialog, DeleteShareDialog, GetChatDialogHistory, GetChatShareApplication, GetChatShareDialog } from "../../../services/ChatApplicationService";
+import {  GetChatDialogHistory, GetChatShareApplication } from "../../../services/ChatApplicationService";
 import Divider from "@lobehub/ui/es/Form/components/FormDivider";
-import { Button, message } from 'antd'
+import { Button } from 'antd'
 import { DeleteOutlined } from '@ant-design/icons';
 import styled from "styled-components";
 
@@ -12,6 +12,13 @@ import { generateRandomString } from "../../../utils/stringHelper";
 import ChatAppList from "../../../components/ChatAppList";
 import FastChatInput from "../../../components/FastChatInput";
 import { isMobileDevice } from "../../../components/ResponsiveIndex";
+import { IndexedDBWrapper } from "../../../utils/IndexedDBWrapper";
+
+const sessionName = 'fast-wiki-dialog';
+const sessionVersion = 1;
+const sessionStoreName = 'sessions';
+const sessionDB = new IndexedDBWrapper(sessionName, sessionVersion, sessionStoreName);
+sessionDB.open();
 
 const DialogList = styled.div`
     margin-top: 8px;
@@ -64,7 +71,7 @@ export default function DesktopLayout() {
     const [expanded, setExpanded] = useState(true);
     const [input] = useState({
         page: 1,
-        pageSize: 5
+        pageSize: 20
     });
 
     useEffect(() => {
@@ -81,17 +88,20 @@ export default function DesktopLayout() {
 
     async function loadingDialogs() {
         try {
-            const result = (await GetChatShareDialog(guestId)) as any[];
+            const result = (await sessionDB.getAll()) as any[];
             setDialogs(result);
             if (result.length === 0) {
-                await AddChatDialog({
+                const v = {
                     name: '默认对话',
-                    chatId: guestId,
                     description: '默认创建的对话',
-                    applicationId: application.id,
-                    type: 1
-                })
+                    applicationId: id,
+                    id: Math.random().toString(36).slice(-8),
+                    type: 0
+                };
+                
+                await sessionDB.add(v)
                 loadingDialogs();
+
                 return;
             }
             setDialog(result[0]);
@@ -135,14 +145,6 @@ export default function DesktopLayout() {
         }
     }
 
-    async function AddChatDialog(data: any) {
-        try {
-            await CreateChatDialog(data)
-        } catch (error) {
-            message.error('创建失败');
-        }
-    }
-
     useEffect(() => {
         if (dialog) {
             LoadingSession();
@@ -155,11 +157,8 @@ export default function DesktopLayout() {
     }, []);
 
 
-    function deleteDialog(itemId: string) {
-        DeleteShareDialog(itemId, guestId)
-            .then(() => {
-                loadingDialogs();
-            })
+    async function deleteDialog(itemId: string) {
+        await sessionDB.deleteStr(itemId);
     }
 
 
@@ -236,7 +235,7 @@ export default function DesktopLayout() {
                 }} history={history} />
             </DraggablePanel>
 
-            <CreateDialog chatId={guestId} visible={createDialogVisible} id={application?.id} type={1} onClose={() => {
+            <CreateDialog db={sessionDB} chatId={guestId} visible={createDialogVisible} id={application?.id} type={1} onClose={() => {
                 setCreateDialogVisible(false);
                 loadingDialogs();
             }} onSucess={() => {

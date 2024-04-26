@@ -2,40 +2,11 @@
 using FastWiki.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Plugins.Core;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    /// <summary>
-    /// 注入FastSemanticKernel
-    /// </summary>
-    /// <param name="builder"></param>
-    public static void AddFastSemanticKernel(this WebApplicationBuilder builder)
-    {
-        var handler = new OpenAiHttpClientHandler();
-
-        builder.Services.AddScoped<Kernel>(_ =>
-        {
-            var kernel = Kernel.CreateBuilder()
-                .AddOpenAIChatCompletion(
-                    modelId: OpenAIOption.ChatModel,
-                    apiKey: OpenAIOption.ChatToken,
-                    httpClient: new HttpClient(handler))
-                .Build();
-#pragma warning disable SKEXP0050 // 类型仅用于评估，在将来的更新中可能会被更改或删除。取消此诊断以继续。
-            kernel.ImportPluginFromObject(new ConversationSummaryPlugin(), "ConversationSummaryPlugin");
-#pragma warning restore SKEXP0050 // 类型仅用于评估，在将来的更新中可能会被更改或删除。取消此诊断以继续。
-#pragma warning disable SKEXP0050 // 类型仅用于评估，在将来的更新中可能会被更改或删除。取消此诊断以继续。
-            kernel.ImportPluginFromObject(new TimePlugin(), "TimePlugin");
-#pragma warning restore SKEXP0050 // 类型仅用于评估，在将来的更新中可能会被更改或删除。取消此诊断以继续。
-            return kernel;
-        });
-    }
-
-
     /// <summary>
     /// 注册JWT Bearer认证服务的静态扩展方法
     /// </summary>
@@ -66,12 +37,16 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+
+    /// <summary>
+    /// 加载环境变量
+    /// </summary>
+    /// <param name="builder"></param>
     public static void AddLoadEnvironment(this WebApplicationBuilder builder)
     {
         var OPENAI_CHAT_ENDPOINT = Environment.GetEnvironmentVariable("OPENAI_CHAT_ENDPOINT");
         var OPENAI_CHAT_EMBEDDING_ENDPOINT = Environment.GetEnvironmentVariable("OPENAI_CHAT_EMBEDDING_ENDPOINT");
         var OPENAI_CHAT_TOKEN = Environment.GetEnvironmentVariable("OPENAI_CHAT_TOKEN");
-        var OPENAI_CHAT_MODEL = Environment.GetEnvironmentVariable("OPENAI_CHAT_MODEL");
         var OPENAI_EMBEDDING_MODEL = Environment.GetEnvironmentVariable("OPENAI_EMBEDDING_MODEL");
         var OPENAI_EMBEDDING_TOKEN = Environment.GetEnvironmentVariable("OPENAI_EMBEDDING_TOKEN");
 
@@ -88,11 +63,6 @@ public static class ServiceCollectionExtensions
         if (!OPENAI_CHAT_TOKEN.IsNullOrWhiteSpace())
         {
             OpenAIOption.ChatToken = OPENAI_CHAT_TOKEN;
-        }
-
-        if (!OPENAI_CHAT_MODEL.IsNullOrWhiteSpace())
-        {
-            OpenAIOption.ChatModel = OPENAI_CHAT_MODEL;
         }
 
         if (!OPENAI_EMBEDDING_MODEL.IsNullOrWhiteSpace())

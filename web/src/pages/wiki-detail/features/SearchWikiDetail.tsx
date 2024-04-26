@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { Button } from 'antd';
 import { GetSearchVectorQuantity } from "../../../services/WikiService";
 
-
 const Textarea = styled.textarea`
     width: 100%;
     height: 300px;
@@ -41,7 +40,6 @@ export default function SearchWikiDetail({
 }: ISearchWikiDetailProps) {
 
     const [value, setValue] = useState('')
-
     async function SearchVectorQuantity() {
         try {
             if (value === '') return;
@@ -55,6 +53,7 @@ export default function SearchWikiDetail({
 
     const [data, setData] = useState<any[]>([]);
     const [elapsedTime, setElapsedTime] = useState(null);
+
 
     return (
         <>

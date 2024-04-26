@@ -7,6 +7,7 @@
 
 - 前端框架：react+lobeUI+ts
 - 后端框架：MasaFramework 基于 .NET 8
+- 基于JS V8引擎实现动态Function
 - 向量搜索引擎：使用 PostgreSQL 的向量插件，优化搜索性能
 - 深度学习与NLP：微软Semantic Kernel，提升搜索的语义理解能力
 - 许可证：Apache-2.0，鼓励社区贡献和使用
@@ -18,6 +19,8 @@
 - 现代化前端：使用react+lobeUI前端框架，提供响应式设计和用户友好的界面。
 - 强大的后端：基于最新的.NET 8和MasaFramework，确保了代码的高效性和可维护性。
 - 开源和社区驱动：采用Apache-2.0许可证，鼓励开发者和企业使用和贡献。
+- 强大的动态JS Function，并且提供Monaco更方便的智能代码提示。
+- 强大的QA问答拆分模式，让知识库回复更智能。
 
 ## 快速开始
 
@@ -32,7 +35,7 @@
 1. 克隆仓库：
 
 ```
-git clone https://github.com/239573049/fast-wiki.git
+git clone https://github.com/AIDotNet/fast-wiki.git
 ```
 
 2. 安装好node.js，最新版本(https://nodejs.p2hp.com/)。
@@ -80,8 +83,6 @@ FastWikiService环境变量参数：
 - OPENAI_CHAT_ENDPOINT：OpenAI API的地址
 - OPENAI_CHAT_EMBEDDING_ENDPOINT： Embedding API的地址
 - OPENAI_CHAT_TOKEN： OpenAI API的Token
-- OPENAI_CHAT_MODEL： 对话的模型，默认gpt-3.5-turbo
-- OPENAI_EMBEDDING_MODEL： Embedding的模型，默认text-embedding-3-small
 - OPENAI_EMBEDDING_TOKEN: Embedding的Token, 默认为空，为空则使用对话的Token
 
 ## 技术交流

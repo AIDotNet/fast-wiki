@@ -48,15 +48,17 @@ public sealed class WikiCommandHandler(
     {
         var wikiDetail = new WikiDetail(command.Input.WikiId, command.Input.Name, command.Input.FilePath,
             command.Input.FileId, 0, "file");
+        wikiDetail.TrainingPattern = command.Input.TrainingPattern;
+        wikiDetail.Mode = command.Input.Mode;
+        wikiDetail.MaxTokensPerLine = command.Input.MaxTokensPerLine;
+        wikiDetail.MaxTokensPerParagraph = command.Input.MaxTokensPerParagraph;
+        wikiDetail.OverlappingTokens = command.Input.OverlappingTokens;
+        wikiDetail.QAPromptTemplate = command.Input.QAPromptTemplate;
 
         wikiDetail = await wikiRepository.AddDetailsAsync(wikiDetail);
 
-        QuantizeWikiDetail quantizeWikiDetail = mapper.Map<QuantizeWikiDetail>(wikiDetail);
-        quantizeWikiDetail.Subsection = command.Input.Subsection;
-        quantizeWikiDetail.Mode = command.Input.Mode;
-        quantizeWikiDetail.TrainingPattern = command.Input.TrainingPattern;
 
-        await QuantizeBackgroundService.AddWikiDetailAsync(quantizeWikiDetail);
+        await QuantizeBackgroundService.AddWikiDetailAsync(wikiDetail);
     }
 
     [EventHandler]
@@ -64,13 +66,14 @@ public sealed class WikiCommandHandler(
     {
         var wikiDetail = new WikiDetail(command.Input.WikiId, command.Input.Name, command.Input.Path,
             -1, 0, "web");
+        wikiDetail.OverlappingTokens = command.Input.OverlappingTokens;
+        wikiDetail.MaxTokensPerLine = command.Input.MaxTokensPerLine;
+        wikiDetail.MaxTokensPerParagraph = command.Input.MaxTokensPerParagraph;
+        wikiDetail.Mode = command.Input.Mode;
+        wikiDetail.TrainingPattern = command.Input.TrainingPattern;
 
         wikiDetail = await wikiRepository.AddDetailsAsync(wikiDetail);
-
-        var quantizeWikiDetail = mapper.Map<QuantizeWikiDetail>(wikiDetail);
-        quantizeWikiDetail.Subsection = command.Input.Subsection;
-        quantizeWikiDetail.Mode = command.Input.Mode;
-        quantizeWikiDetail.TrainingPattern = command.Input.TrainingPattern;
+        var quantizeWikiDetail = mapper.Map<WikiDetail>(wikiDetail);
 
         await QuantizeBackgroundService.AddWikiDetailAsync(quantizeWikiDetail);
     }
@@ -81,12 +84,15 @@ public sealed class WikiCommandHandler(
         var wikiDetail = new WikiDetail(command.Input.WikiId, command.Input.Name, command.Input.FilePath,
             command.Input.FileId, 0, "data");
 
+        wikiDetail.OverlappingTokens = command.Input.OverlappingTokens;
+        wikiDetail.MaxTokensPerLine = command.Input.MaxTokensPerLine;
+        wikiDetail.MaxTokensPerParagraph = command.Input.MaxTokensPerParagraph;
+        wikiDetail.Mode = command.Input.Mode;
+        wikiDetail.TrainingPattern = command.Input.TrainingPattern;
+
         wikiDetail = await wikiRepository.AddDetailsAsync(wikiDetail);
 
-        var quantizeWikiDetail = mapper.Map<QuantizeWikiDetail>(wikiDetail);
-        quantizeWikiDetail.Subsection = command.Input.Subsection;
-        quantizeWikiDetail.Mode = command.Input.Mode;
-        quantizeWikiDetail.TrainingPattern = command.Input.TrainingPattern;
+        var quantizeWikiDetail = mapper.Map<WikiDetail>(wikiDetail);
 
         await QuantizeBackgroundService.AddWikiDetailAsync(quantizeWikiDetail);
     }
@@ -137,15 +143,12 @@ public sealed class WikiCommandHandler(
             throw new UserFriendlyException("未找到数据");
         }
 
-        await QuantizeBackgroundService.AddWikiDetailAsync(new QuantizeWikiDetail()
-        {
-            Path = wikiDetail.Path,
-            WikiId = wikiDetail.WikiId,
-            TrainingPattern = TrainingPattern.Subsection,
-            FileName = wikiDetail.FileName,
-            Type = wikiDetail.Type,
-            Subsection = 400,
-            FileId = wikiDetail.FileId,
-        });
+        await QuantizeBackgroundService.AddWikiDetailAsync(wikiDetail);
+    }
+
+    [EventHandler]
+    public async Task DetailsRenameNameAsync(DetailsRenameNameCommand command)
+    {
+        await wikiRepository.DetailsRenameNameAsync(command.Id, command.Name);
     }
 }

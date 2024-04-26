@@ -3,6 +3,7 @@
 **/.env
 **/.git
 **/.gitignore
+**/package-lock.json
 **/.project
 **/.settings
 **/.toolstarget

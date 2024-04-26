@@ -1,24 +1,8 @@
-import { Footer, FooterProps, Header, Layout, Logo, LogoProps, useControls, useCreateStore } from '@lobehub/ui';
+import { Footer, FooterProps, Header, Layout, Avatar } from '@lobehub/ui';
 import { Button, Flex } from 'antd';
 import { Publicity } from '../features/Publicity';
 
 export default () => {
-  const store = useCreateStore();
-  const control: LogoProps | any = useControls(
-    {
-      size: {
-        max: 240,
-        min: 16,
-        step: 4,
-        value: 45,
-      },
-      type: {
-        options: ['3d', 'flat', 'high-contrast', 'text', 'combine'],
-        value: '3d',
-      },
-    },
-    { store },
-  );
 
   const columns: FooterProps['columns'] = [
     {
@@ -27,7 +11,7 @@ export default () => {
           description: 'Fast Wiki文档',
           openExternal: true,
           title: 'Fast Wiki文档',
-          url: 'https://docs.token-ai.cn/',
+          url: 'https://ai-dotnet.com/',
         },
       ],
       title: '文档',
@@ -55,9 +39,7 @@ export default () => {
         }
         header={
           <Header
-            logo={<Logo {...control} style={{
-              marginLeft: '20px'
-            }} />}
+            logo={<Avatar src="/vite.svg" alt="logo"  />}
             nav={
               <Flex wrap="wrap" gap="small" className="site-button-ghost-wrapper">
                 <Button type="text" onClick={() => {
@@ -66,7 +48,7 @@ export default () => {
                   商务合作
                 </Button>
                 <Button type="text" onClick={() => {
-                  window.open('https://docs.token-ai.cn')
+                  window.open('https://ai-dotnet.com/')
                 }}>
                   文档
                 </Button>

@@ -121,3 +121,21 @@ export function DelDetailsVector(id: string) {
 export function RetryVectorDetail(id:number){
     return post(`${prefix}/RetryVectorDetail/${id}`)
 }
+
+/**
+ * 修改Wiki知识库详情名称
+ * @param id 
+ * @param name 
+ * @returns 
+ */
+export function DetailsRenameName(id: string, name: string) {
+    return post(`${prefix}/DetailsRenameName/${id}?name=${name}`)
+}
+
+/**
+ * 检查知识库向量状态
+ * @returns 
+ */
+export function CheckQuantizationState(wikiId: string) {
+    return post(`${prefix}/CheckQuantizationState?wikiId=${wikiId}`)
+}

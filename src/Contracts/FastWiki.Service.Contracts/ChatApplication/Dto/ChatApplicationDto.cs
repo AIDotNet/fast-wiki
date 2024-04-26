@@ -67,9 +67,41 @@ public class ChatApplicationDto
     /// 匹配相似度
     /// </summary>
     public double Relevancy { get; set; } = 0.4;
-
+    
+    public List<long> FunctionIds { get; set; } = new();
+    
     /// <summary>
-    /// AI模型类型
+    /// 扩展字段
     /// </summary>
-    public string ChatType { get; set; }
+    public Dictionary<string, string> Extend { get; set; } = new();
+    
+    public void SetFeishuAppId(string appId)
+    {
+        Extend["FeishuAppId"] = appId;
+    }
+
+    public string? GetFeishuAppId()
+    {
+        return Extend.TryGetValue("FeishuAppId", out var appId) ? appId : null;
+    }
+
+    public void SetFeishuAppSecret(string appSecret)
+    {
+        Extend["FeishuAppSecret"] = appSecret;
+    }
+
+    public string? GetFeishuAppSecret()
+    {
+        return Extend.TryGetValue("FeishuAppSecret", out var appSecret) ? appSecret : null;
+    }
+
+    public string SetBotName(string botName)
+    {
+        return Extend["BotName"] = botName;
+    }
+
+    public string? GetBotName()
+    {
+        return Extend.TryGetValue("BotName", out var botName) ? botName : null;
+    }
 }

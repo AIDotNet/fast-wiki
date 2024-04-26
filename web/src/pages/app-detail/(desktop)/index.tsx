@@ -5,7 +5,6 @@ import { Button } from 'antd';
 
 import styled from 'styled-components';
 import { GetChatApplications } from '../../../services/ChatApplicationService';
-import SessionLog from '../feautres/SessionLog';
 import ReleaseApplication from '../feautres/ReleaseApplication';
 
 const LeftTabs = styled.div`
@@ -47,9 +46,6 @@ export default memo(() => {
             key: 1,
             label: '应用配置'
         }, {
-            key: 2,
-            label: '对话记录'
-        }, {
             key: 3,
             label: '发布应用'
         }];
@@ -85,7 +81,7 @@ export default memo(() => {
             }}>
                 {
                     tab?.key === 1 ? <AppDetailInfo value={application} /> : (
-                        tab?.key === 2 ? <SessionLog id={application.id} /> :
+                        tab?.key === 2 ? <></> :
                             (
                                 tab?.key === 3 ? <ReleaseApplication id={application.id} /> : null
                             )

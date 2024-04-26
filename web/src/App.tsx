@@ -7,7 +7,8 @@ import Login from './pages/login/page'
 import App from './pages/app/page'
 
 import { ThemeProvider } from '@lobehub/ui'
-const Chat = lazy(() => import('./pages/chat/page'));
+import FunctionCall from './pages/function-call/page'
+const Chat = lazy(() => import('./pages/oid-chat/page'));
 const User = lazy(() => import('./pages/user/page'));
 
 const AppDetail = lazy(() => import('./pages/app-detail/page'));
@@ -20,7 +21,7 @@ const Wiki = lazy(() => import('./pages/wiki/page'));
 
 const Register = lazy(() => import('./pages/register/page'));
 
-const Model = lazy(() => import('./pages/model/page'));
+const CreateFunctionCall = lazy(() => import('./pages/function-call/features/CreateFunctionCall'));
 
 const router = createBrowserRouter([{
   path: '/',
@@ -59,20 +60,29 @@ const router = createBrowserRouter([{
       </Suspense>
     },
     {
-      path: '/model', element: <Suspense fallback={'加载中'}>
-        <Model />
+      path: '/function-call', element: <Suspense fallback={'加载中'}>
+        <FunctionCall />
       </Suspense>
     },
+    {
+      path: '/function-call/create', element: <Suspense fallback={'加载中'}>
+        <CreateFunctionCall />
+      </Suspense>
+    }
   ]
 }, {
   path: '/login',
   element: <Login />
 }, {
   path: '/register',
-  element: <Register />
+  element: <Suspense fallback={'加载中'}>
+    <Register />
+  </Suspense>
 }, {
   path: '/share-chat',
-  element: <ShareChat />
+  element: <Suspense fallback={'加载中'}>
+    <ShareChat />
+  </Suspense>
 }])
 
 

@@ -14,7 +14,6 @@ public class ChatApplicationCommandHandler(
         var chatApplication = new ChatApplication(Guid.NewGuid().ToString("N"))
         {
             Name = command.Input.Name,
-            ChatType = string.Empty
         };
 
         await chatApplicationRepository.AddAsync(chatApplication);
@@ -60,6 +59,12 @@ public class ChatApplicationCommandHandler(
         var chatDialogHistory = new ChatDialogHistory(command.Input.ChatDialogId,
             command.Input.Content, TokenHelper.ComputeToken(command.Input.Content), command.Input.Current,
             command.Input.Type);
+
+        // 如果有id则设置id
+        if (!command.Input.Id.IsNullOrEmpty())
+            chatDialogHistory.SetId(command.Input.Id);
+
+        chatDialogHistory.ReferenceFile.AddRange(mapper.Map<List<ReferenceFile>>(command.Input.ReferenceFile));
 
         await chatApplicationRepository.CreateChatDialogHistoryAsync(chatDialogHistory);
     }
@@ -110,10 +115,16 @@ public class ChatApplicationCommandHandler(
     {
         await chatApplicationRepository.DeductTokenAsync(command.Id, command.Token);
     }
-    
+
     [EventHandler]
     public async Task RemoveChatShareAsync(RemoveChatShareCommand command)
     {
         await chatApplicationRepository.RemoveChatShareAsync(command.Id);
+    }
+
+    [EventHandler]
+    public async Task UpdateChatShareAsync(RemovesChatDialogHistoryCommand command)
+    {
+        await chatApplicationRepository.RemovesChatDialogHistoryAsync(command.dialogId);
     }
 }

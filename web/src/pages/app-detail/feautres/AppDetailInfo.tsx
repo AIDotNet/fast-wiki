@@ -1,10 +1,12 @@
 import { memo, useEffect, useState } from "react";
-import { Select, Row, Checkbox, Button, Collapse, Col, Slider, message } from 'antd';
+import { AutoComplete, Row, Select, Checkbox, Button, Collapse, Col, Slider, message } from 'antd';
 import styled from 'styled-components';
 import { ChatApplicationDto } from "../../../models";
 import { PutChatApplications } from "../../../services/ChatApplicationService";
 import { GetWikisList } from "../../../services/WikiService";
-import { ChatModelList } from "../../../services/ModelService";
+import { Input } from "@lobehub/ui";
+import { FunctionCallSelect } from "../../../services/FunctionService";
+import { getModels } from "../../../store/Model";
 
 interface IAppDetailInfoProps {
     value: ChatApplicationDto
@@ -37,10 +39,9 @@ const ListItem = styled.div`
 const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
     if (value === undefined) return null;
 
-    const [chatModule, setChatModule] = useState([] as any[]);
-    const [chatModelType, setChatModelType] = useState([] as any[]);
     const [selectChatModel, setSelectChatModel] = useState([] as any[]);
     const [wiki, setWiki] = useState([] as any[]);
+    const [functionCallSelect, setFunctionCallSelect] = useState([] as any[]);
     const [input,] = useState({
         keyword: '',
         page: 1,
@@ -48,17 +49,23 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
     } as any);
 
     useEffect(() => {
-        ChatModelList()
-            .then((chatModul) => {
-                setChatModelType(chatModul);
-                setChatModule(chatModul.map((item: any) => {
-                    return { label: item.name, value: item.id }
+        getModels()
+            .then((models) => {
+                setSelectChatModel(models.chatModel.map((item) => {
+                    return { label: item.label, value: item.value }
                 }));
             });
-
         loadingWiki();
+        loadFunctionCallSelect();
 
     }, []);
+
+    function loadFunctionCallSelect() {
+        FunctionCallSelect()
+            .then((value) => {
+                setFunctionCallSelect(value);
+            });
+    }
 
     function loadingWiki() {
         GetWikisList(input.keyword, input.page, 100)
@@ -73,15 +80,6 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
         setApplication(value);
     }, [value]);
 
-    useEffect(() => {
-        const models = chatModelType.find((item: any) => item.id === application.chatType);
-        if (models?.models) {
-            setSelectChatModel(models.models.map((item: any) => {
-                return { label: item, value: item }
-            }))
-        }
-    }, [application,chatModelType]);
-
     function save() {
         PutChatApplications(application)
             .then(() => {
@@ -95,35 +93,12 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                 <span style={{
                     fontSize: 20,
                     marginRight: 20
-                }}>大模型类型</span>
-                <Select
-                    defaultValue={application.chatType}
-                    value={application.chatType}
-                    style={{ width: 380 }}
-                    onChange={(v: any) => {
-                        const models = chatModelType.find((item) => item.id === v);
-                        setApplication({
-                            ...application,
-                            chatType: v,
-                        });
-                        setSelectChatModel(models.models.map((item: any) => {
-                            return { label: item.name, value: item.id }
-                        }))
-                    }}
-                    options={chatModule}
-                />
-            </ListItem>
-
-            <ListItem>
-                <span style={{
-                    fontSize: 20,
-                    marginRight: 20
                 }}>对话模型</span>
-                <Select
+                <AutoComplete
                     defaultValue={application.chatModel}
                     value={application.chatModel}
                     style={{ width: 380 }}
-                    onChange={(v) => {
+                    onChange={(v: any) => {
                         setApplication({
                             ...application,
                             chatModel: v
@@ -139,7 +114,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                     marginRight: 20
                 }}>开场白</span>
                 <textarea value={application?.opener ?? ""}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                         setApplication({
                             ...application,
                             opener: e.target.value
@@ -156,7 +131,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                 }}>提示词</span>
                 <textarea value={application.prompt}
                     defaultValue={application.prompt}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                         setApplication({
                             ...application,
                             prompt: e.target.value
@@ -172,7 +147,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                 }}>未找到回复模板</span>
                 <textarea value={application.noReplyFoundTemplate ?? ''}
                     defaultValue={application.noReplyFoundTemplate ?? ''}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                         setApplication({
                             ...application,
                             noReplyFoundTemplate: e.target.value
@@ -193,7 +168,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                 placeholder="绑定知识库"
                 defaultValue={application.wikiIds}
                 value={application.wikiIds}
-                onChange={(v) => {
+                onChange={(v: any) => {
                     setApplication({
                         ...application,
                         wikiIds: v
@@ -224,7 +199,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                                     max={1}
                                     step={0.1}
                                     defaultValue={application.temperature}
-                                    onChange={(e) => {
+                                    onChange={(e: any) => {
                                         setApplication({
                                             ...application,
                                             temperature: e
@@ -248,7 +223,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                                     min={100}
                                     defaultValue={application.maxResponseToken}
                                     step={1}
-                                    onChange={(e) => {
+                                    onChange={(e: any) => {
                                         setApplication({
                                             ...application,
                                             maxResponseToken: e
@@ -271,7 +246,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                                     max={128000}
                                     step={1}
                                     defaultValue={application.referenceUpperLimit}
-                                    onChange={(e) => {
+                                    onChange={(e: any) => {
                                         setApplication({
                                             ...application,
                                             referenceUpperLimit: e
@@ -295,7 +270,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                                     max={1}
                                     defaultValue={application.relevancy}
                                     step={0.05}
-                                    onChange={(e) => {
+                                    onChange={(e: any) => {
                                         setApplication({
                                             ...application,
                                             relevancy: e
@@ -312,7 +287,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                             }}>引用模板提示词</span>
                             <textarea value={application.template}
                                 defaultValue={application.template}
-                                onChange={(e) => {
+                                onChange={(e: any) => {
                                     setApplication({
                                         ...application,
                                         template: e.target.value
@@ -323,9 +298,110 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                             </textarea>
                         </ListItem>
                     </>
+                }, {
+                    key: '2',
+                    label: '飞书设置',
+                    children: <>
+                        <Row style={{
+                            marginLeft: 20,
+                            marginTop: 20,
+                        }}>
+                            <span style={{
+                                marginRight: 20
+                            }}>飞书机器人名称</span>
+                            <Col span={12}>
+                                <Input value={application.extend?.BotName ?? ""}
+                                    defaultValue={application.extend?.BotName ?? ""}
+                                    onChange={(e: any) => {
+                                        setApplication({
+                                            ...application,
+                                            extend: {
+                                                ...application.extend,
+                                                BotName: e.target.value
+                                            }
+                                        });
+                                    }}
+                                    style={{ width: 380 }}></Input>
+                            </Col>
+                        </Row>
+                        <Row style={{
+                            marginLeft: 20,
+                            marginTop: 20,
+                        }}>
+                            <span style={{
+                                marginRight: 20
+                            }}>飞书AppId</span>
+                            <Col span={12}>
+                                <Input value={application.extend?.FeishuAppId ?? ""}
+                                    defaultValue={application.extend?.FeishuAppId ?? ""}
+                                    onChange={(e: any) => {
+                                        setApplication({
+                                            ...application,
+                                            extend: {
+                                                ...application.extend,
+                                                FeishuAppId: e.target.value
+                                            }
+                                        });
+                                    }}
+                                    style={{ width: 380 }}></Input>
+                            </Col>
+                        </Row>
+                        <Row style={{
+                            marginLeft: 20,
+                            marginTop: 20,
+                        }}>
+                            <span style={{
+                                marginRight: 20
+                            }}>飞书AppSecret</span>
+                            <Col span={12}>
+                                <Input value={application.extend?.FeishuAppSecret ?? ""}
+                                    defaultValue={application.extend?.FeishuAppSecret ?? ""}
+                                    onChange={(e: any) => {
+                                        setApplication({
+                                            ...application,
+                                            extend: {
+                                                ...application.extend,
+                                                FeishuAppSecret: e.target.value
+                                            }
+                                        });
+                                    }}
+                                    style={{ width: 380 }}></Input>
+                            </Col>
+                        </Row>
+                    </>
+                }, {
+                    key: '3', label: "关联FunctionCall",
+                    children: <>
+                        <Select
+                            allowClear
+                            style={{
+                                width: '100%',
+                                marginTop: 20,
+                                marginBottom: 20
+                            }}
+                            placeholder="绑定FunctionCall"
+                            defaultValue={application.functionIds}
+                            value={application.functionIds}
+                            onChange={(v: any) => {
+                                setApplication({
+                                    ...application,
+                                    functionIds: v
+                                });
+                            }}
+                            options={functionCallSelect.map((item) => {
+                                return {
+                                    label: item.name,
+                                    value: item.id
+                                }
+                            })}
+                            mode="multiple"
+                        >
+                        </Select>
+                    </>
                 }]}
             />
-            <Checkbox defaultChecked={application.showSourceFile} checked={application.showSourceFile} value={application.showSourceFile} onChange={(v) => {
+
+            <Checkbox defaultChecked={application.showSourceFile} checked={application.showSourceFile} value={application.showSourceFile} onChange={(v: any) => {
                 setApplication({
                     ...application,
                     showSourceFile: v.target.checked
