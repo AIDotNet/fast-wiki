@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EEFD9393-CF94-4E91-8F98-ACDE9B183B66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastWiki.Service", "src\FastWiki.Service\FastWiki.Service.csproj", "{FF331647-7192-4828-9BF2-C2AEDAC96E0B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution items", "solution items", "{419B754D-3649-434B-AFDA-C49244838ED4}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{5E1DDD49-9AC1-4D76-8711-8F7094304076}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastWiki.Infrastructure.Common", "src\Infrastructure\FastWiki.Infrastructure.Common\FastWiki.Infrastructure.Common.csproj", "{45129ADF-17F9-4AD9-B9C1-D401F3DCE408}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FF331647-7192-4828-9BF2-C2AEDAC96E0B} = {EEFD9393-CF94-4E91-8F98-ACDE9B183B66}
+		{5E1DDD49-9AC1-4D76-8711-8F7094304076} = {EEFD9393-CF94-4E91-8F98-ACDE9B183B66}
+		{45129ADF-17F9-4AD9-B9C1-D401F3DCE408} = {5E1DDD49-9AC1-4D76-8711-8F7094304076}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FF331647-7192-4828-9BF2-C2AEDAC96E0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF331647-7192-4828-9BF2-C2AEDAC96E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF331647-7192-4828-9BF2-C2AEDAC96E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF331647-7192-4828-9BF2-C2AEDAC96E0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45129ADF-17F9-4AD9-B9C1-D401F3DCE408}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45129ADF-17F9-4AD9-B9C1-D401F3DCE408}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45129ADF-17F9-4AD9-B9C1-D401F3DCE408}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45129ADF-17F9-4AD9-B9C1-D401F3DCE408}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
