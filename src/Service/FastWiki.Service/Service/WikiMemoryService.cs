@@ -147,7 +147,7 @@ public sealed class WikiMemoryService : ISingletonDependency
                 .WithOpenAITextGeneration(new OpenAIConfig()
                 {
                     APIKey = OpenAIOption.ChatToken,
-                    TextModel = model ?? string.Empty
+                    TextModel = model ?? OpenAIOption.ChatModel
                 }, null, new HttpClient(HttpClientHandler))
                 .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
                 {
