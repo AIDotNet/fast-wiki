@@ -15,6 +15,11 @@ public class OpenAIOption
     public static string EmbeddingEndpoint { get; set; }
 
     /// <summary>
+    /// 对话模型的 ChatModel
+    /// </summary>
+    public static string ChatModel { get; set; }
+
+    /// <summary>
     /// 对话模型的 API Key
     /// </summary>
     public static string ChatToken { get; set; }
