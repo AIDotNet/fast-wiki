@@ -81,6 +81,7 @@ export default function DesktopLayout() {
 
     async function loadingApplication() {
         const app = await GetChatShareApplication(id as any);
+        debugger;
         setApplication(app)
     }
 
@@ -230,7 +231,7 @@ export default function DesktopLayout() {
             <DraggablePanel style={{
                 height: '100%'
             }} maxHeight={600} minHeight={180} placement='bottom'>
-                <FastChatInput dialog={dialog} application={application} setHistory={(v: any[]) => {
+                <FastChatInput dialog={dialog} id={id} application={application} setHistory={(v: any[]) => {
                     setHistory(v);
                 }} history={history} />
             </DraggablePanel>
