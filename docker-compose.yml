@@ -1,7 +1,7 @@
 version: '3.8'  # 可以根据需要使用不同的版本
 services:
   fast-wiki-service:
-    image: registry.cn-shenzhen.aliyuncs.com/fast-wiki/fast-wiki-service
+    image: hejiale010426/fast-wiki-service
     container_name: fast-wiki-service
     user: root
     restart: always
