@@ -1,0 +1,3 @@
+[submodule "lobe-chat"]
+	path = lobe-chat
+	url = git@github.com:AIDotNet/lobe-chat.git
