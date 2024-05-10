@@ -5,6 +5,8 @@ using FastWiki.Service.Service;
 using Masa.Contrib.Authentication.Identity;
 using Microsoft.AspNetCore.StaticFiles;
 using Serilog;
+using Serilog.Core;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
@@ -12,11 +14,48 @@ AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
 var builder = WebApplication.CreateBuilder(args);
 
 // TODO: 由于引用Serilog导致数据库存储失败，暂时注释掉
-// Log.Logger = new LoggerConfiguration()
-//     .ReadFrom.Configuration(builder.Configuration)
-//     .CreateLogger();
-//
-// builder.Host.UseSerilog();
+
+// "Serilog": {
+//     "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File" ],
+//     "MinimumLevel": "Debug",
+//     "WriteTo": [
+//     { "Name": "Console" },
+//     {
+//         "Name": "File",
+//         "Args": {
+//             "path": "logs/log-.txt",
+//             "rollingInterval": "Day",
+//             "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog"
+//         }
+//     }
+//     ],
+//     "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
+//     "Properties": {
+//         "Application": "Sample"
+//     }
+// } 转换成代码
+
+Logger logger;
+if (builder.Environment.IsDevelopment())
+{
+    logger = new LoggerConfiguration()
+        .MinimumLevel.Information()
+        .WriteTo.Console()
+        .Enrich.FromLogContext()
+        .Enrich.WithProperty("Application", "FastWiki")
+        .CreateLogger();
+}
+else
+{
+    logger = new LoggerConfiguration()
+        .MinimumLevel.Warning()
+        .WriteTo.Console()
+        .Enrich.FromLogContext()
+        .Enrich.WithProperty("Application", "FastWiki")
+        .CreateLogger();
+}
+
+builder.Host.UseSerilog(logger);
 
 builder.Configuration.GetSection(OpenAIOption.Name)
     .Get<OpenAIOption>();
