@@ -258,7 +258,6 @@ app.MapGet("/api/v1/monaco", (async context =>
         var content = await File.ReadAllTextAsync(file);
         dic.Add(info.Name, content);
     }
-
     await context.Response.WriteAsJsonAsync(dic);
 }));
 
