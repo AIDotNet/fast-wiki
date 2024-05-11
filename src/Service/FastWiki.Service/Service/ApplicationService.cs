@@ -10,5 +10,6 @@ public abstract class ApplicationService<TService> : ServiceBase where TService 
 
     protected IUserContext UserContext => GetRequiredService<IUserContext>();
     
+    protected IMapper Mapper => GetRequiredService<IMapper>();
     
 }

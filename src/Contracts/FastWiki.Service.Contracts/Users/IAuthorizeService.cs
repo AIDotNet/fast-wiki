@@ -5,10 +5,8 @@ namespace FastWiki.Service.Contracts.Users;
 public interface IAuthorizeService
 {
     /// <summary>
-    /// µÇÂ¼»ñÈ¡token
+    /// ç™»å½•è·å–token
     /// </summary>
-    /// <param name="account"></param>
-    /// <param name="pass"></param>
     /// <returns></returns>
-    Task<AuthorizeDto> TokenAsync(string account,string pass);
+    Task<AuthorizeDto> TokenAsync(AuthorizeInput input);
 }

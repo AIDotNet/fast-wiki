@@ -20,8 +20,8 @@ public sealed class UserQueryHandler(IUserRepository userRepository, IMapper map
         {
             throw new UserFriendlyException("密码错误");
         }
-        
-        if(dto.IsDisable)
+
+        if (dto.IsDisable)
         {
             throw new UserFriendlyException("账号已禁用");
         }
@@ -41,5 +41,13 @@ public sealed class UserQueryHandler(IUserRepository userRepository, IMapper map
             Total = total,
             Result = mapper.Map<List<UserDto>>(list)
         };
+    }
+
+    [EventHandler]
+    public async Task GetUserAsync(UserQuery query)
+    {
+        var dto = await userRepository.FindAsync(query.Id);
+
+        query.Result = dto;
     }
 }

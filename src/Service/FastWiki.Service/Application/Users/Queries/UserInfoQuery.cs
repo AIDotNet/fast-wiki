@@ -3,7 +3,7 @@ using FastWiki.Service.Contracts.Users.Dto;
 namespace FastWiki.Service.Application.Users.Queries;
 
 /// <summary>
-/// 通过账号密码获取用户信息
+/// 閫氳繃璐﹀彿瀵嗙爜鑾峰彇鐢ㄦ埛淇℃伅
 /// </summary>
 /// <param name="Account"></param>
 /// <param name="Pass"></param>

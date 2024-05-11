@@ -55,11 +55,24 @@ public sealed class UserService : ApplicationService<UserService>
 
         await EventBus.PublishAsync(command);
     }
-    
+
     public async Task CreateAsync(CreateUserInput input)
     {
         var command = new CreateUserCommand(input);
 
         await EventBus.PublishAsync(command);
+    }
+
+    [Authorize]
+    public async ValueTask<UserDto> GetAsync()
+    {
+        var query = new UserQuery(UserContext.GetUserId<Guid>());
+        await EventBus.PublishAsync(query);
+        if (query.Result == null)
+        {
+            throw new UnauthorizedAccessException("用户不存在");
+        }
+
+        return Mapper.Map<UserDto>(query.Result);
     }
 }

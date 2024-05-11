@@ -10,9 +10,9 @@ namespace FastWiki.Service.Service;
 /// </summary>
 public sealed class AuthorizeService : ApplicationService<AuthorizeService>, IAuthorizeService
 {
-    public async Task<AuthorizeDto> TokenAsync(string account, string pass)
+    public async Task<AuthorizeDto> TokenAsync(AuthorizeInput input)
     {
-        var userInfo = new UserInfoQuery(account, pass);
+        var userInfo = new UserInfoQuery(input.account, input.pass);
 
         await EventBus.PublishAsync(userInfo);
 
