@@ -2,7 +2,7 @@ namespace FastWiki.Service.Service;
 
 /// <inheritdoc />
 public sealed class ChatApplicationService
-    : ApplicationService<ChatApplicationService>, IChatApplicationService
+    : ApplicationService<ChatApplicationService>
 {
     /// <inheritdoc />
     [Authorize]
@@ -62,71 +62,6 @@ public sealed class ChatApplicationService
         return query.Result;
     }
 
-    /// <inheritdoc />
-    public async Task CreateChatDialogAsync(CreateChatDialogInput input)
-    {
-        var command = new CreateChatDialogCommand(input);
-
-        await EventBus.PublishAsync(command);
-    }
-
-    /// <param name="applicationId"></param>
-    /// <param name="all"></param>
-    /// <inheritdoc />
-    [Authorize]
-    public async Task<List<ChatDialogDto>> GetChatDialogAsync(string applicationId, bool all)
-    {
-        var query = new ChatDialogQuery(applicationId, all,UserContext.GetUserId<Guid>());
-
-        await EventBus.PublishAsync(query);
-
-        return query.Result;
-    }
-
-    /// <param name="chatId"></param>
-    /// <inheritdoc />
-    public async Task<List<ChatDialogDto>> GetChatShareDialogAsync(string chatId)
-    {
-        var query = new ChatShareDialogQuery(chatId);
-
-        await EventBus.PublishAsync(query);
-
-        return query.Result;
-    }
-
-    public async Task CreateChatDialogHistoryAsync(CreateChatDialogHistoryInput input)
-    {
-        var command = new CreateChatDialogHistoryCommand(input);
-
-        await EventBus.PublishAsync(command);
-    }
-
-    public async Task<PaginatedListBase<ChatDialogHistoryDto>> GetChatDialogHistoryAsync(string chatDialogId, int page,
-        int pageSize)
-    {
-        var query = new ChatDialogHistoryQuery(chatDialogId, page, pageSize);
-
-        await EventBus.PublishAsync(query);
-
-        return query.Result;
-    }
-
-    public async Task<ChatDialogHistoryDto> GetChatDialogHistoryInfoAsync(string historyId)
-    {
-        var query = new GetHistoryInfoQuery(historyId);
-        
-        await EventBus.PublishAsync(query);
-        
-        return query.Result;
-    }
-
-    public async Task RemoveDialogHistoryAsync(string id)
-    {
-        var command = new RemoveChatDialogHistoryCommand(id);
-
-        await EventBus.PublishAsync(command);
-    }
-
     [Authorize]
     public async Task CreateShareAsync(CreateChatShareInput input)
     {
@@ -154,58 +89,4 @@ public sealed class ChatApplicationService
         return EventBus.PublishAsync(command);
     }
 
-    [Authorize]
-    public async Task RemoveDialogAsync(string id)
-    {
-        var command = new RemoveChatDialogCommand(id);
-
-        await EventBus.PublishAsync(command);
-    }
-
-    [Authorize]
-    public async Task UpdateDialogAsync(ChatDialogDto input)
-    {
-        var command = new UpdateChatDialogCommand(input);
-
-        await EventBus.PublishAsync(command);
-    }
-
-    public async Task RemoveShareDialogAsync(string chatId, string id)
-    {
-        var command = new RemoveShareDialogCommand(chatId, id);
-        await EventBus.PublishAsync(command);
-    }
-
-    public async Task UpdateShareDialogAsync(ChatDialogDto input)
-    {
-        var command = new UpdateShareChatDialogCommand(input);
-
-        await EventBus.PublishAsync(command);
-    }
-
-    [Authorize]
-    public async Task<PaginatedListBase<ChatDialogDto>> GetSessionLogDialogAsync(string chatApplicationId, int page,
-        int pageSize)
-    {
-        var query = new GetSessionLogDialogQuery(chatApplicationId, page, pageSize,UserContext.GetUserId<Guid>());
-
-        await EventBus.PublishAsync(query);
-
-        return query.Result;
-    }
-
-    public Task PutChatHistoryAsync(PutChatHistoryInput input)
-    {
-        var command = new PutChatHistoryCommand(input);
-
-        return EventBus.PublishAsync(command);
-    }
-    
-    [Authorize]
-    public async Task PurgeMessageHistoryAsync(string dialogId)
-    {
-        var command = new RemovesChatDialogHistoryCommand(dialogId);
-
-        await EventBus.PublishAsync(command);
-    }
 }

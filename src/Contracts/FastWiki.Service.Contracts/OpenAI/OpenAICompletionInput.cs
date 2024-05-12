@@ -8,35 +8,44 @@ public class ChatCompletionDto
     public double? temperature { get; set; }
 
     /// <summary>
-    /// ÓÃÎÂ¶È²ÉÑùµÄÁíÒ»ÖÖ·½·¨³ÆÎªºË²ÉÑù£¬ÆäÖĞÄ£ĞÍ¿¼ÂÇ¾ßÓĞtop_p¸ÅÂÊÖÊÁ¿µÄtokenµÄ½á¹û¡£Òò´Ë0.1ÒâÎ¶×ÅÖ»¿¼ÂÇ°üº¬Ç°10%¸ÅÂÊÖÊÁ¿µÄ±ê¼Ç¡£ÎÒÃÇÍ¨³£½¨Òé¸Ä±äÕâ¸ö»ò¡°ÎÂ¶È¡±£¬µ«²»½¨ÒéÁ½Õß¶¼¸Ä±ä¡£
+    /// ç”¨æ¸©åº¦é‡‡æ ·çš„å¦ä¸€ç§æ–¹æ³•ç§°ä¸ºæ ¸é‡‡æ ·ï¼Œå…¶ä¸­æ¨¡å‹è€ƒè™‘å…·æœ‰top_pæ¦‚ç‡è´¨é‡çš„tokençš„ç»“æœã€‚å› æ­¤0.1æ„å‘³ç€åªè€ƒè™‘åŒ…å«å‰10%æ¦‚ç‡è´¨é‡çš„æ ‡è®°ã€‚æˆ‘ä»¬é€šå¸¸å»ºè®®æ”¹å˜è¿™ä¸ªæˆ–â€œæ¸©åº¦â€ï¼Œä½†ä¸å»ºè®®ä¸¤è€…éƒ½æ”¹å˜ã€‚
     /// </summary>
     public double? top_p { get; set; }
 
     public bool stream { get; set; } = true;
 
     /// <summary>
-    /// Éú³ÉµÄ´ğ°¸ÔÊĞíµÄ×î´ó±ê¼ÇÊı¡£Ä¬ÈÏÇé¿öÏÂ£¬Ä£ĞÍ¿ÉÒÔ·µ»ØµÄtokenÊıÁ¿Îª(4096 -ÌáÊ¾token)¡£
+    /// ç”Ÿæˆçš„ç­”æ¡ˆå…è®¸çš„æœ€å¤§æ ‡è®°æ•°ã€‚é»˜è®¤æƒ…å†µä¸‹ï¼Œæ¨¡å‹å¯ä»¥è¿”å›çš„tokenæ•°é‡ä¸º(4096 -æç¤ºtoken)ã€‚
     /// </summary>
     public double max_tokens { get; set; } = 2048;
 
     /// <summary>
-    /// ÔÚ-2.0µ½2.0Ö®¼äµÄÊı×Ö¡£ÕıÖµ»á¸ù¾İĞÂ±ê¼ÇÔÚÎÄ±¾ÖĞ´æÔÚµÄÆµÂÊÀ´³Í·£ËüÃÇ£¬½µµÍÄ£ĞÍÖğ×ÖÖØ¸´Í¬Ò»ĞĞµÄ¿ÉÄÜĞÔ¡£[ÓĞ¹ØÆµÂÊºÍ´æÔÚ³Í·£µÄ¸ü¶àĞÅÏ¢¡£](https://docs.api-reference/parameter -details)
+    /// åœ¨-2.0åˆ°2.0ä¹‹é—´çš„æ•°å­—ã€‚æ­£å€¼ä¼šæ ¹æ®æ–°æ ‡è®°åœ¨æ–‡æœ¬ä¸­å­˜åœ¨çš„é¢‘ç‡æ¥æƒ©ç½šå®ƒä»¬ï¼Œé™ä½æ¨¡å‹é€å­—é‡å¤åŒä¸€è¡Œçš„å¯èƒ½æ€§ã€‚[æœ‰å…³é¢‘ç‡å’Œå­˜åœ¨æƒ©ç½šçš„æ›´å¤šä¿¡æ¯ã€‚](https://docs.api-reference/parameter -details)
     /// </summary>
     public double? frequency_penalty { get; set; }
 
     public OpenAIError OpenAiError { get; set; }
 
+    /// <summary>
+    /// åº”ç”¨Id
+    /// </summary>
+    public string ApplicationId { get; set; }
+    
+    /// <summary>
+    /// åˆ†äº«id
+    /// </summary>
+    public string SharedId { get; set; }
 }
 
 public class ChatInputCompletionDto : ChatCompletionDto
 {
     /// <summary>
-    /// Ñ¡ÔñÓ¦ÓÃ³ÌĞòµÄID¡£Èç¹ûÎ´Ö¸¶¨£¬Ôò²»ÊÊÓÃ¡£
+    /// é€‰æ‹©åº”ç”¨ç¨‹åºçš„IDã€‚å¦‚æœæœªæŒ‡å®šï¼Œåˆ™ä¸é€‚ç”¨ã€‚
     /// </summary>
     public long? applicationId { get; set; }
 
     /// <summary>
-    /// Ñ¡ÔñÖªÊ¶¿âµÄID¡£Èç¹ûÎ´Ö¸¶¨£¬Ôò²»ÊÊÓÃ¡£
+    /// é€‰æ‹©çŸ¥è¯†åº“çš„IDã€‚å¦‚æœæœªæŒ‡å®šï¼Œåˆ™ä¸é€‚ç”¨ã€‚
     /// </summary>
     public long? userbankId { get; set; }
 }

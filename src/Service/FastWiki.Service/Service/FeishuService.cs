@@ -207,6 +207,10 @@ public class FeishuService
 
         var content = history.Last();
         var question = content.Content;
+        // 保存对话提问
+        var createChatRecordCommand = new CreateChatRecordCommand(chatApplication.Id, question);
+        
+        await eventBus.PublishAsync(createChatRecordCommand);
 
         var prompt = string.Empty;
 
@@ -344,43 +348,6 @@ public class FeishuService
             chatResponse.Invoke("对话异常：" + e.Message);
             return;
         }
-
-        #region 记录对话内容
-
-        var createChatDialogHistoryCommand = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
-        {
-            ChatDialogId = string.Empty,
-            Id = requestId,
-            Content = question,
-            ExpendToken = requestToken,
-            Type = ChatDialogHistoryType.Text,
-            Current = true
-        });
-
-        await eventBus.PublishAsync(createChatDialogHistoryCommand);
-
-        var outputContent = output.ToString();
-        var completeToken = TokenHelper.ComputeToken(outputContent);
-
-        var chatDialogHistory = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
-        {
-            ChatDialogId = string.Empty,
-            Content = outputContent,
-            Id = responseId,
-            ExpendToken = completeToken,
-            Type = ChatDialogHistoryType.Text,
-            Current = false,
-            ReferenceFile = sourceFile.Select(x => new SourceFileDto()
-            {
-                Name = x.Name,
-                FileId = x.Id.ToString(),
-                FilePath = x.Path
-            }).ToList()
-        });
-
-        await eventBus.PublishAsync(chatDialogHistory);
-
-        #endregion
 
         //对于对话扣款
         if (getAPIKeyChatShareQuery?.Result != null)

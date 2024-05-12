@@ -1,4 +1,3 @@
-using FastWiki.Service.Infrastructure.Helper;
 using Masa.BuildingBlocks.Authentication.Identity;
 
 namespace FastWiki.Service.Application.ChatApplications;
@@ -36,44 +35,6 @@ public class ChatApplicationCommandHandler(
         await chatApplicationRepository.UpdateAsync(chatApplication);
     }
 
-    [EventHandler]
-    public async Task CreateChatDialogAsync(CreateChatDialogCommand command)
-    {
-        var entity = new ChatDialog(command.Input.Name, command.Input.ChatId, command.Input.Description,
-            command.Input.ApplicationId);
-
-        entity.SetType(command.Input.Type);
-
-        await chatApplicationRepository.CreateChatDialogAsync(entity);
-    }
-
-    [EventHandler]
-    public async Task RemoveChatDialogAsync(RemoveChatDialogCommand command)
-    {
-        await chatApplicationRepository.RemoveChatDialogAsync(command.Id);
-    }
-
-    [EventHandler]
-    public async Task CreateChatDialogHistoryAsync(CreateChatDialogHistoryCommand command)
-    {
-        var chatDialogHistory = new ChatDialogHistory(command.Input.ChatDialogId,
-            command.Input.Content, TokenHelper.ComputeToken(command.Input.Content), command.Input.Current,
-            command.Input.Type);
-
-        // 如果有id则设置id
-        if (!command.Input.Id.IsNullOrEmpty())
-            chatDialogHistory.SetId(command.Input.Id);
-
-        chatDialogHistory.ReferenceFile.AddRange(mapper.Map<List<ReferenceFile>>(command.Input.ReferenceFile));
-
-        await chatApplicationRepository.CreateChatDialogHistoryAsync(chatDialogHistory);
-    }
-
-    [EventHandler]
-    public async Task RemoveChatDialogHistoryAsync(RemoveChatDialogHistoryCommand command)
-    {
-        await chatApplicationRepository.RemoveChatDialogHistoryByIdAsync(command.Id);
-    }
 
     [EventHandler]
     public async Task CreateChatShareAsync(CreateChatShareCommand command)
@@ -83,32 +44,6 @@ public class ChatApplicationCommandHandler(
         await chatApplicationRepository.CreateChatShareAsync(share);
     }
 
-    [EventHandler]
-    public async Task UpdateChatDialogAsync(UpdateChatDialogCommand command)
-    {
-        var chatDialog = mapper.Map<ChatDialog>(command.Input);
-
-        await chatApplicationRepository.UpdateChatDialogAsync(chatDialog);
-    }
-
-    [EventHandler]
-    public async Task RemoveShareDialogAsync(RemoveShareDialogCommand command)
-    {
-        await chatApplicationRepository.RemoveShareDialogAsync(command.ChatId, command.Id);
-    }
-
-    [EventHandler]
-    public async Task UpdateShareChatDialogAsync(UpdateShareChatDialogCommand command)
-    {
-        await chatApplicationRepository.UpdateShareDialogAsync(mapper.Map<ChatDialog>(command.Input));
-    }
-
-    [EventHandler]
-    public async Task UpdateChatShareAsync(PutChatHistoryCommand command)
-    {
-        await chatApplicationRepository.PutChatHistoryAsync(command.Input.Id, command.Input.Content,
-            command.Input.ChatShareId);
-    }
 
     [EventHandler]
     public async Task DeductTokenAsync(DeductTokenCommand command)
@@ -123,8 +58,16 @@ public class ChatApplicationCommandHandler(
     }
 
     [EventHandler]
-    public async Task UpdateChatShareAsync(RemovesChatDialogHistoryCommand command)
+    public async Task CreateChatRecordAsync(CreateChatRecordCommand command)
     {
-        await chatApplicationRepository.RemovesChatDialogHistoryAsync(command.dialogId);
+        if (command.Question.IsNullOrWhiteSpace())
+        {
+            return;
+        }
+        await chatApplicationRepository.CreateChatRecordAsync(new ChatRecord()
+        {
+            ApplicationId = command.ApplicationId,
+            Question = command.Question,
+        });
     }
 }

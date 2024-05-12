@@ -4,6 +4,10 @@ using FastWiki.Service.Domain.Storage.Aggregates;
 
 namespace FastWiki.Service.DataAccess;
 
+/// <summary>
+/// Wiki数据库上下文
+/// </summary>
+/// <param name="options"></param>
 public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDbContext(options)
 {
     public DbSet<Wiki> Wikis { get; set; }
@@ -16,13 +20,13 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
     public DbSet<ChatApplication> ChatApplications { get; set; }
 
-    public DbSet<ChatDialog> ChatDialogs { get; set; }
-
-    public DbSet<ChatDialogHistory> ChatDialogHistorys { get; set; }
-
     public DbSet<ChatShare> ChatShares { get; set; }
 
     public DbSet<FastWikiFunctionCall> FunctionCalls { get; set; }
+
+    public DbSet<ChatRecord> ChatRecords { get; set; }
+    
+    public DbSet<Questions> Questions { get; set; }
 
     protected override void OnModelCreatingExecuting(ModelBuilder modelBuilder)
     {
@@ -106,30 +110,6 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
                     v => JsonSerializer.Deserialize<List<long>>(v, new JsonSerializerOptions()));
         });
 
-        modelBuilder.Entity<ChatDialog>(entity =>
-        {
-            entity.ToTable("wiki-chat-dialog");
-
-            entity.HasKey(x => x.Id);
-
-            entity.HasIndex(x => x.ChatId);
-        });
-
-        modelBuilder.Entity<ChatDialogHistory>(entity =>
-        {
-            entity.ToTable("wiki-chat-dialog-history");
-
-            entity.HasKey(x => x.Id);
-
-            entity.HasIndex(x => x.ChatDialogId);
-            entity.HasIndex(x => x.Creator);
-            entity.Property(x => x.Content).HasMaxLength(-1);
-
-            entity.Property(x => x.ReferenceFile)
-                .HasConversion(item => JsonSerializer.Serialize(item, new JsonSerializerOptions()),
-                    item => JsonSerializer.Deserialize<List<ReferenceFile>>(item, new JsonSerializerOptions()));
-        });
-
         modelBuilder.Entity<ChatShare>(entity =>
         {
             entity.ToTable("wiki-chat-share");
@@ -139,6 +119,24 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
             entity.HasKey(x => x.Id);
 
             entity.HasIndex(x => x.ChatApplicationId);
+        });
+        
+        modelBuilder.Entity<ChatRecord>(entity =>
+        {
+            entity.ToTable("wiki-chat-record");
+
+            entity.HasKey(x => x.Id);
+
+            entity.HasIndex(x => x.CreationTime);
+        });
+        
+        modelBuilder.Entity<Questions>(entity =>
+        {
+            entity.ToTable("wiki-questions");
+
+            entity.HasKey(x => x.Id);
+
+            entity.HasIndex(x => x.CreationTime);
         });
 
 

@@ -28,7 +28,6 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("text");
 
                     b.Property<string>("ChatModel")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreationTime")
@@ -38,11 +37,9 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("uuid");
 
                     b.Property<string>("Extend")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("FunctionIds")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
@@ -58,22 +55,18 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("NoReplyFoundTemplate")
                         .HasColumnType("text");
 
                     b.Property<string>("Opener")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Parameter")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Prompt")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("ReferenceUpperLimit")
@@ -89,11 +82,9 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("double precision");
 
                     b.Property<string>("Template")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("WikiIds")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -103,16 +94,12 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                     b.ToTable("wiki-chat-application", (string)null);
                 });
 
-            modelBuilder.Entity("FastWiki.Service.Domain.ChatApplications.Aggregates.ChatDialog", b =>
+            modelBuilder.Entity("FastWiki.Service.Domain.ChatApplications.Aggregates.ChatRecord", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
                     b.Property<string>("ApplicationId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ChatId")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreationTime")
@@ -121,82 +108,20 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                     b.Property<Guid>("Creator")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
                     b.Property<DateTime>("ModificationTime")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("Modifier")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<string>("Question")
                         .HasColumnType("text");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChatId");
+                    b.HasIndex("CreationTime");
 
-                    b.ToTable("wiki-chat-dialog", (string)null);
-                });
-
-            modelBuilder.Entity("FastWiki.Service.Domain.ChatApplications.Aggregates.ChatDialogHistory", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ChatDialogId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(-1)
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("Creator")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("Current")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("ModificationTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("Modifier")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ReferenceFile")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("TokenConsumption")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChatDialogId");
-
-                    b.HasIndex("Creator");
-
-                    b.ToTable("wiki-chat-dialog-history", (string)null);
+                    b.ToTable("wiki-chat-record", (string)null);
                 });
 
             modelBuilder.Entity("FastWiki.Service.Domain.ChatApplications.Aggregates.ChatShare", b =>
@@ -214,7 +139,6 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("bigint");
 
                     b.Property<string>("ChatApplicationId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreationTime")
@@ -233,7 +157,6 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<long>("UsedToken")
@@ -246,6 +169,30 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                     b.ToTable("wiki-chat-share", (string)null);
                 });
 
+            modelBuilder.Entity("FastWiki.Service.Domain.ChatApplications.Aggregates.Questions", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ApplicationId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Question")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreationTime");
+
+                    b.ToTable("wiki-questions", (string)null);
+                });
+
             modelBuilder.Entity("FastWiki.Service.Domain.Function.Aggregates.FastWikiFunctionCall", b =>
                 {
                     b.Property<long>("Id")
@@ -255,7 +202,6 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreationTime")
@@ -265,25 +211,21 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("Enable")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Imports")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Items")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Main")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ModificationTime")
@@ -293,11 +235,9 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Parameters")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -322,7 +262,6 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("uuid");
 
                     b.Property<string>("FullName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsCompression")
@@ -338,12 +277,10 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Path")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
@@ -362,11 +299,9 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("uuid");
 
                     b.Property<string>("Account")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Avatar")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreationTime")
@@ -376,7 +311,6 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("uuid");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
@@ -392,24 +326,20 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Password")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Role")
                         .HasColumnType("integer");
 
                     b.Property<string>("Salt")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -419,19 +349,19 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                     b.HasData(
                         new
                         {
-                            Id = new Guid("81ba41a1-27df-4f6c-b327-dfec1bce8c85"),
+                            Id = new Guid("369059b8-6905-488b-87ab-447afa38b4de"),
                             Account = "admin",
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                            CreationTime = new DateTime(2024, 4, 22, 14, 36, 39, 431, DateTimeKind.Utc).AddTicks(7635),
+                            CreationTime = new DateTime(2024, 5, 12, 15, 6, 23, 950, DateTimeKind.Utc).AddTicks(9764),
                             Email = "239573049@qq.com",
                             IsDeleted = false,
                             IsDisable = false,
-                            ModificationTime = new DateTime(2024, 4, 22, 14, 36, 39, 431, DateTimeKind.Utc).AddTicks(7638),
+                            ModificationTime = new DateTime(2024, 5, 12, 15, 6, 23, 950, DateTimeKind.Utc).AddTicks(9767),
                             Name = "admin",
-                            Password = "ae322a2c4c237df3b8683703e51442aa",
+                            Password = "25b55175d0b2235c4fd324a0388343e0",
                             Phone = "13049809673",
                             Role = 2,
-                            Salt = "19ea5ff625024a1d80bbf86c054e132c"
+                            Salt = "c2f1bbebf79549178117880c43e58776"
                         });
                 });
 
@@ -450,18 +380,15 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("uuid");
 
                     b.Property<string>("EmbeddingModel")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Icon")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Model")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ModificationTime")
@@ -471,7 +398,6 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -503,7 +429,6 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("bigint");
 
                     b.Property<string>("FileName")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -526,7 +451,6 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("integer");
 
                     b.Property<string>("Path")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
@@ -540,7 +464,6 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                         .HasColumnType("integer");
 
                     b.Property<string>("Type")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 

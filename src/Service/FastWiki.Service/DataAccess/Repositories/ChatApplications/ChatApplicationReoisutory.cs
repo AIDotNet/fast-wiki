@@ -21,77 +21,6 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
         return query.LongCountAsync();
     }
 
-    public async Task CreateChatDialogAsync(ChatDialog chatDialog)
-    {
-        await Context.ChatDialogs.AddAsync(chatDialog);
-        await Context.SaveChangesAsync();
-    }
-
-    public async Task RemoveChatDialogAsync(string id)
-    {
-        await Context.ChatDialogs.Where(x => x.Id == id).ExecuteDeleteAsync();
-        await Context.ChatDialogHistorys.Where(x => x.ChatDialogId == id).ExecuteDeleteAsync();
-
-        await Context.SaveChangesAsync();
-    }
-
-    public async Task<List<ChatDialog>> GetChatDialogListAsync(string applicationId, bool all, Guid userId)
-    {
-        var query = Context.ChatDialogs.Where(x => x.ApplicationId == applicationId && x.Creator == userId);
-
-        if (!all)
-        {
-            query = query.Where(x => x.Type == ChatDialogType.ChatApplication);
-        }
-
-        return await query
-            .OrderByDescending(x => x.CreationTime)
-            .ToListAsync();
-    }
-
-    public async Task<List<ChatDialog>> GetChatShareDialogListAsync(string chatId)
-    {
-        return await Context.ChatDialogs.Where(x => x.ChatId == chatId)
-            .OrderByDescending(x => x.CreationTime)
-            .ToListAsync();
-    }
-
-    public async Task CreateChatDialogHistoryAsync(ChatDialogHistory chatDialogHistory)
-    {
-        await Context.ChatDialogHistorys.AddAsync(chatDialogHistory);
-
-        await Context.SaveChangesAsync();
-    }
-
-    public async Task<List<ChatDialogHistory>> GetChatDialogHistoryListAsync(string chatDialogId, int page,
-        int pageSize)
-    {
-        var query = CreateChatDialogHistoriesQueryable(chatDialogId);
-
-        return await query
-            .OrderByDescending(x => x.CreationTime)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-    }
-
-    public async Task<long> GetChatDialogHistoryCountAsync(string chatDialogId)
-    {
-        var query = CreateChatDialogHistoriesQueryable(chatDialogId);
-
-        return await query.LongCountAsync();
-    }
-
-    public async Task RemoveChatDialogHistoryAsync(string chatDialogId)
-    {
-        await Context.ChatDialogHistorys.Where(x => x.ChatDialogId == chatDialogId).ExecuteDeleteAsync();
-    }
-
-    public async Task RemoveChatDialogHistoryByIdAsync(string id)
-    {
-        await Context.ChatDialogHistorys.Where(x => x.Id == id).ExecuteDeleteAsync();
-    }
-
     public async Task CreateChatShareAsync(ChatShare share)
     {
         await Context.ChatShares.AddAsync(share);
@@ -134,70 +63,6 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
         return await query.AsNoTracking().FirstOrDefaultAsync();
     }
 
-    public async Task UpdateChatDialogAsync(ChatDialog chatDialog)
-    {
-        await Context.ChatDialogs.Where(x => x.Id == chatDialog.Id).ExecuteUpdateAsync(x =>
-            x.SetProperty(b => b.Name, chatDialog.Name));
-    }
-
-    public async Task RemoveShareDialogAsync(string chatId, string id)
-    {
-        await Context.ChatDialogs.Where(x => x.ChatId == chatId && x.Id == id).ExecuteDeleteAsync();
-        await Context.ChatDialogHistorys.Where(x => x.ChatDialogId == id).ExecuteDeleteAsync();
-    }
-
-    public async Task UpdateShareDialogAsync(ChatDialog chatDialog)
-    {
-        await Context.ChatDialogs.Where(x => x.ChatId == chatDialog.ChatId && x.Id == chatDialog.Id)
-            .ExecuteUpdateAsync(x =>
-                x.SetProperty(b => b.Name, chatDialog.Name));
-    }
-
-    public Task<List<ChatDialog>> GetSessionLogDialogListAsync(Guid userId, string chatApplicationId, int page,
-        int pageSize)
-    {
-        var query = Context.ChatDialogs
-            .AsNoTracking()
-            .Where(x => x.ApplicationId == chatApplicationId && x.Creator == userId);
-
-        return query
-            .OrderByDescending(x => x.CreationTime)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-    }
-
-    public async Task<long> GetSessionLogDialogCountAsync(Guid userId, string chatApplicationId)
-    {
-        var query = Context.ChatDialogs
-            .AsNoTracking()
-            .Where(x => x.ApplicationId == chatApplicationId && x.Creator == userId);
-
-        return await query.LongCountAsync();
-    }
-
-    public async Task PutChatHistoryAsync(string id, string content, string? chatShareId)
-    {
-        if (chatShareId.IsNullOrEmpty())
-        {
-            await Context.ChatDialogHistorys.Where(x => x.Id == id)
-                .ExecuteUpdateAsync(x =>
-                    x.SetProperty(b => b.Content, content));
-        }
-        else
-        {
-            var result = await Context.ChatShares.FirstOrDefaultAsync(x => x.Id == chatShareId);
-
-            if (result == null)
-            {
-                throw new UserFriendlyException("����Ի�������");
-            }
-
-            await Context.ChatDialogHistorys.Where(x => x.Id == id)
-                .ExecuteUpdateAsync(x =>
-                    x.SetProperty(b => b.Content, content));
-        }
-    }
 
     public async Task<ChatShare> GetAPIKeyChatShareAsync(string apiKey)
     {
@@ -220,17 +85,9 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
             .ExecuteDeleteAsync();
     }
 
-    public Task<ChatDialogHistory> GetChatDialogHistoryAsync(string id)
+    public async Task CreateChatRecordAsync(ChatRecord chatRecord)
     {
-        return Context.ChatDialogHistorys.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == id);
-    }
-
-    public async Task RemovesChatDialogHistoryAsync(string chatDialogId)
-    {
-        await Context.ChatDialogHistorys
-            .Where(x => x.ChatDialogId == chatDialogId)
-            .ExecuteDeleteAsync();
+        await Context.ChatRecords.AddAsync(chatRecord);
     }
 
     private IQueryable<ChatShare> CreateChatShareQueryable(Guid userId, string chatApplicationId)
@@ -238,12 +95,6 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
         return Context.ChatShares.AsNoTracking()
             .Where(x => x.ChatApplicationId == chatApplicationId && x.Creator == userId);
     }
-
-    private IQueryable<ChatDialogHistory> CreateChatDialogHistoriesQueryable(string chatDialogId)
-    {
-        return Context.ChatDialogHistorys.Where(x => x.ChatDialogId == chatDialogId);
-    }
-
 
     private IQueryable<ChatApplication> CreateQueryable(Guid userId)
     {

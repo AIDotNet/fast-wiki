@@ -27,7 +27,11 @@ public class OpenAIService
         using var stream = new StreamReader(context.Request.Body);
 
         var module =
-            JsonSerializer.Deserialize<ChatCompletionDto<ChatCompletionRequestMessage>>(await stream.ReadToEndAsync());
+            JsonSerializer.Deserialize<ChatCompletionDto<ChatCompletionRequestMessage>>(await stream.ReadToEndAsync(),
+                new JsonSerializerOptions()
+                {
+                    PropertyNameCaseInsensitive = true,
+                });
 
         context.Response.ContentType = "text/event-stream";
 
@@ -40,11 +44,21 @@ public class OpenAIService
 
         var logger = context.RequestServices.GetRequiredService<ILogger<OpenAIService>>();
 
-        var chatDialogId = context.Request.Query["ChatDialogId"].ToString();
-        var chatId = context.Request.Query["ChatId"];
+        var chatId = context.Request.Query["ChatId"].ToString();
         var token = context.Request.Headers.Authorization;
-        var chatShareId = context.Request.Query["ChatShareId"];
-        
+
+        if (chatId.IsNullOrEmpty())
+        {
+            chatId = module.ApplicationId;
+        }
+
+        // 获取分享Id
+        var chatShareId = context.Request.Query["ChatShareId"].ToString();
+        if (chatShareId.IsNullOrEmpty())
+        {
+            chatShareId = module.SharedId;
+        }
+
         var eventBus = context.RequestServices.GetRequiredService<IEventBus>();
 
         var getAPIKeyChatShareQuery = new GetAPIKeyChatShareQuery(token);
@@ -128,6 +142,10 @@ public class OpenAIService
         var content = module.messages.Last();
         var question = content.content;
 
+        // 保存对话提问
+        var createChatRecordCommand = new CreateChatRecordCommand(chatApplication.Id, question);
+        
+        await eventBus.PublishAsync(createChatRecordCommand);
 
         var sourceFile = new List<FileStorage>();
         var wikiMemoryService = context.RequestServices.GetRequiredService<WikiMemoryService>();
@@ -310,50 +328,6 @@ public class OpenAIService
         }
 
         await context.WriteEndAsync();
-
-        #region 记录对话内容
-
-        if (!chatDialogId.IsNullOrEmpty())
-        {
-            var createChatDialogHistoryCommand = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
-            {
-                ChatDialogId = chatDialogId ?? string.Empty,
-                Id = requestId,
-                Content = question,
-                ExpendToken = requestToken,
-                Type = ChatDialogHistoryType.Text,
-                Current = true
-            });
-
-            await eventBus.PublishAsync(createChatDialogHistoryCommand);
-        }
-
-
-        var outputContent = output.ToString();
-        var completeToken = TokenHelper.ComputeToken(outputContent);
-
-        if (!chatDialogId.IsNullOrEmpty())
-        {
-            var chatDialogHistory = new CreateChatDialogHistoryCommand(new CreateChatDialogHistoryInput()
-            {
-                ChatDialogId = chatDialogId,
-                Content = outputContent,
-                Id = responseId,
-                ExpendToken = completeToken,
-                Type = ChatDialogHistoryType.Text,
-                Current = false,
-                ReferenceFile = sourceFile.Select(x => new SourceFileDto()
-                {
-                    Name = x.Name,
-                    FileId = x.Id.ToString(),
-                    FilePath = x.Path
-                }).ToList()
-            });
-
-            await eventBus.PublishAsync(chatDialogHistory);
-        }
-
-        #endregion
 
         //对于对话扣款
         if (getAPIKeyChatShareQuery?.Result != null)
