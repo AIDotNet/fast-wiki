@@ -88,6 +88,29 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
     public async Task CreateChatRecordAsync(ChatRecord chatRecord)
     {
         await Context.ChatRecords.AddAsync(chatRecord);
+        
+        await Context.SaveChangesAsync();
+    }
+
+    public async Task CreateQuestionsAsync(Questions questions)
+    {
+        await Context.Questions.AddAsync(questions);
+        await Context.SaveChangesAsync();
+    }
+
+    public Task RemoveQuestionsAsync(string id)
+    {
+        return Context.Questions
+            .Where(x => x.Id == id)
+            .ExecuteDeleteAsync();
+    }
+
+    public Task<List<Questions>> GetQuestionsAsync(string applicationId)
+    {
+        return Context.Questions
+            .AsNoTracking()
+            .Where(x => x.ApplicationId == applicationId)
+            .ToListAsync();
     }
 
     private IQueryable<ChatShare> CreateChatShareQueryable(Guid userId, string chatApplicationId)

@@ -89,4 +89,43 @@ public sealed class ChatApplicationService
         return EventBus.PublishAsync(command);
     }
 
+    [Authorize]
+    public async Task CreateQuestionsAsync(QuestionsInput input)
+    {
+        var command = new CreateQuestionsCommand(input);
+
+        await EventBus.PublishAsync(command);
+    }
+    
+    public async Task<List<QuestionsDto>> GetQuestionsAsync(string applicationId)
+    {
+        var query = new GetQuestionsQuery(applicationId);
+
+        await EventBus.PublishAsync(query);
+
+        return query.Result;
+    }
+    
+    public async Task<List<QuestionsDto>> GetSharedQuestionsAsync(string sharedId)
+    {
+        var chatShareInfoQuery = new ChatShareInfoQuery(sharedId);
+
+        await EventBus.PublishAsync(chatShareInfoQuery);
+        var query = new GetQuestionsQuery(chatShareInfoQuery.Result.ChatApplicationId);
+
+        await EventBus.PublishAsync(query);
+
+        return query.Result;
+    }
+    
+    
+    
+    [Authorize]
+    public Task RemoveQuestionsAsync(string id)
+    {
+        var command = new RemoveQuestionsCommand(id);
+
+        return EventBus.PublishAsync(command);
+    }
+    
 }

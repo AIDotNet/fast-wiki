@@ -5,7 +5,7 @@ namespace FastWiki.Service.Domain.ChatApplications.Aggregates;
 /// <summary>
 /// 问题热点
 /// </summary>
-public class Questions : Entity<string>, IAuditAggregateRoot<Guid>
+public class Questions : Entity<string>
 {
     /// <summary>
     /// 应用
@@ -22,11 +22,18 @@ public class Questions : Entity<string>, IAuditAggregateRoot<Guid>
     /// </summary>
     public int Order { get; set; }
     
-    public Guid Creator { get; }
+    public DateTime CreationTime { get;set; }
     
-    public DateTime CreationTime { get; }
+    protected Questions()
+    {
+    }
     
-    public Guid Modifier { get; }
-    
-    public DateTime ModificationTime { get; }
+    public Questions(string id, string applicationId, string question, int order)
+    {
+        Id = id;
+        ApplicationId = applicationId;
+        Question = question;
+        Order = order;
+        CreationTime = DateTime.Now;
+    }
 }

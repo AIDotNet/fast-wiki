@@ -69,4 +69,11 @@ public class ChatApplicationQueryHandler(
         query.Result = dto;
     }
 
+    [EventHandler]
+    public async Task GetQuestionsAsync(GetQuestionsQuery query)
+    {
+        var result = await chatApplicationRepository.GetQuestionsAsync(query.ApplicationId);
+
+        query.Result = mapper.Map<List<QuestionsDto>>(result);
+    }
 }

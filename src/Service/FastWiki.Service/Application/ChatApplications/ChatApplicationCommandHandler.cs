@@ -64,10 +64,21 @@ public class ChatApplicationCommandHandler(
         {
             return;
         }
-        await chatApplicationRepository.CreateChatRecordAsync(new ChatRecord()
-        {
-            ApplicationId = command.ApplicationId,
-            Question = command.Question,
-        });
+
+        await chatApplicationRepository.CreateChatRecordAsync(new ChatRecord(Guid.NewGuid().ToString("N"),
+            command.ApplicationId, command.Question));
+    }
+
+    [EventHandler]
+    public async Task CreateQuestionsAsync(CreateQuestionsCommand command)
+    {
+        await chatApplicationRepository.CreateQuestionsAsync(new Questions(Guid.NewGuid().ToString("N"),
+            command.QuestionsDto.ApplicationId, command.QuestionsDto.Question, command.QuestionsDto.Order));
+    }
+    
+    [EventHandler]
+    public async Task RemoveQuestionsAsync(RemoveQuestionsCommand command)
+    {
+        await chatApplicationRepository.RemoveQuestionsAsync(command.Id);
     }
 }

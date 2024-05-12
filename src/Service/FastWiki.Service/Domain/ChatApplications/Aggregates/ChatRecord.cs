@@ -21,4 +21,18 @@ public sealed class ChatRecord : Entity<string>, IAuditAggregateRoot<Guid>
     public Guid Modifier { get; set;}
     
     public DateTime ModificationTime { get;set; }
+
+
+    protected ChatRecord()
+    {
+        
+    }
+    
+    public ChatRecord(string id, string applicationId, string question)
+    {
+        Id = id;
+        ApplicationId = applicationId;
+        Question = question;
+        CreationTime = DateTime.Now;
+    }
 }

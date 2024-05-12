@@ -1,3 +1,5 @@
+using Masa.BuildingBlocks.Data.Mapping.Options;
+
 namespace FastWiki.Service.Domain.ChatApplications.Repositories;
 
 public interface IChatApplicationRepository : IRepository<ChatApplication, string>
@@ -73,4 +75,25 @@ public interface IChatApplicationRepository : IRepository<ChatApplication, strin
     /// <param name="chatRecord"></param>
     /// <returns></returns>
     Task CreateChatRecordAsync(ChatRecord chatRecord);
+    
+    /// <summary>
+    /// 创建问题
+    /// </summary>
+    /// <param name="questions"></param>
+    /// <returns></returns>
+    Task CreateQuestionsAsync(Questions questions);
+
+    /// <summary>
+    /// 移除问题
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task RemoveQuestionsAsync(string id);
+
+    /// <summary>
+    /// 获取问题列表
+    /// </summary>
+    /// <param name="applicationId"></param>
+    /// <returns></returns>
+    Task<List<Questions>> GetQuestionsAsync(string applicationId);
 }
