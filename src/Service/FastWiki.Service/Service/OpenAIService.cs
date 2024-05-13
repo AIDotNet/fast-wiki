@@ -52,12 +52,22 @@ public class OpenAIService
         {
             chatId = module.ApplicationId;
         }
+        
+        if(chatId.IsNullOrEmpty())
+        {
+            chatId = context.Request.Headers["applicationId"];
+        }
 
         // 获取分享Id
         var chatShareId = context.Request.Query["ChatShareId"].ToString();
         if (chatShareId.IsNullOrEmpty())
         {
             chatShareId = module.SharedId;
+        }
+        
+        if(chatShareId.IsNullOrEmpty())
+        {
+            chatShareId = context.Request.Headers["sharedId"];
         }
 
         var eventBus = context.RequestServices.GetRequiredService<IEventBus>();
