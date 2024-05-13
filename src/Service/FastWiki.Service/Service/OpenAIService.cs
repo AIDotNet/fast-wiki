@@ -3,6 +3,7 @@ using System.Text.Json;
 using AIDotNet.Abstractions.Dto;
 using Azure.AI.OpenAI;
 using FastWiki.Service.Application.Function.Queries;
+using FastWiki.Service.Application.Storage;
 using FastWiki.Service.Application.Storage.Queries;
 using FastWiki.Service.Contracts.OpenAI;
 using FastWiki.Service.Domain.Storage.Aggregates;
@@ -144,7 +145,7 @@ public class OpenAIService
 
         // 保存对话提问
         var createChatRecordCommand = new CreateChatRecordCommand(chatApplication.Id, question);
-        
+
         await eventBus.PublishAsync(createChatRecordCommand);
 
         var sourceFile = new List<FileStorage>();
@@ -154,8 +155,8 @@ public class OpenAIService
         // 如果为空则不使用知识库
         if (chatApplication.WikiIds.Count != 0)
         {
-            var success = await WikiPrompt(context, chatApplication, memoryServerless, content, eventBus,
-                sourceFile, module);
+            var success = await WikiPrompt(chatApplication, memoryServerless, content.content, eventBus,
+                sourceFile, module, async x => { await context.WriteEndAsync(x); });
 
             if (!success)
             {
@@ -199,107 +200,16 @@ public class OpenAIService
         var output = new StringBuilder();
         try
         {
-            var functionCall = new ChatApplicationFunctionCallQuery(chatApplication.FunctionIds.ToArray());
-
-            if (chatApplication.FunctionIds.Any())
+            await foreach (var item in SendChatMessageAsync(chatApplication, eventBus, wikiMemoryService, chatHistory))
             {
-                await eventBus.PublishAsync(functionCall);
-            }
-
-            var kernel =
-                wikiMemoryService.CreateFunctionKernel(functionCall?.Result?.ToList(), chatApplication.ChatModel);
-
-            // 如果有函数调用
-            if (chatApplication.FunctionIds.Any() && functionCall.Result.Any())
-            {
-                OpenAIPromptExecutionSettings settings = new()
+                if (string.IsNullOrEmpty(item))
                 {
-                    ToolCallBehavior = ToolCallBehavior.EnableKernelFunctions
-                };
-
-                var chat = kernel.GetRequiredService<IChatCompletionService>();
-
-                var result =
-                    (OpenAIChatMessageContent)await chat.GetChatMessageContentAsync(chatHistory, settings,
-                        kernel);
-
-                List<ChatCompletionsFunctionToolCall> toolCalls =
-                    result.ToolCalls.OfType<ChatCompletionsFunctionToolCall>().ToList();
-
-                if (toolCalls.Count == 0)
-                {
-                    await context.WriteEndAsync("未找到函数");
-                    return;
+                    continue;
                 }
 
-                foreach (var toolCall in toolCalls)
-                {
-                    kernel.Plugins.TryGetFunctionAndArguments(toolCall, out var function,
-                        out KernelArguments? arguments);
-
-                    if (function == null)
-                    {
-                        logger.LogError("未找到函数");
-                        continue;
-                    }
-
-                    try
-                    {
-                        var functionResult = await function.InvokeAsync(kernel, new KernelArguments()
-                        {
-                            {
-                                "value", arguments?.Select(x => x.Value).ToArray()
-                            }
-                        });
-                        // 判断ValueType是否为值类型
-                        if (functionResult.ValueType?.IsValueType == true || functionResult.ValueType == typeof(string))
-                        {
-                            chatHistory.AddAssistantMessage(functionResult.GetValue<object>().ToString());
-                        }
-                        else
-                        {
-                            // 记录函数调用
-                            chatHistory.AddAssistantMessage(
-                                JsonSerializer.Serialize(functionResult.GetValue<object>()));
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        await context.WriteEndAsync("函数调用异常：" + e.Message);
-                        logger.LogError(e, "函数调用异常");
-                        return;
-                    }
-                }
-
-                await foreach (var item in chat.GetStreamingChatMessageContentsAsync(chatHistory))
-                {
-                    var message = item.Content;
-                    if (string.IsNullOrEmpty(message))
-                    {
-                        continue;
-                    }
-
-                    output.Append(message);
-                    await context.WriteOpenAiResultAsync(message, module.model, requestId,
-                        responseId);
-                }
-            }
-            else
-            {
-                var chat = kernel.GetRequiredService<IChatCompletionService>();
-
-                await foreach (var item in chat.GetStreamingChatMessageContentsAsync(chatHistory))
-                {
-                    var message = item.Content;
-                    if (string.IsNullOrEmpty(message))
-                    {
-                        continue;
-                    }
-
-                    output.Append(message);
-                    await context.WriteOpenAiResultAsync(message, module.model, requestId,
-                        responseId);
-                }
+                output.Append(item);
+                await context.WriteOpenAiResultAsync(item, module.model, requestId,
+                    responseId);
             }
         }
         catch (NotModelException notModelException)
@@ -340,6 +250,130 @@ public class OpenAIService
     }
 
     /// <summary>
+    /// 提问AI
+    /// </summary>
+    /// <param name="chatApplication"></param>
+    /// <param name="eventBus"></param>
+    /// <param name="wikiMemoryService"></param>
+    /// <param name="chatHistory"></param>
+    /// <returns></returns>
+    public static async IAsyncEnumerable<string> SendChatMessageAsync(ChatApplicationDto chatApplication,
+        IEventBus eventBus, WikiMemoryService wikiMemoryService, ChatHistory chatHistory)
+    {
+        var functionCall = new ChatApplicationFunctionCallQuery(chatApplication.FunctionIds.ToArray());
+
+        if (chatApplication.FunctionIds.Any())
+        {
+            await eventBus.PublishAsync(functionCall);
+        }
+
+        var kernel =
+            wikiMemoryService.CreateFunctionKernel(functionCall?.Result?.ToList(), chatApplication.ChatModel);
+
+        // 如果有函数调用
+        if (chatApplication.FunctionIds.Any() && functionCall.Result.Any())
+        {
+            OpenAIPromptExecutionSettings settings = new()
+            {
+                ToolCallBehavior = ToolCallBehavior.EnableKernelFunctions
+            };
+
+            var chat = kernel.GetRequiredService<IChatCompletionService>();
+
+            var result =
+                (OpenAIChatMessageContent)await chat.GetChatMessageContentAsync(chatHistory, settings,
+                    kernel);
+
+            List<ChatCompletionsFunctionToolCall> toolCalls =
+                result.ToolCalls.OfType<ChatCompletionsFunctionToolCall>().ToList();
+
+            if (toolCalls.Count == 0)
+            {
+                yield return "未找到函数";
+                yield break;
+            }
+
+            foreach (var toolCall in toolCalls)
+            {
+                kernel.Plugins.TryGetFunctionAndArguments(toolCall, out var function,
+                    out KernelArguments? arguments);
+
+                if (function == null)
+                {
+                    continue;
+                }
+
+                Exception? exception = null;
+
+                try
+                {
+                    var functionResult = await function.InvokeAsync(kernel, new KernelArguments()
+                    {
+                        {
+                            "value", arguments?.Select(x => x.Value).ToArray()
+                        }
+                    });
+                    // 判断ValueType是否为值类型
+                    if (functionResult.ValueType?.IsValueType == true || functionResult.ValueType == typeof(string))
+                    {
+                        chatHistory.AddAssistantMessage(functionResult.GetValue<object>().ToString());
+                    }
+                    else
+                    {
+                        // 记录函数调用
+                        chatHistory.AddAssistantMessage(
+                            JsonSerializer.Serialize(functionResult.GetValue<object>()));
+                    }
+                }
+                catch (Exception e)
+                {
+                    exception = e;
+                }
+
+                if (exception != null)
+                {
+                    yield return "函数调用异常：" + exception?.Message;
+                    yield break;
+                }
+            }
+
+            await foreach (var message in SendChatMessageAsync(chat, chatHistory))
+            {
+                if (string.IsNullOrEmpty(message))
+                {
+                    continue;
+                }
+
+                yield return message;
+            }
+        }
+        else
+        {
+            var chat = kernel.GetRequiredService<IChatCompletionService>();
+
+            await foreach (var item in chat.GetStreamingChatMessageContentsAsync(chatHistory))
+            {
+                var message = item.Content;
+                if (string.IsNullOrEmpty(message))
+                {
+                    continue;
+                }
+
+                yield return message;
+            }
+        }
+    }
+
+    public static async IAsyncEnumerable<string> SendChatMessageAsync(IChatCompletionService chat,
+        ChatHistory chatHistory)
+    {
+        await foreach (var item in chat.GetStreamingChatMessageContentsAsync(chatHistory))
+        {
+            yield return item.Content;
+        }
+    }
+
+    /// <summary>
     /// 知识库Prompt组合
     /// 在向量中搜索响应的知识库内容，然后将其添加到对话中
     /// </summary>
@@ -350,16 +384,18 @@ public class OpenAIService
     /// <param name="eventBus"></param>
     /// <param name="sourceFile"></param>
     /// <param name="module"></param>
+    /// <param name="notFoundAction"></param>
     /// <returns></returns>
-    private static async ValueTask<bool> WikiPrompt(HttpContext context, ChatApplicationDto chatApplication,
-        MemoryServerless memoryServerless, ChatCompletionRequestMessage content, IEventBus eventBus,
-        List<FileStorage> sourceFile, ChatCompletionDto<ChatCompletionRequestMessage> module)
+    public static async ValueTask<bool> WikiPrompt(ChatApplicationDto chatApplication,
+        MemoryServerless memoryServerless, string content, IEventBus eventBus,
+        List<FileStorage> sourceFile, ChatCompletionDto<ChatCompletionRequestMessage> module,
+        Func<string, ValueTask> notFoundAction = null)
     {
         var prompt = string.Empty;
         var filters = chatApplication.WikiIds
             .Select(chatApplication => new MemoryFilter().ByTag("wikiId", chatApplication.ToString())).ToList();
 
-        var result = await memoryServerless.SearchAsync(content.content, "wiki", filters: filters, limit: 3,
+        var result = await memoryServerless.SearchAsync(content, "wiki", filters: filters, limit: 3,
             minRelevance: chatApplication.Relevancy);
 
         var fileIds = new List<long>();
@@ -382,7 +418,7 @@ public class OpenAIService
         if (result.Results.Count == 0 &&
             !string.IsNullOrWhiteSpace(chatApplication.NoReplyFoundTemplate))
         {
-            await context.WriteEndAsync(chatApplication.NoReplyFoundTemplate);
+            await notFoundAction!.Invoke(chatApplication.NoReplyFoundTemplate);
             return false;
         }
 
@@ -396,7 +432,7 @@ public class OpenAIService
         if (!prompt.IsNullOrEmpty())
         {
             prompt = chatApplication.Template.Replace("{{quote}}", prompt)
-                .Replace("{{question}}", content.content);
+                .Replace("{{question}}", content);
         }
 
         // 在这里需要获取源文件

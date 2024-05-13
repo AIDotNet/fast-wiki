@@ -245,6 +245,18 @@ app.MapPost("/v1/feishu/completions/{id}", FeishuService.Completions)
     .WithDescription("飞书对话接入处理")
     .WithOpenApi();
 
+app.MapGet("/api/v1/WeChatService/ReceiveMessage/{id}", WeChatService.ReceiveMessageAsync)
+    .WithTags("WeChat")
+    .WithGroupName("WeChat")
+    .WithDescription("微信消息验证")
+    .WithOpenApi();
+
+app.MapPost("/api/v1/WeChatService/ReceiveMessage/{id}", WeChatService.ReceiveMessageAsync)
+    .WithTags("WeChat")
+    .WithGroupName("WeChat")
+    .WithDescription("微信消息接收")
+    .WithOpenApi();
+
 app.MapGet("/api/v1/monaco", (async context =>
 {
     // 获取monaco目录下的所有文件
