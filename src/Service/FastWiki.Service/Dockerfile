@@ -21,16 +21,8 @@ ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./FastWiki.Service.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 
-FROM node:alpine as builder
-WORKDIR /src
-COPY ["web","."]
-RUN yarn
-RUN npm i
-RUN yarn run build
-
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY --from=builder /src/dist ./wwwroot
 ENTRYPOINT ["dotnet", "FastWiki.Service.dll"]
