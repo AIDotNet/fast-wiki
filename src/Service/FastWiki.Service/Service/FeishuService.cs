@@ -13,6 +13,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using FastWiki.Service.Contracts.OpenAI;
 using TokenApi.Service.Exceptions;
 
 namespace FastWiki.Service.Service;
@@ -79,13 +80,16 @@ public class FeishuService
             memoryCache.Set(eventId, true, TimeSpan.FromHours(1));
 
             var eventBus = context.RequestServices.GetRequiredService<IEventBus>();
+            var wikiMemoryService = context.RequestServices.GetRequiredService<WikiMemoryService>();
             var chatShareInfoQuery = new ChatShareInfoQuery(id);
 
             await eventBus.PublishAsync(chatShareInfoQuery);
 
-            var getApiKeyChatShareQuery = new GetAPIKeyChatShareQuery(string.Empty);
-            // 如果chatShareId不存在则返回让下面扣款
-            getApiKeyChatShareQuery.Result = chatShareInfoQuery.Result;
+            var getApiKeyChatShareQuery = new GetAPIKeyChatShareQuery(string.Empty)
+            {
+                // 如果chatShareId不存在则返回让下面扣款
+                Result = chatShareInfoQuery.Result
+            };
 
             var chatApplicationQuery = new ChatApplicationInfoQuery(chatShareInfoQuery.Result.ChatApplicationId);
 
@@ -116,24 +120,12 @@ public class FeishuService
                     return;
                 }
 
-
                 // 是文本消息，直接回复
                 var userInput = JsonSerializer.Deserialize<FeishuChatUserInput>(input._event.message.content);
 
-                var history = new ChatHistory();
-                history.AddUserMessage(userInput.text);
+                await ChatMessage(context, userInput.text, sessionId, chatApplication, chatShareInfoQuery,
+                    eventBus, wikiMemoryService);
 
-                var text = new StringBuilder();
-
-                await ChatMessageAsync(getApiKeyChatShareQuery, chatApplication, context, history, id,
-                    async x => { text.Append(x); });
-
-                await SendMessages(chatApplication, sessionId, text.ToString());
-
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    code = 0,
-                });
                 return;
             }
 
@@ -162,24 +154,15 @@ public class FeishuService
                     return;
                 }
 
-
                 // 是文本消息，直接回复
                 var userInput = JsonSerializer.Deserialize<FeishuChatUserInput>(input._event.message.content);
 
                 var history = new ChatHistory();
                 history.AddUserMessage(userInput.text);
 
-                var text = new StringBuilder();
+                await ChatMessage(context, userInput.text, sessionId, chatApplication, chatShareInfoQuery,
+                    eventBus, wikiMemoryService);
 
-                await ChatMessageAsync(getApiKeyChatShareQuery, chatApplication, context, history, id,
-                    async x => { text.Append(x); });
-
-                await SendMessages(chatApplication, chatId, text.ToString(), "chat_id");
-
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    code = 0,
-                });
                 return;
             }
         }
@@ -190,173 +173,145 @@ public class FeishuService
         });
     }
 
-
-    public static async Task ChatMessageAsync(GetAPIKeyChatShareQuery getAPIKeyChatShareQuery,
-        ChatApplicationDto chatApplication, HttpContext context,
-        ChatHistory history, string chatShareId,
-        Action<string> chatResponse)
+    public static async Task ChatMessage(HttpContext context, string content, string sessionId,
+        ChatApplicationDto chatApplication, ChatShareInfoQuery chatShareInfoQuery, IEventBus eventBus,
+        WikiMemoryService wikiMemoryService)
     {
-        var eventBus = context.RequestServices.GetRequiredService<IEventBus>();
+        int requestToken = 0;
+
+        var module = new ChatCompletionDto<ChatCompletionRequestMessage>()
+        {
+            messages =
+            [
+                new()
+                {
+                    content = content,
+                    role = "user",
+                }
+            ]
+        };
+
+        var chatHistory = new ChatHistory();
 
         // 如果设置了Prompt，则添加
         if (!chatApplication.Prompt.IsNullOrEmpty())
         {
-            history.AddSystemMessage(chatApplication.Prompt);
+            chatHistory.AddSystemMessage(chatApplication.Prompt);
         }
 
-
-        var content = history.Last();
-        var question = content.Content;
         // 保存对话提问
-        var createChatRecordCommand = new CreateChatRecordCommand(chatApplication.Id, question);
-        
+        var createChatRecordCommand =
+            new CreateChatRecordCommand(chatApplication.Id, content);
+
         await eventBus.PublishAsync(createChatRecordCommand);
 
-        var prompt = string.Empty;
-
         var sourceFile = new List<FileStorage>();
+        var memoryServerless = wikiMemoryService.CreateMemoryServerless(chatApplication.ChatModel);
+
         // 如果为空则不使用知识库
         if (chatApplication.WikiIds.Count != 0)
         {
-            var memoryServerless =
-                context.RequestServices.GetRequiredService<WikiMemoryService>().CreateMemoryServerless();
+            var success = await OpenAIService.WikiPrompt(chatApplication, memoryServerless,
+                content,
+                eventBus,
+                sourceFile, module);
 
-            var filters = chatApplication.WikiIds
-                .Select(chatApplication => new MemoryFilter().ByTag("wikiId", chatApplication.ToString())).ToList();
-
-            var result = await memoryServerless.SearchAsync(content.Content, "wiki", filters: filters, limit: 3,
-                minRelevance: chatApplication.Relevancy);
-
-            var fileIds = new List<long>();
-
-            result.Results.ForEach(x =>
+            if (!success)
             {
-                // 获取fileId
-                var fileId = x.Partitions.Select(x => x.Tags.FirstOrDefault(x => x.Key == "fileId"))
-                    .FirstOrDefault(x => !x.Value.IsNullOrEmpty())
-                    .Value.FirstOrDefault();
-
-                if (!fileId.IsNullOrWhiteSpace() && long.TryParse(fileId, out var id))
-                {
-                    fileIds.Add(id);
-                }
-
-                prompt += string.Join(Environment.NewLine, x.Partitions.Select(x => x.Text));
-            });
-
-            if (result.Results.Count == 0 &&
-                !string.IsNullOrWhiteSpace(chatApplication.NoReplyFoundTemplate))
-            {
-                await context.WriteEndAsync(chatApplication.NoReplyFoundTemplate);
                 return;
-            }
-
-            var tokens = TokenHelper.GetGptEncoding().Encode(prompt);
-
-            // 这里可以有效的防止token数量超出限制，但是也会降低回复的质量
-            prompt = TokenHelper.GetGptEncoding()
-                .Decode(tokens.Take(chatApplication.MaxResponseToken).ToList());
-
-            // 如果prompt不为空，则需要进行模板替换
-            if (!prompt.IsNullOrEmpty())
-            {
-                prompt = chatApplication.Template.Replace("{{quote}}", prompt)
-                    .Replace("{{question}}", content.Content);
-            }
-
-            // 在这里需要获取源文件
-            if (fileIds.Count > 0 && chatApplication.ShowSourceFile)
-            {
-                var fileQuery = new StorageInfosQuery(fileIds);
-
-                await eventBus.PublishAsync(fileQuery);
-
-                sourceFile.AddRange(fileQuery.Result);
-            }
-
-            if (!prompt.IsNullOrEmpty())
-            {
-                // 删除最后一个消息
-                history.RemoveAt(history.Count - 1);
-                history.AddUserMessage(prompt);
             }
         }
 
+        var output = new StringBuilder();
+
         // 添加用户输入，并且计算请求token数量
-        int requestToken = history.Where(x => !x.Content.IsNullOrEmpty()).Sum(x => TokenHelper.ComputeToken(x.Content));
+        module.messages.ForEach(x =>
+        {
+            if (x.content.IsNullOrEmpty()) return;
+            requestToken += TokenHelper.ComputeToken(x.content);
+
+            chatHistory.Add(new ChatMessageContent(new AuthorRole(x.role), x.content));
+        });
 
 
-        if (getAPIKeyChatShareQuery?.Result != null)
+        if (chatShareInfoQuery.Result != null)
         {
             // 如果token不足则返回，使用token和当前request总和大于可用token，则返回
-            if (getAPIKeyChatShareQuery.Result.AvailableToken != -1 &&
-                (getAPIKeyChatShareQuery.Result.UsedToken + requestToken) >=
-                getAPIKeyChatShareQuery.Result.AvailableToken)
+            if (chatShareInfoQuery.Result.AvailableToken != -1 &&
+                (chatShareInfoQuery.Result.UsedToken + requestToken) >=
+                chatShareInfoQuery.Result.AvailableToken)
             {
-                await context.WriteEndAsync("Token不足");
+                output.Append("Token不足");
                 return;
             }
 
             // 如果没有过期则继续
-            if (getAPIKeyChatShareQuery.Result.Expires != null &&
-                getAPIKeyChatShareQuery.Result.Expires < DateTimeOffset.Now)
+            if (chatShareInfoQuery.Result.Expires != null &&
+                chatShareInfoQuery.Result.Expires < DateTimeOffset.Now)
             {
-                await context.WriteEndAsync("Token已过期");
+                output.Append("Token已过期");
                 return;
             }
         }
 
-        var responseId = Guid.NewGuid().ToString("N");
-        var requestId = Guid.NewGuid().ToString("N");
-        var output = new StringBuilder();
+        // 是文本消息，直接回复
+        var userInput = JsonSerializer.Deserialize<FeishuChatUserInput>(content);
+
+        var history = new ChatHistory();
+        history.AddUserMessage(userInput.text);
+
+        var text = new StringBuilder();
+
         try
         {
-            var kernel = context.RequestServices.GetRequiredService<Kernel>();
-
-            var chat = kernel.GetRequiredService<IChatCompletionService>();
-
-            await foreach (var item in chat.GetStreamingChatMessageContentsAsync(history))
+            await foreach (var item in OpenAIService.SendChatMessageAsync(chatApplication, eventBus,
+                               wikiMemoryService,
+                               chatHistory))
             {
-                var message = item.Content;
-                if (string.IsNullOrEmpty(message))
+                if (string.IsNullOrEmpty(item))
                 {
                     continue;
                 }
 
-                output.Append(message);
+                output.Append(item);
+            }
 
-                chatResponse.Invoke(message);
+            //对于对话扣款
+            if (chatShareInfoQuery.Result != null)
+            {
+                var updateChatShareCommand = new DeductTokenCommand(chatShareInfoQuery.Result.Id,
+                    requestToken);
+
+                await eventBus.PublishAsync(updateChatShareCommand);
             }
         }
         catch (NotModelException notModelException)
         {
-            chatResponse.Invoke("未找到模型兼容：" + notModelException.Message);
-            return;
+            output.Clear();
+            output.Append(notModelException.Message);
         }
         catch (InvalidOperationException invalidOperationException)
         {
-            chatResponse.Invoke("对话异常：" + invalidOperationException.Message);
-            return;
+            output.Clear();
+            output.Append("对话异常:" + invalidOperationException.Message);
         }
         catch (ArgumentException argumentException)
         {
-            chatResponse.Invoke(argumentException.Message);
-            return;
+            output.Clear();
+            output.Append("对话异常:" + argumentException.Message);
         }
         catch (Exception e)
         {
-            chatResponse.Invoke("对话异常：" + e.Message);
-            return;
+            output.Clear();
+            output.Append("对话异常,请联系管理员");
         }
 
-        //对于对话扣款
-        if (getAPIKeyChatShareQuery?.Result != null)
+        await SendMessages(chatApplication, sessionId, text.ToString());
+
+        await context.Response.WriteAsJsonAsync(new
         {
-            var updateChatShareCommand = new DeductTokenCommand(getAPIKeyChatShareQuery.Result.Id,
-                requestToken);
-
-            await eventBus.PublishAsync(updateChatShareCommand);
-        }
+            code = 0,
+        });
     }
 
     private static readonly ConcurrentDictionary<string, DateTime> MemoryCache = new();

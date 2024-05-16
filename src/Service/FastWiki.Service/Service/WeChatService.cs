@@ -255,6 +255,8 @@ public class WeChatService
             return;
         }
 
+        string outputValue = string.Empty;
+
         var messageId = GetMessageId(output);
 
         // 从缓存中获取,如果有则返回
@@ -263,14 +265,12 @@ public class WeChatService
         // 如果value有值则，但是value为空，则返回提示,防止重复提问！
         if (value is string str && str.IsNullOrEmpty())
         {
-            context.Response.ContentType = "application/xml";
-            await context.Response.WriteAsync(GetOutputXml(output, "暂无消息，请稍后再试！code:no_message"));
+            await WriteMessageAsync(context, output, "暂无消息，请稍后再试！code:no_message");
             return;
         }
         else if (value is string v && !v.IsNullOrEmpty())
         {
-            context.Response.ContentType = "application/xml";
-            await context.Response.WriteAsync(GetOutputXml(output, v));
+            await WriteMessageAsync(context, output, v, messageId);
             return;
         }
 
@@ -278,14 +278,11 @@ public class WeChatService
         {
             if (value is string v && !v.IsNullOrEmpty())
             {
-                memoryCache.Remove(messageId);
-                context.Response.ContentType = "application/xml";
-                await context.Response.WriteAsync(GetOutputXml(output, v));
+                await WriteMessageAsync(context, output, v, messageId);
                 return;
             }
 
-            context.Response.ContentType = "application/xml";
-            await context.Response.WriteAsync(GetOutputXml(output, "暂无消息，请稍后再试！code:no_message"));
+            await WriteMessageAsync(context, output, "暂无消息，请稍后再试！code:no_message");
             return;
         }
 
@@ -298,14 +295,20 @@ public class WeChatService
         });
 
         // 等待4s
-        await Task.Delay(4500);
+        for (int i = 0; i < 9; i++)
+        {
+            await Task.Delay(510);
+            if (!memoryCache.TryGetValue(messageId, out outputValue) || outputValue.IsNullOrEmpty()) continue;
+
+            await WriteMessageAsync(context, output, outputValue, messageId);
+            return;
+        }
 
         // 尝试从缓存中获取
-        memoryCache.TryGetValue(messageId, out var outputTemplate);
-        if (outputTemplate is string outValue && !outValue.IsNullOrEmpty())
+        memoryCache.TryGetValue(messageId, out outputValue);
+        if (!outputValue.IsNullOrEmpty())
         {
-            context.Response.ContentType = "application/xml";
-            await context.Response.WriteAsync(GetOutputXml(output, outValue));
+            await WriteMessageAsync(context, output, outputValue, messageId);
             return;
         }
 
@@ -314,6 +317,17 @@ public class WeChatService
 
         // 写入缓存,5分钟过期
         memoryCache.Set(messageId, OutputTemplate, TimeSpan.FromMinutes(5));
+    }
+
+    public static async Task WriteMessageAsync(HttpContext context, WehCahtMe chatAi, string outputValue,
+        string? messageId = null)
+    {
+        context.Response.ContentType = "application/xml";
+        await context.Response.WriteAsync(GetOutputXml(chatAi, outputValue));
+        if (!messageId.IsNullOrWhiteSpace())
+        {
+            context.RequestServices.GetRequiredService<IMemoryCache>().Remove(messageId);
+        }
     }
 
     private static string GetMessageId(WehCahtMe output)

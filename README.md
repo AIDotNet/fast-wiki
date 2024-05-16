@@ -5,10 +5,10 @@
 
 ## 技术栈
 
-- 前端框架：react+lobeUI+ts
+- 前端框架：react+LobeChat+ts
 - 后端框架：MasaFramework 基于 .NET 8
 - 基于JS V8引擎实现动态Function
-- 向量搜索引擎：使用 PostgreSQL 的向量插件，优化搜索性能
+- 向量搜索引擎：使用 PostgreSQL 的向量插件，优化搜索性能也提供了DISK
 - 深度学习与NLP：微软Semantic Kernel，提升搜索的语义理解能力
 - 许可证：Apache-2.0，鼓励社区贡献和使用
 
@@ -21,6 +21,9 @@
 - 开源和社区驱动：采用Apache-2.0许可证，鼓励开发者和企业使用和贡献。
 - 强大的动态JS Function，并且提供Monaco更方便的智能代码提示。
 - 强大的QA问答拆分模式，让知识库回复更智能。
+- 快速接入飞书机器人
+- 快速接入微信公众号
+- 快速接入企业项目
 
 ## 快速开始
 
