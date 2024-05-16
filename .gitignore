@@ -9,6 +9,7 @@
 # User-specific files
 *.rsuser
 *.suo
+lobe-chat
 *.user
 *.userosscache
 *.sln.docstates

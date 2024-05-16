@@ -25,6 +25,9 @@ services:
   chat:
     image: registry.cn-shenzhen.aliyuncs.com/fast-wiki/chat
     restart: always
+    build: 
+      context: lobe-chat/
+      dockerfile: ./Dockerfile
     ports:
       - "3210:3210"
     environment:
