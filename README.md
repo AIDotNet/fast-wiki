@@ -1,100 +1,104 @@
 # FastWiki
-## 介绍
 
-本项目是一个高性能、基于最新技术栈的知识库系统，专为大规模信息检索和智能搜索设计。利用微软Semantic Kernel进行深度学习和自然语言处理，结合.NET 8与react框架，后台采用MasaFramework，实现了一个高效、易用、可扩展的智能向量搜索平台。我们的目标是提供一个能够理解和处理复杂查询的智能搜索解决方案，帮助用户快速准确地获取所需信息。
+-----
+Document Language: [English](README.md) | [简体中文](README-zh-cn.md)
 
-## 技术栈
+## Introduction
 
-- 前端框架：react+LobeChat+ts
-- 后端框架：MasaFramework 基于 .NET 8
-- 基于JS V8引擎实现动态Function
-- 向量搜索引擎：使用 PostgreSQL 的向量插件，优化搜索性能也提供了DISK
-- 深度学习与NLP：微软Semantic Kernel，提升搜索的语义理解能力
-- 许可证：Apache-2.0，鼓励社区贡献和使用
+This project is a high-performance knowledge base system based on the latest technology stack, designed for large-scale information retrieval and intelligent search. Leveraging Microsoft's Semantic Kernel for deep learning and natural language processing, combined with .NET 8 and React framework, with the backend using MasaFramework, it has implemented an efficient, user-friendly, and scalable intelligent vector search platform. Our goal is to provide an intelligent search solution that can understand and process complex queries, helping users quickly and accurately obtain the information they need.
 
-## 特点
+## Technology Stack
 
-- 智能搜索：借助Semantic Kernel的深度学习和自然语言处理技术，能够理解复杂查询，提供精准的搜索结果。
-- 高性能：通过pgsql的向量插件优化向量搜索性能，确保即使在大数据量下也能快速响应。
-- 现代化前端：使用react+lobeUI前端框架，提供响应式设计和用户友好的界面。
-- 强大的后端：基于最新的.NET 8和MasaFramework，确保了代码的高效性和可维护性。
-- 开源和社区驱动：采用Apache-2.0许可证，鼓励开发者和企业使用和贡献。
-- 强大的动态JS Function，并且提供Monaco更方便的智能代码提示。
-- 强大的QA问答拆分模式，让知识库回复更智能。
-- 快速接入飞书机器人
-- 快速接入微信公众号
-- 快速接入企业项目
+- Frontend Framework: React + LobeChat + TypeScript
+- Backend Framework: MasaFramework based on .NET 8
+- Implemented dynamic functions based on the JS V8 engine
+- Vector Search Engine: Utilizes PostgreSQL's vector plugin to optimize search performance and also provides DISK
+- Deep Learning and NLP: Microsoft's Semantic Kernel to enhance the semantic understanding capability of search
+- License: Apache-2.0, encouraging community contributions and usage
 
-## 快速开始
+## Features
 
-### 先决条件
+- Intelligent Search: Leveraging Semantic Kernel's deep learning and natural language processing technology to understand complex queries and provide precise search results.
+- High Performance: Optimizes vector search performance through pgsql's vector plugin, ensuring quick responses even with large amounts of data.
+- Modern Frontend: Utilizes the React + LobeUI frontend framework, offering responsive design and user-friendly interfaces.
+- Powerful Backend: Based on the latest .NET 8 and MasaFramework, ensuring code efficiency and maintainability.
+- Open Source and Community-Driven: Adopts the Apache-2.0 license, encouraging developers and enterprises to use and contribute.
+- Powerful dynamic JS Function and provides Monaco for convenient intelligent code suggestions.
+- Powerful QA question-answer split mode for more intelligent knowledge base responses.
+- Fast integration with Feishu bots.
+- Fast integration with WeChat Official Accounts.
+- Fast integration with enterprise projects.
 
-确保你已经安装了.NET 8 SDK和PostgreSQL数据库和PostgreSQL的vector插件，并且配置了相应的环境。
+## Quick Start
 
-## 前端
+### Prerequisites
 
-### 安装
+Ensure you have installed the .NET 8 SDK, PostgreSQL database, the PostgreSQL vector plugin, and have configured the corresponding environments.
 
-1. 克隆仓库：
+## Frontend
+
+### Installation
+
+1. Clone the repository:
 
 ```
-git clone  --recursive  https://github.com/AIDotNet/fast-wiki.git
+git clone --recursive https://github.com/AIDotNet/fast-wiki.git
 ```
 
-2. 安装好node.js，最新版本(https://nodejs.p2hp.com/)。
+2. Install node.js, the latest version (https://nodejs.p2hp.com/).
 
-3. 将web目录的package-lock.json文件和node_modules目录删除,
+3. Delete the package-lock.json file and node_modules directory in the web directory.
 
-4. 在web目录运行
+4. Run the following commands in the web directory:
 ```
 npm i
 npm run build
 ```
-5. 将web目录下的dist下的内容copy到"\fast-wiki\src\Service\FastWiki.Service\wwwroot" 目录下(如果wwwroot没有就创建个)
+5. Copy the contents under the dist directory in the web directory to the "\fast-wiki\src\Service\FastWiki.Service\wwwroot" directory (create one if wwwroot doesn't exist).
 
-## 后端
+## Backend
 
-1. 安装依赖项：
+1. Install dependencies:
 
-在项目根目录下执行：
+Execute the following in the project root directory:
 
 ```
 cd src/Service/FastWiki.Service
 dotnet restore
 ```
 
-2. 数据库配置：
+2. Database Configuration:
 
-确保你的PostgreSQL数据库运行正常，并且创建了必要的数据库。根据你的配置修改`appsettings.json`中的数据库连接字符串。
+Ensure your PostgreSQL database is running properly and has the necessary databases created. Modify the database connection string in `appsettings.json` according to your configuration.
 
-### 运行
+### Running
 
-在项目根目录下执行：
+Execute the following in the project root directory:
 
 ```
 dotnet run
 ```
 
-这将启动后端服务。访问http://localhost:5124/就可以看到前端的页面了
+This will start the backend service. Visit http://localhost:5124/ to see the frontend page.
 
-默认账号密码：admin Aa123456
+Default username and password: admin Aa123456
 
-## 环境变量参数
+## Environment Variables
 
-FastWikiService环境变量参数：
-- QUANTIZE_MAX_TASK：量化任务的最大并发数，默认为3
-- OPENAI_CHAT_ENDPOINT：OpenAI API的地址
-- OPENAI_CHAT_EMBEDDING_ENDPOINT： Embedding API的地址
-- OPENAI_CHAT_TOKEN： OpenAI API的Token
-- OPENAI_EMBEDDING_TOKEN: Embedding的Token, 默认为空，为空则使用对话的Token
+FastWikiService environment variables:
+- QUANTIZE_MAX_TASK: Maximum concurrency of quantization tasks, default is 3
+- OPENAI_CHAT_ENDPOINT: Address of the OpenAI API
+- OPENAI_CHAT_EMBEDDING_ENDPOINT: Address of the Embedding API
+- OPENAI_CHAT_TOKEN: Token for the OpenAI API
+- OPENAI_EMBEDDING_TOKEN: Token for Embedding, default is empty, if empty, the conversation Token is used
 
-## 技术交流
-![群聊二维码](img/wechat.png)
+## Technical Communication
+![Group Chat QR Code](img/wechat.png)
 
-## 贡献指南
+## Contribution Guidelines
 
-我们欢迎所有形式的贡献，无论是功能请求、bug报告、代码提交、文档或是其他类型的支持。请参阅`CONTRIBUTING.md`了解如何开始。
+We welcome all forms of contributions, whether it's feature requests, bug reports, code submissions, documentation, or any other type of support. Please refer to `CONTRIBUTING.md` to get started.
 
-## 许可证
+## License
 
-本项目采用Apache-2.0许可证。详情请见[LICENSE](LICENSE)文件。
+This project is licensed under Apache-2.0. See the [LICENSE](LICENSE) file for details.
