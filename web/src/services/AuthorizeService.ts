@@ -1,5 +1,4 @@
-import { post } from '../utils/fetch';
-import { config } from '../config';
+import { postJson } from '../utils/fetch';
 
 /**
  * 账号登录
@@ -7,6 +6,6 @@ import { config } from '../config';
  * @param password 
  * @returns 
  */
-export const login = (account: string, password: string) => {
-    return post(`/api/${config.VITE_VERSIONS}/Authorizes/Token?account=${account}&pass=${password}`);
+export const login = (data: any) => {
+    return postJson(`/api/v1/Authorizes/Token`, data);
 };

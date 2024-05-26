@@ -1,8 +1,6 @@
 import { postJson, get, del, putJson, post } from '../utils/fetch';
-import { config } from '../config';
-import { ChatApplicationDto, ChatDialogDto, PaginatedListBase } from '../models';
 
-const prefix = `/api/${config.VITE_VERSIONS}/ChatApplications`;
+const prefix = `/api/v1/ChatApplications`;
 
 /**
  * 创建聊天应用程序。
@@ -31,14 +29,14 @@ export function DeleteChatApplications(id: string) {
  * 通过ID获取聊天应用程序。
  * @param id - 聊天应用程序的ID。
  */
-export function GetChatApplications(id: string) : Promise<ChatApplicationDto> {
+export function GetChatApplications(id: string) : Promise<any> {
     return get(`${prefix}/${id}`);
 }
 
 /**
  * 获取聊天应用程序列表。
  */
-export function GetChatApplicationsList(page: number, pageSize: number) : Promise<PaginatedListBase<ChatApplicationDto>> {
+export function GetChatApplicationsList(page: number, pageSize: number) : Promise<any> {
     return get(`${prefix}/List?page=${page}&pageSize=${pageSize}`);
 }
 
@@ -179,7 +177,7 @@ export function PutShareDialog(data: any) {
  * @param chatId 
  * @returns 
  */
-export function GetSessionLogDialog(chatApplicationId: string, page: number, pageSize: number) : Promise<PaginatedListBase<ChatDialogDto>>{
+export function GetSessionLogDialog(chatApplicationId: string, page: number, pageSize: number) : Promise<any>{
     return get(`${prefix}/SessionLogDialog?chatApplicationId=${chatApplicationId}&page=${page}&pageSize=${pageSize}`);
 }
 
@@ -206,4 +204,20 @@ export function GetChatDialogHistoryInfo(historyId: string) {
  */
 export function PurageMessageHistory(dialogId:string){
     return post(`${prefix}/PurgeMessageHistory?dialogId=${dialogId}`);
+}
+
+export function CreateQuestions(data: any) {
+    return postJson(`${prefix}/Questions`, data);
+}
+
+export function GetQuestions(applicationId: string) {
+    return get(`${prefix}/Questions?applicationId=${applicationId}`);
+}
+
+export function RemoveQuestions(id:string){
+    return del(`${prefix}/Questions/${id}`);
+}
+
+export function SharedQuestions(id:string){
+    return get(`${prefix}/SharedQuestions?sharedId=${id}`);
 }

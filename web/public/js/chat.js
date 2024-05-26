@@ -1,7 +1,7 @@
 function embedChatbot() {
     const chatBtnId = 'fastwiki-chatbot-button';
     const chatWindowId = 'fastwiki-chatbot-window';
-    const script = document.getElementById('chatbot-iframe');
+    const script = document.getElementById('fastwiki-iframe');
     const botSrc = script?.getAttribute('data-bot-src');
     const defaultOpen = script?.getAttribute('data-default-open') === 'true';
     const canDrag = script?.getAttribute('data-drag') === 'true';

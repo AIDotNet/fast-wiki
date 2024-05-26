@@ -1,0 +1,49 @@
+{
+  "button": {
+    "import": "Import Configuration",
+    "market": "Visit Market",
+    "start": "Start Now"
+  },
+  "guide": {
+    "agents": {
+      "replaceBtn": "Replace Batch",
+      "title": "New Assistant Recommendations:"
+    },
+    "defaultMessage": "The FastWiki project is a high-performance, knowledge base system based on the latest technology stack, designed for large-scale information retrieval and intelligent search. It utilizes Microsoft's Semantic Kernel for deep learning and natural language processing, combined with the .NET 8 and MasaBlazor frontend framework, and the MasaFramework backend to create an efficient, user-friendly, and scalable intelligent vector search platform. \n\n Our goal is to provide an intelligent search solution that can understand and process complex queries, helping users quickly and accurately obtain the information they need. The project is licensed under Apache-2.0, allowing for complete commercial use without any copyright disputes.\n\n [Github](https://github.com/AIDotNet/fast-wiki)\n[Gitee](https://gitee.com/hejiale010426/fast-wiki) \n [Project Documentation](https://docs.token-ai.cn/) \n\n    The current AI has provided the Avalonia Chinese documentation knowledge base functionality!",
+    "qa": {
+      "q01": "What is AIDotNet?",
+      "q02": "What is FastWki?",
+      "q03": "Does FastWki have community support?",
+      "q04": "What functions does FastWki support?",
+      "q05": "How to deploy and use FastWki?",
+      "q06": "What is the pricing of FastWki?",
+      "q07": "Is there a paid version?",
+      "q08": "Is there a cloud service version?",
+      "q09": "Does FastWki support local language models?",
+      "q10": "Does FastWki support image recognition and generation?",
+      "q11": "Does FastWki support speech synthesis and speech recognition?",
+      "q12": "Does FastWki support a plugin system?",
+      "q13": "Is there a marketplace to obtain GPTs?",
+      "q14": "Does FastWki support multiple AI service providers?",
+      "q15": "What should I do if I encounter problems while using it?"
+    },
+    "questions": {
+      "moreBtn": "Learn More",
+      "title": "Frequently Asked Questions:"
+    },
+    "welcome": {
+      "afternoon": "Good Afternoon",
+      "morning": "Good Morning",
+      "night": "Good Evening",
+      "noon": "Good Noon"
+    }
+  },
+  "header": "Welcome",
+  "pickAgent": "Or choose from the following agent templates",
+  "skip": "Skip Creation",
+  "slogan": {
+    "desc1": "Turn on smarter Smart assistants for your projects.",
+    "desc2": "Create your first agent and let's get started~",
+    "title": "Unlock the superpower of your brain"
+  }
+}

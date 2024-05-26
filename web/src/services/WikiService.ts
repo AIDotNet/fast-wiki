@@ -1,9 +1,7 @@
 import { del, get, post, postJson, putJson } from '../utils/fetch';
 
-import { config } from '../config';
-import { PaginatedListBase, WikiDto, WikiQuantizationState } from '../models/index.d';
 
-const prefix = `/api/${config.VITE_VERSIONS}/Wikis`;
+const prefix = `/api/v1/Wikis`;
 
 
 /**
@@ -41,7 +39,7 @@ export function GetWikis(id: string) {
 /**
  * 获取Wiki列表。
  */
-export function GetWikisList(keyword: string, page: number, pageSize: number): Promise<PaginatedListBase<WikiDto>> {
+export function GetWikisList(keyword: string, page: number, pageSize: number): Promise<any> {
     return get(`${prefix}/WikiList?keyword=${keyword}&page=${page}&pageSize=${pageSize}`);
 }
 
@@ -55,7 +53,7 @@ export function CreateWikiDetails(data: any) {
 /**
  * 获取Wiki知识库详情列表
  */
-export function GetWikiDetailsList(wikiId: string, keyword: string, page: number, pageSize: number, state?: WikiQuantizationState | null) {
+export function GetWikiDetailsList(wikiId: string, keyword: string, page: number, pageSize: number, state?: any | null) {
     return get(`${prefix}/WikiDetails?wikiId=${wikiId}&page=${page}&pageSize=${pageSize}&keyword=${keyword}` + (state === null ? `` : "&state=" + state));
 }
 

@@ -1,9 +1,6 @@
 import { del, get, post, postJson, put } from '../utils/fetch';
 
-import { config } from '../config';
-import { RoleType } from '../models/index.d';
-
-const prefix = `/api/${config.VITE_VERSIONS}/Users`;
+const prefix = `/api/v1/Users`;
 
 
 /**
@@ -47,7 +44,7 @@ export const DisableUser = (id: string, disable: boolean) => {
  * 修改用户角色
  * @param id 用户id
  */
-export const UpdateUserRole = (id: string, role: RoleType) => {
+export const UpdateUserRole = (id: string, role: any) => {
     return put(`${prefix}/Role/${id}?role=${role}`, {})
 }
 
@@ -57,7 +54,13 @@ export const UpdateUserRole = (id: string, role: RoleType) => {
  * @returns 
  */
 export const Create = (data: any) => {
-    console.log('data', data);
-    
     return postJson(`${prefix}`, data)
+}
+
+/**
+ * 获取用户信息
+ * @returns
+ */
+export const GetUser = () => {
+    return get(`${prefix}`)
 }

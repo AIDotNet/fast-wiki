@@ -1,5 +1,105 @@
+import { t } from 'i18next';
+
+import { LOBE_CHAT_OBSERVATION_ID, LOBE_CHAT_TRACE_ID,FAST_API_URL } from '@/const/trace';
+import { ErrorResponse, ErrorType } from '@/types/fetch';
+import { ChatMessageError } from '@/types/message';
 import { message } from 'antd';
-import { config } from "../config";
+
+export const getMessageError = async (response: Response) => {
+  let chatMessageError: ChatMessageError;
+
+  // 尝试取一波业务错误语义
+  try {
+    const data = (await response.json()) as ErrorResponse;
+    chatMessageError = {
+      body: data.body,
+      message: t(`response.${data.errorType}` as any, { ns: 'error' }),
+      type: data.errorType,
+    };
+  } catch {
+    // 如果无法正常返回，说明是常规报错
+    chatMessageError = {
+      message: t(`response.${response.status}` as any, { ns: 'error' }),
+      type: response.status as ErrorType,
+    };
+  }
+
+  return chatMessageError;
+};
+
+type SSEFinishType = 'done' | 'error' | 'abort';
+
+export type OnFinishHandler = (
+  text: string,
+  context: {
+    observationId?: string | null;
+    traceId?: string | null;
+    type?: SSEFinishType;
+  },
+) => Promise<void>;
+
+export interface FetchSSEOptions {
+  onAbort?: (text: string) => Promise<void>;
+  onErrorHandle?: (error: ChatMessageError) => void;
+  onFinish?: OnFinishHandler;
+  onMessageHandle?: (text: string) => void;
+}
+
+/**
+ * Fetch data using stream method
+ */
+export const fetchSSE = async (fetchFn: () => Promise<Response>, options: FetchSSEOptions = {}) => {
+  const response = await fetchFn();
+
+  // 如果不 ok 说明有请求错误
+  if (!response.ok) {
+    const chatMessageError = await getMessageError(response);
+
+    options.onErrorHandle?.(chatMessageError);
+    return;
+  }
+
+  const returnRes = response.clone();
+
+  const data = response.body;
+
+  if (!data) return;
+  let output = '';
+  const reader = data.getReader();
+  const decoder = new TextDecoder();
+
+  let done = false;
+  let finishedType: SSEFinishType = 'done';
+
+  while (!done) {
+    try {
+      const { value, done: doneReading } = await reader.read();
+      done = doneReading;
+      const chunkValue = decoder.decode(value, { stream: true });
+
+      output += chunkValue;
+      options.onMessageHandle?.(chunkValue);
+    } catch (error) {
+      done = true;
+
+      if ((error as TypeError).name === 'AbortError') {
+        finishedType = 'abort';
+        options?.onAbort?.(output);
+      } else {
+        finishedType = 'error';
+        console.error(error);
+      }
+    }
+  }
+
+  const traceId = response.headers.get(LOBE_CHAT_TRACE_ID);
+  const observationId = response.headers.get(LOBE_CHAT_OBSERVATION_ID);
+  await options?.onFinish?.(output, { observationId, traceId, type: finishedType });
+
+  return returnRes;
+};
+
+
 
 export async function fetch(url: string, options: any) {
   const token = localStorage.getItem('token');
@@ -8,9 +108,7 @@ export async function fetch(url: string, options: any) {
     Authorization: `Bearer ${token}`
   };
   try {
-    // 拼接baseUrl并且处理/重复问题
-    const baseUrl = config.FAST_API_URL;
-    url = `${baseUrl}${url}`.replace(/([^:]\/)\/+/g, '$1');
+    url = `${FAST_API_URL}${url}`.replace(/([^:]\/)\/+/g, '$1');
     const response = await window.fetch(url, { ...options, headers });
     if (response.status >= 200 && response.status < 300) {
       const data = await response.text();
@@ -26,7 +124,8 @@ export async function fetch(url: string, options: any) {
 
     // 如果是401，跳转到登录页
     if (response.status === 401) {
-      window.location.href = '/login';
+      if (typeof window === 'undefined') return;
+      window.location.href = '/auth-login';
     }
 
     if (response.status === 400) {
@@ -62,8 +161,7 @@ export async function fetchRaw(url: string, data:any) {
   };
   try {
     // 拼接baseUrl并且处理/重复问题
-    const baseUrl = config.FAST_API_URL;
-    url = `${baseUrl}${url}`.replace(/([^:]\/)\/+/g, '$1');
+    url = `${FAST_API_URL}${url}`.replace(/([^:]\/)\/+/g, '$1');
     const response = await window.fetch(url, { 
       headers,
       method: 'POST',

@@ -1,8 +1,7 @@
 import { fetch } from '../utils/fetch';
 
-import { config } from '../config';
 
-const prefix = `/api/${config.VITE_VERSIONS}/Storages`;
+const prefix = `/api/v1/Storages`;
 
 /**
  * 上传文件

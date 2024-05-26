@@ -1,0 +1,49 @@
+{
+  "button": {
+    "import": "导入配置",
+    "market": "逛逛市场",
+    "start": "立即开始"
+  },
+  "guide": {
+    "agents": {
+      "replaceBtn": "换一批",
+      "title": "新增助理推荐："
+    },
+    "defaultMessage": "FastWiki本项目是一个高性能、基于最新技术栈的知识库系统，专为大规模信息检索和智能搜索设计。\n 利用微软Semantic Kernel进行深度学习和自然语言处理，结合.NET 8和`MasaBlazor`前端框架，后台采用`MasaFramework`，实现了一个高效、易用、可扩展的智能向量搜索平台。 \n 我们的目标是提供一个能够理解和处理复杂查询的智能搜索解决方案，帮助用户快速准确地获取所需信息。采用Apache-2.0，您也可以完全商用不会有任何版权纠纷\n [Github](https://github.com/AIDotNet/fast-wiki)\n [Gitee](https://gitee.com/hejiale010426/fast-wiki) \n [项目文档](https://docs.token-ai.cn/) \n\n当前AI提供了Avalonia中文文档知识库功能！",
+    "qa": {
+      "q01": "AIDotNet 是什么？",
+      "q02": "FastWki 是什么？",
+      "q03": "FastWki 是否有社区支持？",
+      "q04": "FastWki 支持哪些功能？",
+      "q05": "FastWki 如何部署和使用？",
+      "q06": "FastWki 的定价是如何的？",
+      "q07": "FastWki 是否免费?",
+      "q08": "是否有收费版本？",
+      "q09": "是否支持本地语言模型?",
+      "q10": "是否支持图像识别和生成?",
+      "q11": "是否支持语音合成和语音识别？",
+      "q12": "是否支持插件系统？",
+      "q13": "是否有自己的市场来获取 GPTs？",
+      "q14": "是否支持多种 AI 服务提供商？",
+      "q15": "我在使用时遇到问题应该怎么办？"
+    },
+    "questions": {
+      "moreBtn": "了解更多",
+      "title": "大家都在问："
+    },
+    "welcome": {
+      "afternoon": "下午好",
+      "morning": "早上好",
+      "night": "晚上好",
+      "noon": "中午好"
+    }
+  },
+  "header": "欢迎使用",
+  "pickAgent": "或从下列助手模板选择",
+  "skip": "跳过创建",
+  "slogan": {
+    "desc1": "为您的项目开启更智能的智能助手。",
+    "desc2": "创建你的第一个助手，让我们开始吧~",
+    "title": "给自己一个更聪明的大脑"
+  }
+}
