@@ -26,7 +26,7 @@ else
 {
     logger = new LoggerConfiguration()
         .MinimumLevel.Information()
-`        .WriteTo.Console()
+        .WriteTo.Console()
         .Enrich.FromLogContext()
         .Enrich.WithProperty("Application", "FastWiki")
         .CreateLogger();
