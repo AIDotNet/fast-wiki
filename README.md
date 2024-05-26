@@ -6,10 +6,6 @@
 
 FastWiki打造企业级人工智能客服管理系统！
 
-[![][npm-release-shield]][npm-release-link]
-[![][github-releasedate-shield]][github-releasedate-link]
-[![][github-action-test-shield]][github-action-test-link]
-[![][github-action-release-shield]][github-action-release-link]<br/>
 [![][github-contributors-shield]][github-contributors-link]
 [![][github-forks-shield]][github-forks-link]
 [![][github-stars-shield]][github-stars-link]
@@ -21,25 +17,6 @@ FastWiki打造企业级人工智能客服管理系统！
 ![](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 </div>
-
-[npm-release-shield]: https://img.shields.io/npm/v/@lobehub/chat?color=369eff&labelColor=ffcb47&logo=npm&logoColor=white&style=flat-square
-[npm-release-link]: https://www.npmjs.com/package/@lobehub/chat
-[github-releasedate-shield]: https://img.shields.io/github/release-date/AIDotNet/fast-wiki?color=8ae8ff&labelColor=ffcb47&style=flat-square
-[github-releasedate-link]: https://github.com/AIDotNet/fast-wiki/releases
-[github-action-test-shield]: https://img.shields.io/github/actions/workflow/status/AIDotNet/fast-wiki/test.yml?color=8ae8ff&label=test&labelColor=ffcb47&logo=githubactions&logoColor=white&style=flat-square
-[github-action-test-link]: https://github.com/AIDotNet/fast-wiki/actions/workflows/test.yml
-[github-action-release-shield]: https://img.shields.io/github/actions/workflow/status/AIDotNet/fast-wiki/release.yml?color=8ae8ff&label=release&labelColor=ffcb47&logo=githubactions&logoColor=white&style=flat-square
-[github-action-release-link]: https://github.com/AIDotNet/fast-wiki/actions/workflows/release.yml
-[github-contributors-shield]: https://img.shields.io/github/contributors/AIDotNet/fast-wiki?color=c4f042&labelColor=ffcb47&style=flat-square
-[github-contributors-link]: https://github.com/AIDotNet/fast-wiki/graphs/contributors
-[github-forks-shield]: https://img.shields.io/github/forks/AIDotNet/fast-wiki?color=8ae8ff&labelColor=ffcb47&style=flat-square
-[github-forks-link]: https://github.com/AIDotNet/fast-wiki/network/members
-[github-stars-shield]: https://img.shields.io/github/stars/AIDotNet/fast-wiki?color=ffcb47&labelColor=ffcb47&style=flat-square
-[github-stars-link]: https://github.com/AIDotNet/fast-wiki/network/stargazers
-[github-issues-shield]: https://img.shields.io/github/issues/AIDotNet/fast-wiki?color=ff80eb&labelColor=ffcb47&style=flat-square
-[github-issues-link]: https://github.com/AIDotNet/fast-wiki/issues
-[github-license-shield]: https://img.shields.io/github/license/AIDotNet/fast-wiki?color=white&labelColor=ffcb47&style=flat-square
-[github-license-link]: https://github.com/AIDotNet/fast-wiki/blob/main/LICENSE
 
 # FastWiki
 
