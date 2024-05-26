@@ -34,13 +34,13 @@ public sealed class WikiMemoryService : ISingletonDependency
         int overlappingTokens,
         string? chatModel, string? embeddingModel)
     {
-        if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
+        if (ConnectionStringsOptions.WikiType.Equals("disk", StringComparison.OrdinalIgnoreCase))
         {
             var memory = new KernelMemoryBuilder()
                 .WithSimpleVectorDb(new SimpleVectorDbConfig
                 {
                     StorageType = FileSystemTypes.Disk,
-                    Directory = "./data"
+                    Directory = ConnectionStringsOptions.WikiConnection
                 })
                 .WithSearchClientConfig(searchClientConfig)
                 .WithCustomTextPartitioningOptions(new TextPartitioningOptions()
@@ -56,7 +56,6 @@ public sealed class WikiMemoryService : ISingletonDependency
                 }, null, new HttpClient(HttpClientHandler))
                 .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
                 {
-                    // 如果 EmbeddingToken 为空，则使用 ChatToken
                     APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
                         ? OpenAIOption.ChatToken
                         : OpenAIOption.EmbeddingToken,
@@ -72,7 +71,7 @@ public sealed class WikiMemoryService : ISingletonDependency
             var memory = new KernelMemoryBuilder()
                 .WithPostgresMemoryDb(new PostgresConfig()
                 {
-                    ConnectionString = ConnectionStringsOptions.DefaultConnection,
+                    ConnectionString = ConnectionStringsOptions.WikiConnection,
                     TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
                 })
                 .WithSimpleFileStorage(new SimpleFileStorageConfig
@@ -119,7 +118,7 @@ public sealed class WikiMemoryService : ISingletonDependency
                 .WithSimpleVectorDb(new SimpleVectorDbConfig
                 {
                     StorageType = FileSystemTypes.Disk,
-                    Directory = "./data"
+                    Directory = ConnectionStringsOptions.WikiConnection
                 })
                 .WithOpenAITextGeneration(new OpenAIConfig()
                 {
@@ -141,7 +140,7 @@ public sealed class WikiMemoryService : ISingletonDependency
             return new KernelMemoryBuilder()
                 .WithPostgresMemoryDb(new PostgresConfig()
                 {
-                    ConnectionString = ConnectionStringsOptions.DefaultConnection,
+                    ConnectionString = ConnectionStringsOptions.WikiConnection,
                     TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
                 })
                 .WithOpenAITextGeneration(new OpenAIConfig()

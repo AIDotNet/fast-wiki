@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution items", "solution 
 		.dockerignore = .dockerignore
 		.gitignore = .gitignore
 		NuGet.config = NuGet.config
+		README-zh-cn.md = README-zh-cn.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{789CE025-90BF-4A37-B13A-9E6CFE9F7F4C}"

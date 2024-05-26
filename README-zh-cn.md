@@ -91,6 +91,10 @@ FastWikiService环境变量参数：
 - OPENAI_CHAT_EMBEDDING_ENDPOINT： Embedding API的地址
 - OPENAI_CHAT_TOKEN： OpenAI API的Token
 - OPENAI_EMBEDDING_TOKEN: Embedding的Token, 默认为空，为空则使用对话的Token
+- DEFAULT_TYPE：业务数据库类型 默认sqlite|[pgsql|postgres]
+- DEFAULT_CONNECTION：业务数据库连接字符串
+- WIKI_TYPE: wiki数据库类型 默认disk|[pgsql|postgres]
+- WIKI_CONNECTION: wiki数据库连接字符串(如果是disk则是目录)
 
 ## 技术交流
 ![群聊二维码](img/wechat.png)

@@ -6,34 +6,11 @@ using Masa.Contrib.Authentication.Identity;
 using Microsoft.AspNetCore.StaticFiles;
 using Serilog;
 using Serilog.Core;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
 
 var builder = WebApplication.CreateBuilder(args);
-
-// TODO: 由于引用Serilog导致数据库存储失败，暂时注释掉
-
-// "Serilog": {
-//     "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.File" ],
-//     "MinimumLevel": "Debug",
-//     "WriteTo": [
-//     { "Name": "Console" },
-//     {
-//         "Name": "File",
-//         "Args": {
-//             "path": "logs/log-.txt",
-//             "rollingInterval": "Day",
-//             "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog"
-//         }
-//     }
-//     ],
-//     "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
-//     "Properties": {
-//         "Application": "Sample"
-//     }
-// } 转换成代码
 
 Logger logger;
 if (builder.Environment.IsDevelopment())
@@ -48,8 +25,8 @@ if (builder.Environment.IsDevelopment())
 else
 {
     logger = new LoggerConfiguration()
-        .MinimumLevel.Warning()
-        .WriteTo.Console()
+        .MinimumLevel.Information()
+`        .WriteTo.Console()
         .Enrich.FromLogContext()
         .Enrich.WithProperty("Application", "FastWiki")
         .CreateLogger();
@@ -72,23 +49,19 @@ builder
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimit"));
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
-if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
+
+if (ConnectionStringsOptions.DefaultType == "sqlite")
 {
     builder.Services.AddMasaDbContext<SqliteContext>(opt =>
     {
-        // 兼容多数据库
-        if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
-        {
-            // 创建目录data
-            if (!Directory.Exists("./data"))
-                Directory.CreateDirectory("./data");
-
-            opt.UseSqlite("Data Source=./data/wiki.db");
-        }
-        else
-        {
-            opt.UseNpgsql();
-        }
+        opt.UseSqlite(ConnectionStringsOptions.DefaultConnection);
+    });
+}
+else
+{
+    builder.Services.AddMasaDbContext<WikiDbContext>(opt =>
+    {
+        opt.UseNpgsql(ConnectionStringsOptions.DefaultConnection);
     });
 }
 
@@ -270,6 +243,7 @@ app.MapGet("/api/v1/monaco", (async context =>
         var content = await File.ReadAllTextAsync(file);
         dic.Add(info.Name, content);
     }
+
     await context.Response.WriteAsJsonAsync(dic);
 }));
 
@@ -282,7 +256,7 @@ if (app.Environment.IsDevelopment())
 
 #region MigrationDb
 
-if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
+if (ConnectionStringsOptions.DefaultType == "sqlite")
 {
     await using var context = app.Services.CreateScope().ServiceProvider.GetService<SqliteContext>();
     {

@@ -91,6 +91,10 @@ FastWikiService environment variables:
 - OPENAI_CHAT_EMBEDDING_ENDPOINT: Address of the Embedding API
 - OPENAI_CHAT_TOKEN: Token for the OpenAI API
 - OPENAI_EMBEDDING_TOKEN: Token for Embedding, default is empty, if empty, the conversation Token is used
+- DEFAULT_TYPE: Business database type default sqlite|[pgsql|postgres]
+- DEFAULT_CONNECTION: Business database connection string
+- WIKI_TYPE: Wiki database type default disk|[pgsql|postgres]
+- WIKI_CONNECTION: Wiki database connection string (if disk, it should be a directory)
 
 ## Technical Communication
 ![Group Chat QR Code](img/wechat.png)

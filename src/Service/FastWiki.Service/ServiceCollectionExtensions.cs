@@ -49,6 +49,11 @@ public static class ServiceCollectionExtensions
         var OPENAI_CHAT_TOKEN = Environment.GetEnvironmentVariable("OPENAI_CHAT_TOKEN");
         var OPENAI_EMBEDDING_MODEL = Environment.GetEnvironmentVariable("OPENAI_EMBEDDING_MODEL");
         var OPENAI_EMBEDDING_TOKEN = Environment.GetEnvironmentVariable("OPENAI_EMBEDDING_TOKEN");
+        var DEFAULT_TYPE = Environment.GetEnvironmentVariable("DEFAULT_TYPE");
+        var DEFAULT_CONNECTION = Environment.GetEnvironmentVariable("DEFAULT_CONNECTION");
+        var WIKI_TYPE = Environment.GetEnvironmentVariable("WIKI_TYPE");
+        var WIKI_CONNECTION = Environment.GetEnvironmentVariable("WIKI_CONNECTION");
+
 
         if (!OPENAI_CHAT_ENDPOINT.IsNullOrWhiteSpace())
         {
@@ -73,6 +78,26 @@ public static class ServiceCollectionExtensions
         if (!OPENAI_EMBEDDING_TOKEN.IsNullOrWhiteSpace())
         {
             OpenAIOption.EmbeddingToken = OPENAI_EMBEDDING_TOKEN;
+        }
+
+        if (!DEFAULT_TYPE.IsNullOrWhiteSpace())
+        {
+            ConnectionStringsOptions.DefaultType = DEFAULT_TYPE;
+        }
+
+        if (!DEFAULT_CONNECTION.IsNullOrWhiteSpace())
+        {
+            ConnectionStringsOptions.DefaultConnection = DEFAULT_CONNECTION;
+        }
+
+        if (!WIKI_TYPE.IsNullOrWhiteSpace())
+        {
+            ConnectionStringsOptions.WikiType = WIKI_TYPE;
+        }
+
+        if (!WIKI_CONNECTION.IsNullOrWhiteSpace())
+        {
+            ConnectionStringsOptions.WikiConnection = WIKI_CONNECTION;
         }
     }
 }
