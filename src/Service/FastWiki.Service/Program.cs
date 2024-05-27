@@ -127,18 +127,13 @@ builder.Services.AddInMemoryRateLimiting()
     })
     .AddMasaDbContext<WikiDbContext>(opt =>
     {
-        // 兼容多数据库
-        if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
+        if (ConnectionStringsOptions.DefaultType == "sqlite")
         {
-            // 创建目录data
-            if (!Directory.Exists("./data"))
-                Directory.CreateDirectory("./data");
-
-            opt.UseSqlite("Data Source=./data/wiki.db");
+            opt.UseSqlite(ConnectionStringsOptions.DefaultConnection);
         }
         else
         {
-            opt.UseNpgsql();
+            opt.UseNpgsql(ConnectionStringsOptions.DefaultConnection);
         }
     })
     .AddDomainEventBus(dispatcherOptions =>

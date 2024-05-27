@@ -67,7 +67,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="data\" />
       <Folder Include="Migrations\" />
+      <Folder Include="Migrations\PostgreSQL\" />
+      <Folder Include="Migrations\Sqlite\" />
     </ItemGroup>
 </Project>
