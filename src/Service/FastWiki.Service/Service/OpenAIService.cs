@@ -1,9 +1,7 @@
 using System.Text;
 using System.Text.Json;
-using AIDotNet.Abstractions.Dto;
 using Azure.AI.OpenAI;
 using FastWiki.Service.Application.Function.Queries;
-using FastWiki.Service.Application.Storage;
 using FastWiki.Service.Application.Storage.Queries;
 using FastWiki.Service.Contracts.OpenAI;
 using FastWiki.Service.Domain.Storage.Aggregates;

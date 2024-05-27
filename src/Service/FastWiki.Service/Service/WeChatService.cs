@@ -30,7 +30,7 @@ public class WeChatService
         """
         您好，欢迎关注FastWiki！
         由于微信限制，我们无法立即回复您的消息，但是您的消息已经收到，我们会尽快回复您！
-        如果获取消息结果，请输入1。
+        如果获取消息结果，请输入继续。
         如果您有其他问题，可以直接回复，我们会尽快回复您！
         """;
 
@@ -274,7 +274,7 @@ public class WeChatService
             return;
         }
 
-        if (output.Content == "1")
+        if (output.Content == "继续")
         {
             if (value is string v && !v.IsNullOrEmpty())
             {
