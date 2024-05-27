@@ -23,10 +23,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
   
   chat:
-    image: registry.cn-shenzhen.aliyuncs.com/fast-wiki/chat
+    image: hejiale010426/fast-wiki-chat
     restart: always
     build: 
-      context: lobe-chat/
+      context: web/
       dockerfile: ./Dockerfile
     ports:
       - "3210:3210"
