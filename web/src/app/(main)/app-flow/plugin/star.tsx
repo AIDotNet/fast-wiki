@@ -6,7 +6,6 @@ import styled from 'styled-components';
 const Container = styled(Card)`
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
-    background: white;
 `;
 
 const PTag = styled(Tag)`

@@ -1,12 +1,13 @@
-import { Card, Divider, Select, Tag } from 'antd';
-import { useCallback } from 'react';
-import { Handle, Position } from 'reactflow';
+import { GetWikisList } from '@/services/WikiService';
+import { Input } from '@lobehub/ui';
+import { Card, Divider, InputNumber, Select, Slider, Tag } from 'antd';
+import { useCallback, useEffect, useState } from 'react';
+import { Handle, NodeResizer, Position } from 'reactflow';
 import styled from 'styled-components';
 
 const Container = styled(Card)`
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
-    background: white;
 `;
 
 const PTag = styled(Tag)`
@@ -26,6 +27,21 @@ interface StarProps {
 
 export default function WikiSearch({ data }: StarProps) {
 
+    const [wiki, setWiki] = useState([] as any[]);
+
+    function loadingWiki() {
+        GetWikisList('', 1, 1000)
+            .then((wiki) => {
+                setWiki(wiki.result);
+                console.log(wiki.result);
+
+            });
+    }
+
+    useEffect(() => {
+        loadingWiki();
+    }, []);
+
     const onChange = useCallback((evt) => {
         console.log(evt.target.value);
     }, []);
@@ -34,6 +50,8 @@ export default function WikiSearch({ data }: StarProps) {
         <Container
             title="知识库搜索"
             bordered={false}>
+            <NodeResizer minWidth={100} minHeight={30} />
+            <Handle type="target" position={Position.Top} />
             <div style={{
                 fontSize: 10,
                 marginBottom: 8,
@@ -45,28 +63,41 @@ export default function WikiSearch({ data }: StarProps) {
             <div>
                 <Select
                     mode="multiple"
-                    allowClear
                     style={{
                         width: '100%',
-                        marginTop: 20,
-                        marginBottom: 20
+                        marginTop: 8,
+                        marginBottom: 8
                     }}
                     placeholder="绑定知识库"
-                    defaultValue={application.wikiIds}
-                    value={application.wikiIds}
+                    defaultValue={data?.application?.wikiIds}
+                    value={data?.application?.wikiIds}
                     onChange={(v: any) => {
-                        setApplication({
-                            ...application,
-                            wikiIds: v
-                        });
+                        data.application.wikiIds = v;
+                        data.onApplication(data.application);
                     }}
-                    options={wiki.map((item) => {
+                    options={wiki?.map((item) => {
                         return {
                             label: item.name,
                             value: item.id
                         }
                     })}
                 />
+                <Card title='搜索参数设置'>
+                    <span style={{
+                        marginRight: 8
+                    }}>向量匹配相似</span>
+                    <InputNumber
+                        style={{
+                            width: '100%'
+                        }}
+                        min={0}
+                        max={1}
+                        onChange={(v) => {
+                            data.application.relevancy = v;
+                            data.onApplication(data.application);
+                        }}
+                        value={data?.application.relevancy} />
+                </Card>
             </div>
             <Handle type="source" position={Position.Bottom} />
         </Container>

@@ -5,7 +5,6 @@ import { Input } from "@lobehub/ui";
 import { FunctionCallSelect } from "@/services/FunctionService";
 import { GetWikisList } from "@/services/WikiService";
 import { PutChatApplications } from "@/services/ChatApplicationService";
-import { set } from "lodash";
 import { getModels } from "@/utils/model";
 
 interface IAppDetailInfoProps {
@@ -15,12 +14,11 @@ interface IAppDetailInfoProps {
 const Container = styled.div`
     display: grid;
     padding: 20px; 
-    /* 屏幕居中显示 */
     margin: auto;
     width: 580px;
-    overflow: auto;
-    height: 100%;
 
+    overflow: auto;
+    height: calc(100vh - 50px);
     // 隐藏滚动条
     &::-webkit-scrollbar {
         display: none;

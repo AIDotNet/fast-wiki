@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from 'react';
 import AppDetailInfo from './feautres/AppDetailInfo';
-import { Button } from 'antd';
+import { Button, Tabs } from 'antd';
 
 import styled from 'styled-components';
 import ReleaseApplication from './feautres/ReleaseApplication';
@@ -29,7 +29,7 @@ export default function AppDetail() {
 
     const [tabs, setTabs] = useState([] as any[]);
 
-    const [tab, setTab] = useState() as any;
+    const [tab, setTab] = useState(1) as any;
 
     useEffect(() => {
         if (id) {
@@ -53,16 +53,22 @@ export default function AppDetail() {
     function loadingTabs() {
         const tabs = [{
             key: 1,
-            label: '应用配置'
+            label: '应用配置',
+            children: <AppDetailInfo value={application} />
         }, {
             key: 2,
-            label: '管理提问'
+            label: '管理提问',
+            children: <Questions id={application.id} />
         }, {
             key: 3,
-            label: '发布应用'
-        }];
+            label: '发布应用',
+            children: <ReleaseApplication id={application.id} />
+        },{
+            key: 4,
+            label: '高级编排'
+        }] ;
 
-        changeTab(tabs[0]);
+        changeTab(tabs[0].key);
 
         //强制刷新
         setTabs([...tabs]);
@@ -70,38 +76,24 @@ export default function AppDetail() {
 
     function changeTab(key: any) {
         setTab(key);
+        if(key === 4){
+            location.href = '/app-flow?id=' + application.id;
+        }
     }
 
     return (
-        <>
-            <div style={{ display: 'flex' }}>
-                <LeftTabs>
-                    {tabs.map((item, index) => {
-                        return <Button key={index} onClick={() => {
-                            changeTab(item);
-                        }} type={tab?.key === item.key ? 'default' : 'text'} style={{
-                            marginBottom: 16,
-                            width: '100%'
-                        }} size='large'>{item.label}</Button>
-                    })}
-                </LeftTabs>
-            </div>
-            <div style={{
+        <Tabs
+            style={{
                 width: '100%',
-                padding: 20
-
-            }}>
-                {
-                    tab?.key === 1 && <AppDetailInfo value={application} />
-                }
-                {
-                    tab?.key === 2 && <Questions id={application.id} ></Questions>
-                }
-                {
-                    tab?.key === 3 && <ReleaseApplication id={application.id} />
-                }
-            </div>
-        </>
+                height: '100%',
+                margin: '8px',
+                overflowY: 'hidden',
+            }}
+            tabPosition={'left'}
+            activeKey={tab}
+            onChange={(key) => changeTab(key)}
+            items={tabs}
+        />
     );
 
 }
