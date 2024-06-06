@@ -1,6 +1,4 @@
 "use client"
-
-
 import ReactFlow, {
     Controls,
     applyNodeChanges,
@@ -11,7 +9,7 @@ import ReactFlow, {
     Panel,
 } from 'reactflow';
 import './index.css'
-import { Button, Card, Drawer, List, message } from 'antd'
+import { Button, Card, Drawer,  message } from 'antd'
 import { useState, useCallback, useEffect } from 'react';
 import 'reactflow/dist/style.css';
 import nodeTypes, { getList } from './plugin';

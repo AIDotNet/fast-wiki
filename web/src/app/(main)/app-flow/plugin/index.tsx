@@ -1,12 +1,15 @@
 
-import { l } from "node_modules/nuqs/dist/serializer-C_l8WgvO";
 import AIChat from "./ai-chat";
 import Star from "./star";
 import WikiSearch from "./wiki-search";
+import FunctionCall from "./function-call";
+import HttpRequest from "./httpRequest";
 const nodeTypes = {
     star: Star,
     wikiSearch: WikiSearch,
-    aiChat: AIChat
+    aiChat: AIChat,
+    functionCall: FunctionCall,
+    httpRequest: HttpRequest
 }
 export default nodeTypes;
 
@@ -35,15 +38,15 @@ function getList() {
                 {
                     label: "工具调用",
                     type: "functionCall"
-                }, 
+                },
                 {
-                    label:"文本提取",
+                    label: "文本提取",
                     type: "textExtract"
                 }
             ]
         },
         {
-            label:"外部调用",
+            label: "外部调用",
             children: [
                 {
                     label: "HTTP 请求",

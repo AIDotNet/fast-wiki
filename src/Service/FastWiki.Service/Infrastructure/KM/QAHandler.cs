@@ -1,10 +1,11 @@
-﻿using FastWiki.Service.Backgrounds;
+﻿using System.Security.Cryptography;
+using System.Text;
+using FastWiki.Service.Backgrounds;
 using FastWiki.Service.Service;
 using Microsoft.KernelMemory.AI.OpenAI;
 using Microsoft.KernelMemory.Configuration;
 using Microsoft.KernelMemory.DataFormats.Text;
 using Microsoft.KernelMemory.Diagnostics;
-using Microsoft.KernelMemory.Extensions;
 using Microsoft.KernelMemory.Pipeline;
 
 namespace FastWiki.Service.Infrastructure.KM;
@@ -18,6 +19,7 @@ public class QAHandler : IPipelineStepHandler
     private readonly IPipelineOrchestrator _orchestrator;
     private readonly WikiMemoryService _wikiMemoryService;
     private readonly ILogger<QAHandler> _log;
+#pragma warning disable KMEXP00 // by design
     private readonly TextChunker.TokenCounter _tokenCounter;
 
     /// </inheritdoc>
@@ -150,7 +152,7 @@ public class QAHandler : IPipelineStepHandler
                         PartitionNumber = partitionNumber,
                         SectionNumber = sectionNumber,
                         Tags = pipeline.Tags,
-                        ContentSHA256 = textData.CalculateSHA256(),
+                        ContentSHA256 = ComputeSha256Hash(text),
                     };
                     newFiles.Add(destFile, destFileDetails);
                     destFileDetails.MarkProcessedBy(this);
@@ -167,5 +169,24 @@ public class QAHandler : IPipelineStepHandler
         }
 
         return (true, pipeline);
+    }
+    
+    
+    static string ComputeSha256Hash(string rawData)
+    {
+        // Create a SHA256   
+        using (SHA256 sha256Hash = SHA256.Create())
+        {
+            // ComputeHash - returns byte array  
+            byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
+
+            // Convert byte array to a string   
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                builder.Append(bytes[i].ToString("x2"));
+            }
+            return builder.ToString();
+        }
     }
 }

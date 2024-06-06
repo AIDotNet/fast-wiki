@@ -101,26 +101,6 @@ export default function WikiInfo(props: IWikiInfoProps) {
                     options={model}
                 />
             </ListItem>
-            <ListItem>
-                <Tooltip title="用于将内容量化的模型" trigger='hover'>
-                    <span style={{
-                        fontSize: 20,
-                        marginRight: 20
-                    }}>嵌入模型</span>
-                </Tooltip>
-                <AutoComplete
-                    defaultValue={wikiInfo.embeddingModel}
-                    value={wikiInfo.embeddingModel}
-                    style={{ width: 380 }}
-                    onChange={(v) => {
-                        setWikiInfo({
-                            ...wikiInfo,
-                            embeddingModel: v
-                        });
-                    }}
-                    options={embeddingModel}
-                />
-            </ListItem>
             <Button onClick={() => saveWiki()}>保存修改</Button>
         </Container>
     )

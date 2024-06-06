@@ -1,10 +1,9 @@
 using FastWiki.FunctionCall;
 using FastWiki.Service.Domain.Function.Aggregates;
 using Microsoft.KernelMemory.Configuration;
-using Microsoft.KernelMemory.ContentStorage.DevTools;
+using Microsoft.KernelMemory.DocumentStorage.DevTools;
 using Microsoft.KernelMemory.FileSystem.DevTools;
 using Microsoft.KernelMemory.MemoryStorage.DevTools;
-using Microsoft.KernelMemory.Postgres;
 using Microsoft.SemanticKernel;
 
 namespace FastWiki.Service.Service;
