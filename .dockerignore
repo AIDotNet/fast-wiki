@@ -21,6 +21,7 @@
 **/npm-debug.log
 **/obj
 **/secrets.dev.yaml
+**/node_modules
 **/values.dev.yaml
 LICENSE
 README.md
@@ -32,5 +33,5 @@ README.md
 **/disk
 **/.idea
 **/postgresql
-lobe-chat
-lobe-chat
+**/.next
+

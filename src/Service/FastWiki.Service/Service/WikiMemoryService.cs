@@ -111,7 +111,7 @@ public sealed class WikiMemoryService : ISingletonDependency
     /// <returns></returns>
     public MemoryServerless CreateMemoryServerless(string? model = null)
     {
-        if (ConnectionStringsOptions.DefaultConnection.IsNullOrEmpty())
+        if (ConnectionStringsOptions.WikiType == "disk")
         {
             return new KernelMemoryBuilder()
                 .WithSimpleVectorDb(new SimpleVectorDbConfig

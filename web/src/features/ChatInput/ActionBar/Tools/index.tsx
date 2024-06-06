@@ -1,7 +1,6 @@
 import { ActionIcon, Avatar, Icon } from '@lobehub/ui';
 import { Dropdown } from 'antd';
 import { createStyles } from 'antd-style';
-import type { ItemType } from 'antd/es/menu/hooks/useItems';
 import isEqual from 'fast-deep-equal';
 import { ArrowRight, Blocks, Store, ToyBrick } from 'lucide-react';
 import { memo } from 'react';
@@ -51,7 +50,7 @@ const Tools = memo(() => {
   const model = useAgentStore(agentSelectors.currentAgentModel);
   const enableFC = useUserStore(modelProviderSelectors.isModelEnabledFunctionCall(model));
 
-  const items: ItemType[] = [
+  const items: any[] = [
     (builtinList.length !== 0 && {
       children: builtinList.map((item) => ({
         icon: <Avatar avatar={item.meta.avatar} size={24} />,
@@ -64,7 +63,7 @@ const Tools = memo(() => {
       key: 'builtins',
       label: t('tools.builtins.groupName'),
       type: 'group',
-    }) as ItemType,
+    }) as any,
     {
       children: [
         ...list.map((item) => ({
@@ -108,7 +107,7 @@ const Tools = memo(() => {
         </Flexbox>
       ),
       type: 'group',
-    } as ItemType,
+    } as any,
   ].filter(Boolean);
 
   return (
