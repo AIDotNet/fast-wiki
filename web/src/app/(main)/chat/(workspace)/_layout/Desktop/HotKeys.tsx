@@ -1,5 +1,3 @@
-'use client';
-
 import isEqual from 'fast-deep-equal';
 import { useCallback } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';

@@ -1,7 +1,7 @@
 import { Icon, MobileTabBar, type MobileTabBarProps } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
 import { Bot, MessageSquare, User } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { rgba } from 'polished';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,10 +23,10 @@ interface Props {
 }
 
 export default memo<Props>(({ className, tabBarKey }) => {
-  const { t } = useTranslation('common')as any
+  const { t } = useTranslation('common');
   const { styles } = useStyles();
   const openSettings = useOpenSettings();
-  const router = useRouter();
+  const navigate = useNavigate();
   const items: MobileTabBarProps['items'] = useMemo(
     () => [
       {
@@ -35,7 +35,7 @@ export default memo<Props>(({ className, tabBarKey }) => {
         ),
         key: SidebarTabKey.Chat,
         onClick: () => {
-          router.push('/chat');
+          navigate('/chat');
         },
         title: t('tab.chat'),
       },

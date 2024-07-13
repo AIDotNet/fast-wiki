@@ -1,4 +1,4 @@
-'use client';
+
 
 import { createStyles } from 'antd-style';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +37,7 @@ interface SidebarLayoutProps extends FlexboxProps {
 
 const SidebarLayout = ({ children, className, title, desc, ...rest }: SidebarLayoutProps) => {
   const { cx, styles } = useStyles();
-  const { t } = useTranslation('setting') as any;
+  const { t } = useTranslation('setting');
   return (
     <Flexbox
       className={cx(styles.container, className)}

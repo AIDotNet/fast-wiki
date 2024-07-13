@@ -1,4 +1,4 @@
-'use client';
+
 
 import { SiWebrtc } from '@icons-pack/react-simple-icons';
 import { Form, type ItemGroup, Tooltip } from '@lobehub/ui';
@@ -17,7 +17,7 @@ import ChannelNameInput from './ChannelNameInput';
 type SettingItemGroup = ItemGroup;
 
 const WebRTC = memo(() => {
-  const { t } = useTranslation('setting') as any;
+  const { t } = useTranslation('setting');
   const [form] = Form.useForm();
 
   const [setSettings] = useUserStore((s) => [s.setSettings]);

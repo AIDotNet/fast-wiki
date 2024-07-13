@@ -1,22 +1,27 @@
-'use client';
 
-import { ChatHeaderTitle } from '@lobehub/ui';
-import { memo, useEffect, useState } from 'react';
+
+import {  Avatar, ChatHeaderTitle } from '@lobehub/ui';
+import { Skeleton } from 'antd';
+import { Suspense, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
+import { DESKTOP_HEADER_ICON_SIZE } from '@/const/layoutTokens';
 import { useOpenChatSettings } from '@/hooks/useInterceptingRoutes';
+import { useGlobalStore } from '@/store/global';
+import { systemStatusSelectors } from '@/store/global/selectors';
 import { useSessionStore } from '@/store/session';
 import { sessionMetaSelectors, sessionSelectors } from '@/store/session/selectors';
 
+import { useInitAgentConfig } from '../../useInitAgentConfig';
 import Tags from './Tags';
-import { useApplication } from '@/hooks/useGreeting';
 
 const Main = memo(() => {
-  const { t } = useTranslation('chat') as any
-  const application = useApplication() as any;
+  const { t } = useTranslation('chat');
 
-  const [isInbox, description,] = useSessionStore((s) => [
+  useInitAgentConfig();
+
+  const [init, isInbox, title, description, avatar, backgroundColor] = useSessionStore((s) => [
     sessionSelectors.isSomeSessionActive(s),
     sessionSelectors.isInboxSession(s),
     sessionMetaSelectors.currentAgentTitle(s),
@@ -25,13 +30,45 @@ const Main = memo(() => {
     sessionMetaSelectors.currentAgentBackgroundColor(s),
   ]);
 
+  const openChatSettings = useOpenChatSettings();
+
+  const displayTitle = isInbox ? t('inbox.title') : title;
   const displayDesc = isInbox ? t('inbox.desc') : description;
 
-  return (
-    <Flexbox align={'flex-start'} gap={12} horizontal>
-      <ChatHeaderTitle desc={displayDesc} tag={<Tags />} title={application?.name} />
+  return !init ? (
+    <Flexbox horizontal>
+      <Skeleton
+        active
+        avatar={{ shape: 'circle', size: 'default' }}
+        paragraph={false}
+        title={{ style: { margin: 0, marginTop: 8 }, width: 200 }}
+      />
     </Flexbox>
-  )
+  ) : (
+    <Flexbox align={'center'} gap={4} horizontal>
+      <Avatar
+        avatar={avatar}
+        background={backgroundColor}
+        onClick={() => openChatSettings()}
+        size={40}
+        title={title}
+      />
+      <ChatHeaderTitle desc={displayDesc} tag={<Tags />} title={displayTitle} />
+    </Flexbox>
+  );
 });
 
-export default Main;
+export default () => (
+  <Suspense
+    fallback={
+      <Skeleton
+        active
+        avatar={{ shape: 'circle', size: 'default' }}
+        paragraph={false}
+        title={{ style: { margin: 0, marginTop: 8 }, width: 200 }}
+      />
+    }
+  >
+    <Main />
+  </Suspense>
+);

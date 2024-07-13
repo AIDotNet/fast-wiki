@@ -1,9 +1,9 @@
 import { Icon } from '@lobehub/ui';
-import { Button, Space } from 'antd';
+import { Button, Skeleton, Space } from 'antd';
 import { createStyles } from 'antd-style';
 import { ChevronUp, CornerDownLeft, LucideCommand } from 'lucide-react';
 import { rgba } from 'polished';
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Center, Flexbox } from 'react-layout-kit';
 
@@ -13,7 +13,8 @@ import { useSendMessage } from '@/features/ChatInput/useSend';
 import { useAgentStore } from '@/store/agent';
 import { agentSelectors } from '@/store/agent/slices/chat';
 import { useChatStore } from '@/store/chat';
-import { chatSelectors } from '@/store/chat/selectors';
+import { chatSelectors, topicSelectors } from '@/store/chat/selectors';
+import { filesSelectors, useFileStore } from '@/store/file';
 import { useUserStore } from '@/store/user';
 import { modelProviderSelectors, preferenceSelectors } from '@/store/user/selectors';
 import { isMacOS } from '@/utils/platform';
@@ -49,21 +50,30 @@ const useStyles = createStyles(({ css, prefixCls, token }) => {
   };
 });
 
-const isMac = isMacOS();
-
 interface FooterProps {
   setExpand?: (expand: boolean) => void;
 }
 
 const Footer = memo<FooterProps>(({ setExpand }) => {
-  const { t } = useTranslation('chat')as any;
+  const { t } = useTranslation('chat');
 
   const { theme, styles } = useStyles();
 
-  const [loading, stopGenerateMessage] = useChatStore((s) => [
+  const [
+    isAIGenerating,
+    isHasMessageLoading,
+    isCreatingMessage,
+    isCreatingTopic,
+    stopGenerateMessage,
+  ] = useChatStore((s) => [
     chatSelectors.isAIGenerating(s),
+    chatSelectors.isHasMessageLoading(s),
+    chatSelectors.isCreatingMessage(s),
+    topicSelectors.isCreatingTopic(s),
     s.stopGenerateMessage,
   ]);
+
+  const isImageUploading = useFileStore(filesSelectors.isImageUploading);
 
   const model = useAgentStore(agentSelectors.currentAgentModel);
 
@@ -74,9 +84,20 @@ const Footer = memo<FooterProps>(({ setExpand }) => {
 
   const sendMessage = useSendMessage();
 
+  const [isMac, setIsMac] = useState<boolean>();
+  useEffect(() => {
+    setIsMac(isMacOS());
+  }, [setIsMac]);
+
   const cmdEnter = (
     <Flexbox gap={2} horizontal>
-      <Icon icon={isMac ? LucideCommand : ChevronUp} />
+      {typeof isMac === 'boolean' ? (
+        <Icon icon={isMac ? LucideCommand : ChevronUp} />
+      ) : (
+        <Skeleton.Node active style={{ height: '100%', width: 12 }}>
+          {' '}
+        </Skeleton.Node>
+      )}
       <Icon icon={CornerDownLeft} />
     </Flexbox>
   );
@@ -91,6 +112,9 @@ const Footer = memo<FooterProps>(({ setExpand }) => {
 
   const wrapperShortcut = useCmdEnterToSend ? enter : cmdEnter;
 
+  const buttonDisabled =
+    isImageUploading || isHasMessageLoading || isCreatingTopic || isCreatingMessage;
+
   return (
     <Flexbox
       align={'end'}
@@ -101,7 +125,7 @@ const Footer = memo<FooterProps>(({ setExpand }) => {
       horizontal
       padding={'0 24px'}
     >
-      <Flexbox align={'center'} gap={8} horizontal>
+      <Flexbox align={'center'} gap={8} horizontal style={{ overflow: 'hidden' }}>
         {canUpload && (
           <>
             <DragUpload />
@@ -109,44 +133,42 @@ const Footer = memo<FooterProps>(({ setExpand }) => {
           </>
         )}
       </Flexbox>
-      <Flexbox align={'center'} gap={8} horizontal>
+      <Flexbox align={'center'} flex={'none'} gap={8} horizontal>
         <Flexbox
           gap={4}
           horizontal
           style={{ color: theme.colorTextDescription, fontSize: 12, marginRight: 12 }}
         >
           {sendShortcut}
-          {/* @ts-ignore */}
           <span>{t('input.send')}</span>
           <span>/</span>
           {wrapperShortcut}
-          {/* @ts-ignore */}
           <span>{t('input.warp')}</span>
         </Flexbox>
         <SaveTopic />
         <Flexbox style={{ minWidth: 92 }}>
-          {loading ? (
+          {isAIGenerating ? (
             <Button
               className={styles.loadingButton}
               icon={<StopLoadingIcon />}
               onClick={stopGenerateMessage}
             >
-              {/* @ts-ignore */}
               {t('input.stop')}
             </Button>
           ) : (
             <Space.Compact>
               <Button
+                disabled={buttonDisabled}
+                loading={buttonDisabled}
                 onClick={() => {
                   sendMessage();
                   setExpand?.(false);
                 }}
                 type={'primary'}
               >
-                {/* @ts-ignore */}
                 {t('input.send')}
               </Button>
-              <SendMore />
+              <SendMore disabled={buttonDisabled} isMac={isMac} />
             </Space.Compact>
           )}
         </Flexbox>

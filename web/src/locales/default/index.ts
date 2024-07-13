@@ -5,6 +5,8 @@ import clerk from './clerk';
 import common from './common';
 import components from './components';
 import error from './error';
+import market from './market';
+import metadata from './metadata';
 import migration from './migration';
 import modelProvider from './modelProvider';
 import plugin from './plugin';
@@ -18,6 +20,8 @@ const resources = {
   common,
   components,
   error,
+  market,
+  metadata,
   migration,
   modelProvider,
   plugin,

@@ -60,10 +60,7 @@ export const createCustomPluginSlice: StateCreator<
       const name = pluginHelpers.getPluginTitle(meta);
 
       notification.error({
-        // @ts-ignore
         description: t(`error.${err.message}`, { error: err.cause, ns: 'plugin' }),
-
-        // @ts-ignore
         message: t('error.reinstallError', { name, ns: 'plugin' }),
       });
     }

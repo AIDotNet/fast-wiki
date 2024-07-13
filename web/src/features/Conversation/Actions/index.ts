@@ -8,18 +8,18 @@ import { LLMRoleType } from '@/types/llm';
 import { OnActionsClick, RenderAction } from '../types';
 import { AssistantActionsBar } from './Assistant';
 import { DefaultActionsBar } from './Fallback';
-import { FunctionActionsBar } from './Function';
+import { ToolActionsBar } from './Tool';
 import { UserActionsBar } from './User';
 
 export const renderActions: Record<LLMRoleType, RenderAction> = {
   assistant: AssistantActionsBar,
-  function: FunctionActionsBar,
   system: DefaultActionsBar,
+  tool: ToolActionsBar,
   user: UserActionsBar,
 };
 
 export const useActionsClick = (): OnActionsClick => {
-  const { t } = useTranslation('common') as any;
+  const { t } = useTranslation('common');
   const [
     deleteMessage,
     regenerateMessage,
@@ -38,7 +38,7 @@ export const useActionsClick = (): OnActionsClick => {
   const { message } = App.useApp();
 
   return useCallback<OnActionsClick>(async (action, { id, content, error }) => {
-    switch (action?.key) {
+    switch (action.key) {
       case 'copy': {
         await copyMessage(id, content);
         message.success(t('copySuccess', { defaultValue: 'Copy Success' }));

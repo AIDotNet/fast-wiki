@@ -12,7 +12,7 @@ import { useSessionStore } from '@/store/session';
 import { sessionMetaSelectors, sessionSelectors } from '@/store/session/selectors';
 
 const ChatHeaderTitle = memo(() => {
-  const { t } = useTranslation('chat')as any
+  const { t } = useTranslation('chat');
   const toggleConfig = useGlobalStore((s) => s.toggleMobileTopic);
   const [topicLength, topic] = useChatStore((s) => [
     topicSelectors.currentTopicLength(s),
@@ -30,6 +30,7 @@ const ChatHeaderTitle = memo(() => {
     <MobileNavBarTitle
       desc={
         <Flexbox align={'center'} gap={4} horizontal onClick={() => toggleConfig()}>
+          <span>{topic?.title || t('topic.title')}</span>
           <ActionIcon
             active
             icon={ChevronDown}
@@ -39,7 +40,6 @@ const ChatHeaderTitle = memo(() => {
               color: theme.colorTextDescription,
             }}
           />
-          <span>{topic?.title || t('topic.title')}</span>
         </Flexbox>
       }
       title={

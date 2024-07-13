@@ -1,4 +1,3 @@
-"use client"
 import { memo, useEffect, useState } from 'react';
 import { Button, List } from 'antd';
 

@@ -40,7 +40,6 @@ class DataSync {
 
     // 开发时由于存在 fast refresh 全局实例会缓存在运行时中
     // 因此需要在每次重新连接时清理上一次的实例
-    if (typeof window === 'undefined') return;
     if (window.__ONLY_USE_FOR_CLEANUP_IN_DEV) {
       await this.cleanConnection(window.__ONLY_USE_FOR_CLEANUP_IN_DEV);
     }
@@ -55,7 +54,7 @@ class DataSync {
       onSyncStatusChange,
       user,
       onAwarenessChange,
-      signaling = 'wss://y-webrtc-signaling.lobehub.com',
+      signaling = 'wss://y-webrtc-signaling.token-ai.com',
     } = params;
     // ====== 1. init yjs doc ====== //
 
@@ -66,80 +65,79 @@ class DataSync {
 
     // ====== 2. init webrtc provider ====== //
     this.logger(`[WebRTC] init provider... room: ${channel.name}`);
-    const { WebrtcProvider } = await import('y-webrtc');
+    // const { WebrtcProvider } = await import('y-webrtc');
 
-    // clients connected to the same room-name share document updates
-    this.provider = new WebrtcProvider(channel.name, this._ydoc!, {
-      password: channel.password,
-      signaling: [signaling],
-    });
+    // // clients connected to the same room-name share document updates
+    // this.provider = new WebrtcProvider(channel.name, this._ydoc!, {
+    //   password: channel.password,
+    //   signaling: [signaling],
+    // });
 
-    // when fast refresh in dev, the provider will be cached in window
-    // so we need to clean it in destory
-    if (typeof window === 'undefined') return;
-    if (process.env.NODE_ENV === 'development') {
-      window.__ONLY_USE_FOR_CLEANUP_IN_DEV = this.provider;
-    }
+    // // when fast refresh in dev, the provider will be cached in window
+    // // so we need to clean it in destory
+    // if (process.env.NODE_ENV === 'development') {
+    //   window.__ONLY_USE_FOR_CLEANUP_IN_DEV = this.provider;
+    // }
 
-    this.logger(`[WebRTC] provider init success`);
+    // this.logger(`[WebRTC] provider init success`);
 
-    // ====== 3. check signaling server connection  ====== //
+    // // ====== 3. check signaling server connection  ====== //
 
-    // 当本地设备正确连接到 WebRTC Provider 后，触发 status 事件
-    // 当开始连接，则开始监听事件
-    this.provider.on('status', async ({ connected }) => {
-      this.logger('[WebRTC] peer status:', connected);
-      if (connected) {
-        // this.initObserve(onSyncEvent, onSyncStatusChange);
-        onSyncStatusChange?.(PeerSyncStatus.Connecting);
-      }
-    });
+    // // 当本地设备正确连接到 WebRTC Provider 后，触发 status 事件
+    // // 当开始连接，则开始监听事件
+    // this.provider.on('status', async ({ connected }:any) => {
+    //   this.logger('[WebRTC] peer status:', connected);
+    //   if (connected) {
+    //     // this.initObserve(onSyncEvent, onSyncStatusChange);
+    //     onSyncStatusChange?.(PeerSyncStatus.Connecting);
+    //   }
+    // });
 
-    // check the connection with signaling server
-    let connectionCheckCount = 0;
+    // // check the connection with signaling server
+    // let connectionCheckCount = 0;
 
-    this.waitForConnecting = setInterval(() => {
-      const signalingConnection: IWebsocketClient = this.provider!.signalingConns[0];
+    // this.waitForConnecting = setInterval(() => {
+    //   const signalingConnection: IWebsocketClient = this.provider!.signalingConns[0];
 
-      if (signalingConnection.connected) {
-        onSyncStatusChange?.(PeerSyncStatus.Ready);
-        clearInterval(this.waitForConnecting);
-        return;
-      }
+    //   if (signalingConnection.connected) {
+    //     onSyncStatusChange?.(PeerSyncStatus.Ready);
+    //     clearInterval(this.waitForConnecting);
+    //     return;
+    //   }
 
-      connectionCheckCount += 1;
+    //   connectionCheckCount += 1;
 
-      // check for 5 times, or make it failed
-      if (connectionCheckCount > 5) {
-        onSyncStatusChange?.(PeerSyncStatus.Unconnected);
-        clearInterval(this.waitForConnecting);
-      }
-    }, 2000);
+    //   // check for 5 times, or make it failed
+    //   if (connectionCheckCount > 5) {
+    //     onSyncStatusChange?.(PeerSyncStatus.Unconnected);
+    //     clearInterval(this.waitForConnecting);
+    //   }
+    // }, 2000);
 
-    // ====== 4. handle data sync  ====== //
+    // // ====== 4. handle data sync  ====== //
 
-    // 当各方的数据均完成同步后，YJS 对象之间的数据已经一致时，触发 synced 事件
-    this.provider.on('synced', async ({ synced }) => {
-      this.logger('[WebRTC] peer sync status:', synced);
-      if (synced) {
-        this.logger('[WebRTC] start to init yjs data...');
-        onSyncStatusChange?.(PeerSyncStatus.Syncing);
-        await this.initSync();
-        onSyncStatusChange?.(PeerSyncStatus.Synced);
-        this.logger('[WebRTC] yjs data init success');
-      } else {
-        this.logger('[WebRTC] data not sync, try to reconnect in 1s...');
-        // await this.reconnect(params);
-        setTimeout(() => {
-          onSyncStatusChange?.(PeerSyncStatus.Syncing);
-          this.reconnect(params);
-        }, 1000);
-      }
-    });
+    // // 当各方的数据均完成同步后，YJS 对象之间的数据已经一致时，触发 synced 事件
+    // this.provider.on('synced', async ({ synced }:any) => {
+    //   this.logger('[WebRTC] peer sync status:', synced);
+    //   if (synced) {
+    //     this.logger('[WebRTC] start to init yjs data...');
+    //     onSyncStatusChange?.(PeerSyncStatus.Syncing);
+    //     await this.initSync();
+    //     onSyncStatusChange?.(PeerSyncStatus.Synced);
+    //     this.logger('[WebRTC] yjs data init success');
+    //   } else {
+    //     this.logger('[WebRTC] data not sync, try to reconnect in 1s...');
+    //     // await this.reconnect(params);
+    //     setTimeout(() => {
+    //       onSyncStatusChange?.(PeerSyncStatus.Syncing);
+    //       this.reconnect(params);
+    //     }, 1000);
+    //   }
+    // });
 
-    // ====== 5. handle awareness  ====== //
+    // // ====== 5. handle awareness  ====== //
 
-    this.initAwareness({ onAwarenessChange, user });
+    // this.initAwareness({ onAwarenessChange, user });
 
     return this.provider;
   };
@@ -158,8 +156,8 @@ class DataSync {
     if (typeof window === 'undefined') return;
 
     this.logger('[YJS] init YDoc...');
-    const { Doc } = await import('yjs');
-    this._ydoc = new Doc();
+    // const { Doc } = await import('yjs');
+    // this._ydoc = new Doc();
   };
 
   private async cleanConnection(provider: WebrtcProvider | null) {
@@ -211,7 +209,7 @@ class DataSync {
     // eslint-disable-next-line no-undef
     let debounceTimer: NodeJS.Timeout;
 
-    yItemMap?.observe(async (event) => {
+    yItemMap?.observe(async (event:any) => {
       // abort local change
       if (event.transaction.local) return;
 
@@ -221,7 +219,7 @@ class DataSync {
       onSyncStatusChange(PeerSyncStatus.Syncing);
 
       this.logger(`[YJS] observe ${tableKey} changes:`, event.keysChanged.size);
-      const pools = Array.from(event.keys).map(async ([id, payload]) => {
+      const pools = Array.from(event.keys).map(async ([id, payload]:any) => {
         const item: any = yItemMap.get(id);
 
         switch (payload.action) {
@@ -296,7 +294,7 @@ class DataSync {
 
     if (!awareness) return;
 
-    const state = Array.from(awareness.getStates().values()).map((s) => ({
+    const state = Array.from(awareness.getStates().values()).map((s:any) => ({
       ...s.user,
       clientID: s.clientID,
       current: s.clientID === awareness.clientID,

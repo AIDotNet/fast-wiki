@@ -1,62 +1,24 @@
-# Gitignore for AIDotNet
-################################################################
-
-# general
-.DS_Store
-.idea
-.vscode
-.history
-.temp
-.env.local
-venv
-temp
-tmp
-
-# dependencies
-node_modules
-*.log
-*.lock
-package-lock.json
-
-# ci
-coverage
-.coverage
-.eslintcache
-.stylelintcache
-
-# production
-dist
-es
-lib
+# Logs
 logs
-test-output
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# umi
-.umi
-.umi-production
-.umi-test
-.dumi/tmp*
+node_modules
+dist
+dist-ssr
+*.local
 
-# husky
-.husky/prepare-commit-msg
-
-# misc
-# add other ignore file below
-
-# local env files
-.env*.local
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-.next
-.env
-public/*.js
-bun.lockb
-sitemap*.xml
-robots.txt
-
-*.patch
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

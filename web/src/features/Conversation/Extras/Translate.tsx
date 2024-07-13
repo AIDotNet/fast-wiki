@@ -18,7 +18,7 @@ interface TranslateProps extends ChatTranslate {
 
 const Translate = memo<TranslateProps>(({ content = '', from, to, id, loading }) => {
   const theme = useTheme();
-  const { t } = useTranslation('common')as any
+  const { t } = useTranslation('common');
   const [show, setShow] = useState(true);
   const clearTranslate = useChatStore((s) => s.clearTranslate);
 

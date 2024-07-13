@@ -1,5 +1,3 @@
-'use client';
-
 import { FluentEmoji, Markdown } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
 import { memo, useEffect, useState } from 'react';
@@ -9,7 +7,6 @@ import { Center, Flexbox } from 'react-layout-kit';
 import { useApplication, useGreeting } from '@/hooks/useGreeting';
 import { useServerConfigStore } from '@/store/serverConfig';
 
-import AgentsSuggest from './AgentsSuggest';
 import QuestionSuggest from './QuestionSuggest';
 
 const useStyles = createStyles(({ css, responsive }) => ({
@@ -57,7 +54,6 @@ const InboxWelcome = memo(() => {
         <Markdown className={styles.desc} variant={'chat'}>
           {application?.opener ?? t('guide.defaultMessage')}
         </Markdown>
-        <AgentsSuggest mobile={mobile} />
         <QuestionSuggest mobile={mobile} />
       </Flexbox>
     </Center>

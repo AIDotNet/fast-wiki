@@ -1,11 +1,9 @@
-'use client';
 
-import dynamic from 'next/dynamic';
+
 import { memo } from 'react';
 import { Center } from 'react-layout-kit';
-
-const LogoThree = dynamic(() => import('@lobehub/ui/es/LogoThree'), { ssr: false });
-const LogoSpline = dynamic(() => import('@lobehub/ui/es/LogoThree/LogoSpline'), { ssr: false });
+import LogoThree from '@lobehub/ui/es/LogoThree'
+import LogoSpline from '@lobehub/ui/es/LogoThree/LogoSpline'
 
 const Logo = memo<{ mobile?: boolean }>(({ mobile }) => {
   return mobile ? (

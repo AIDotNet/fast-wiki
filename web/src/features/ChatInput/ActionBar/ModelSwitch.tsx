@@ -1,16 +1,16 @@
 import { ActionIcon } from '@lobehub/ui';
-import { AppWindowMac } from 'lucide-react';
+import { Brain } from 'lucide-react';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ModelSwitchPanel from '@/features/ModelSwitchPanel';
 
 const ModelSwitch = memo(() => {
-  const { t } = useTranslation('chat') as any;
+  const { t } = useTranslation('chat');
 
   return (
     <ModelSwitchPanel>
-      <ActionIcon icon={AppWindowMac} placement={'bottom'} title={t('ModelSwitch.title')} />
+      <ActionIcon icon={Brain} placement={'bottom'} title={t('ModelSwitch.title')} />
     </ModelSwitchPanel>
   );
 });

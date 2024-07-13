@@ -1,9 +1,10 @@
 import { ActionIcon, DiscordIcon, Icon } from '@lobehub/ui';
-import { Badge, Button } from 'antd';
+import { Badge } from 'antd';
+import { ItemType } from 'antd/es/menu/interface';
 import {
   Book,
   CircleUserRound,
-  ExternalLink,
+  Download,
   Feather,
   HardDriveDownload,
   HardDriveUpload,
@@ -13,26 +14,68 @@ import {
   Maximize,
   Settings2,
 } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { PropsWithChildren, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 import urlJoin from 'url-join';
 
 import type { MenuProps } from '@/components/Menu';
-import { DISCORD, DOCUMENTS, EMAIL_SUPPORT, GITHUB_ISSUES } from '@/const/url';
+import { DISCORD, DOCUMENTS, EMAIL_SUPPORT, GITHUB_ISSUES, mailTo } from '@/const/url';
+import { isServerMode } from '@/const/version';
 import DataImporter from '@/features/DataImporter';
+import { useOpenSettings } from '@/hooks/useInterceptingRoutes';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { useQueryRoute } from '@/hooks/useQueryRoute';
 import { configService } from '@/services/config';
 import { SettingsTabs } from '@/store/global/initialState';
 import { useUserStore } from '@/store/user';
 import { authSelectors } from '@/store/user/selectors';
 
+import { useNewVersion } from './useNewVersion';
+
+const NewVersionBadge = memo(
+  ({
+    children,
+    showBadge,
+    onClick,
+  }: PropsWithChildren & { onClick: () => void; showBadge?: boolean }) => {
+    const { t } = useTranslation('common');
+    if (!showBadge)
+      return (
+        <Flexbox flex={1} onClick={onClick}>
+          {children}
+        </Flexbox>
+      );
+    return (
+      <Flexbox align={'center'} flex={1} gap={8} horizontal onClick={onClick} width={'100%'}>
+        <span>{children}</span>
+        <Badge count={t('upgradeVersion.hasNew')} />
+      </Flexbox>
+    );
+  },
+);
 
 export const useMenu = () => {
   const router = useQueryRoute();
-  const { t } = useTranslation(['common', 'setting', 'auth']) as any;
-  const isSignedIn = useUserStore(authSelectors.isLoginWithAuth);
+  const hasNewVersion = useNewVersion();
+  const openSettings = useOpenSettings();
+  const { t } = useTranslation(['common', 'setting', 'auth']);
+  const [isLogin, isLoginWithAuth, isLoginWithClerk, openUserProfile] = useUserStore((s) => [
+    authSelectors.isLogin(s),
+    authSelectors.isLoginWithAuth(s),
+    authSelectors.isLoginWithClerk(s),
+    s.openUserProfile,
+  ]);
+
+  const profile: MenuProps['items'] = [
+    {
+      icon: <Icon icon={CircleUserRound} />,
+      key: 'profile',
+      label: t('userPanel.profile'),
+      onClick: () => openUserProfile(),
+    },
+  ];
 
   const settings: MenuProps['items'] = [
     {
@@ -40,6 +83,9 @@ export const useMenu = () => {
       key: 'setting',
       label: (
         <Flexbox align={'center'} gap={8} horizontal>
+          <NewVersionBadge onClick={openSettings} showBadge={hasNewVersion}>
+            {t('userPanel.setting')}
+          </NewVersionBadge>
           <ActionIcon
             icon={Maximize}
             onClick={() => router.push(urlJoin('/settings', SettingsTabs.Common))}
@@ -54,80 +100,78 @@ export const useMenu = () => {
     },
   ];
 
-  const exports: MenuProps['items'] = [
+  /* ↓ cloud slot ↓ */
+
+  /* ↑ cloud slot ↑ */
+
+  const pwa: MenuProps['items'] = [
     {
-      icon: <Icon icon={HardDriveUpload} />,
-      key: 'import',
-      label: <DataImporter>{t('import')}</DataImporter>,
+      type: 'divider',
     },
-    {
-      children: [
+  ];
+
+  const data = !isLogin
+    ? []
+    : ([
         {
-          key: 'allAgent',
-          label: t('exportType.allAgent'),
-          onClick: configService.exportAgents,
+          icon: <Icon icon={HardDriveDownload} />,
+          key: 'import',
+          label: <DataImporter>{t('import')}</DataImporter>,
         },
-        {
-          key: 'allAgentWithMessage',
-          label: t('exportType.allAgentWithMessage'),
-          onClick: configService.exportSessions,
-        },
-        {
-          key: 'globalSetting',
-          label: t('exportType.globalSetting'),
-          onClick: configService.exportSettings,
-        },
+        isServerMode
+          ? null
+          : {
+              children: [
+                {
+                  key: 'allAgent',
+                  label: t('exportType.allAgent'),
+                  onClick: configService.exportAgents,
+                },
+                {
+                  key: 'allAgentWithMessage',
+                  label: t('exportType.allAgentWithMessage'),
+                  onClick: configService.exportSessions,
+                },
+                {
+                  key: 'globalSetting',
+                  label: t('exportType.globalSetting'),
+                  onClick: configService.exportSettings,
+                },
+                {
+                  type: 'divider',
+                },
+                {
+                  key: 'all',
+                  label: t('exportType.all'),
+                  onClick: configService.exportAll,
+                },
+              ],
+              icon: <Icon icon={HardDriveUpload} />,
+              key: 'export',
+              label: t('export'),
+            },
         {
           type: 'divider',
         },
-        {
-          key: 'all',
-          label: t('exportType.all'),
-          onClick: configService.exportAll,
-        },
-      ],
-      icon: <Icon icon={HardDriveDownload} />,
-      key: 'export',
-      label: t('export'),
-    },
-    {
-      type: 'divider',
-    },
-  ];
-
-  const openUserProfile = useUserStore((s) => s.openUserProfile);
-
-  const planAndBilling: MenuProps['items'] = [
-    {
-      icon: <Icon icon={CircleUserRound} />,
-      key: 'profile',
-      label: t('userPanel.profile'),
-      onClick: () => {
-        openUserProfile();
-      },
-    },
-    {
-      type: 'divider',
-    },
-  ];
+      ].filter(Boolean) as ItemType[]);
 
   const helps: MenuProps['items'] = [
-    // {
-    //   icon: <Icon icon={DiscordIcon} />,
-    //   key: 'discord',
-    //   label: (
-    //     <Link href={DISCORD} target={'_blank'}>
-    //       {t('userPanel.discord')}
-    //     </Link>
-    //   ),
-    // },
+    {
+      icon: <Icon icon={DiscordIcon} />,
+      key: 'discord',
+      label: (
+        <Link to={DISCORD} target={'_blank'}>
+          {t('userPanel.discord')}
+        </Link>
+      ),
+    },
     {
       children: [
         {
           icon: <Icon icon={Book} />,
           key: 'docs',
           label: (
-            <Link href={DOCUMENTS} target={'_blank'}>
+            <Link to={DOCUMENTS} target={'_blank'}>
               {t('userPanel.docs')}
             </Link>
           ),
@@ -136,7 +180,7 @@ export const useMenu = () => {
           icon: <Icon icon={Feather} />,
           key: 'feedback',
           label: (
-            <Link href={GITHUB_ISSUES} target={'_blank'}>
+            <Link to={GITHUB_ISSUES} target={'_blank'}>
               {t('userPanel.feedback')}
             </Link>
           ),
@@ -145,7 +189,7 @@ export const useMenu = () => {
           icon: <Icon icon={Mail} />,
           key: 'email',
           label: (
-            <Link href={`mailto:${EMAIL_SUPPORT}`} target={'_blank'}>
+            <Link to={mailTo(EMAIL_SUPPORT)} target={'_blank'}>
               {t('userPanel.email')}
             </Link>
           ),
@@ -156,18 +200,6 @@ export const useMenu = () => {
       label: t('userPanel.help'),
     },
     {
-      icon: <Icon icon={ExternalLink} />,
-      key: 'exit',
-      label: (
-        <span onClick={()=>{
-          window.localStorage.clear();
-          window.location.href = '/auth-login';
-        }}>
-          {t('userPanel.exit')}
-        </span>
-      ),
-    },
-    {
       type: 'divider',
     },
   ];
@@ -176,19 +208,22 @@ export const useMenu = () => {
     {
       type: 'divider',
     },
-    ...settings,
-    ...(isSignedIn ? planAndBilling : []),
-    ...exports,
+    ...(isLogin ? settings : []),
+    ...(isLoginWithClerk ? profile : []),
+    /* ↓ cloud slot ↓ */
+    ...data,
     ...helps,
   ].filter(Boolean) as MenuProps['items'];
 
-  const logoutItems: MenuProps['items'] = [
-    {
-      icon: <Icon icon={LogOut} />,
-      key: 'logout',
-      label: <span>{t('signout', { ns: 'auth' })}</span>,
-    },
-  ];
+  const logoutItems: MenuProps['items'] = isLoginWithAuth
+    ? [
+        {
+          icon: <Icon icon={LogOut} />,
+          key: 'logout',
+          label: <span>{t('signout', { ns: 'auth' })}</span>,
+        },
+      ]
+    : [];
 
   return { logoutItems, mainItems };
 };

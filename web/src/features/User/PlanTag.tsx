@@ -13,7 +13,7 @@ export interface PlanTagProps {
 }
 
 const PlanTag = memo<PlanTagProps>(({ type = PlanType.Preview }) => {
-  const { t } = useTranslation('common') as any;;
+  const { t } = useTranslation('common');
   const theme = useTheme();
   const tag: {
     desc: string;

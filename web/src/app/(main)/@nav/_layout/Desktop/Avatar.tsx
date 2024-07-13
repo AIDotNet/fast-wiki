@@ -11,7 +11,7 @@ import { useUserStore } from '@/store/user';
 import { preferenceSelectors } from '@/store/user/selectors';
 
 const Avatar = memo(() => {
-  const { t } = useTranslation('common')as any;
+  const { t } = useTranslation('common');
   const hideSettingsMoveGuide = useUserStore(preferenceSelectors.hideSettingsMoveGuide);
   const updateGuideState = useUserStore((s) => s.updateGuideState);
   const content = (
@@ -30,7 +30,6 @@ const Avatar = memo(() => {
       prefixCls={'guide'}
       title={
         <Flexbox align={'center'} gap={8} horizontal>
-          {/* @ts-ignore */}
           <div style={{ lineHeight: '22px' }}>{t('userPanel.moveGuide')}</div>
           <ActionIcon
             icon={LucideX}

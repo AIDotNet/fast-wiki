@@ -9,7 +9,7 @@ interface HistoryDividerProps {
 }
 
 const HistoryDivider = memo<HistoryDividerProps>(({ enable }) => {
-  const { t } = useTranslation('common') as any;
+  const { t } = useTranslation('common');
   if (!enable) return null;
 
   return (

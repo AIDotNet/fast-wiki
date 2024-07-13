@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
 import { message, Button, Pagination } from 'antd';
 
-import { useRouter } from 'next/navigation';
 import { DeleteOutlined } from '@ant-design/icons';
 import { DeleteWikis, GetWikisList } from '@/services/WikiService';
+import { useNavigate } from 'react-router-dom';
 
 
 interface IAppListProps {
@@ -17,7 +17,7 @@ interface IAppListProps {
 }
 
 export function AppList(props: IAppListProps) {
-    const router = useRouter();
+    const navigate = useNavigate();
 
     const [input, setInput] = useState({
         keyword: '',
@@ -64,7 +64,7 @@ export function AppList(props: IAppListProps) {
     }
 
     function openWikiDetail(id: number) {
-        router.push(`/wiki-detail?id=${id}`);
+        navigate(`/wiki-detail?id=${id}`);
     }
 
     async function loadingData() {

@@ -1,4 +1,3 @@
-'use client';
 import { memo, useState } from 'react';
 import { Input, Button } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';

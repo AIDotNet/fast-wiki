@@ -53,7 +53,6 @@ export const createSessionGroupSlice: StateCreator<
     get().internal_dispatchSessionGroups({ sortMap, type: 'updateSessionGroupOrder' });
 
     message.loading({
-      // @ts-ignore
       content: t('sessionGroup.sorting', { ns: 'chat' }),
       duration: 0,
       key: 'updateSessionGroupSort',
@@ -61,7 +60,6 @@ export const createSessionGroupSlice: StateCreator<
 
     await sessionService.updateSessionGroupOrder(sortMap);
     message.destroy('updateSessionGroupSort');
-    // @ts-ignore
     message.success(t('sessionGroup.sortSuccess', { ns: 'chat' }));
 
     await get().refreshSessions();

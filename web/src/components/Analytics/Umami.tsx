@@ -1,15 +1,27 @@
-'use client';
 
-import Script from 'next/script';
-import { memo } from 'react';
 
-import { getClientConfig } from '@/config/client';
+import { useEffect } from 'react';
 
-const { UMAMI_SCRIPT_URL, UMAMI_WEBSITE_ID } = getClientConfig();
+interface UmamiAnalyticsProps {
+  scriptUrl: string;
+  websiteId?: string;
+}
 
-const UmamiAnalytics = memo(
-  () =>
-    UMAMI_WEBSITE_ID && <Script data-website-id={UMAMI_WEBSITE_ID} defer src={UMAMI_SCRIPT_URL} />,
-);
+const UmamiAnalytics = ({ scriptUrl, websiteId }: UmamiAnalyticsProps) => {
+  useEffect(() => {
+    if (websiteId) {
+      const script = document.createElement('script');
+      script.src = scriptUrl;
+      script.defer = true;
+      script.setAttribute('data-website-id', websiteId);
+      document.head.appendChild(script);
+      return () => {
+        document.head.removeChild(script);
+      };
+    }
+  }, [scriptUrl, websiteId]);
+
+  return null;
+};
 
 export default UmamiAnalytics;

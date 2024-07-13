@@ -21,7 +21,7 @@ interface PluginSettingsProps {
 
 const PluginSettings = memo<PluginSettingsProps>(({ id, plugin }) => {
   const { styles } = useStyles();
-  const { t } = useTranslation('error')as any
+  const { t } = useTranslation('error');
   const theme = useTheme();
   const [resend, deleteMessage] = useChatStore((s) => [s.regenerateMessage, s.deleteMessage]);
   const pluginIdentifier = plugin?.identifier as string;

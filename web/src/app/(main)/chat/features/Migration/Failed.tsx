@@ -3,7 +3,7 @@ import { Button, Popconfirm, Result } from 'antd';
 import { useTheme } from 'antd-style';
 import { createStore, del, get, set } from 'idb-keyval';
 import { ShieldAlert } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { lighten } from 'polished';
 import { memo } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -34,7 +34,7 @@ interface FailedProps {
   upgradeStatus: UpgradeStatus;
 }
 const Failed = memo<FailedProps>(({ error, state, setUpgradeStatus, setError, upgradeStatus }) => {
-  const { t } = useTranslation('migration')as any;
+  const { t } = useTranslation('migration');
   const theme = useTheme();
 
   return (
@@ -93,11 +93,11 @@ const Failed = memo<FailedProps>(({ error, state, setUpgradeStatus, setError, up
       style={{ paddingBlock: 24, width: 450 }}
       subTitle={
         <Balancer>
-          <Trans  ns={'migration'}>
+          <Trans i18nKey="dbV1.upgrade.error.subTitle" ns={'migration'}>
             非常抱歉，数据库升级过程发生异常。请重试升级，或
             <Link
               aria-label={'issue'}
-              href={GITHUB_ISSUES}
+              to={GITHUB_ISSUES}
               onClick={(e) => {
                 e.preventDefault();
                 githubService.submitDBV1UpgradeError(1, error!);

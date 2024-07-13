@@ -1,4 +1,4 @@
-'use client';
+
 
 import { Icon, Tooltip } from '@lobehub/ui';
 import { Badge } from 'antd';
@@ -13,6 +13,7 @@ import useSWR from 'swr';
 import { messageService } from '@/services/message';
 import { sessionService } from '@/services/session';
 import { topicService } from '@/services/topic';
+import { useServerConfigStore } from '@/store/serverConfig';
 
 const useStyles = createStyles(({ css, token }) => ({
   card: css`
@@ -53,6 +54,7 @@ const formatNumber = (num: any) => {
 };
 
 const DataStatistics = memo<Omit<FlexboxProps, 'children'>>(({ style, ...rest }) => {
+  const mobile = useServerConfigStore((s) => s.isMobile);
   // sessions
   const { data: sessions, isLoading: sessionsLoading } = useSWR(
     'count-sessions',
@@ -71,7 +73,7 @@ const DataStatistics = memo<Omit<FlexboxProps, 'children'>>(({ style, ...rest })
   const { data: messagesToday } = useSWR('today-messages', messageService.countTodayMessages);
 
   const { styles, theme } = useStyles();
-  const { t } = useTranslation('common') as any;;
+  const { t } = useTranslation('common');
 
   const loading = useMemo(() => <Icon icon={LoaderCircle} spin />, []);
 
@@ -111,7 +113,7 @@ const DataStatistics = memo<Omit<FlexboxProps, 'children'>>(({ style, ...rest })
             <Flexbox
               align={'center'}
               className={styles.card}
-              flex={showBadge ? 2 : 1}
+              flex={showBadge && !mobile ? 2 : 1}
               gap={4}
               horizontal
               justify={'space-between'}

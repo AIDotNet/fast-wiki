@@ -1,5 +1,4 @@
 import { SignJWT, importJWK } from 'jose';
-
 import { JWT_SECRET_KEY, NON_HTTP_PREFIX } from '@/const/auth';
 
 export const createJWT = async <T>(payload: T) => {
@@ -9,11 +8,11 @@ export const createJWT = async <T>(payload: T) => {
   const encoder = new TextEncoder();
 
   // fix the issue that crypto.subtle is not available in non-HTTPS environment
-  // refs: https://github.com/AIDotNet/lobe-chat/pull/1238
+  // refs: https://github.comAIDotNet/lobe-chat/pull/1238
   if (!crypto.subtle) {
     const buffer = encoder.encode(JSON.stringify(payload));
 
-    return `${NON_HTTP_PREFIX}.${Buffer.from(buffer).toString('base64')}`;
+    return `${NON_HTTP_PREFIX}.${btoa(String.fromCharCode(...buffer))}`;
   }
 
   // create a secret key
@@ -22,7 +21,7 @@ export const createJWT = async <T>(payload: T) => {
   // get the JWK from the secret key
   const jwkSecretKey = await importJWK(
     {
-      k: Buffer.from(secretKey).toString('base64'),
+      k: btoa(String.fromCharCode(...new Uint8Array(secretKey))),
       kty: 'oct',
     },
     'HS256',

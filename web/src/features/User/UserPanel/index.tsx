@@ -1,8 +1,8 @@
-'use client';
+
 
 import { Popover } from 'antd';
 import { createStyles } from 'antd-style';
-import { PropsWithChildren, memo, useState } from 'react';
+import { PropsWithChildren, memo, startTransition, useState } from 'react';
 
 import PanelContent from './PanelContent';
 import UpgradeBadge from './UpgradeBadge';
@@ -25,7 +25,9 @@ const UserPanel = memo<PropsWithChildren>(({ children }) => {
       <Popover
         arrow={false}
         content={<PanelContent closePopover={() => setOpen(false)} />}
-        onOpenChange={setOpen}
+        onOpenChange={(open)=>{
+          startTransition(() => setOpen(open));
+        }}
         open={open}
         overlayInnerStyle={{ padding: 0 }}
         placement={'topRight'}

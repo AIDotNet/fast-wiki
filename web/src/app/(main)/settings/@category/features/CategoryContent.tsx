@@ -1,6 +1,4 @@
-'use client';
-
-import { memo } from 'react';
+import { memo, startTransition } from 'react';
 import urlJoin from 'url-join';
 
 import Menu from '@/components/Menu';
@@ -21,11 +19,13 @@ const CategoryContent = memo<{ modal?: boolean }>(({ modal }) => {
     <Menu
       items={cateItems}
       onClick={({ key }) => {
-        if (modal) {
-          router.replace('/settings/modal', { query: { tab: key } });
-        } else {
-          router.push(urlJoin('/settings', key));
-        }
+        startTransition(() => {
+          if (modal) {
+            router.replace('/settings/modal', { query: { tab: key } });
+          } else {
+            router.push(urlJoin('/settings', key));
+          }
+        });
       }}
       selectable
       selectedKeys={[modal ? tab : (activeTab as any)]}

@@ -1,4 +1,4 @@
-export const generateRandomRoomName = async () => {
-  const { generate } = await import('random-words');
-  return (generate(3) as string[]).join('-');
+export const generateRandomRoomName = () => {
+  const randomString = Math.random().toString(36).substring(2, 7);
+  return randomString;
 };

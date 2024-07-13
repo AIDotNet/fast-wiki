@@ -1,5 +1,3 @@
-'use client';
-
 import { Avatar, Icon, Tag } from '@lobehub/ui';
 import type { MenuProps } from 'antd';
 import { Dropdown } from 'antd';
@@ -17,14 +15,14 @@ export interface PluginTagProps {
   plugins: string[];
 }
 
-const PluginTag = memo<PluginTagProps>(({ plugins }: any) => {
+const PluginTag = memo<PluginTagProps>(({ plugins }) => {
   const { showDalle } = useServerConfigStore(featureFlagsSelectors);
   const list = useToolStore(toolSelectors.metaList(showDalle), isEqual);
   const displayPlugin = useToolStore(toolSelectors.getMetaById(plugins[0]), isEqual);
 
   if (plugins.length === 0) return null;
 
-  const items: MenuProps['items'] = plugins.map((id:any) => {
+  const items: MenuProps['items'] = plugins.map((id) => {
     const item = list.find((i) => i.identifier === id);
     const isDeprecated = !pluginHelpers.getPluginTitle(item?.meta);
     const avatar = isDeprecated ? '♻️' : pluginHelpers.getPluginAvatar(item?.meta);
@@ -48,9 +46,9 @@ const PluginTag = memo<PluginTagProps>(({ plugins }: any) => {
     <Dropdown menu={{ items }}>
       <div>
         <Tag>
-          {/* {<Icon icon={LucideToyBrick} />}
+          {<Icon icon={LucideToyBrick} />}
           {pluginHelpers.getPluginTitle(displayPlugin) || plugins[0]}
-          {count > 1 && <div>({plugins.length - 1}+)</div>} */}
+          {count > 1 && <div>({plugins.length - 1}+)</div>}
         </Tag>
       </div>
     </Dropdown>

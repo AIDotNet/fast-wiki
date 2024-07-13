@@ -1,4 +1,4 @@
-'use client';
+
 
 import { Icon } from '@lobehub/ui';
 import { createStyles } from 'antd-style';

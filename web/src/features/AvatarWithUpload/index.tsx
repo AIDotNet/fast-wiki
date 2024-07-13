@@ -1,4 +1,4 @@
-'use client';
+
 
 import { Upload } from 'antd';
 import { memo, useCallback } from 'react';

@@ -1,6 +1,5 @@
-"use client"
 export default function WikiDetail() {
     return (<div>
-        as
+        并没兼容
     </div>)
 }

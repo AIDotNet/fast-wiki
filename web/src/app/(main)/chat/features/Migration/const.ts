@@ -6,8 +6,8 @@ export enum UpgradeStatus {
   UPGRADE_FAILED,
 }
 
-export const V1DB_NAME = 'AIDotNet';
-export const V1DB_TABLE_NAME = 'LOBE_CHAT';
+export const V1DB_NAME = 'TokenHub';
+export const V1DB_TABLE_NAME = 'TOKEN_CHAT';
 
 export interface MigrationError {
   message: string;

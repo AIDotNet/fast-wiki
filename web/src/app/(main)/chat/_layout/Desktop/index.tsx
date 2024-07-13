@@ -1,29 +1,76 @@
-'use client';
-
 import { Flexbox } from 'react-layout-kit';
 
 import Migration from '../../features/Migration';
-import { LayoutProps } from '../type';
+import WorkspaceLayout from '../../(workspace)/layout';
+import WorkspacePage from '../../(workspace)/page';
+import { useEffect, useState } from 'react';
+import { Modal } from '@lobehub/ui';
+import { Outlet, useLocation } from 'react-router-dom';
 
-const Layout = ({ children, session }: LayoutProps) => {
+const Layout = () => {
+  const [workSpacePage, setWorkSpacePage] = useState<any>();
+  const location = useLocation();
+  const [showSettingModal, setShowSettingModal] = useState(false);
 
-  if (typeof window === 'undefined') return;
-  // 获取当前query中的sharedId
-  const query = new URLSearchParams(window.location.search);
-  const sharedId = query.get('sharedId');
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [screenHeight, setScreenHeight] = useState(window.innerHeight);
+
+  const updateScreenSize = () => {
+    setScreenWidth(window.innerWidth);
+    setScreenHeight(window.innerHeight);
+  };
+
+  useEffect(() => {
+    // 获取路由token
+    const query = new URLSearchParams(window.location.search);
+    const token = query.get('token');
+    if (token) {
+      localStorage.setItem('token', token);
+    }
+
+    WorkspacePage()
+      .then((page) => {
+        setWorkSpacePage(page);
+      })
+
+    window.addEventListener('resize', updateScreenSize);
+    return () => window.removeEventListener('resize', updateScreenSize);
+  }, []);
+
+  useEffect(() => {
+    if (location.pathname.includes('/chat/settings')) {
+      setShowSettingModal(true);
+    }else{
+      setShowSettingModal(false);
+    }
+  }, [location]);
 
   return (
     <>
       <Flexbox
         height={'100%'}
         horizontal
-        style={{ maxWidth: sharedId ? '100vw' : 'calc(100vw - 64px)', overflow: 'hidden', position: 'relative' }}
+        style={{ maxWidth: 'calc(100vw - 64px)', overflow: 'hidden', position: 'relative' }}
         width={'100%'}
       >
         <Flexbox flex={1} style={{ overflow: 'hidden', position: 'relative' }}>
-          {children}
+          <WorkspaceLayout>
+            {workSpacePage}
+          </WorkspaceLayout>
         </Flexbox>
       </Flexbox>
+      <Modal
+        width={screenWidth-200}
+        onCancel={() => {
+          setShowSettingModal(false);
+        }}
+        onClose={() => {
+          setShowSettingModal(false);
+        }}
+        footer={[]}
+        open={showSettingModal}>
+        <Outlet />
+      </Modal>
       <Migration />
     </>
   );

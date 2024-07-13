@@ -14,10 +14,7 @@ const currentAgentMeta = (s: SessionStore): MetaData => {
   const defaultMeta = {
     avatar: isInbox ? DEFAULT_INBOX_AVATAR : DEFAULT_AVATAR,
     backgroundColor: DEFAULT_BACKGROUND_COLOR,
-    // @ts-ignore
-    description: isInbox ? t('inbox.desc', { ns: 'chat' }) : t('noDescription'),
-    
-    // @ts-ignore
+    description: isInbox ? t('inbox.desc', { ns: 'chat' }) : undefined,
     title: isInbox ? t('inbox.title', { ns: 'chat' }) : t('defaultSession'),
   };
 
@@ -32,11 +29,9 @@ const currentAgentAvatar = (s: SessionStore) => currentAgentMeta(s).avatar;
 const currentAgentBackgroundColor = (s: SessionStore) => currentAgentMeta(s).backgroundColor;
 
 const getAvatar = (s: MetaData) => s.avatar || DEFAULT_AVATAR;
-// @ts-ignore
 const getTitle = (s: MetaData) => s.title || t('defaultSession', { ns: 'common' });
-export const getDescription = (s: MetaData) =>
-  // @ts-ignore
-  s.description || t('noDescription', { ns: 'common' });
+// New session do not show 'noDescription'
+export const getDescription = (s: MetaData) => s.description;
 
 export const sessionMetaSelectors = {
   currentAgentAvatar,

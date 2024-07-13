@@ -1,4 +1,4 @@
-'use client';
+
 
 import { MobileChatInputArea, MobileChatSendButton } from '@lobehub/ui';
 import { useTheme } from 'antd-style';
@@ -13,7 +13,7 @@ import { useChatInput } from '@/features/ChatInput/useChatInput';
 import Files from './Files';
 
 const MobileChatInput = memo(() => {
-  const { t } = useTranslation('chat')as any;
+  const { t } = useTranslation('chat');
   const theme = useTheme();
   const { ref, onSend, loading, value, onInput, onStop, expand, setExpand } = useChatInput();
 
@@ -32,13 +32,13 @@ const MobileChatInput = memo(() => {
         width: '100%',
         zIndex: 101,
       }}
-      // textAreaLeftAddons={<STT mobile />}
+      textAreaLeftAddons={<STT mobile />}
       textAreaRightAddons={
         <MobileChatSendButton loading={loading} onSend={onSend} onStop={onStop} />
       }
       topAddons={
         <>
-          {/* <Files /> */}
+          <Files />
           <ActionBar mobile padding={'0 8px'} rightAreaStartRender={<SaveTopic mobile />} />
         </>
       }

@@ -31,7 +31,6 @@ export const parseAgentConfig = (envStr: string) => {
     }
     // Handle arrays
     else if (value.includes(',') || value.includes('，')) {
-      // @ts-ignore
       const array = value.replaceAll('，', ',').split(',');
       finalValue = array.map((item) => (isNaN(item as any) ? item : Number(item)));
     }

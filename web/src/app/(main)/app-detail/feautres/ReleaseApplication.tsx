@@ -4,8 +4,8 @@ import type { TableProps } from 'antd';
 import { Button, Table, message, Dropdown, MenuProps } from 'antd';
 import styled from 'styled-components';
 import CreateApplication from "./CreateApplication";
-import { FAST_API_URL } from "@/const/trace";
 import { GetChatShareList, RemoveChatShare } from "@/services/ChatApplicationService";
+import { VITE_API_URL } from "@/const/url";
 
 
 const Title = styled.div`
@@ -85,7 +85,7 @@ export default memo((props: IReleaseApplicationProps) => {
                     key: '3',
                     label: '复制飞书对接地址',
                     onClick: async () => {
-                        let url = FAST_API_URL;
+                        let url = VITE_API_URL;
                         if (!url) {
                             url = location.origin;
                         }
@@ -102,7 +102,7 @@ export default memo((props: IReleaseApplicationProps) => {
                     key: '6',
                     label: '复制微信公众号对接地址',
                     onClick: async () => {
-                        let url = FAST_API_URL;
+                        let url = VITE_API_URL;
                         if (!url) {
                             url = location.origin;
                         }

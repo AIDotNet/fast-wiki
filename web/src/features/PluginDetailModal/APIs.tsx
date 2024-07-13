@@ -10,7 +10,7 @@ import { pluginSelectors } from '@/store/tool/selectors';
 const APIs = memo<{
   id: string;
 }>(({ id }) => {
-  const { t } = useTranslation('plugin') as any;
+  const { t } = useTranslation('plugin');
   const pluginManifest = useToolStore(pluginSelectors.getPluginManifestById(id), isEqual);
 
   if (!pluginManifest?.api) return <Empty />;
@@ -22,13 +22,11 @@ const APIs = memo<{
         columns={[
           {
             dataIndex: 'name',
-            ellipsis: true,
             render: (name: string) => <code>{name}</code>,
             title: t('detailModal.info.name'),
           },
           {
             dataIndex: 'description',
-            ellipsis: true,
             title: t('detailModal.info.description'),
           },
         ]}
@@ -36,6 +34,7 @@ const APIs = memo<{
         pagination={false}
         rowKey={'name'}
         size={'small'}
+        tableLayout="fixed"
       />
     </Flexbox>
   );

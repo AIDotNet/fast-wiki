@@ -184,10 +184,10 @@ class _MessageModel extends BaseModel {
     return super._updateWithSync(id, data);
   }
 
-  async updatePluginState(id: string, key: string, value: any) {
+  async updatePluginState(id: string, value: any) {
     const item = await this.findById(id);
 
-    return this.update(id, { pluginState: { ...item.pluginState, [key]: value } });
+    return this.update(id, { pluginState: { ...item.pluginState, ...value } });
   }
 
   /**
@@ -249,10 +249,10 @@ class _MessageModel extends BaseModel {
     translate,
     tts,
     ...item
-  }: DBModel<any>): ChatMessage => {
+  }: DBModel<DB_Message>): ChatMessage => {
     return {
       ...item,
-      extra: { fromModel, fromProvider, translate , tts },
+      extra: { fromModel, fromProvider, translate, tts },
       meta: {},
       topicId: item.topicId ?? undefined,
     };

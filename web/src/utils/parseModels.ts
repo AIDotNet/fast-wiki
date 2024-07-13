@@ -15,8 +15,8 @@ export const parseModelString = (modelString: string = '', withDeploymentName = 
   for (const item of modelNames) {
     const disable = item.startsWith('-');
     const nameConfig = item.startsWith('+') || item.startsWith('-') ? item.slice(1) : item;
-    const [idAndname, ...capabilities] = nameConfig.split('<');
-    let [id, name] = idAndname.split('=');
+    const [idAndDisplayName, ...capabilities] = nameConfig.split('<');
+    let [id, displayName] = idAndDisplayName.split('=');
 
     let deploymentName: string | undefined;
 
@@ -41,7 +41,7 @@ export const parseModelString = (modelString: string = '', withDeploymentName = 
     }
 
     const model: ChatModelCard = {
-      name: name || undefined,
+      displayName: displayName || undefined,
       id,
     };
 
@@ -114,18 +114,23 @@ export const transformToChatModelCards = ({
 
       // if the model is known, update it based on the known model
       if (knownModel) {
-        const modelInList = draft.find((model) => model.id === toAddModel.id);
+        const index = draft.findIndex((model) => model.id === toAddModel.id);
+        const modelInList = draft[index];
 
         // if the model is already in chatModels, update it
         if (modelInList) {
-          // if (modelInList.hidden) delete modelInList.hidden;
-          modelInList.enabled = true;
-          if (toAddModel.name) modelInList.name = toAddModel.name;
+          draft[index] = {
+            ...modelInList,
+            ...toAddModel,
+            displayName: toAddModel.displayName || modelInList.displayName || modelInList.id,
+            enabled: true,
+          };
         } else {
           // if the model is not in chatModels, add it
           draft.push({
             ...knownModel,
-            name: toAddModel.name || knownModel.name || knownModel.id,
+            ...toAddModel,
+            displayName: toAddModel.displayName || knownModel.displayName || knownModel.id,
             enabled: true,
           });
         }
@@ -133,7 +138,7 @@ export const transformToChatModelCards = ({
         // if the model is not in LOBE_DEFAULT_MODEL_LIST, add it as a new custom model
         draft.push({
           ...toAddModel,
-          name: toAddModel.name || toAddModel.id,
+          displayName: toAddModel.displayName || toAddModel.id,
           enabled: true,
         });
       }

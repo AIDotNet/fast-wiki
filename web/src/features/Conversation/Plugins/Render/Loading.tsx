@@ -46,7 +46,7 @@ const useStyles = createStyles(
   `,
 );
 const Loading = memo(() => {
-  const { t } = useTranslation('plugin')as any
+  const { t } = useTranslation('plugin');
   const { styles } = useStyles();
 
   return (

@@ -47,7 +47,7 @@ const useStyles = createStyles(({ css, token, isDarkMode, responsive }) => ({
 }));
 
 const MigrationStart = memo<UpgradeButtonProps>((props) => {
-  const { t } = useTranslation('migration')as any;
+  const { t } = useTranslation('migration');
   const { styles } = useStyles();
 
   const features = [

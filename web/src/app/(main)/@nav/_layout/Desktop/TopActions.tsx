@@ -1,12 +1,12 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix , typescript-sort-keys/interface */
 import { ActionIcon } from '@lobehub/ui';
 import { AppWindowMac, SquareFunction, Album, User } from 'lucide-react';
-import Link from 'next/link';
-import { memo, useEffect, useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { memo, startTransition, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useGlobalStore } from '@/store/global';
 import { SidebarTabKey } from '@/store/global/initialState';
+import { useSessionStore } from '@/store/session';
 import { GetUser } from '@/services/UserService';
 
 export interface TopActionProps {
@@ -14,13 +14,10 @@ export interface TopActionProps {
 }
 
 const TopActions = memo<TopActionProps>(({ tab }) => {
-  const { t } = useTranslation('common')as any;
-  const [items, setItems] = useState([] as any[]);
-  const switchToApp = useGlobalStore((s) => s.switchToApp);
-  const switchToFunctionCall = useGlobalStore((s) => s.switchToFunctionCall);
-  const switchToWiki = useGlobalStore((s) => s.switchToWiki);
-  const switchToUser = useGlobalStore((s) => s.switchToUser);
-
+  const { t } = useTranslation('common');
+  const navigate = useNavigate();
+  const switchBackToChat = useGlobalStore((s) => s.switchBackToChat);
+  const [items, setItems] = useState<any[]>();
 
   function getUser() {
     GetUser()
@@ -28,23 +25,17 @@ const TopActions = memo<TopActionProps>(({ tab }) => {
         let items = [];
         items.push({
           href: '/app',
-          icon: AppWindowMac,      
+          icon: AppWindowMac,
           // @ts-ignore
-          title: t('tab.app'),
-          key: SidebarTabKey.App,
-          onClick: () => {
-            switchToApp();
-          }
-        });
+          title: t('tab.app') ,
+          key: SidebarTabKey.App
+        } );
         items.push({
           href: '/function-call',
           icon: SquareFunction,
           // @ts-ignore
           title: t('tab.function-call'),
-          key: SidebarTabKey.FuncationCall,
-          onClick: () => {
-            switchToFunctionCall();
-          }
+          key: SidebarTabKey.FuncationCall
         });
 
         items.push({
@@ -52,10 +43,7 @@ const TopActions = memo<TopActionProps>(({ tab }) => {
           icon: Album,
           // @ts-ignore
           title: t('tab.wiki'),
-          key: SidebarTabKey.Wiki,
-          onClick: () => {
-            switchToWiki();
-          }
+          key: SidebarTabKey.Wiki
         });
 
         // 管理员
@@ -65,10 +53,7 @@ const TopActions = memo<TopActionProps>(({ tab }) => {
             icon: User,
             // @ts-ignore
             title: t('tab.user'),
-            key: SidebarTabKey.User,
-            onClick: () => {
-              switchToUser();
-            }
+            key: SidebarTabKey.User
           });
         }
 
@@ -83,14 +68,13 @@ const TopActions = memo<TopActionProps>(({ tab }) => {
 
   return (
     <>
-      {items.map((item) => {
+      {items?.map((item) => {
         return (
           <Link
             aria-label={item.title}
-            href={item.href}
+            to={item.href}
             onClick={(e) => {
-              e.preventDefault();
-              item.onClick();
+              navigate(item.href);
             }}
           >
             <ActionIcon

@@ -1,12 +1,13 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix, typescript-sort-keys/interface */
 // Disable the auto sort key eslint rule to make the code more logic and readable
 import { copyToClipboard } from '@lobehub/ui';
+import isEqual from 'fast-deep-equal';
 import { produce } from 'immer';
 import { template } from 'lodash-es';
 import { SWRResponse, mutate } from 'swr';
 import { StateCreator } from 'zustand/vanilla';
 
-import { LOADING_FLAT, isFunctionMessageAtStart, testFunctionMessageAtEnd } from '@/const/message';
+import { LOADING_FLAT } from '@/const/message';
 import { TraceEventType, TraceNameMap } from '@/const/trace';
 import { useClientDataSWR } from '@/libs/swr';
 import { chatService } from '@/services/chat';
@@ -16,16 +17,19 @@ import { traceService } from '@/services/trace';
 import { useAgentStore } from '@/store/agent';
 import { agentSelectors } from '@/store/agent/selectors';
 import { chatHelpers } from '@/store/chat/helpers';
+import { messageMapKey } from '@/store/chat/slices/message/utils';
 import { ChatStore } from '@/store/chat/store';
-import { ChatMessage } from '@/types/message';
+import { ChatMessage, ChatMessageError, MessageToolCall } from '@/types/message';
 import { TraceEventPayloads } from '@/types/trace';
 import { setNamespace } from '@/utils/storeDebug';
 import { nanoid } from '@/utils/uuid';
 
-import { chatSelectors } from '../../selectors';
+import type { ChatStoreState } from '../../initialState';
+import { chatSelectors, topicSelectors } from '../../selectors';
+import { preventLeavingFn, toggleBooleanList } from '../../utils';
 import { MessageDispatch, messagesReducer } from './reducer';
 
-const n = setNamespace('message');
+const n = setNamespace('m');
 
 const SWR_USE_FETCH_MESSAGES = 'SWR_USE_FETCH_MESSAGES';
 
@@ -35,7 +39,7 @@ export interface SendMessageParams {
   onlyAddUserMessage?: boolean;
   /**
    *
-   * https://github.com/AIDotNet/lobe-chat/pull/2086
+   * https://github.comAIDotNet/lobe-chat/pull/2086
    */
   isWelcomeQuestion?: boolean;
 }
@@ -73,6 +77,7 @@ export interface ChatMessageAction {
   copyMessage: (id: string, content: string) => Promise<void>;
   refreshMessages: () => Promise<void>;
   toggleMessageEditing: (id: string, editing: boolean) => void;
+
   // =========  ↓ Internal Method ↓  ========== //
   // ========================================== //
   // ========================================== //
@@ -81,6 +86,13 @@ export interface ChatMessageAction {
     id?: string,
     action?: string,
   ) => AbortController | undefined;
+  internal_toggleLoadingArrays: (
+    key: keyof ChatStoreState,
+    loading: boolean,
+    id?: string,
+    action?: string,
+  ) => AbortController | undefined;
+  internal_toggleToolCallingStreaming: (id: string, streaming: boolean[] | undefined) => void;
   internal_toggleMessageLoading: (loading: boolean, id: string) => void;
   /**
    * update message at the frontend point
@@ -94,8 +106,6 @@ export interface ChatMessageAction {
     messages: ChatMessage[],
     parentId: string,
     params?: ProcessMessageParams,
-    sharedId?: string,
-    applicationId?: string,
   ) => Promise<void>;
   /**
    * 实际获取 AI 响应
@@ -106,52 +116,34 @@ export interface ChatMessageAction {
     messages: ChatMessage[],
     assistantMessageId: string,
     params?: ProcessMessageParams,
-    sharedId?: string,
-    applicationId?: string,
   ) => Promise<{
-    content: string;
-    functionCallAtEnd: boolean;
-    functionCallContent: string;
     isFunctionCall: boolean;
     traceId?: string;
   }>;
-  // TODO: 后续 smoothMessage 实现考虑落到 sse 这一层
-  internal_createSmoothMessage: (id: string) => {
-    startAnimation: (speed?: number) => Promise<void>;
-    stopAnimation: () => void;
-    outputQueue: string[];
-    isAnimationActive: boolean;
-  };
+
   /**
    * a method used by other action
    * @param id
    * @param content
    */
-  internal_updateMessageContent: (id: string, content: string) => Promise<void>;
-  internal_createMessage: (params: CreateMessageParams) => Promise<string>;
+  internal_updateMessageContent: (
+    id: string,
+    content: string,
+    toolCalls?: MessageToolCall[],
+  ) => Promise<void>;
+  internal_updateMessageError: (id: string, error: ChatMessageError | null) => Promise<void>;
+  internal_createMessage: (
+    params: CreateMessageParams,
+    context?: { tempMessageId?: string; skipRefresh?: boolean },
+  ) => Promise<string>;
+  internal_createTmpMessage: (params: CreateMessageParams) => string;
+  internal_fetchMessages: () => Promise<void>;
   internal_resendMessage: (id: string, traceId?: string) => Promise<void>;
   internal_traceMessage: (id: string, payload: TraceEventPayloads) => Promise<void>;
 }
 
 const getAgentConfig = () => agentSelectors.currentAgentConfig(useAgentStore.getState());
-
-const preventLeavingFn = (e: BeforeUnloadEvent) => {
-  // set returnValue to trigger alert modal
-  // Note: No matter what value is set, the browser will display the standard text
-  e.returnValue = '你有正在生成中的请求，确定要离开吗？';
-};
-
-const toggleBooleanList = (ids: string[], id: string, loading: boolean) => {
-  return produce(ids, (draft) => {
-    if (loading) {
-      draft.push(id);
-    } else {
-      const index = draft.indexOf(id);
-
-      if (index >= 0) draft.splice(index, 1);
-    }
-  });
-};
+const getAgentChatConfig = () => agentSelectors.currentAgentChatConfig(useAgentStore.getState());
 
 export const chatMessage: StateCreator<
   ChatStore,
@@ -160,8 +152,31 @@ export const chatMessage: StateCreator<
   ChatMessageAction
 > = (set, get) => ({
   deleteMessage: async (id) => {
-    get().internal_dispatchMessage({ type: 'deleteMessage', id });
-    await messageService.removeMessage(id);
+    const message = chatSelectors.getMessageById(id)(get());
+    if (!message) return;
+
+    const deleteFn = async (id: string) => {
+      get().internal_dispatchMessage({ type: 'deleteMessage', id });
+      await messageService.removeMessage(id);
+    };
+
+    // if the message is a tool calls, then delete all the related messages
+    // TODO: maybe we need to delete it in the DB?
+    if (message.tools) {
+      const pools = message.tools
+        .flatMap((tool) => {
+          const messages = chatSelectors
+            .currentChats(get())
+            .filter((m) => m.tool_call_id === tool.id);
+
+          return messages.map((m) => m.id);
+        })
+        .map((i) => deleteFn(i));
+
+      await Promise.all(pools);
+    }
+
+    await deleteFn(id);
     await get().refreshMessages();
   },
   delAndRegenerateMessage: async (id) => {
@@ -204,8 +219,11 @@ export const chatMessage: StateCreator<
 
     const fileIdList = files?.map((f) => f.id);
 
-    // if message is empty and no files, then stop
-    if (!message && (!fileIdList || fileIdList?.length === 0)) return;
+    const isNoFile = !fileIdList || fileIdList.length === 0;
+
+    // if message is empty or no files, then stop
+    if (!message && isNoFile) return;
+    set({ isCreatingMessage: true }, false, 'creatingMessage/start');
 
     const newMessage: CreateMessageParams = {
       content: message,
@@ -217,27 +235,93 @@ export const chatMessage: StateCreator<
       topicId: activeTopicId,
     };
 
-    const id = await get().internal_createMessage(newMessage);
+    const agentConfig = getAgentChatConfig();
+
+    let tempMessageId: string | undefined = undefined;
+    let newTopicId: string | undefined = undefined;
+
+    // it should be the default topic, then
+    // if autoCreateTopic is enabled, check to whether we need to create a topic
+    if (!onlyAddUserMessage && !activeTopicId && agentConfig.enableAutoCreateTopic) {
+      // check activeTopic and then auto create topic
+      const chats = chatSelectors.currentChats(get());
+
+      // we will add two messages (user and assistant), so the finial length should +2
+      const featureLength = chats.length + 2;
+
+      // if there is no activeTopicId and the feature length is greater than the threshold
+      // then create a new topic and active it
+      if (!get().activeTopicId && featureLength >= agentConfig.autoCreateTopicThreshold) {
+        // we need to create a temp message for optimistic update
+        tempMessageId = get().internal_createTmpMessage(newMessage);
+        get().internal_toggleMessageLoading(true, tempMessageId);
+
+        const topicId = await get().createTopic();
+
+        if (topicId) {
+          newTopicId = topicId;
+          newMessage.topicId = topicId;
+
+          // we need to copy the messages to the new topic or the message will disappear
+          const mapKey = chatSelectors.currentChatKey(get());
+          const newMaps = {
+            ...get().messagesMap,
+            [messageMapKey(activeId, topicId)]: get().messagesMap[mapKey],
+          };
+          set({ messagesMap: newMaps }, false, 'internal_copyMessages');
+
+          // get().internal_dispatchMessage({ type: 'deleteMessage', id: tempMessageId });
+          get().internal_toggleMessageLoading(false, tempMessageId);
+
+          // make the topic loading
+          get().internal_updateTopicLoading(topicId, true);
+        }
+      }
+    }
+
+    const id = await get().internal_createMessage(newMessage, {
+      tempMessageId,
+      skipRefresh: !onlyAddUserMessage,
+    });
+
+    // switch to the new topic if create the new topic
+    if (!!newTopicId) {
+      await get().switchTopic(newTopicId, true);
+      await get().internal_fetchMessages();
+
+      // delete previous messages
+      // remove the temp message map
+      const newMaps = { ...get().messagesMap, [messageMapKey(activeId, null)]: [] };
+      set({ messagesMap: newMaps }, false, 'internal_copyMessages');
+    }
 
     // if only add user message, then stop
-    if (onlyAddUserMessage) return;
+    if (onlyAddUserMessage) {
+      set({ isCreatingMessage: false }, false, 'creatingMessage/start');
+      return;
+    }
 
     // Get the current messages to generate AI response
     const messages = chatSelectors.currentChats(get());
-
     await internal_coreProcessMessage(messages, id, { isWelcomeQuestion });
 
-    // check activeTopic and then auto create topic
-    const chats = chatSelectors.currentChats(get());
+    set({ isCreatingMessage: false }, false, 'creatingMessage/stop');
 
-    const agentConfig = getAgentConfig();
     // if autoCreateTopic is false, then stop
     if (!agentConfig.enableAutoCreateTopic) return;
 
-    if (!activeTopicId && chats.length >= agentConfig.autoCreateTopicThreshold) {
-      const { saveToTopic, switchTopic } = get();
-      const id = await saveToTopic();
-      if (id) switchTopic(id);
+    // check activeTopic and then auto update topic title
+    if (newTopicId) {
+      const chats = chatSelectors.currentChats(get());
+      await get().summaryTopicTitle(newTopicId, chats);
+      return;
+    }
+
+    const topic = topicSelectors.currentActiveTopic(get());
+
+    if (topic && !topic.title) {
+      const chats = chatSelectors.currentChats(get());
+      await get().summaryTopicTitle(topic.id, chats);
     }
   },
   addAIMessage: async () => {
@@ -275,7 +359,10 @@ export const chatMessage: StateCreator<
 
     internal_toggleChatLoading(false, undefined, n('stopGenerateMessage') as string);
   },
+
   updateInputMessage: (message) => {
+    if (isEqual(message, get().inputMessage)) return;
+
     set({ inputMessage: message }, false, n('updateInputMessage', message));
   },
   modifyMessageContent: async (id, content) => {
@@ -294,16 +381,18 @@ export const chatMessage: StateCreator<
       async ([, sessionId, topicId]: [string, string, string | undefined]) =>
         messageService.getMessages(sessionId, topicId),
       {
-        suspense: true,
-        fallbackData: [],
         onSuccess: (messages, key) => {
+          const nextMap = {
+            ...get().messagesMap,
+            [messageMapKey(sessionId, activeTopicId)]: messages,
+          };
+          // no need to update map if the messages have been init and the map is the same
+          if (get().messagesInit && isEqual(nextMap, get().messagesMap)) return;
+
           set(
-            { activeId: sessionId, messages, messagesInit: true },
+            { messagesInit: true, messagesMap: nextMap },
             false,
-            n('useFetchMessages', {
-              messages,
-              queryKey: key,
-            }),
+            n('useFetchMessages', { messages, queryKey: key }),
           );
         },
       },
@@ -314,8 +403,7 @@ export const chatMessage: StateCreator<
 
   // the internal process method of the AI message
   internal_coreProcessMessage: async (messages, userMessageId, params) => {
-    const { internal_fetchAIChatMessage, triggerFunctionCall, refreshMessages, activeTopicId } =
-      get();
+    const { internal_fetchAIChatMessage, refreshMessages, activeTopicId } = get();
 
     const { model, provider } = getAgentConfig();
 
@@ -331,39 +419,14 @@ export const chatMessage: StateCreator<
       topicId: activeTopicId, // if there is activeTopicId，then add it to topicId
     };
 
-    const mid = await get().internal_createMessage(assistantMessage);
+    const assistantId = await get().internal_createMessage(assistantMessage);
 
     // 2. fetch the AI response
-    const { isFunctionCall, content, functionCallAtEnd, functionCallContent, traceId } =
-      await internal_fetchAIChatMessage(messages, mid, params);
+    const { isFunctionCall } = await internal_fetchAIChatMessage(messages, assistantId, params);
 
     // 3. if it's the function call message, trigger the function method
     if (isFunctionCall) {
-      let functionId = mid;
-
-      // if the function call is at the end of the message, then create a new function message
-      if (functionCallAtEnd) {
-        // create a new separate message and remove the function call from the prev message
-
-        await get().internal_updateMessageContent(mid, content.replace(functionCallContent, ''));
-
-        const functionMessage: CreateMessageParams = {
-          role: 'function',
-          content: functionCallContent,
-          fromModel: model,
-          fromProvider: provider,
-
-          parentId: userMessageId,
-          sessionId: get().activeId,
-          topicId: activeTopicId,
-          traceId,
-        };
-
-        functionId = await get().internal_createMessage(functionMessage);
-      }
-
       await refreshMessages();
-      await triggerFunctionCall(functionId);
     }
   },
   internal_dispatchMessage: (payload) => {
@@ -371,9 +434,13 @@ export const chatMessage: StateCreator<
 
     if (!activeId) return;
 
-    const messages = messagesReducer(get().messages, payload);
+    const messages = messagesReducer(chatSelectors.currentChats(get()), payload);
 
-    set({ messages }, false, n(`dispatchMessage/${payload.type}`, payload));
+    const nextMap = { ...get().messagesMap, [chatSelectors.currentChatKey(get())]: messages };
+
+    if (isEqual(nextMap, get().messagesMap)) return;
+
+    set({ messagesMap: nextMap }, false, { type: `dispatchMessage/${payload.type}`, payload });
   },
   internal_fetchAIChatMessage: async (messages, assistantId, params) => {
     const {
@@ -381,7 +448,7 @@ export const chatMessage: StateCreator<
       refreshMessages,
       internal_updateMessageContent,
       internal_dispatchMessage,
-      internal_createSmoothMessage,
+      internal_toggleToolCallingStreaming,
     } = get();
 
     const abortController = internal_toggleChatLoading(
@@ -390,98 +457,41 @@ export const chatMessage: StateCreator<
       n('generateMessage(start)', { assistantId, messages }) as string,
     );
 
-    const config = getAgentConfig();
-
-    const compiler = template(config.inputTemplate, { interpolate: /{{([\S\s]+?)}}/g });
-
-    // ================================== //
-    //   messages uniformly preprocess    //
-    // ================================== //
+    const agentConfig = getAgentConfig();
+    const chatConfig = agentConfig.chatConfig;
 
     // 1. slice messages with config
-    let preprocessMsgs = chatHelpers.getSlicedMessagesWithConfig(messages, config);
+    let preprocessMsgs = chatHelpers.getSlicedMessagesWithConfig(messages, chatConfig);
 
-    // 2. replace inputMessage template
-    preprocessMsgs = !config.inputTemplate
-      ? preprocessMsgs
-      : preprocessMsgs.map((m) => {
-        if (m.role === 'user') {
-          try {
-            return { ...m, content: compiler({ text: m.content }) };
-          } catch (error) {
-            console.error(error);
-
-            return m;
-          }
-        }
-
-        return m;
-      });
-
-    // 3. add systemRole
-    if (config.systemRole) {
-      preprocessMsgs.unshift({ content: config.systemRole, role: 'system' } as ChatMessage);
-    }
-
-    // 4. handle max_tokens
-    config.params.max_tokens = config.enableMaxTokens ? config.params.max_tokens : undefined;
-
-    // 5. handle config for the vision model
-    // Due to the gpt-4-vision-preview model's default max_tokens is very small
-    // we need to set the max_tokens a larger one.
-    if (config.model === 'gpt-4-vision-preview') {
-      /* eslint-disable unicorn/no-lonely-if */
-      if (!config.params.max_tokens)
-        // refs: https://github.com/AIDotNet/lobe-chat/issues/837
-        config.params.max_tokens = 2048;
-    }
-
-    let output = '';
     let isFunctionCall = false;
-    let functionCallAtEnd = false;
-    let functionCallContent = '';
     let msgTraceId: string | undefined;
+    let output = '';
 
     // 获取query的id或sharedId
     const query = location.search;
 
     var q = new URLSearchParams(query);
 
-
     const id = q.get('id');
     const sharedId = q.get('sharedId');
-
-    // TODO: 消息发送
-    const { startAnimation, stopAnimation, outputQueue, isAnimationActive } =
-      internal_createSmoothMessage(assistantId);
 
     await chatService.createAssistantMessageStream({
       abortController,
       params: {
         messages: preprocessMsgs,
-        model: config.model,
-        applicationId:id,
-        sharedId:sharedId,
-        provider: config.provider,
-        ...config.params,
-        // plugins: config.plugins,
-      },
-      trace: {
-        traceId: params?.traceId,
-        sessionId: get().activeId,
-        topicId: get().activeTopicId,
-        traceName: TraceNameMap.Conversation,
+        model: agentConfig.model,
+        applicationId: id,
+        sharedId: sharedId,
+        provider: agentConfig.provider,
+        ...agentConfig.params,
+        plugins: agentConfig.plugins,
       },
       isWelcomeQuestion: params?.isWelcomeQuestion,
       onErrorHandle: async (error) => {
         await messageService.updateMessageError(assistantId, error);
         await refreshMessages();
       },
-      onAbort: async () => {
-        stopAnimation();
-      },
-      onFinish: async (content, { traceId, observationId }) => {
-        stopAnimation();
+      onFinish: async (content, { traceId, observationId, toolCalls }) => {
         // if there is traceId, update it
         if (traceId) {
           msgTraceId = traceId;
@@ -491,92 +501,48 @@ export const chatMessage: StateCreator<
           });
         }
 
-        // if there is still content not displayed,
-        // and the message is not a function call
-        // then continue the animation
-        if (outputQueue.length > 0 && !isFunctionCall) {
-          await startAnimation(15);
+        if (toolCalls && toolCalls.length > 0) {
+          internal_toggleToolCallingStreaming(assistantId, undefined);
         }
 
         // update the content after fetch result
-        await internal_updateMessageContent(assistantId, content);
+        await internal_updateMessageContent(assistantId, content, toolCalls);
       },
-      onMessageHandle: async (text) => {
-        output += text;
-        outputQueue.push(...text.split(''));
+      onMessageHandle: async (chunk) => {
+        switch (chunk.type) {
+          case 'text': {
+            output += chunk.text;
+            internal_dispatchMessage({
+              id: assistantId,
+              type: 'updateMessages',
+              value: { content: output },
+            });
+            break;
+          }
 
-        // is this message is just a function call
-        if (isFunctionMessageAtStart(output)) {
-          stopAnimation();
-          internal_dispatchMessage({
-            id: assistantId,
-            key: 'content',
-            type: 'updateMessage',
-            value: output,
-          });
-          isFunctionCall = true;
+          // is this message is just a tool call
+          case 'tool_calls': {
+            internal_toggleToolCallingStreaming(assistantId, chunk.isAnimationActives);
+            internal_dispatchMessage({
+              id: assistantId,
+              type: 'updateMessages',
+              value: { tools: [] },
+            });
+            isFunctionCall = true;
+          }
         }
-
-        // if it's the first time to receive the message,
-        // and the message is not a function call
-        // then start the animation
-        if (!isAnimationActive && !isFunctionCall) startAnimation();
       },
     });
 
-    internal_toggleChatLoading(false, undefined, n('generateMessage(end)') as string);
-
-    // also exist message like this:
-    // 请稍等，我帮您查询一下。{"tool_calls":[{"id":"call_sbca","type":"function","function":{"name":"pluginName____apiName","arguments":{"key":"value"}}}]}
-    if (!isFunctionCall) {
-      const { content, valid } = testFunctionMessageAtEnd(output);
-
-      // if fc at end, replace the message
-      if (valid) {
-        isFunctionCall = true;
-        functionCallAtEnd = true;
-        functionCallContent = content;
-      }
-    }
+    internal_toggleChatLoading(false, assistantId, n('generateMessage(end)') as string);
 
     return {
-      content: output,
-      functionCallAtEnd,
-      functionCallContent,
       isFunctionCall,
       traceId: msgTraceId,
     };
   },
   internal_toggleChatLoading: (loading, id, action) => {
-    if (loading) {
-      window.addEventListener('beforeunload', preventLeavingFn);
-
-      const abortController = new AbortController();
-      set(
-        {
-          abortController,
-          chatLoadingIds: toggleBooleanList(get().messageLoadingIds, id!, loading),
-        },
-        false,
-        action,
-      );
-
-      return abortController;
-    } else {
-      if (!id) {
-        set({ abortController: undefined, chatLoadingIds: [] }, false, action);
-      } else
-        set(
-          {
-            abortController: undefined,
-            chatLoadingIds: toggleBooleanList(get().messageLoadingIds, id, loading),
-          },
-          false,
-          action,
-        );
-
-      window.removeEventListener('beforeunload', preventLeavingFn);
-    }
+    return get().internal_toggleLoadingArrays('chatLoadingIds', loading, id, action);
   },
   internal_toggleMessageLoading: (loading, id) => {
     set(
@@ -587,7 +553,22 @@ export const chatMessage: StateCreator<
       'internal_toggleMessageLoading',
     );
   },
+  internal_toggleToolCallingStreaming: (id, streaming) => {
+    set(
+      {
+        toolCallingStreamIds: produce(get().toolCallingStreamIds, (draft) => {
+          if (!!streaming) {
+            draft[id] = streaming;
+          } else {
+            delete draft[id];
+          }
+        }),
+      },
 
+      false,
+      'toggleToolCallingStreaming',
+    );
+  },
   internal_resendMessage: async (messageId, traceId) => {
     // 1. 构造所有相关的历史记录
     const chats = chatSelectors.currentChats(get());
@@ -600,7 +581,7 @@ export const chatMessage: StateCreator<
     let contextMessages: ChatMessage[] = [];
 
     switch (currentMessage.role) {
-      case 'function':
+      case 'tool':
       case 'user': {
         contextMessages = chats.slice(0, currentIndex + 1);
         break;
@@ -626,97 +607,73 @@ export const chatMessage: StateCreator<
     await internal_coreProcessMessage(contextMessages, latestMsg.id, { traceId });
   },
 
-  internal_updateMessageContent: async (id, content) => {
+  internal_updateMessageError: async (id, error) => {
+    get().internal_dispatchMessage({ id, type: 'updateMessages', value: { error } });
+    await messageService.updateMessage(id, { error });
+    await get().refreshMessages();
+  },
+  internal_updateMessageContent: async (id, content, toolCalls) => {
     const { internal_dispatchMessage, refreshMessages } = get();
 
     // Due to the async update method and refresh need about 100ms
     // we need to update the message content at the frontend to avoid the update flick
     // refs: https://medium.com/@kyledeguzmanx/what-are-optimistic-updates-483662c3e171
-    internal_dispatchMessage({ id, key: 'content', type: 'updateMessage', value: content });
+    if (toolCalls) {
+      internal_dispatchMessage({
+        id,
+        type: 'updateMessages',
+        value: { tools: [] },
+      });
+    } else {
+      internal_dispatchMessage({ id, type: 'updateMessages', value: { content } });
+    }
 
-    await messageService.updateMessage(id, { content });
+    await messageService.updateMessage(id, {
+      content,
+      tools: undefined,
+    });
     await refreshMessages();
   },
 
-  internal_createMessage: async (message) => {
-    const { internal_dispatchMessage, refreshMessages, internal_toggleMessageLoading } = get();
+  internal_createMessage: async (message, context) => {
+    const { internal_createTmpMessage, refreshMessages, internal_toggleMessageLoading } = get();
+    let tempId = context?.tempMessageId;
+    if (!tempId) {
+      // use optimistic update to avoid the slow waiting
+      tempId = internal_createTmpMessage(message);
+
+      internal_toggleMessageLoading(true, tempId);
+    }
+
+    const id = await messageService.createMessage(message);
+    if (!context?.skipRefresh) {
+      await refreshMessages();
+    }
+
+    internal_toggleMessageLoading(false, tempId);
+    return id;
+  },
+
+  internal_fetchMessages: async () => {
+    const messages = await messageService.getMessages(get().activeId, get().activeTopicId);
+    const nextMap = { ...get().messagesMap, [chatSelectors.currentChatKey(get())]: messages };
+    // no need to update map if the messages have been init and the map is the same
+    if (get().messagesInit && isEqual(nextMap, get().messagesMap)) return;
+
+    set(
+      { messagesInit: true, messagesMap: nextMap },
+      false,
+      n('internal_fetchMessages', { messages }),
+    );
+  },
+  internal_createTmpMessage: (message) => {
+    const { internal_dispatchMessage } = get();
 
     // use optimistic update to avoid the slow waiting
     const tempId = 'tmp_' + nanoid();
     internal_dispatchMessage({ type: 'createMessage', id: tempId, value: message });
 
-    internal_toggleMessageLoading(true, tempId);
-    const id = await messageService.createMessage(message);
-
-    await refreshMessages();
-    internal_toggleMessageLoading(false, tempId);
-
-    return id;
-  },
-
-  internal_createSmoothMessage: (id) => {
-    const { internal_dispatchMessage } = get();
-
-    let buffer = '';
-    // why use queue: https://shareg.pt/GLBrjpK
-    let outputQueue: string[] = [];
-
-    // eslint-disable-next-line no-undef
-    let animationTimeoutId: NodeJS.Timeout | null = null;
-    let isAnimationActive = false;
-
-    // when you need to stop the animation, call this function
-    const stopAnimation = () => {
-      isAnimationActive = false;
-      if (animationTimeoutId !== null) {
-        clearTimeout(animationTimeoutId);
-        animationTimeoutId = null;
-      }
-    };
-
-    // define startAnimation function to display the text in buffer smooth
-    // when you need to start the animation, call this function
-    const startAnimation = (speed = 2) =>
-      new Promise<void>((resolve) => {
-        if (isAnimationActive) {
-          resolve();
-          return;
-        }
-
-        isAnimationActive = true;
-
-        const updateText = () => {
-          // 如果动画已经不再激活，则停止更新文本
-          if (!isAnimationActive) {
-            clearTimeout(animationTimeoutId!);
-            animationTimeoutId = null;
-            resolve();
-          }
-
-          // 如果还有文本没有显示
-          // 检查队列中是否有字符待显示
-          if (outputQueue.length > 0) {
-            // 从队列中获取前两个字符（如果存在）
-            const charsToAdd = outputQueue.splice(0, speed).join('');
-            buffer += charsToAdd;
-
-            // 更新消息内容，这里可能需要结合实际情况调整
-            internal_dispatchMessage({ id, key: 'content', type: 'updateMessage', value: buffer });
-
-            // 设置下一个字符的延迟
-            animationTimeoutId = setTimeout(updateText, 16); // 16 毫秒的延迟模拟打字机效果
-          } else {
-            // 当所有字符都显示完毕时，清除动画状态
-            isAnimationActive = false;
-            animationTimeoutId = null;
-            resolve();
-          }
-        };
-
-        updateText();
-      });
-
-    return { startAnimation, stopAnimation, outputQueue, isAnimationActive };
+    return tempId;
   },
 
   internal_traceMessage: async (id, payload) => {
@@ -731,6 +688,38 @@ export const chatMessage: StateCreator<
       traceService
         .traceEvent({ traceId, observationId, content: message.content, ...payload })
         .catch();
+    }
+  },
+
+  internal_toggleLoadingArrays: (key, loading, id, action) => {
+    if (loading) {
+      window.addEventListener('beforeunload', preventLeavingFn);
+
+      const abortController = new AbortController();
+      set(
+        {
+          abortController,
+          [key]: toggleBooleanList(get()[key] as string[], id!, loading),
+        },
+        false,
+        action,
+      );
+
+      return abortController;
+    } else {
+      if (!id) {
+        set({ abortController: undefined, [key]: [] }, false, action);
+      } else
+        set(
+          {
+            abortController: undefined,
+            [key]: toggleBooleanList(get()[key] as string[], id, loading),
+          },
+          false,
+          action,
+        );
+
+      window.removeEventListener('beforeunload', preventLeavingFn);
     }
   },
 });

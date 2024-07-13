@@ -1,8 +1,9 @@
 import { Icon } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
 import { FileImage, FileText, FileUpIcon } from 'lucide-react';
-import { rgba } from 'polished';
+import { darken, lighten } from 'polished';
 import { memo, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Center, Flexbox } from 'react-layout-kit';
 
@@ -12,61 +13,73 @@ import { useFileStore } from '@/store/file';
 import { useUserStore } from '@/store/user';
 import { modelProviderSelectors } from '@/store/user/selectors';
 
-const useStyles = createStyles(({ css, token, stylish }) => {
+const DRAGGING_ROOT_ID = 'dragging-root';
+const getContainer = () => document.querySelector(`#${DRAGGING_ROOT_ID}`);
+const BLOCK_SIZE = 64;
+const ICON_SIZE = 36;
+
+const useStyles = createStyles(({ css, token }) => {
   return {
     container: css`
-      width: 300px;
-      height: 300px;
-      padding: 16px;
-
-      color: ${token.colorWhite};
+      width: 320px;
+      height: 200px;
+      padding: ${token.borderRadiusLG + 4}px;
 
       background: ${token.geekblue};
       border-radius: 16px;
-      box-shadow:
-        ${rgba(token.geekblue, 0.1)} 0 1px 1px 0 inset,
-        ${rgba(token.geekblue, 0.1)} 0 50px 100px -20px,
-        ${rgba(token.geekblue, 0.3)} 0 30px 60px -30px;
     `,
     content: css`
       width: 100%;
       height: 100%;
       padding: 16px;
 
-      border: 2px dashed ${token.colorWhite};
-      border-radius: 12px;
+      border: 1.5px dashed ${token.colorBorder};
+      border-radius: ${token.borderRadiusLG}px;
     `,
     desc: css`
-      color: ${rgba(token.colorTextLightSolid, 0.6)};
+      color: #fff;
+    `,
+    icon: css`
+      color: ${darken(0.05, token.geekblue)};
+      background: ${lighten(0.38, token.geekblue)};
+      border-radius: ${token.borderRadiusLG}px;
+    `,
+    iconGroup: css`
+      margin-top: -44px;
     `,
     title: css`
-      font-size: 24px;
+      font-size: 20px;
       font-weight: bold;
+      color: #fff;
     `,
     wrapper: css`
       position: fixed;
-      z-index: 10000000;
-      top: 0;
-      left: 0;
+      z-index: 9999;
+      inset: 0;
 
       width: 100%;
       height: 100%;
 
-      transition: all 0.3s ease-in-out;
-
       background: ${token.colorBgMask};
-      ${stylish.blur};
+      backdrop-filter: blur(4px);
+
+      transition: all 0.3s ease-in-out;
     `,
   };
 });
 
 const handleDragOver = (e: DragEvent) => {
-  e.preventDefault();
+  if (!e.dataTransfer?.items || e.dataTransfer.items.length === 0) return;
+
+  const isFile = e.dataTransfer.types.includes('Files');
+  if (isFile) {
+    e.preventDefault();
+  }
 };
 
 const DragUpload = memo(() => {
-  const { styles } = useStyles();
-  const { t } = useTranslation('chat')as any;
+  const { styles, theme } = useStyles();
+  const { t } = useTranslation('chat');
   const [isDragging, setIsDragging] = useState(false);
   // When a file is dragged to a different area, the 'dragleave' event may be triggered,
   // causing isDragging to be mistakenly set to false.
@@ -92,47 +105,70 @@ const DragUpload = memo(() => {
   };
 
   const handleDragEnter = (e: DragEvent) => {
-    e.preventDefault();
+    if (!e.dataTransfer?.items || e.dataTransfer.items.length === 0) return;
 
-    dragCounter.current += 1;
-    if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
+    const isFile = e.dataTransfer.types.includes('Files');
+    if (isFile) {
+      dragCounter.current += 1;
+      e.preventDefault();
       setIsDragging(true);
     }
   };
 
   const handleDragLeave = (e: DragEvent) => {
-    e.preventDefault();
+    if (!e.dataTransfer?.items || e.dataTransfer.items.length === 0) return;
 
-    // reset counter
-    dragCounter.current -= 1;
+    const isFile = e.dataTransfer.types.includes('Files');
+    if (isFile) {
+      e.preventDefault();
 
-    if (dragCounter.current === 0) {
-      setIsDragging(false);
+      // reset counter
+      dragCounter.current -= 1;
+
+      if (dragCounter.current === 0) {
+        setIsDragging(false);
+      }
     }
   };
 
   const handleDrop = async (e: DragEvent) => {
-    e.preventDefault();
-    // reset counter
-    dragCounter.current = 0;
+    if (!e.dataTransfer?.items || e.dataTransfer.items.length === 0) return;
 
-    setIsDragging(false);
+    const isFile = e.dataTransfer.types.includes('Files');
+    if (isFile) {
+      e.preventDefault();
 
-    // get filesList
-    // TODO: support folder files upload
-    const files = e.dataTransfer?.files;
+      // reset counter
+      dragCounter.current = 0;
 
-    // upload files
-    uploadImages(files);
+      setIsDragging(false);
+
+      // get filesList
+      // TODO: support folder files upload
+      const files = e.dataTransfer?.files;
+
+      // upload files
+      uploadImages(files);
+    }
   };
 
   const handlePaste = (event: ClipboardEvent) => {
     // get files from clipboard
-
     const files = event.clipboardData?.files;
 
     uploadImages(files);
   };
+
+  useEffect(() => {
+    if (getContainer()) return;
+    const root = document.createElement('div');
+    root.id = DRAGGING_ROOT_ID;
+    document.body.append(root);
+
+    return () => {
+      root.remove();
+    };
+  }, []);
 
   useEffect(() => {
     window.addEventListener('dragenter', handleDragEnter);
@@ -150,30 +186,59 @@ const DragUpload = memo(() => {
     };
   }, [handleDragEnter, handleDragOver, handleDragLeave, handleDrop, handlePaste]);
 
-  return (
-    isDragging && (
-      <Center className={styles.wrapper}>
-        <div className={styles.container}>
-          <Center className={styles.content} gap={40}>
-            <Flexbox horizontal>
-              <Icon icon={FileImage} size={{ fontSize: 64, strokeWidth: 1 }} />
-              <Icon icon={FileUpIcon} size={{ fontSize: 64, strokeWidth: 1 }} />
-              <Icon icon={FileText} size={{ fontSize: 64, strokeWidth: 1 }} />
+  if (!isDragging) return;
+
+  return createPortal(
+    <Center className={styles.wrapper}>
+      <div className={styles.container}>
+        <Center className={styles.content} gap={12}>
+          <Flexbox className={styles.iconGroup} horizontal>
+            <Center
+              className={styles.icon}
+              height={BLOCK_SIZE * 1.25}
+              style={{
+                background: lighten(0.32, theme.geekblue),
+                transform: 'rotateZ(-20deg) translateX(10px)',
+              }}
+              width={BLOCK_SIZE}
+            >
+              <Icon icon={FileImage} size={{ fontSize: ICON_SIZE, strokeWidth: 1.5 }} />
+            </Center>
+            <Center
+              className={styles.icon}
+              height={BLOCK_SIZE * 1.25}
+              style={{
+                transform: 'translateY(-12px)',
+                zIndex: 1,
+              }}
+              width={BLOCK_SIZE}
+            >
+              <Icon icon={FileUpIcon} size={{ fontSize: ICON_SIZE, strokeWidth: 1.5 }} />
+            </Center>
+            <Center
+              className={styles.icon}
+              height={BLOCK_SIZE * 1.25}
+              style={{
+                background: lighten(0.32, theme.geekblue),
+                transform: 'rotateZ(20deg) translateX(-10px)',
+              }}
+              width={BLOCK_SIZE}
+            >
+              <Icon icon={FileText} size={{ fontSize: ICON_SIZE, strokeWidth: 1.5 }} />
+            </Center>
+          </Flexbox>
+          <Flexbox align={'center'} gap={8} style={{ textAlign: 'center' }}>
+            <Flexbox className={styles.title}>
+              {t(enabledFiles ? 'upload.dragFileTitle' : 'upload.dragTitle')}
             </Flexbox>
-            <Flexbox align={'center'} gap={8} style={{ textAlign: 'center' }}>
-              <Flexbox className={styles.title}>
-          {/* @ts-ignore */}
-                {t(enabledFiles ? 'upload.dragFileTitle' : 'upload.dragTitle')}
-              </Flexbox>
-              <Flexbox className={styles.desc}>
-      {/* @ts-ignore */}
-                {t(enabledFiles ? 'upload.dragFileDesc' : 'upload.dragDesc')}
-              </Flexbox>
+            <Flexbox className={styles.desc}>
+              {t(enabledFiles ? 'upload.dragFileDesc' : 'upload.dragDesc')}
             </Flexbox>
-          </Center>
-        </div>
-      </Center>
-    )
+          </Flexbox>
+        </Center>
+      </div>
+    </Center>,
+    getContainer()!,
   );
 });
 

@@ -1,4 +1,4 @@
-'use client';
+
 
 import { createStyles } from 'antd-style';
 import { rgba } from 'polished';
@@ -30,7 +30,7 @@ const useStyles = createStyles(({ css, token }) => {
 const Hero = memo(() => {
   const { styles } = useStyles();
 
-  const { t } = useTranslation('welcome')as any;
+  const { t } = useTranslation('welcome');
 
   return (
     <>
@@ -43,7 +43,7 @@ const Hero = memo(() => {
         justify={'center'}
         wrap={'wrap'}
       >
-        <strong style={{ fontSize: 'min(56px, 8vw)' }}>FastWki-Chat</strong>
+        <strong style={{ fontSize: 'min(56px, 8vw)' }}>TokenChat</strong>
         <span>{t('slogan.title')}</span>
       </Flexbox>
       <Flexbox

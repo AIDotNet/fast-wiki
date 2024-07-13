@@ -3,10 +3,11 @@ import { IPluginErrorType } from '@lobehub/chat-plugin-sdk';
 import { ILobeAgentRuntimeErrorType } from '@/libs/agent-runtime';
 import { ErrorType } from '@/types/fetch';
 
-import { LLMRoleType } from '../llm';
 import { BaseDataModel } from '../meta';
-import { ChatPluginPayload } from './tools';
+import { ChatPluginPayload, ChatToolPayload } from './tools';
 import { Translate } from './translate';
+
+export type MessageRoleType = 'user' | 'system' | 'assistant' | 'tool';
 
 /**
  * 聊天消息错误对象
@@ -31,13 +32,13 @@ export * from './tools';
 
 export interface ChatMessage extends BaseDataModel {
   content: string;
-  error?: ChatMessageError;
+  error?: ChatMessageError | null;
   // 扩展字段
   extra?: {
     fromModel?: string;
     fromProvider?: string;
     // 翻译
-    translate?: ChatTranslate | false;
+    translate?: ChatTranslate | false | null;
     // TTS
     tts?: ChatTTS;
   } & Record<string, any>;
@@ -51,9 +52,10 @@ export interface ChatMessage extends BaseDataModel {
    * parent message id
    */
   parentId?: string;
-  plugin?: ChatPluginPayload;
 
+  plugin?: ChatPluginPayload;
   pluginState?: any;
+
   /**
    * quoted other message's id
    */
@@ -61,8 +63,11 @@ export interface ChatMessage extends BaseDataModel {
   /**
    * message role type
    */
-  role: LLMRoleType;
+  role: MessageRoleType;
   sessionId?: string;
+
+  tool_call_id?: string;
+  tools?: ChatToolPayload[];
 
   /**
    * 保存到主题的消息
@@ -72,16 +77,6 @@ export interface ChatMessage extends BaseDataModel {
    * 观测链路 id
    */
   traceId?: string;
-
-  /**
-   * 分享id
-   */
-  sharedId?: string;
-
-  /**
-   * 应用id
-   */
-  applicationId?: string;
 }
 
 export type ChatMessageMap = Record<string, ChatMessage>;

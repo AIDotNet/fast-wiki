@@ -14,7 +14,7 @@ export interface BackBottomProps {
 const BackBottom = memo<BackBottomProps>(({ visible, onScrollToBottom }) => {
   const { styles, cx } = useStyles();
 
-  const { t } = useTranslation('chat') as any;
+  const { t } = useTranslation('chat');
 
   return (
     <Button

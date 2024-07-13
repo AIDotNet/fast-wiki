@@ -5,7 +5,7 @@ export const useOnPluginStateUpdate = (callback: (key: string, value: any) => vo
   useEffect(() => {
     const fn = (e: MessageEvent) => {
       if (e.data.type === PluginChannel.updatePluginState) {
-        const key = e.data?.key;
+        const key = e.data.key;
         const value = e.data.value;
 
         callback(key, value);

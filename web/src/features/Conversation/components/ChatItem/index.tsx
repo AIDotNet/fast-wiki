@@ -1,7 +1,7 @@
-import { AlertProps, ChatItem } from '@lobehub/ui';
+import { ChatItem } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
 import isEqual from 'fast-deep-equal';
-import { ReactNode, memo, useCallback, useMemo } from 'react';
+import { ReactNode, memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useAgentStore } from '@/store/agent';
@@ -11,10 +11,10 @@ import { chatSelectors } from '@/store/chat/selectors';
 import { useSessionStore } from '@/store/session';
 import { sessionMetaSelectors } from '@/store/session/selectors';
 import { useUserStore } from '@/store/user';
-import { settingsSelectors } from '@/store/user/selectors';
+import { userGeneralSettingsSelectors } from '@/store/user/selectors';
 import { ChatMessage } from '@/types/message';
 
-import ErrorMessageExtra, { getErrorAlertConfig } from '../../Error';
+import ErrorMessageExtra, { useErrorContent } from '../../Error';
 import { renderMessagesExtra } from '../../Extras';
 import { renderMessages, useAvatarsClick } from '../../Messages';
 import ActionsBar from './ActionsBar';
@@ -38,11 +38,11 @@ export interface ChatListItemProps {
 }
 
 const Item = memo<ChatListItemProps>(({ index, id }) => {
-  const fontSize = useUserStore((s) => settingsSelectors.currentSettings(s).fontSize);
-  const { t } = useTranslation('common') as any;
+  const fontSize = useUserStore(userGeneralSettingsSelectors.fontSize);
+  const { t } = useTranslation('common');
   const { styles, cx } = useStyles();
   const [type = 'chat'] = useAgentStore((s) => {
-    const config = agentSelectors.currentAgentConfig(s);
+    const config = agentSelectors.currentAgentChatConfig(s);
     return [config.displayMode];
   });
 
@@ -91,19 +91,10 @@ const Item = memo<ChatListItemProps>(({ index, id }) => {
     },
     [item?.role],
   );
-
-  const { t: errorT } = useTranslation('error');
-  const error = useMemo<AlertProps | undefined>(() => {
-    if (!item?.error) return;
-    const messageError = item.error;
-
-    const alertConfig = getErrorAlertConfig(messageError.type);
-
-    return { message: errorT(`response.${messageError.type}` as any), ...alertConfig };
-  }, [item?.error]);
+  const error = useErrorContent(item?.error);
 
   const enableHistoryDivider = useAgentStore((s) => {
-    const config = agentSelectors.currentAgentConfig(s);
+    const config = agentSelectors.currentAgentChatConfig(s);
     return (
       config.enableHistoryCount &&
       historyLength > (config.historyCount ?? 0) &&

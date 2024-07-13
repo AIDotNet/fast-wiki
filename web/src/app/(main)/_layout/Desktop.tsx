@@ -1,15 +1,14 @@
-'use client';
-
 import { useTheme } from 'antd-style';
 import { memo } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
-import { useIsPWA } from '@/hooks/useIsPWA';
+import { usePlatform } from '@/hooks/usePlatform';
 
 import { LayoutProps } from './type';
+import Nav from '../@nav/default';
 
-const Layout = memo<LayoutProps>(({ children, nav }) => {
-  const isPWA = useIsPWA();
+const Layout = memo<LayoutProps>(({ children }) => {
+  const { isPWA } = usePlatform();
   const theme = useTheme();
 
   return (
@@ -17,13 +16,12 @@ const Layout = memo<LayoutProps>(({ children, nav }) => {
       height={'100%'}
       horizontal
       style={{
-        // @ts-ignore
         borderTop: isPWA ? `1px solid ${theme.colorBorder}` : undefined,
         position: 'relative',
       }}
       width={'100%'}
     >
-      {nav}
+      <Nav />
       {children}
     </Flexbox>
   );

@@ -1,0 +1,49 @@
+{
+  "button": {
+    "import": "Importuj konfigurację",
+    "market": "Przeglądaj rynek",
+    "start": "Rozpocznij teraz"
+  },
+  "guide": {
+    "agents": {
+      "replaceBtn": "Zmień",
+      "title": "Nowe zalecenia asystenta:"
+    },
+    "defaultMessage": "Jestem Twoim prywatnym asystentem TokenChat. W czym mogę pomóc?\nJeśli potrzebujesz bardziej profesjonalnej lub spersonalizowanej pomocy, kliknij `+` aby stworzyć niestandardowego asystenta",
+    "qa": {
+      "q01": "Czym jest AIDotNet?",
+      "q02": "Czym jest TokenChat?",
+      "q03": "Czy TokenChat ma wsparcie społecznościowe?",
+      "q04": "Jakie funkcje obsługuje TokenChat?",
+      "q05": "Jak zainstalować i używać TokenChat?",
+      "q06": "Jakie są ceny TokenChat?",
+      "q07": "Czy TokenChat jest darmowy?",
+      "q08": "Czy istnieje wersja usługi w chmurze?",
+      "q09": "Czy obsługuje lokalne modele językowe?",
+      "q10": "Czy obsługuje rozpoznawanie i generowanie obrazów?",
+      "q11": "Czy obsługuje syntezę mowy i rozpoznawanie mowy?",
+      "q12": "Czy obsługuje system wtyczek?",
+      "q13": "Czy ma własny rynek do pobierania GPTs?",
+      "q14": "Czy obsługuje wiele dostawców usług AI?",
+      "q15": "Co zrobić, gdy napotkasz problem podczas korzystania?"
+    },
+    "questions": {
+      "moreBtn": "Dowiedz się więcej",
+      "title": "Najczęściej zadawane pytania:"
+    },
+    "welcome": {
+      "afternoon": "Dzień dobry",
+      "morning": "Dzień dobry",
+      "night": "Dobry wieczór",
+      "noon": "Dzień dobry"
+    }
+  },
+  "header": "Witaj",
+  "pickAgent": "Wybierz szablon asystenta lub kontynuuj",
+  "skip": "Pomiń tworzenie",
+  "slogan": {
+    "desc1": "Ożyw swoje myślenie poprzez uruchomienie klastra mózgu. Twój inteligentny asystent zawsze jest obecny.",
+    "desc2": "Stwórz swojego pierwszego asystenta. Zaczynamy!",
+    "title": "Daj sobie mądrzejszy mózg"
+  }
+}

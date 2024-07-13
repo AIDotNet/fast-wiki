@@ -76,7 +76,7 @@ class ToolService {
     const parser = pluginManifestSchema.safeParse(data);
 
     if (!parser.success) {
-      throw new TypeError('manifestInvalid', { cause: parser.error });
+      throw new TypeError('manifestInvalid');
     }
 
     // 4. if exist OpenAPI api, merge the OpenAPIs to api
@@ -92,7 +92,7 @@ class ToolService {
 
         data.settings = await convertor.convertAuthToSettingsSchema(data.settings);
       } catch (error) {
-        throw new TypeError('openAPIInvalid', { cause: error });
+        throw new TypeError('openAPIInvalid');
       }
     }
 

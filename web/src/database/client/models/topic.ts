@@ -238,7 +238,7 @@ class _TopicModel extends BaseModel {
   private mapToChatTopic = (dbTopic: DBModel<DB_Topic>): ChatTopic => ({
     ...dbTopic,
     favorite: !!dbTopic.favorite,
-  }) as ChatTopic;
+  });
 }
 
 export const TopicModel = new _TopicModel();

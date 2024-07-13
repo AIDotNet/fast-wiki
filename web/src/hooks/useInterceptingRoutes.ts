@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { startTransition, useMemo } from 'react';
 import urlJoin from 'url-join';
 
 import { INBOX_SESSION_ID } from '@/const/session';
@@ -15,10 +15,18 @@ export const useOpenSettings = (tab: SettingsTabs = SettingsTabs.Common) => {
 
   return useMemo(() => {
     if (mobile) {
-      return () => router.push(urlJoin('/settings', tab));
+      return () => {
+        startTransition(() => {
+          router.push(urlJoin('/settings', tab))
+        });
+      };
     } else {
       // use Intercepting Routes on Desktop
-      return () => router.push('/settings/modal', { query: { session: activeId, tab } });
+      return () => {
+        startTransition(() => {
+          router.push('/settings/modal', { query: { session: activeId, tab } })
+        })
+      };
     }
   }, [mobile, tab, activeId, router]);
 };
@@ -37,10 +45,18 @@ export const useOpenChatSettings = (tab: ChatSettingsTabs = ChatSettingsTabs.Met
       return openSettings;
     }
     if (mobile) {
-      return () => router.push('/chat/settings');
+      return () => {
+        startTransition(() => {
+          router.push('/chat/settings')
+        });
+      };
     } else {
       // use Intercepting Routes on Desktop
-      return () => router.push('/chat/settings/modal', { query: { session: activeId, tab } });
+      return () => {
+        startTransition(() => {
+          router.push('/chat/settings/modal', { query: { session: activeId, tab } })
+        })
+      };
     }
   }, [openSettings, mobile, activeId, router, tab]);
 };

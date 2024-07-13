@@ -5,8 +5,7 @@ import { message, Button, Pagination, Dropdown } from 'antd';
 import styled from 'styled-components';
 import { DeleteOutlined } from '@ant-design/icons';
 import { DeleteChatApplications, GetChatApplicationsList } from '@/services/ChatApplicationService';
-
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { MenuIcon } from 'lucide-react';
 import { ChatGLM } from '@lobehub/icons';
 import { SiChatwoot } from '@icons-pack/react-simple-icons';
@@ -24,7 +23,7 @@ interface IAppListProps {
 }
 
 export function AppList(props: IAppListProps) {
-    const router = useRouter();
+    const navigate = useNavigate();
 
     const [data, setData] = useState<any[]>([]);
     const [total, setTotal] = useState(0);
@@ -84,11 +83,11 @@ export function AppList(props: IAppListProps) {
     )
 
     function openChat(id: string) {
-        router.push(`/chat?id=${id}`);
+        navigate(`/chat?id=${id}`);
     }
 
     function openAppDetail(id: string) {
-        router.push(`/app-detail?id=${id}`)
+        navigate(`/app-detail?id=${id}`)
     }
 
     async function deleteApp(id: string) {

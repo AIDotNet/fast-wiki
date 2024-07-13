@@ -75,10 +75,7 @@ const IFrameRender = memo<IFrameRenderProps>(({ url, id, payload, width = 600, h
     }
   }, []);
 
-  // when plugin try to send back message, we should fill it to the message content
-  const fillPluginContent = useChatStore((s) => s.fillPluginMessageContent);
   useOnPluginFillContent((content, triggerAiMessage) => {
-    fillPluginContent(id, content, triggerAiMessage);
   });
 
   // when plugin wants to get plugin state, send it to plugin
@@ -93,10 +90,7 @@ const IFrameRender = memo<IFrameRenderProps>(({ url, id, payload, width = 600, h
     }
   });
 
-  // when plugin update state, we should update it to the message pluginState key
-  const updatePluginState = useChatStore((s) => s.updatePluginState);
   useOnPluginStateUpdate((key, value) => {
-    updatePluginState(id, key, value);
   });
 
   // when plugin wants to get plugin settings, send it to plugin
@@ -120,19 +114,12 @@ const IFrameRender = memo<IFrameRenderProps>(({ url, id, payload, width = 600, h
     updatePluginSettings(payload?.identifier, value);
   });
 
-  // when plugin want to trigger AI message
-  const triggerAIMessage = useChatStore((s) => s.triggerAIMessage);
   useOnPluginTriggerAIMessage((messageId) => {
     // we need to know which message to trigger
     if (messageId !== id) return;
-
-    triggerAIMessage(id);
   });
-
-  // when plugin want to create an assistant message
-  const createAssistantMessage = useChatStore((s) => s.createAssistantMessageByPlugin);
   useOnPluginCreateAssistantMessage((content) => {
-    createAssistantMessage(content, id);
+    
   });
 
   return (

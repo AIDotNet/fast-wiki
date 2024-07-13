@@ -5,11 +5,11 @@ export const enableNextAuth = authEnv.NEXT_PUBLIC_ENABLE_NEXT_AUTH;
 export const enableAuth =
   authEnv.NEXT_PUBLIC_ENABLE_CLERK_AUTH || authEnv.NEXT_PUBLIC_ENABLE_NEXT_AUTH;
 
-export const LOBE_CHAT_AUTH_HEADER = 'X-lobe-chat-auth';
+export const THOR_CHAT_AUTH_HEADER = 'Authorization';
 
 export const OAUTH_AUTHORIZED = 'X-oauth-authorized';
 
-export const JWT_SECRET_KEY = 'AIDotNet · FastWki-Chat';
+export const JWT_SECRET_KEY = 'LobeHub · TokenChat';
 export const NON_HTTP_PREFIX = 'http_nosafe';
 
 /* eslint-disable typescript-sort-keys/interface */
@@ -30,5 +30,16 @@ export interface JWTPayload {
    */
   endpoint?: string;
 
+  azureApiVersion?: string;
+
+  awsAccessKeyId?: string;
+  awsRegion?: string;
+  awsSecretAccessKey?: string;
+  /**
+   * user id
+   * in client db mode it's a uuid
+   * in server db mode it's a user id
+   */
+  userId?: string;
 }
 /* eslint-enable */

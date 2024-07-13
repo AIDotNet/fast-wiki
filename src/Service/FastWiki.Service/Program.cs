@@ -1,6 +1,8 @@
+using System.Text.Json;
 using AspNetCoreRateLimit;
 using FastWiki.Service;
 using FastWiki.Service.Backgrounds;
+using FastWiki.Service.Options;
 using FastWiki.Service.Service;
 using Masa.Contrib.Authentication.Identity;
 using Microsoft.AspNetCore.StaticFiles;
@@ -11,7 +13,7 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
 
 var builder = WebApplication.CreateBuilder(args);
-
+WebOptions.Init(builder.Configuration);
 Logger logger;
 if (builder.Environment.IsDevelopment())
 {
@@ -200,6 +202,20 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapGet("/js/env.js", () =>
+{
+    var webEnv = new
+    {
+        WebOptions.DEFAULT_AVATAR,
+        WebOptions.DEFAULT_USER_AVATAR,
+        WebOptions.DEFAULT_INBOX_AVATAR,
+        WebOptions.DEFAULT_MODEL,
+    };
+    
+    // 返回js
+    return Results.Text($"window.thor = {JsonSerializer.Serialize(webEnv)};", "application/javascript");
+});
 
 app.MapPost("/v1/chat/completions", OpenAIService.Completions)
     .WithTags("OpenAI")

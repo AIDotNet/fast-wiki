@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { PeerSyncStatus } from '@/types/sync';
 
 const EnableTag = memo<{ isSyncing: boolean; status: PeerSyncStatus }>(({ status, isSyncing }) => {
-  const { t } = useTranslation('common') as any;;
+  const { t } = useTranslation('common');
 
   switch (status) {
     case PeerSyncStatus.Connecting: {

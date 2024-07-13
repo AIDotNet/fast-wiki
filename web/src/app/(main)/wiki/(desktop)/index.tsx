@@ -1,4 +1,3 @@
-"use client"
 import { memo, useState } from "react";
 import Header from "../features/Header";
 import { AppList } from "../features/WikiList";

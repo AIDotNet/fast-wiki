@@ -1,48 +1,28 @@
 import { LobeChatPluginManifest } from '@lobehub/chat-plugin-sdk';
 import { uniqBy } from 'lodash-es';
-import { Md5 } from 'ts-md5';
 
-import { PLUGIN_SCHEMA_API_MD5_PREFIX, PLUGIN_SCHEMA_SEPARATOR } from '@/const/plugin';
 import { MetaData } from '@/types/meta';
 import { ChatCompletionTool } from '@/types/openai/chat';
 import { LobeToolMeta } from '@/types/tool/tool';
+import { genToolCallingName } from '@/utils/toolCall';
 
 import { pluginHelpers } from '../helpers';
 import { ToolStoreState } from '../initialState';
 import { builtinToolSelectors } from '../slices/builtin/selectors';
 import { pluginSelectors } from '../slices/plugin/selectors';
 
-const getAPIName = (identifier: string, name: string, type?: string) => {
-  const pluginType = type && type !== 'default' ? `${PLUGIN_SCHEMA_SEPARATOR + type}` : '';
-
-  // 将插件的 identifier 作为前缀，避免重复
-  let apiName = identifier + PLUGIN_SCHEMA_SEPARATOR + name + pluginType;
-
-  // OpenAI GPT function_call name can't be longer than 64 characters
-  // So we need to use md5 to shorten the name
-  // and then find the correct apiName in response by md5
-  if (apiName.length >= 64) {
-    const md5Content = PLUGIN_SCHEMA_API_MD5_PREFIX + Md5.hashStr(name).toString();
-
-    apiName = identifier + PLUGIN_SCHEMA_SEPARATOR + md5Content + pluginType;
-  }
-
-  return apiName;
-};
-
 const enabledSchema =
   (tools: string[] = []) =>
   (s: ToolStoreState): ChatCompletionTool[] => {
     const list = pluginSelectors
       .installedPluginManifestList(s)
-      // @ts-ignore
       .concat(s.builtinTools.map((b) => b.manifest as LobeChatPluginManifest))
       // 如果存在 enabledPlugins，那么只启用 enabledPlugins 中的插件
       .filter((m) => tools.includes(m?.identifier))
       .flatMap((manifest) =>
         manifest.api.map((m) => ({
           description: m.description,
-          name: getAPIName(manifest.identifier, m.name, manifest.type),
+          name: genToolCallingName(manifest.identifier, m.name, manifest.type),
           parameters: m.parameters,
         })),
       );
@@ -55,7 +35,6 @@ const enabledSystemRoles =
   (s: ToolStoreState) => {
     const toolsSystemRole = pluginSelectors
       .installedPluginManifestList(s)
-      // @ts-ignore
       .concat(s.builtinTools.map((b) => b.manifest as LobeChatPluginManifest))
       // 如果存在 enabledPlugins，那么只启用 enabledPlugins 中的插件
       .filter((m) => tools.includes(m?.identifier))
@@ -69,9 +48,10 @@ const enabledSystemRoles =
 
         const methods = manifest.api
           .map((m) =>
-            [`#### ${getAPIName(manifest.identifier, m.name, manifest.type)}`, m.description].join(
-              '\n\n',
-            ),
+            [
+              `#### ${genToolCallingName(manifest.identifier, m.name, manifest.type)}`,
+              m.description,
+            ].join('\n\n'),
           )
           .join('\n\n');
 
@@ -106,7 +86,6 @@ const getManifestById =
   (s: ToolStoreState): LobeChatPluginManifest | undefined =>
     pluginSelectors
       .installedPluginManifestList(s)
-      // @ts-ignore
       .concat(s.builtinTools.map((b) => b.manifest as LobeChatPluginManifest))
       .find((i) => i.identifier === id);
 

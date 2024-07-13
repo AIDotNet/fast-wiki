@@ -1,11 +1,9 @@
-"use client"
 import { Form, Input, TextArea } from "@lobehub/ui";
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { Button, message } from 'antd';
-
-import { useRouter } from 'next/navigation';
+import { useNavigate } from "react-router-dom";
 import { CreateFunction } from "@/services/FunctionService";
 const SInput = styled(Input)`
     margin-bottom: 20px;
@@ -16,23 +14,22 @@ const SButton = styled(Button)`
     width: 100%;
 `
 
-
 export default function CreateFunctionCall() {
     const [editor, setEditor] = useState<monaco.editor.IStandaloneCodeEditor | null>(null);
-    const router = useRouter();
+    const navigate = useNavigate();
     const monacoEl = useRef(null);
-    // useEffect(() => {
-    //     if (typeof window === 'undefined') return;
-    //     const editor = monaco.editor.create(monacoEl.current!, {
-    //         value: ['function Test(x,y) {', '\treturn x+y;', '} '].join('\n'),
-    //         language: 'javascript',
-    //         theme: 'vs-dark',
-    //         automaticLayout: true,
-    //     })
-    //     setEditor(editor);
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const editor = monaco.editor.create(monacoEl.current!, {
+            value: ['function Test(x,y) {', '\treturn x+y;', '} '].join('\n'),
+            language: 'javascript',
+            theme: 'vs-dark',
+            automaticLayout: true,
+        })
+        setEditor(editor);
 
-    //     return () => editor?.dispose();
-    // }, []);
+        return () => editor?.dispose();
+    }, []);
     const [functionCall, setFunctionCall] = useState<any>({
         name: '',
         description: '',
@@ -83,7 +80,7 @@ export default function CreateFunctionCall() {
         }}>
             <Button
                 onClick={() => {
-                    router.push('/function-call')
+                    navigate('/function-call')
                 }}
                 style={{
                     width: '200px',
@@ -134,7 +131,7 @@ export default function CreateFunctionCall() {
                 <span>
                     Function JS代码。
                 </span>
-                <TextArea
+                {/* <TextArea
                     value={functionCall.content}
                     onChange={(e: any) => {
                         setFunctionCall((functionCall: any) => {
@@ -152,8 +149,8 @@ export default function CreateFunctionCall() {
                         marginTop: '10px'
                     }}
                     placeholder="请输入JS代码"
-                    />
-                {/* <div style={{
+                    /> */}
+                <div style={{
                     height: '400px',
                     width: '100%',
                     border: '1px solid #e8e8e8',
@@ -161,7 +158,7 @@ export default function CreateFunctionCall() {
                     marginTop: '10px'
                 }} id="monaco" ref={monacoEl}>
 
-                </div> */}
+                </div>
             </div>
             <SButton onClick={
                 () => {

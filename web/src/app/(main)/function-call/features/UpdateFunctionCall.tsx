@@ -33,21 +33,20 @@ export default function UpdateFunctionCall({
     const monacoEl = useRef(null);
     useEffect(() => {
         if (visible) {
-            if (typeof window === 'undefined') return;
-            // setEditor((editor) => {
-            //     // if (editor) return editor;
-            //     // 判断是否有monacoEl，如果没有就返回
-            //     if (!monacoEl.current) return editor;
+            setEditor((editor) => {
+                // if (editor) return editor;
+                // 判断是否有monacoEl，如果没有就返回
+                if (!monacoEl.current) return editor;
 
-            //     const e = monaco.editor.create(monacoEl.current!, {
-            //         value: value.content,
-            //         language: 'javascript',
-            //         theme: 'vs-dark',
-            //         automaticLayout: true
-            //     });
+                const e = monaco.editor.create(monacoEl.current!, {
+                    value: value.content,
+                    language: 'javascript',
+                    theme: 'vs-dark',
+                    automaticLayout: true
+                });
 
-            //     return e;
-            // });
+                return e;
+            });
         }
 
         return () => editor?.dispose();
@@ -139,7 +138,7 @@ export default function UpdateFunctionCall({
                 <span>
                     Function JS代码。
                 </span>
-                <TextArea
+                {/* <TextArea
                     value={functionCall.content}
                     onChange={(e: any) => {
                         setFunctionCall((functionCall: any) => {
@@ -156,8 +155,8 @@ export default function UpdateFunctionCall({
                         borderRadius: '5px',
                         marginTop: '10px'
                     }}
-                    />
-                {/* <div style={{
+                    /> */}
+                <div style={{
                     height: '400px',
                     width: '100%',
                     border: '1px solid #e8e8e8',
@@ -165,7 +164,7 @@ export default function UpdateFunctionCall({
                     marginTop: '10px'
                 }} ref={monacoEl}>
 
-                </div> */}
+                </div>
             </div>
             <SButton onClick={
                 () => {

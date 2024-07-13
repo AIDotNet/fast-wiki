@@ -1,4 +1,4 @@
-'use client';
+
 
 import { Alert } from '@lobehub/ui';
 import { memo } from 'react';
@@ -13,7 +13,7 @@ interface ExperimentAlertProps {
   mobile?: boolean;
 }
 const ExperimentAlert = memo<ExperimentAlertProps>(({ mobile }) => {
-  const { t } = useTranslation('setting') as any;
+  const { t } = useTranslation('setting');
   const [hideSyncAlert, updatePreference] = useUserStore((s) => [
     preferenceSelectors.hideSyncAlert(s),
     s.updatePreference,

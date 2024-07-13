@@ -6,8 +6,6 @@ import { Flexbox } from 'react-layout-kit';
 import { DelDetailsVector, GetWikiDetailVectorQuantity } from "@/services/WikiService";
 
 
-
-
 interface IWikiDetailProps {
     wikiDetail: any;
     visible: boolean;

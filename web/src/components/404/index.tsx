@@ -1,8 +1,8 @@
-'use client';
+
 
 import { FluentEmoji } from '@lobehub/ui';
 import { Button } from 'antd';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
@@ -10,9 +10,9 @@ import { Flexbox } from 'react-layout-kit';
 import { MAX_WIDTH } from '@/const/layoutTokens';
 
 const NotFound = memo(() => {
-  const { t } = useTranslation('error')as any;
+  const { t } = useTranslation('error');
   return (
-    <Flexbox align={'center'} justify={'center'} style={{ height: '100%', width: '100%' }}>
+    <Flexbox align={'center'} justify={'center'} style={{ minHeight: '100%', width: '100%' }}>
       <h1
         style={{
           filter: 'blur(8px)',
@@ -31,7 +31,7 @@ const NotFound = memo(() => {
         {t('notFound.title')}
       </h2>
       <p style={{ marginBottom: '2em' }}>{t('notFound.desc')}</p>
-      <Link href="/">
+      <Link to="/">
         <Button type={'primary'}>{t('notFound.backHome')}</Button>
       </Link>
     </Flexbox>

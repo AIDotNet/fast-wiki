@@ -1,12 +1,14 @@
-'use client';
+
 
 import { DraggablePanel, DraggablePanelContainer } from '@lobehub/ui';
 import { createStyles, useResponsive } from 'antd-style';
-import { PropsWithChildren, memo, useEffect, useLayoutEffect, useState } from 'react';
+import isEqual from 'fast-deep-equal';
+import { PropsWithChildren, memo, useEffect, useState } from 'react';
 
 import SafeSpacing from '@/components/SafeSpacing';
 import { CHAT_SIDEBAR_WIDTH } from '@/const/layoutTokens';
 import { useGlobalStore } from '@/store/global';
+import { systemStatusSelectors } from '@/store/global/selectors';
 
 const useStyles = createStyles(({ css, token }) => ({
   content: css`
@@ -26,27 +28,23 @@ const useStyles = createStyles(({ css, token }) => ({
 const TopicPanel = memo(({ children }: PropsWithChildren) => {
   const { styles } = useStyles();
   const { md = true, lg = true } = useResponsive();
-  const [showAgentSettings, toggleConfig, isPreferenceInit] = useGlobalStore((s) => [
-    s.preference.showChatSideBar,
+  const [showAgentSettings, toggleConfig] = useGlobalStore((s) => [
+    systemStatusSelectors.showChatSideBar(s),
     s.toggleChatSideBar,
-    s.isPreferenceInit,
   ]);
-  const [expand, setExpand] = useState(showAgentSettings);
 
-  const handleExpand = (e: boolean) => {
-    toggleConfig(e);
-    setExpand(e);
+  const [cacheExpand, setCacheExpand] = useState<boolean>(Boolean(showAgentSettings));
+
+  const handleExpand = (expand: boolean) => {
+    if (isEqual(expand, Boolean(showAgentSettings))) return;
+    toggleConfig(expand);
+    setCacheExpand(expand);
   };
 
-  useLayoutEffect(() => {
-    if (!isPreferenceInit) return;
-    setExpand(showAgentSettings);
-  }, [isPreferenceInit, showAgentSettings]);
-
   useEffect(() => {
-    if (lg && showAgentSettings) setExpand(true);
-    if (!lg) setExpand(false);
-  }, [lg, showAgentSettings]);
+    if (lg && cacheExpand) toggleConfig(true);
+    if (!lg) toggleConfig(false);
+  }, [lg, cacheExpand]);
 
   return (
     <DraggablePanel
@@ -54,7 +52,7 @@ const TopicPanel = memo(({ children }: PropsWithChildren) => {
       classNames={{
         content: styles.content,
       }}
-      expand={expand}
+      expand={showAgentSettings}
       minWidth={CHAT_SIDEBAR_WIDTH}
       mode={md ? 'fixed' : 'float'}
       onExpandChange={handleExpand}

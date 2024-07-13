@@ -1,6 +1,6 @@
-import { OpenAIStreamCallbacks } from 'ai';
+import { MessageToolCall } from '@/types/message';
 
-export type LLMRoleType = 'user' | 'system' | 'assistant' | 'function';
+export type LLMRoleType = 'user' | 'system' | 'assistant' | 'function' | 'tool';
 
 interface UserMessageContentPartText {
   text: string;
@@ -30,6 +30,8 @@ export interface OpenAIChatMessage {
    * @description 消息发送者的角色
    */
   role: LLMRoleType;
+  tool_call_id?: string;
+  tool_calls?: MessageToolCall[];
 }
 
 /**
@@ -87,14 +89,16 @@ export interface ChatStreamPayload {
    * @default 1
    */
   top_p?: number;
-  applicationId?: string;
-  sharedId?: string;
 }
 
 export interface ChatCompetitionOptions {
   callback?: ChatStreamCallbacks;
   headers?: Record<string, any>;
   signal?: AbortSignal;
+  /**
+   * userId for the chat completion
+   */
+  user?: string;
 }
 
 export interface ChatCompletionFunctions {
@@ -129,4 +133,18 @@ export interface ChatCompletionTool {
   type: 'function';
 }
 
-export type ChatStreamCallbacks = OpenAIStreamCallbacks;
+export interface ChatStreamCallbacks {
+  /**
+   * `onCompletion`: Called for each tokenized message.
+   **/
+  onCompletion?: (completion: string) => Promise<void> | void;
+  /** `onFinal`: Called once when the stream is closed with the final completion message. */
+  onFinal?: (completion: string) => Promise<void> | void;
+  /** `onStart`: Called once when the stream is initialized. */
+  onStart?: () => Promise<void> | void;
+  /** `onText`: Called for each text chunk. */
+  onText?: (text: string) => Promise<void> | void;
+  /** `onToken`: Called for each tokenized message. */
+  onToken?: (token: string) => Promise<void> | void;
+  onToolCall?: () => Promise<void> | void;
+}

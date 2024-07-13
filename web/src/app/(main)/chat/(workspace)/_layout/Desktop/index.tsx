@@ -4,8 +4,10 @@ import { LayoutProps } from '../type';
 import ChatHeader from './ChatHeader';
 import HotKeys from './HotKeys';
 import TopicPanel from './TopicPanel';
+import Topic from '../../@topic/default';
+import ChatConversation from '../../@conversation/default';
 
-const Layout = ({ children, topic, conversation }: LayoutProps) => {
+const Layout = ({ children }: LayoutProps) => {
   return (
     <>
       <ChatHeader />
@@ -20,10 +22,12 @@ const Layout = ({ children, topic, conversation }: LayoutProps) => {
           style={{ overflow: 'hidden', position: 'relative' }}
           width={'100%'}
         >
-          {conversation}
+          <ChatConversation />
         </Flexbox>
         {children}
-        <TopicPanel>{topic}</TopicPanel>
+        <TopicPanel>
+          <Topic />
+        </TopicPanel>
       </Flexbox>
       <HotKeys />
     </>

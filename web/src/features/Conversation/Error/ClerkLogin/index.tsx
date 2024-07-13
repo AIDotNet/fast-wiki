@@ -11,7 +11,7 @@ import { userProfileSelectors } from '@/store/user/selectors';
 import { ErrorActionContainer, FormAction } from '../style';
 
 const ClerkLogin = memo<{ id: string }>(({ id }) => {
-  const { t } = useTranslation('error')as any
+  const { t } = useTranslation('error');
   const [openSignIn, isSignedIn] = useUserStore((s) => [s.openLogin, s.isSignedIn]);
   const greeting = useGreeting();
   const nickName = useUserStore(userProfileSelectors.nickName);

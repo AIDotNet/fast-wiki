@@ -7,6 +7,7 @@ const getStatus = (errorType: ILobeAgentRuntimeErrorType | ErrorType) => {
 
   switch (errorType) {
     // TODO: Need to refactor to Invalid OpenAI API Key
+    case AgentRuntimeErrorType.InvalidProviderAPIKey:
     case AgentRuntimeErrorType.NoOpenAIAPIKey: {
       return 401;
     }
@@ -19,10 +20,18 @@ const getStatus = (errorType: ILobeAgentRuntimeErrorType | ErrorType) => {
     case AgentRuntimeErrorType.AgentRuntimeError: {
       return 470;
     }
+
+    case AgentRuntimeErrorType.ProviderBizError:
     case AgentRuntimeErrorType.OpenAIBizError: {
       return 471;
     }
+
+    case ChatErrorType.OllamaServiceUnavailable:
+    case AgentRuntimeErrorType.OllamaBizError: {
+      return 472;
+    }
   }
+
   return errorType as number;
 };
 

@@ -1,32 +1,37 @@
-'use client';
+import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 
-import { Loader } from 'next/dist/shared/lib/dynamic';
-import dynamic from 'next/dynamic';
-import { FC, PropsWithChildren, memo } from 'react';
+// 自定义钩子，用于检测是否为移动设备
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
 
-import MobileSwitchLoading from '@/features/MobileSwitchLoading';
-import { useIsMobile } from '@/hooks/useIsMobile';
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // 监听窗口大小变化
+    window.addEventListener('resize', checkIfMobile);
+    // 初始化检查
+    checkIfMobile();
+
+    // 清理监听器
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+
+  return isMobile;
+};
 
 interface ClientResponsiveLayoutProps {
-  Desktop: FC<PropsWithChildren>;
-  Mobile: Loader;
+  Desktop: FC<PropsWithChildren<any>>;
+  Mobile: FC<PropsWithChildren<any>>;
 }
 
-const ClientResponsiveLayout = ({ Desktop, Mobile }: ClientResponsiveLayoutProps) => {
-  const MobileComponent = dynamic(Mobile, {
-    loading: MobileSwitchLoading,
-    ssr: false,
-  }) as FC<PropsWithChildren>;
+// 响应式布局组件
+const ClientResponsiveLayout: FC<ClientResponsiveLayoutProps> = ({ Desktop, Mobile }) => {
+  const isMobile = useIsMobile();
 
-  const Layout = memo<PropsWithChildren>(({ children }) => {
-    const mobile = useIsMobile();
-
-    return mobile ? <MobileComponent>{children}</MobileComponent> : <Desktop>{children}</Desktop>;
-  });
-
-  Layout.displayName = 'ClientLayout';
-
-  return Layout;
+  // 根据是否为移动设备渲染对应组件
+  return isMobile ? <Mobile /> : <Desktop />;
 };
 
 export default ClientResponsiveLayout;

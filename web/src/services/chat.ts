@@ -3,6 +3,7 @@ import { produce } from 'immer';
 import { merge } from 'lodash-es';
 
 import { createErrorResponse } from '@/app/api/errorResponse';
+import { INBOX_GUIDE_SYSTEMROLE } from '@/const/guide';
 import { INBOX_SESSION_ID } from '@/const/session';
 import { DEFAULT_AGENT_CONFIG } from '@/const/settings';
 import { TracePayload, TraceTagMap } from '@/const/trace';
@@ -20,16 +21,16 @@ import {
   userProfileSelectors,
 } from '@/store/user/selectors';
 import { ChatErrorType } from '@/types/fetch';
-import { ChatMessage } from '@/types/message';
+import { ChatMessage, MessageToolCall } from '@/types/message';
 import type { ChatStreamPayload, OpenAIChatMessage } from '@/types/openai/chat';
 import { UserMessageContentPart } from '@/types/openai/chat';
-import { FetchSSEOptions, OnFinishHandler, fetchSSE, getMessageError } from '@/utils/fetch';
-import { createTraceHeader, getTraceId } from '@/utils/trace';
+import { FetchSSEOptions, fetchSSE, getMessageError } from '@/utils/fetch';
+import { genToolCallingName } from '@/utils/toolCall';
 
 import { createHeaderWithAuth, getProviderAuthPayload } from './_auth';
 import { API_ENDPOINTS } from './_url';
 
-interface FetchOptions {
+interface FetchOptions extends FetchSSEOptions {
   isWelcomeQuestion?: boolean;
   signal?: AbortSignal | undefined;
   trace?: TracePayload;
@@ -39,23 +40,14 @@ interface GetChatCompletionPayload extends Partial<Omit<ChatStreamPayload, 'mess
   messages: ChatMessage[];
 }
 
-interface FetchAITaskResultParams {
+interface FetchAITaskResultParams extends FetchSSEOptions {
   abortController?: AbortController;
-  /**
-   * 错误处理函数
-   */
   onError?: (e: Error, rawError?: any) => void;
-  onFinish?: OnFinishHandler;
   /**
    * 加载状态变化处理函数
    * @param loading - 是否处于加载状态
    */
   onLoadingChange?: (loading: boolean) => void;
-  /**
-   * 消息处理函数
-   * @param text - 消息内容
-   */
-  onMessageHandle?: (text: string) => void;
   /**
    * 请求对象
    */
@@ -93,6 +85,76 @@ export function initializeWithClientStore(provider: string, payload: any) {
       providerOptions = {
         baseURL: providerAuthPayload?.endpoint,
       };
+      break;
+    }
+    case ModelProvider.Azure: {
+      providerOptions = {
+        apiVersion: providerAuthPayload?.azureApiVersion,
+        // That's a wired properity, but just remapped it
+        apikey: providerAuthPayload?.apiKey,
+      };
+      break;
+    }
+    case ModelProvider.ZhiPu: {
+      break;
+    }
+    case ModelProvider.Google: {
+      providerOptions = {
+        baseURL: providerAuthPayload?.endpoint,
+      };
+      break;
+    }
+    case ModelProvider.Moonshot: {
+      break;
+    }
+    case ModelProvider.Bedrock: {
+      if (providerAuthPayload?.apiKey) {
+        providerOptions = {
+          accessKeyId: providerAuthPayload?.awsAccessKeyId,
+          accessKeySecret: providerAuthPayload?.awsSecretAccessKey,
+          region: providerAuthPayload?.awsRegion,
+        };
+      }
+      break;
+    }
+    case ModelProvider.Ollama: {
+      providerOptions = {
+        baseURL: providerAuthPayload?.endpoint,
+      };
+      break;
+    }
+    case ModelProvider.Perplexity: {
+      break;
+    }
+    case ModelProvider.Qwen: {
+      break;
+    }
+    case ModelProvider.Anthropic: {
+      providerOptions = {
+        baseURL: providerAuthPayload?.endpoint,
+      };
+      break;
+    }
+    case ModelProvider.Mistral: {
+      break;
+    }
+    case ModelProvider.Groq: {
+      providerOptions = {
+        apikey: providerAuthPayload?.apiKey,
+        baseURL: providerAuthPayload?.endpoint,
+      };
+      break;
+    }
+    case ModelProvider.DeepSeek: {
+      break;
+    }
+    case ModelProvider.OpenRouter: {
+      break;
+    }
+    case ModelProvider.TogetherAI: {
+      break;
+    }
+    case ModelProvider.ZeroOne: {
       break;
     }
   }
@@ -163,20 +225,15 @@ class ChatService {
     trace,
     isWelcomeQuestion,
   }: CreateAssistantMessageStream) => {
-    await fetchSSE(
-      () =>
-        this.createAssistantMessage(params, {
-          isWelcomeQuestion,
-          signal: abortController?.signal,
-          trace: this.mapTrace(trace, TraceTagMap.Chat),
-        }),
-      {
-        onAbort,
-        onErrorHandle,
-        onFinish,
-        onMessageHandle,
-      },
-    );
+    await this.createAssistantMessage(params, {
+      isWelcomeQuestion,
+      onAbort,
+      onErrorHandle,
+      onFinish,
+      onMessageHandle,
+      signal: abortController?.signal,
+      trace: this.mapTrace(trace, TraceTagMap.Chat),
+    });
   };
 
   getChatCompletion = async (params: Partial<ChatStreamPayload>, options?: FetchOptions) => {
@@ -186,12 +243,18 @@ class ChatService {
 
     let model = res.model || DEFAULT_AGENT_CONFIG.model;
 
+    // if the provider is Azure, get the deployment name as the request model
+    if (provider === ModelProvider.Azure) {
+      const chatModelCards = modelProviderSelectors.getModelCardsById(provider)(
+        useUserStore.getState(),
+      );
+
+      const deploymentName = chatModelCards.find((i) => i.id === model)?.deploymentName;
+      if (deploymentName) model = deploymentName;
+    }
+
     const payload = merge(
-      { 
-        model: DEFAULT_AGENT_CONFIG.model,
-         stream: true, 
-         ...DEFAULT_AGENT_CONFIG.params 
-        },
+      { model: DEFAULT_AGENT_CONFIG.model, stream: true, ...DEFAULT_AGENT_CONFIG.params },
       { ...res, model },
     );
 
@@ -201,41 +264,49 @@ class ChatService {
     const enableFetchOnClient = modelConfigSelectors.isProviderFetchOnClient(provider)(
       useUserStore.getState(),
     );
-    /**
-     * Notes:
-     * 1. Broswer agent runtime will skip auth check if a key and endpoint provided by
-     *    user which will cause abuse of plugins services
-     * 2. This feature will disabled by default
-     */
+
+    let fetcher: typeof fetch | undefined = undefined;
+
     if (enableFetchOnClient) {
-      try {
-        return await this.fetchOnClient({ payload, provider, signal });
-      } catch (e) {
-        const {
-          errorType = ChatErrorType.BadRequest,
-          error: errorContent,
-          ...res
-        } = e as ChatCompletionErrorPayload;
+      /**
+       * Notes:
+       * 1. Browser agent runtime will skip auth check if a key and endpoint provided by
+       *    user which will cause abuse of plugins services
+       * 2. This feature will be disabled by default
+       */
+      fetcher = async () => {
+        try {
+          return await this.fetchOnClient({ payload, provider, signal });
+        } catch (e) {
+          const {
+            errorType = ChatErrorType.BadRequest,
+            error: errorContent,
+            ...res
+          } = e as ChatCompletionErrorPayload;
 
-        const error = errorContent || e;
-        // track the error at server side
-        console.error(`Route: [${provider}] ${errorType}:`, error);
+          const error = errorContent || e;
+          // track the error at server side
+          console.error(`Route: [${provider}] ${errorType}:`, error);
 
-        return createErrorResponse(errorType, { error, ...res, provider });
-      }
+          return createErrorResponse(errorType, { error, ...res, provider });
+        }
+      };
     }
 
-    const traceHeader = createTraceHeader({ ...options?.trace });
-
     const headers = await createHeaderWithAuth({
-      headers: { 'Content-Type': 'application/json', ...traceHeader },
+      headers: { 'Content-Type': 'application/json', },
       provider,
     });
 
-    return fetch(API_ENDPOINTS.chat(provider), {
+    return fetchSSE(API_ENDPOINTS.chat(provider), {
       body: JSON.stringify(payload),
+      fetcher: fetcher,
       headers,
       method: 'POST',
+      onAbort: options?.onAbort,
+      onErrorHandle: options?.onErrorHandle,
+      onFinish: options?.onFinish,
+      onMessageHandle: options?.onMessageHandle,
       signal,
     });
   };
@@ -251,10 +322,8 @@ class ChatService {
     const settings = pluginSelectors.getPluginSettingsById(params.identifier)(s);
     const manifest = pluginSelectors.getPluginManifestById(params.identifier)(s);
 
-    const traceHeader = createTraceHeader(this.mapTrace(options?.trace, TraceTagMap.ToolCalling));
-
     const headers = await createHeaderWithAuth({
-      headers: { ...createHeadersWithPluginSettings(settings), ...traceHeader },
+      headers: { ...createHeadersWithPluginSettings(settings) },
     });
 
     const gatewayURL = manifest?.gateway ?? API_ENDPOINTS.gateway;
@@ -271,7 +340,7 @@ class ChatService {
     }
 
     const text = await res.text();
-    return { text, traceId: getTraceId(res) };
+    return { text };
   };
 
   fetchPresetTaskResult = async ({
@@ -293,20 +362,15 @@ class ChatService {
 
     onLoadingChange?.(true);
 
-    const data = await fetchSSE(
-      () =>
-        this.getChatCompletion(params, {
-          signal: abortController?.signal,
-          trace: this.mapTrace(trace, TraceTagMap.SystemChain),
-        }),
-      {
-        onErrorHandle: (error) => {
-          errorHandle(new Error(error.message), error);
-        },
-        onFinish,
-        onMessageHandle,
+    const data = await this.getChatCompletion(params, {
+      onErrorHandle: (error) => {
+        errorHandle(new Error(error.message), error);
       },
-    ).catch(errorHandle) as any;
+      onFinish,
+      onMessageHandle,
+      signal: abortController?.signal,
+      trace: this.mapTrace(trace, TraceTagMap.SystemChain),
+    }).catch(errorHandle);
 
     onLoadingChange?.(false);
 
@@ -357,9 +421,30 @@ class ChatService {
           return { content: getContent(m), role: m.role };
         }
 
-        case 'function': {
-          const name = m.plugin?.identifier as string;
-          return { content: m.content, name, role: m.role };
+        case 'assistant': {
+          return {
+            content: m.content,
+            role: m.role,
+            tool_calls: m.tools?.map(
+              (tool): MessageToolCall => ({
+                function: {
+                  arguments: tool.arguments,
+                  name: genToolCallingName(tool.identifier, tool.apiName, tool.type),
+                },
+                id: tool.id,
+                type: 'function',
+              }),
+            ),
+          };
+        }
+
+        case 'tool': {
+          return {
+            content: m.content,
+            name: genToolCallingName(m.plugin!.identifier, m.plugin!.apiName, m.plugin?.type),
+            role: m.role,
+            tool_call_id: m.tool_call_id,
+          };
         }
 
         default: {
@@ -372,7 +457,8 @@ class ChatService {
       // if it's a welcome question, inject InboxGuide SystemRole
       const inboxGuideSystemRole =
         options?.isWelcomeQuestion &&
-        options?.trace?.sessionId === INBOX_SESSION_ID 
+        options?.trace?.sessionId === INBOX_SESSION_ID &&
+        INBOX_GUIDE_SYSTEMROLE;
 
       // Inject Tool SystemRole
       const hasTools = tools && tools?.length > 0;

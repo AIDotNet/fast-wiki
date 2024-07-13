@@ -1,10 +1,8 @@
-'use client';
 declare var window: any;
 import { ActionIcon } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
 import { shuffle } from 'lodash-es';
 import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
@@ -13,6 +11,7 @@ import { USAGE_DOCUMENTS } from '@/const/url';
 import { useSendMessage } from '@/features/ChatInput/useSend';
 import { useChatStore } from '@/store/chat';
 import { GetQuestions, SharedQuestions } from '@/services/ChatApplicationService';
+import { Link } from 'react-router-dom';
 
 const useStyles = createStyles(({ css, token, responsive }) => ({
   card: css`
@@ -62,7 +61,7 @@ const qa = shuffle([
 const QuestionSuggest = memo<{ mobile?: boolean }>(({ mobile }) => {
   const [updateInputMessage] = useChatStore((s) => [s.updateInputMessage]);
 
-  const { t } = useTranslation('welcome')as any
+  const { t } = useTranslation('welcome') as any
   const { styles } = useStyles();
   const sendMessage = useSendMessage();
   const [qas, setQa] = useState<any[]>([]);
@@ -83,7 +82,7 @@ const QuestionSuggest = memo<{ mobile?: boolean }>(({ mobile }) => {
         })
       return null;
     }
-    if(id){
+    if (id) {
       GetQuestions(id)
         .then((res) => {
           setQa(res)
@@ -99,7 +98,7 @@ const QuestionSuggest = memo<{ mobile?: boolean }>(({ mobile }) => {
     <Flexbox gap={8} width={'100%'}>
       <Flexbox align={'center'} horizontal justify={'space-between'}>
         <div className={styles.title}>{t('guide.questions.title')}</div>
-        <Link href={USAGE_DOCUMENTS} target={'_blank'}>
+        <Link to={USAGE_DOCUMENTS} target={'_blank'}>
           <ActionIcon
             icon={ArrowRight}
             size={{ blockSize: 24, fontSize: 16 }}
@@ -108,24 +107,18 @@ const QuestionSuggest = memo<{ mobile?: boolean }>(({ mobile }) => {
         </Link>
       </Flexbox>
       <Flexbox gap={8} horizontal wrap={'wrap'}>
-        {qas.length === 0 && qa.slice(0, mobile ? 2 : 5).map((item) => {
-          const text = t(`guide.qa.${item}` as any);
-          return (
-            <Flexbox
-              align={'center'}
-              className={styles.card}
-              gap={8}
-              horizontal
-              key={item}
-              onClick={() => {
-                updateInputMessage(text);
-                sendMessage({ isWelcomeQuestion: true });
-              }}
-            >
-              {t(text)}
-            </Flexbox>
-          );
-        })}
+        {
+          qas.length === 0 && <>
+            <h2 style={{
+              fontSize: '20px',
+              textAlign: 'center',
+              width: '100%',
+              marginTop: '20px',
+            }}>
+              暂无问题
+            </h2>
+          </>
+        }
         {
           qas.map((item) => {
             return <Flexbox

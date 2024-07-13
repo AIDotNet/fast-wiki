@@ -1,5 +1,3 @@
-'use client';
-
 import { EditableText } from '@lobehub/ui';
 import { Typography } from 'antd';
 import { memo, useState } from 'react';
@@ -10,7 +8,7 @@ import { useUserStore } from '@/store/user';
 import { syncSettingsSelectors } from '@/store/user/selectors';
 
 const DeviceName = memo(() => {
-  const { t } = useTranslation('setting') as any;
+  const { t } = useTranslation('setting');
 
   const [deviceName, setSettings] = useUserStore((s) => [
     syncSettingsSelectors.deviceName(s),

@@ -37,7 +37,7 @@ interface InputAreaProps {
 }
 
 const InputArea = memo<InputAreaProps>(({ setExpand }) => {
-  const { t } = useTranslation('chat')as any;
+  const { t } = useTranslation('chat');
   const { styles } = useStyles();
   const ref = useRef<TextAreaRef>(null);
   const isChineseInput = useRef(false);
@@ -94,7 +94,7 @@ const InputArea = memo<InputAreaProps>(({ setExpand }) => {
           // eslint-disable-next-line unicorn/consistent-function-scoping
           const send = () => {
             // avoid inserting newline when sending message.
-            // refs: https://github.com/AIDotNet/lobe-chat/pull/989
+            // refs: https://github.comAIDotNet/lobe-chat/pull/989
             e.preventDefault();
 
             sendMessage();
@@ -115,7 +115,6 @@ const InputArea = memo<InputAreaProps>(({ setExpand }) => {
             send();
           }
         }}
-        // @ts-ignore
         placeholder={t('sendPlaceholder')}
         ref={ref}
         type={'pure'}

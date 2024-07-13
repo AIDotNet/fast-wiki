@@ -9,7 +9,7 @@ const metaList =
     s.builtinTools
       .filter((item) => (!showDalle ? item.identifier !== DalleManifest.identifier : true))
       .map((t) => ({
-        author: 'AIDotNet',
+        author: 'LobeHub',
         identifier: t.identifier,
         meta: t.manifest.meta,
         type: 'builtin',

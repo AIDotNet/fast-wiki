@@ -1,11 +1,21 @@
+import { Icon } from '@lobehub/ui';
 import { Dropdown } from 'antd';
 import { createStyles } from 'antd-style';
-import { PropsWithChildren, memo, useEffect, useMemo, useState } from 'react';
+import type { ItemType } from 'antd/es/menu/interface';
+import isEqual from 'fast-deep-equal';
+import { LucideArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { PropsWithChildren, memo, startTransition, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Flexbox } from 'react-layout-kit';
+
 import { ModelItemRender, ProviderItemRender } from '@/components/ModelSelect';
 import { useAgentStore } from '@/store/agent';
 import { agentSelectors } from '@/store/agent/slices/chat';
-import { GetChatApplicationsList } from '@/services/ChatApplicationService';
+import { useUserStore } from '@/store/user';
+import { modelProviderSelectors } from '@/store/user/selectors';
+import { ModelProviderCard } from '@/types/llm';
+import { withBasePath } from '@/utils/basePath';
 
 const useStyles = createStyles(({ css, prefixCls }) => ({
   menu: css`
@@ -28,67 +38,63 @@ const useStyles = createStyles(({ css, prefixCls }) => ({
   `,
 }));
 
-let models = [];
+const menuKey = (provider: string, model: string) => `${provider}-${model}`;
+
 const ModelSwitchPanel = memo<PropsWithChildren>(({ children }) => {
-  const { t } = useTranslation('components') as any;
+  const { t } = useTranslation('components');
   const { styles, theme } = useStyles();
-  const [items, setItems] = useState([] as any[]);
-  const [model, updateAgentConfig] = useAgentStore((s) => [
+  const [model, provider, updateAgentConfig] = useAgentStore((s) => [
     agentSelectors.currentAgentModel(s),
+    agentSelectors.currentAgentModelProvider(s),
     s.updateAgentConfig,
   ]);
 
-  useEffect(() => {
+  const navigate = useNavigate();
+  const enabledList = useUserStore(modelProviderSelectors.modelProviderListForModelSelect, isEqual);
 
-    GetChatApplicationsList(1, 1000)
-      .then((res) => {
-        models = res.result;
-
-        // 增加functionCall = true
-        models = models.map((model:any) => {
-          return {
-            ...model,
-            functionCall: true,
-            maxOutput: model.maxResponseToken
-          };
-        })
-
-        setItems([
-          {
-            id: '系统应用',
-            name: '应用',
-            chatModels: models,
-          }].map((provider) => ({
-            children: getModelItems(provider),
-            key: provider.name,
-            label: <ProviderItemRender provider={provider.name} />,
-            type: 'group',
-          })));
-      })
-
-    const getModelItems = (provider: any) => {
-
-      if (provider.chatModels.length > 0) {
-        updateAgentConfig({ model: provider.chatModels[0].name, provider: provider.id });
-      }
-
-      const items = provider.chatModels.map((model:any) => ({
-        key: model.name,
+  const items = useMemo<ItemType[]>(() => {
+    const getModelItems = (provider: ModelProviderCard) => {
+      const items = provider.chatModels.map((model) => ({
+        key: menuKey(provider.id, model.id),
         label: <ModelItemRender {...model} />,
         onClick: () => {
-          updateAgentConfig({ model: model.name, provider: provider.id });
+          updateAgentConfig({ model: model.id, provider: provider.id });
         },
       }));
+
+      // if there is empty items, add a placeholder guide
+      if (items.length === 0)
+        return [
+          {
+            key: 'empty',
+            label: (
+              <Flexbox gap={8} horizontal style={{ color: theme.colorTextTertiary }}>
+                {t('ModelSwitchPanel.emptyModel')}
+                <Icon icon={LucideArrowRight} />
+              </Flexbox>
+            ),
+            onClick: () => {
+              startTransition(() => {navigate(withBasePath('/settings/llm'));});
+            },
+          },
+        ];
 
       return items;
     };
 
-  }, []);
+    // otherwise show with provider group
+    return enabledList.map((provider) => ({
+      children: getModelItems(provider),
+      key: provider.id,
+      label: <ProviderItemRender name={provider.name} provider={provider.id} />,
+      type: 'group',
+    }));
+  }, [enabledList]);
 
   return (
     <Dropdown
       menu={{
-        activeKey: model,
+        activeKey: menuKey(provider, model),
         className: styles.menu,
         items,
         style: {

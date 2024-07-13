@@ -1,13 +1,11 @@
-'use client';
+
 
 import { Spin } from 'antd';
 import { createStore, getMany } from 'idb-keyval';
-import dynamic from 'next/dynamic';
+import Modal from './Modal';
 import { memo, useEffect, useState } from 'react';
 
 import { MIGRATE_KEY, V1DB_NAME, V1DB_TABLE_NAME } from './const';
-
-const Modal = dynamic(() => import('./Modal'), { loading: () => <Spin fullscreen />, ssr: false });
 
 const Migration = memo(() => {
   const [dbState, setDbState] = useState(null);

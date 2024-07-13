@@ -45,20 +45,19 @@ export const createPluginStoreSlice: StateCreator<
     try {
       updateInstallLoadingState(name, true);
       const data = await toolService.getPluginManifest(plugin.manifest);
-      updateInstallLoadingState(name, undefined);
 
       // 4. 存储 manifest 信息
       await pluginService.installPlugin({ identifier: plugin.identifier, manifest: data, type });
       await refreshPlugins();
+
+      updateInstallLoadingState(name, undefined);
     } catch (error) {
       console.error(error);
       updateInstallLoadingState(name, undefined);
 
       const err = error as PluginInstallError;
       notification.error({
-        // @ts-ignore
         description: t(`error.${err.message}`, { ns: 'plugin' }),
-        // @ts-ignore
         message: t('error.installError', { name: plugin.meta.title, ns: 'plugin' }),
       });
     }
@@ -93,6 +92,7 @@ export const createPluginStoreSlice: StateCreator<
   },
   useFetchInstalledPlugins: () =>
     useSWR<LobeTool[]>(INSTALLED_PLUGINS, pluginService.getInstalledPlugins, {
+      fallbackData: [],
       onSuccess: (data) => {
         set(
           { installedPlugins: data, loadingInstallPlugins: false },
@@ -101,7 +101,12 @@ export const createPluginStoreSlice: StateCreator<
         );
       },
       revalidateOnFocus: false,
+      suspense: true,
     }),
   useFetchPluginStore: () =>
-    useSWR<LobeChatPluginsMarketIndex>('loadPluginStore', get().loadPluginStore),
+    useSWR<LobeChatPluginsMarketIndex>('loadPluginStore', get().loadPluginStore, {
+      fallbackData: { plugins: [], schemaVersion: 1 },
+      revalidateOnFocus: false,
+      suspense: true,
+    }),
 });

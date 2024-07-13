@@ -13,7 +13,7 @@ import { useUserStore } from '@/store/user';
 import { modelProviderSelectors } from '@/store/user/selectors';
 
 const FileUpload = memo(() => {
-  const { t } = useTranslation('chat') as any;
+  const { t } = useTranslation('chat');
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
   const upload = useFileStore((s) => s.uploadFile);

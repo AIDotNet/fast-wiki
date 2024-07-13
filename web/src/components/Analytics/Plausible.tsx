@@ -1,21 +1,26 @@
-'use client';
+import { useEffect } from 'react';
 
-import Script from 'next/script';
-import { memo } from 'react';
+interface PlausibleAnalyticsProps {
+  domain?: string;
+  scriptBaseUrl: string;
+}
 
-import { getClientConfig } from '@/config/client';
+const PlausibleAnalytics = ({ domain, scriptBaseUrl }: PlausibleAnalyticsProps) => {
+  useEffect(() => {
+    if (domain) {
+      const script = document.createElement('script');
+      script.setAttribute('data-domain', domain);
+      script.defer = true;
+      script.src = `${scriptBaseUrl}/js/script.js`;
+      document.head.appendChild(script);
 
-const { PLAUSIBLE_DOMAIN, PLAUSIBLE_SCRIPT_BASE_URL } = getClientConfig();
+      return () => {
+        document.head.removeChild(script);
+      };
+    }
+  }, [domain, scriptBaseUrl]);
 
-const PlausibleAnalytics = memo(
-  () =>
-    PLAUSIBLE_DOMAIN && (
-      <Script
-        data-domain={PLAUSIBLE_DOMAIN}
-        defer
-        src={`${PLAUSIBLE_SCRIPT_BASE_URL}/js/script.js`}
-      />
-    ),
-);
+  return null;
+};
 
 export default PlausibleAnalytics;

@@ -1,13 +1,10 @@
-"use client"
-
 import { Input } from "@lobehub/ui"
 import styled from "styled-components"
 import { Button } from 'antd'
 import { useState } from "react";
 import FunctionCallList from "./features/FunctionCallList";
 import UpdateFunctionCall from "./features/UpdateFunctionCall";
-import { useRouter } from 'next/navigation';
-
+import { useNavigate } from "react-router-dom";
 const FunctionCallWrapper = styled.div`
     padding: 20px;
     width: 100%;
@@ -15,7 +12,7 @@ const FunctionCallWrapper = styled.div`
 
 export default function DesktopLayout() {
     const [keyword, setKeyword] = useState('');
-    const router = useRouter();
+    const navigate = useNavigate();
     const [input, setInput] = useState({
         page: 1,
         pageSize: 10,
@@ -53,7 +50,7 @@ export default function DesktopLayout() {
                         marginTop: '5px'
                     }} placeholder="请输入名称或描述的内容搜索" />
                 <Button onClick={() => 
-                    router.push('/function-call/create')
+                    navigate('/function-call/create')
                 } style={{
                     marginRight: '20px',
                     marginTop: '5px'

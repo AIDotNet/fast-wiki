@@ -1,15 +1,16 @@
 import isEqual from 'fast-deep-equal';
 import { produce } from 'immer';
-import useSWR, { SWRResponse, mutate } from 'swr';
+import { SWRResponse, mutate } from 'swr';
 import { DeepPartial } from 'utility-types';
 import { StateCreator } from 'zustand/vanilla';
 
+import { INBOX_SESSION_ID } from '@/const/session';
 import { DEFAULT_AGENT_CONFIG } from '@/const/settings';
-import { useClientDataSWR } from '@/libs/swr';
-import { globalService } from '@/services/global';
+import { useClientDataSWR, useOnlyFetchOnceSWR } from '@/libs/swr';
 import { sessionService } from '@/services/session';
+import { AgentState } from '@/store/agent/slices/chat/initialState';
 import { useSessionStore } from '@/store/session';
-import { LobeAgentConfig } from '@/types/agent';
+import { LobeAgentChatConfig, LobeAgentConfig } from '@/types/agent';
 import { merge } from '@/utils/merge';
 
 import { AgentStore } from '../../store';
@@ -21,15 +22,28 @@ import { agentSelectors } from './selectors';
 export interface AgentChatAction {
   removePlugin: (id: string) => void;
   togglePlugin: (id: string, open?: boolean) => Promise<void>;
-  updateAgentConfig: (config: Partial<LobeAgentConfig>) => Promise<void>;
+  updateAgentChatConfig: (config: Partial<LobeAgentChatConfig>) => Promise<void>;
+  updateAgentConfig: (config: DeepPartial<LobeAgentConfig>) => Promise<void>;
 
   useFetchAgentConfig: (id: string) => SWRResponse<LobeAgentConfig>;
-  useFetchDefaultAgentConfig: () => SWRResponse<DeepPartial<LobeAgentConfig>>;
+  useInitAgentStore: (
+    defaultAgentConfig?: DeepPartial<LobeAgentConfig>,
+  ) => SWRResponse<DeepPartial<LobeAgentConfig>>;
 
   /* eslint-disable typescript-sort-keys/interface */
 
-  internal_updateAgentConfig: (id: string, data: DeepPartial<LobeAgentConfig>) => Promise<void>;
+  internal_updateAgentConfig: (
+    id: string,
+    data: DeepPartial<LobeAgentConfig>,
+    signal?: AbortSignal,
+  ) => Promise<void>;
   internal_refreshAgentConfig: (id: string) => Promise<void>;
+  internal_dispatchAgentMap: (
+    id: string,
+    config: DeepPartial<LobeAgentConfig>,
+    actions?: string,
+  ) => void;
+  internal_createAbortController: (key: keyof AgentState) => AbortController;
   /* eslint-enable */
 }
 
@@ -69,54 +83,78 @@ export const createChatSlice: StateCreator<
 
     await get().updateAgentConfig(config);
   },
+  updateAgentChatConfig: async (config) => {
+    const { activeId } = get();
+
+    if (!activeId) return;
+
+    await get().updateAgentConfig({ chatConfig: config });
+  },
   updateAgentConfig: async (config) => {
     const { activeId } = get();
 
     if (!activeId) return;
 
-    await get().internal_updateAgentConfig(activeId, config);
+    const controller = get().internal_createAbortController('updateAgentConfigSignal');
+
+    await get().internal_updateAgentConfig(activeId, config, controller.signal);
   },
   useFetchAgentConfig: (sessionId) =>
     useClientDataSWR<LobeAgentConfig>(
       [FETCH_AGENT_CONFIG_KEY, sessionId],
       ([, id]: string[]) => sessionService.getSessionConfig(id),
       {
+        fallbackData: DEFAULT_AGENT_CONFIG,
         onSuccess: (data) => {
-          if (get().isAgentConfigInit && isEqual(get().agentConfig, data)) return;
-
-          set({ agentConfig: data, isAgentConfigInit: true }, false, 'fetchAgentConfig');
+          get().internal_dispatchAgentMap(sessionId, data, 'fetch');
         },
+        suspense: true,
       },
     ),
-  useFetchDefaultAgentConfig: () =>
-    useSWR<DeepPartial<LobeAgentConfig>>(
-      'fetchDefaultAgentConfig',
-      globalService.getDefaultAgentConfig,
+  useInitAgentStore: (defaultAgentConfig) =>
+    useOnlyFetchOnceSWR<DeepPartial<LobeAgentConfig>>(
+      'fetchInboxAgentConfig',
+      () => sessionService.getSessionConfig(INBOX_SESSION_ID),
       {
         onSuccess: (data) => {
+          set(
+            {
+              defaultAgentConfig: merge(get().defaultAgentConfig, defaultAgentConfig),
+              isInboxAgentConfigInit: true,
+            },
+            false,
+            'initDefaultAgent',
+          );
+
           if (data) {
-            set(
-              {
-                defaultAgentConfig: merge(DEFAULT_AGENT_CONFIG, data),
-                isDefaultAgentConfigInit: true,
-              },
-              false,
-              'fetchDefaultAgentConfig',
-            );
+            get().internal_dispatchAgentMap(INBOX_SESSION_ID, data, 'initInbox');
           }
         },
-        revalidateOnFocus: false,
       },
     ),
 
   /* eslint-disable sort-keys-fix/sort-keys-fix */
 
-  internal_updateAgentConfig: async (id, data) => {
+  internal_dispatchAgentMap: (id, config, actions) => {
+    const agentMap = produce(get().agentMap, (draft) => {
+      if (!draft[id]) {
+        draft[id] = config;
+      } else {
+        draft[id] = merge(draft[id], config);
+      }
+    });
+
+    if (isEqual(get().agentMap, agentMap)) return;
+
+    set({ agentMap }, false, 'dispatchAgent' + (actions ? `/${actions}` : ''));
+  },
+
+  internal_updateAgentConfig: async (id, data, signal) => {
     const prevModel = agentSelectors.currentAgentModel(get());
     // optimistic update at frontend
-    set({ agentConfig: merge(get().agentConfig, data) }, false, 'optimistic_updateAgentConfig');
+    get().internal_dispatchAgentMap(id, data, 'optimistic_updateAgentConfig');
 
-    await sessionService.updateSessionConfig(id, data);
+    await sessionService.updateSessionConfig(id, data, signal);
     await get().internal_refreshAgentConfig(id);
 
     // refresh sessions to update the agent config if the model has changed
@@ -125,5 +163,14 @@ export const createChatSlice: StateCreator<
 
   internal_refreshAgentConfig: async (id) => {
     await mutate([FETCH_AGENT_CONFIG_KEY, id]);
+  },
+
+  internal_createAbortController: (key) => {
+    const abortController = get()[key] as AbortController;
+    if (abortController) abortController.abort('canceled');
+    const controller = new AbortController();
+    set({ [key]: controller }, false, 'internal_createAbortController');
+
+    return controller;
   },
 });

@@ -14,7 +14,7 @@ const translateStyle = css`
 `;
 
 export const useCustomActions = () => {
-  const { t } = useTranslation('chat') as any;
+  const { t } = useTranslation('chat');
 
   const translate = {
     children: localeOptions.map((i) => ({

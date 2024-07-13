@@ -2,9 +2,17 @@ export default {
   about: {
     title: '关于',
   },
+  agentTab: {
+    chat: '聊天偏好',
+    meta: '助手信息',
+    modal: '模型设置',
+    plugin: '插件设置',
+    prompt: '角色设定',
+    tts: '语音服务',
+  },
   analytics: {
     telemetry: {
-      desc: '通过选择发送遥测数据，你可以帮助我们改善 FastWki-Chat 整体用户体验',
+      desc: '通过选择发送遥测数据，你可以帮助我们改善 TokenChat 整体用户体验',
       title: '发送匿名使用数据',
     },
     title: '数据统计',
@@ -35,6 +43,12 @@ export default {
     title: '设置',
   },
   llm: {
+    aesGcm: '您的秘钥与代理地址等将使用 <1>AES-GCM</1> 加密算法进行加密',
+    apiKey: {
+      desc: '请填写你的 {{name}} API Key',
+      placeholder: '{{name}} API Key',
+      title: 'API Key',
+    },
     checker: {
       button: '检查',
       desc: '测试 Api Key 与代理地址是否正确填写',
@@ -57,12 +71,12 @@ export default {
         },
         files: {
           extra:
-            '当前 FastWki-Chat 的文件上传实现仅为一种 Hack 方案，仅限自行尝试。完整文件上传能力请等待后续实现',
+            '当前 TokenChat 的文件上传实现仅为一种 Hack 方案，仅限自行尝试。完整文件上传能力请等待后续实现',
           title: '支持文件上传',
         },
         functionCall: {
           extra:
-            '此配置将仅开启 FastWki-Chat 中的函数调用能力，是否支持函数调用完全取决于模型本身，请自行测试该模型的函数调用能力可用性',
+            '此配置将仅开启 TokenChat 中的函数调用能力，是否支持函数调用完全取决于模型本身，请自行测试该模型的函数调用能力可用性',
           title: '支持函数调用',
         },
         id: {
@@ -77,7 +91,7 @@ export default {
         },
         vision: {
           extra:
-            '此配置将仅开启 FastWki-Chat 中的图片上传配置，是否支持识别完全取决于模型本身，请自行测试该模型的视觉识别能力可用性',
+            '此配置将仅开启 TokenChat 中的图片上传配置，是否支持识别完全取决于模型本身，请自行测试该模型的视觉识别能力可用性',
           title: '支持视觉识别',
         },
       },
@@ -92,6 +106,7 @@ export default {
       latestTime: '上次更新时间：{{time}}',
       noLatestTime: '暂未获取列表',
     },
+    helpDoc: '配置教程',
     modelList: {
       desc: '选择在会话中展示的模型，选择的模型会在模型列表中展示',
       placeholder: '请从列表中选择模型',
@@ -102,15 +117,7 @@ export default {
       desc: '除默认地址外，必须包含 http(s)://',
       title: 'API 代理地址',
     },
-    waitingForMore: '更多模型正在 <1>计划接入</1> 中，敬请期待 ✨',
-  },
-  ollama: {
-    download: {
-      desc: 'Ollama 正在下载该模型，请尽量不要关闭本页面。重新下载时将会中断处继续',
-      remainingTime: '剩余时间',
-      speed: '下载速度',
-      title: '正在下载模型 {{model}} ',
-    },
+    waitingForMore: '更多模型正在 <1>计划接入</1> 中，敬请期待',
   },
   plugin: {
     addTooltip: '自定义插件',
@@ -153,7 +160,7 @@ export default {
   },
   settingChat: {
     autoCreateTopicThreshold: {
-      desc: '当前消息数超过设定该值后，将自动创建对话记录',
+      desc: '当前消息数超过设定该值后，将自动创建话题',
       title: '消息阈值',
     },
     chatStyleType: {
@@ -168,8 +175,8 @@ export default {
       title: '历史消息长度压缩阈值',
     },
     enableAutoCreateTopic: {
-      desc: '会话过程中是否自动创建对话记录，仅在临时对话记录中生效',
-      title: '自动创建对话记录',
+      desc: '会话过程中是否自动创建话题，仅在临时话题中生效',
+      title: '自动创建话题',
     },
     enableCompressThreshold: {
       title: '是否开启历史消息长度压缩阈值',
@@ -177,6 +184,7 @@ export default {
     enableHistoryCount: {
       alias: '不限制',
       limited: '只包含 {{number}} 条会话消息',
+      setlimited: '使用历史消息数',
       title: '限制历史消息数',
       unlimited: '不限历史消息数',
     },
@@ -214,8 +222,8 @@ export default {
       title: '模型',
     },
     presencePenalty: {
-      desc: '值越大，越有可能扩展到新对话记录',
-      title: '对话记录新鲜度',
+      desc: '值越大，越有可能扩展到新话题',
+      title: '话题新鲜度',
     },
     temperature: {
       desc: '值越大，回复越随机',
@@ -363,14 +371,33 @@ export default {
       title: 'WebRTC 同步',
     },
   },
+  systemAgent: {
+    agentMeta: {
+      label: '助理元数据生成模型',
+      modelDesc: '指定用于生成助理名称、描述、头像、标签的模型',
+      title: '自动生成助理信息',
+    },
+    title: '系统助手',
+    topic: {
+      label: '话题命名模型',
+      modelDesc: '指定用于话题自动重命名的模型',
+      title: '话题自动命名',
+    },
+    translation: {
+      label: '翻译模型',
+      modelDesc: '指定用于翻译的模型',
+      title: '消息内容翻译',
+    },
+  },
   tab: {
-    about: '关于',
-    agent: '默认助手',
-    common: '通用设置',
-    experiment: '实验',
-    llm: '语言模型',
-    sync: '云端同步',
-    tts: '语音服务',
+    'about': '关于',
+    'agent': '默认助手',
+    'common': '通用设置',
+    'experiment': '实验',
+    'llm': '语言模型',
+    'sync': '云端同步',
+    'system-agent': '系统助手',
+    'tts': '语音服务',
   },
   tools: {
     builtins: {

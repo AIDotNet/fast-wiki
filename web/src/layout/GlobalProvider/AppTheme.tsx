@@ -1,10 +1,6 @@
-'use client';
-
 import { ConfigProvider, NeutralColors, PrimaryColors, ThemeProvider } from '@lobehub/ui';
 import { ThemeAppearance, createStyles } from 'antd-style';
 import 'antd/dist/reset.css';
-import Image from 'next/image';
-import Link from 'next/link';
 import { ReactNode, memo, useEffect } from 'react';
 
 import AntdStaticMethods from '@/components/AntdStaticMethods';
@@ -14,7 +10,7 @@ import {
   LOBE_THEME_PRIMARY_COLOR,
 } from '@/const/theme';
 import { useUserStore } from '@/store/user';
-import { settingsSelectors } from '@/store/user/selectors';
+import { userGeneralSettingsSelectors } from '@/store/user/selectors';
 import { GlobalStyle } from '@/styles';
 import { setCookie } from '@/utils/cookie';
 
@@ -30,12 +26,25 @@ const useStyles = createStyles(({ css, token }) => ({
     height: 100%;
     min-height: 100dvh;
     max-height: 100dvh;
+
+    @media (min-device-width: 576px) {
+      overflow: hidden;
+    }
   `,
   // scrollbar-width and scrollbar-color are supported from Chrome 121
   // https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-color
   scrollbar: css`
     scrollbar-color: ${token.colorFill} transparent;
     scrollbar-width: thin;
+
+    #lobe-mobile-scroll-container {
+      scrollbar-width: none;
+
+      ::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+      }
+    }
   `,
 
   // so this is a polyfill for older browsers
@@ -73,11 +82,11 @@ const AppTheme = memo<AppThemeProps>(
     // console.debug('server:appearance', defaultAppearance);
     // console.debug('server:primaryColor', defaultPrimaryColor);
     // console.debug('server:neutralColor', defaultNeutralColor);
-    const themeMode = useUserStore(settingsSelectors.currentThemeMode);
+    const themeMode = useUserStore(userGeneralSettingsSelectors.currentThemeMode);
     const { styles, cx } = useStyles();
     const [primaryColor, neutralColor] = useUserStore((s) => [
-      settingsSelectors.currentSettings(s).primaryColor,
-      settingsSelectors.currentSettings(s).neutralColor,
+      userGeneralSettingsSelectors.primaryColor(s),
+      userGeneralSettingsSelectors.neutralColor(s),
     ]);
 
     useEffect(() => {
@@ -103,7 +112,7 @@ const AppTheme = memo<AppThemeProps>(
       >
         <GlobalStyle />
         <AntdStaticMethods />
-        <ConfigProvider config={{ aAs: Link, imgAs: Image, imgUnoptimized: true }}>
+        <ConfigProvider config={{   imgUnoptimized: true }}>
           {children}
         </ConfigProvider>
       </ThemeProvider>

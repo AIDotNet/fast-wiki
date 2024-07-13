@@ -10,7 +10,7 @@ import { useServerConfigStore } from '@/store/serverConfig';
 import SubmitAgentModal from './SubmitAgentModal';
 
 const SubmitAgentButton = memo<{ modal?: boolean }>(({ modal }) => {
-  const { t } = useTranslation('setting') as any;
+  const { t } = useTranslation('setting');
   const mobile = useServerConfigStore((s) => s.isMobile);
   const [isModalOpen, setIsModalOpen] = useState(false);
 

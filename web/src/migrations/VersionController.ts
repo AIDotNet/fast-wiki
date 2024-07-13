@@ -48,10 +48,13 @@ export class VersionController<T> {
   migrate(data: MigrationData<T>): MigrationData<T> {
     let nextData = data;
     const targetVersion = this.targetVersion || this.migrations.length;
+    if (data.version === undefined)
+      throw new Error(t('migrateError.missVersion', { ns: 'migration' }));
     const currentVersion = data.version;
 
     for (let i = currentVersion || 0; i < targetVersion; i++) {
       const migration = this.migrations.find((m) => m.version === i);
+      if (!migration) throw new Error(t('migrateError.noMigration', { ns: 'migration' }));
 
       nextData = migration.migrate(nextData);
 

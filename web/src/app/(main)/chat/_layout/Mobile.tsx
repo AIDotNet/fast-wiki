@@ -1,13 +1,13 @@
-'use client';
 
 import { createStyles } from 'antd-style';
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
 import Migration from '@/app/(main)/chat/features/Migration';
 import { useQuery } from '@/hooks/useQuery';
+import WorkspaceLayout from '../(workspace)/layout';
+import WorkspacePage from '../(workspace)/page';
 
-import { LayoutProps } from './type';
 
 const useStyles = createStyles(({ css, token }) => ({
   main: css`
@@ -17,19 +17,29 @@ const useStyles = createStyles(({ css, token }) => ({
   `,
 }));
 
-const Layout = memo<LayoutProps>(({ children, session }) => {
+const Layout = memo(() => {
   const { showMobileWorkspace } = useQuery();
+  
   const { styles } = useStyles();
+  const [workSpacePage, setWorkSpacePage] = useState<any>();
 
+  useEffect(() => {
+    WorkspacePage()
+      .then((page) => {
+        setWorkSpacePage(page);
+      })
+  }, []);
+  
   return (
     <>
       <Flexbox
         className={styles.main}
         height="100%"
-        
         width="100%"
       >
-        {children}
+        <WorkspaceLayout>
+          {workSpacePage}
+        </WorkspaceLayout>
       </Flexbox>
       <Migration />
     </>

@@ -9,7 +9,7 @@ import { agentSelectors } from '@/store/agent/slices/chat';
 import { useChatStore } from '@/store/chat';
 import { chatSelectors } from '@/store/chat/selectors';
 import { useUserStore } from '@/store/user';
-import { settingsSelectors } from '@/store/user/selectors';
+import { settingsSelectors, userGeneralSettingsSelectors } from '@/store/user/selectors';
 import { ChatMessageError } from '@/types/message';
 import { getMessageError } from '@/utils/fetch';
 
@@ -22,7 +22,7 @@ interface STTConfig extends SWRConfiguration {
 const useBrowserSTT = (config: STTConfig) => {
   const ttsSettings = useUserStore(settingsSelectors.currentTTS, isEqual);
   const ttsAgentSettings = useAgentStore(agentSelectors.currentAgentTTS, isEqual);
-  const locale = useUserStore(settingsSelectors.currentLanguage);
+  const locale = useUserStore(userGeneralSettingsSelectors.currentLanguage);
 
   const autoStop = ttsSettings.sttAutoStop;
   const sttLocale =
@@ -38,7 +38,7 @@ const useBrowserSTT = (config: STTConfig) => {
 
 const BrowserSTT = memo<{ mobile?: boolean }>(({ mobile }) => {
   const [error, setError] = useState<ChatMessageError>();
-  const { t } = useTranslation('chat') as any;
+  const { t } = useTranslation('chat');
 
   const [loading, updateInputMessage] = useChatStore((s) => [
     chatSelectors.isAIGenerating(s),

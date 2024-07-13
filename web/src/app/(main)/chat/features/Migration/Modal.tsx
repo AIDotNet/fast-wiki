@@ -18,7 +18,7 @@ interface MigrationModalProps {
 }
 
 const MigrationModal = memo<MigrationModalProps>(({ setOpen, open, state: dbState }) => {
-  const { t } = useTranslation('migration')as any;
+  const { t } = useTranslation('migration');
   const [upgradeStatus, setUpgradeStatus] = useState<UpgradeStatus>(UpgradeStatus.START);
 
   const [error, setError] = useState<MigrationError>();

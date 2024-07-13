@@ -1,20 +1,21 @@
-'use client';
+
 
 import { MobileNavBar, MobileNavBarTitle } from '@lobehub/ui';
 import { Tag } from 'antd';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
 
+import { enableAuth } from '@/const/auth';
 import { useActiveSettingsKey } from '@/hooks/useActiveSettingsKey';
 import { SettingsTabs } from '@/store/global/initialState';
 import { mobileHeaderSticky } from '@/styles/mobileHeader';
 
 const Header = memo(() => {
-  const { t } = useTranslation('setting') as any;
+  const { t } = useTranslation('setting');
 
-  const router = useRouter();
+  const navigate = useNavigate();
   const activeSettingsKey = useActiveSettingsKey();
   return (
     <MobileNavBar
@@ -32,7 +33,7 @@ const Header = memo(() => {
           }
         />
       }
-      onBackClick={() => router.push('/me')}
+      onBackClick={() => navigate(enableAuth ? '/me/settings' : '/me')}
       showBackButton
       style={mobileHeaderSticky}
     />

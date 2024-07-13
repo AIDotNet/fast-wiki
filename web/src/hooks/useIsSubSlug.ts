@@ -1,10 +1,11 @@
-import { usePathname } from 'next/navigation';
+import { useLocation } from 'react-router-dom';
 
 /**
  * Returns true if the current path has a sub slug (`/chat/mobile` or `/chat/settings`)
  */
 export const useIsSubSlug = () => {
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
 
   const slugs = pathname.split('/').filter(Boolean);
 

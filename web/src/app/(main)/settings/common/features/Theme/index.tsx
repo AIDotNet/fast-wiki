@@ -1,4 +1,4 @@
-'use client';
+
 
 import { Form, type ItemGroup, SelectWithImg, SliderWithInput } from '@lobehub/ui';
 import { Select } from 'antd';
@@ -14,7 +14,7 @@ import { imageUrl } from '@/const/url';
 import AvatarWithUpload from '@/features/AvatarWithUpload';
 import { localeOptions } from '@/locales/resources';
 import { useUserStore } from '@/store/user';
-import { settingsSelectors } from '@/store/user/selectors';
+import { settingsSelectors, userGeneralSettingsSelectors } from '@/store/user/selectors';
 import { switchLang } from '@/utils/client/switchLang';
 
 import { ThemeSwatchesNeutral, ThemeSwatchesPrimary } from './ThemeSwatches';
@@ -22,9 +22,10 @@ import { ThemeSwatchesNeutral, ThemeSwatchesPrimary } from './ThemeSwatches';
 type SettingItemGroup = ItemGroup;
 
 const Theme = memo(() => {
-  const { t } = useTranslation('setting') as any;
+  const { t } = useTranslation('setting');
   const [form] = Form.useForm();
   const settings = useUserStore(settingsSelectors.currentSettings, isEqual);
+  const themeMode = useUserStore(userGeneralSettingsSelectors.currentThemeMode);
   const [setThemeMode, setSettings] = useUserStore((s) => [s.switchThemeMode, s.setSettings]);
 
   useSyncSettings(form);
@@ -40,7 +41,6 @@ const Theme = memo(() => {
       {
         children: (
           <SelectWithImg
-            defaultValue={settings.themeMode}
             height={60}
             onChange={setThemeMode}
             options={[
@@ -64,6 +64,7 @@ const Theme = memo(() => {
               },
             ]}
             unoptimized={false}
+            value={themeMode}
             width={100}
           />
         ),
@@ -78,7 +79,7 @@ const Theme = memo(() => {
           />
         ),
         label: t('settingTheme.lang.title'),
-        name: 'language',
+        name: ['general', 'language'],
       },
       {
         children: (
@@ -113,7 +114,7 @@ const Theme = memo(() => {
         ),
         desc: t('settingTheme.fontSize.desc'),
         label: t('settingTheme.fontSize.title'),
-        name: 'fontSize',
+        name: ['general', 'fontSize'],
       },
       {
         children: <ThemeSwatchesPrimary />,

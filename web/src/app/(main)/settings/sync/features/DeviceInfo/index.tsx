@@ -1,5 +1,3 @@
-'use client';
-
 import { Typography } from 'antd';
 import { createStyles } from 'antd-style';
 import { rgba } from 'polished';
@@ -54,7 +52,7 @@ interface DeviceCardProps {
 
 const DeviceCard = memo<DeviceCardProps>(({ browser, os }) => {
   const { styles } = useStyles();
-  const { t } = useTranslation('setting') as any;
+  const { t } = useTranslation('setting');
 
   return (
     <Flexbox

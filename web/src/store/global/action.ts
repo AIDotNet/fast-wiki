@@ -7,32 +7,28 @@ import type { StateCreator } from 'zustand/vanilla';
 import { INBOX_SESSION_ID } from '@/const/session';
 import { SESSION_CHAT_URL } from '@/const/url';
 import { CURRENT_VERSION } from '@/const/version';
-import { useClientDataSWR } from '@/libs/swr';
+import { useOnlyFetchOnceSWR } from '@/libs/swr';
 import { globalService } from '@/services/global';
 import type { GlobalStore } from '@/store/global/index';
 import { merge } from '@/utils/merge';
 import { setNamespace } from '@/utils/storeDebug';
 
-import type { GlobalPreference } from './initialState';
+import type { SystemStatus } from './initialState';
 
-const n = setNamespace('preference');
+const n = setNamespace('g');
 
 /**
  * 设置操作
  */
 export interface GlobalStoreAction {
   switchBackToChat: (sessionId?: string) => void;
-  switchToApp: () => void;
-  switchToFunctionCall: () => void;
-  switchToWiki: () => void;
-  switchToUser: () => void;
   toggleChatSideBar: (visible?: boolean) => void;
   toggleExpandSessionGroup: (id: string, expand: boolean) => void;
   toggleMobileTopic: (visible?: boolean) => void;
   toggleSystemRole: (visible?: boolean) => void;
-  updatePreference: (preference: Partial<GlobalPreference>, action?: any) => void;
-  useCheckLatestVersion: () => SWRResponse<string>;
-  useInitGlobalPreference: () => SWRResponse;
+  updateSystemStatus: (status: Partial<SystemStatus>, action?: any) => void;
+  useCheckLatestVersion: (enabledCheck?: boolean) => SWRResponse<string>;
+  useInitSystemStatus: () => SWRResponse;
 }
 
 export const globalActionSlice: StateCreator<
@@ -44,27 +40,15 @@ export const globalActionSlice: StateCreator<
   switchBackToChat: (sessionId) => {
     get().router?.push(SESSION_CHAT_URL(sessionId || INBOX_SESSION_ID, get().isMobile));
   },
-  switchToUser: () => {
-    get().router?.push('/user');
-  },
-  switchToApp: () => {
-    get().router?.push('/app');
-  },
-  switchToWiki: () => {
-    get().router?.push('/wiki');
-  },
-  switchToFunctionCall: () => {
-    get().router?.push('/function-call');
-  },
   toggleChatSideBar: (newValue) => {
     const showChatSideBar =
-      typeof newValue === 'boolean' ? newValue : !get().preference.showChatSideBar;
+      typeof newValue === 'boolean' ? newValue : !get().status.showChatSideBar;
 
-    get().updatePreference({ showChatSideBar }, n('toggleAgentPanel', newValue));
+    get().updateSystemStatus({ showChatSideBar }, n('toggleAgentPanel', newValue));
   },
   toggleExpandSessionGroup: (id, expand) => {
-    const { preference } = get();
-    const nextExpandSessionGroup = produce(preference.expandSessionGroupKeys, (draft: string[]) => {
+    const { status } = get();
+    const nextExpandSessionGroup = produce(status.expandSessionGroupKeys, (draft: string[]) => {
       if (expand) {
         if (draft.includes(id)) return;
         draft.push(id);
@@ -73,30 +57,33 @@ export const globalActionSlice: StateCreator<
         if (index !== -1) draft.splice(index, 1);
       }
     });
-    get().updatePreference({ expandSessionGroupKeys: nextExpandSessionGroup });
+    get().updateSystemStatus({ expandSessionGroupKeys: nextExpandSessionGroup });
   },
   toggleMobileTopic: (newValue) => {
     const mobileShowTopic =
-      typeof newValue === 'boolean' ? newValue : !get().preference.mobileShowTopic;
+      typeof newValue === 'boolean' ? newValue : !get().status.mobileShowTopic;
 
-    get().updatePreference({ mobileShowTopic }, n('toggleMobileTopic', newValue));
+    get().updateSystemStatus({ mobileShowTopic }, n('toggleMobileTopic', newValue));
   },
   toggleSystemRole: (newValue) => {
-    const showSystemRole =
-      typeof newValue === 'boolean' ? newValue : !get().preference.mobileShowTopic;
+    const showSystemRole = typeof newValue === 'boolean' ? newValue : !get().status.mobileShowTopic;
 
-    get().updatePreference({ showSystemRole }, n('toggleMobileTopic', newValue));
+    get().updateSystemStatus({ showSystemRole }, n('toggleMobileTopic', newValue));
   },
-  updatePreference: (preference, action) => {
-    const nextPreference = merge(get().preference, preference);
+  updateSystemStatus: (status, action) => {
+    // Status cannot be modified when it is not initialized
+    if (!get().isStatusInit) return;
 
-    set({ preference: nextPreference }, false, action || n('updatePreference'));
+    const nextStatus = merge(get().status, status);
+    if (isEqual(get().status, nextStatus)) return;
 
-    get().preferenceStorage.saveToLocalStorage(nextPreference);
+    set({ status: nextStatus }, false, action || n('updateSystemStatus'));
+
+    get().statusStorage.saveToLocalStorage(nextStatus);
   },
 
-  useCheckLatestVersion: () =>
-    useSWR('checkLatestVersion', globalService.getLatestVersion, {
+  useCheckLatestVersion: (enabledCheck = true) =>
+    useSWR(enabledCheck ? 'checkLatestVersion' : null, globalService.getLatestVersion, {
       // check latest version every 30 minutes
       focusThrottleInterval: 1000 * 60 * 30,
       onSuccess: (data: string) => {
@@ -105,19 +92,15 @@ export const globalActionSlice: StateCreator<
       },
     }),
 
-  useInitGlobalPreference: () =>
-    useClientDataSWR<GlobalPreference>(
-      'initGlobalPreference',
-      () => get().preferenceStorage.getFromLocalStorage(),
+  useInitSystemStatus: () =>
+    useOnlyFetchOnceSWR<SystemStatus>(
+      'initSystemStatus',
+      () => get().statusStorage.getFromLocalStorage(),
       {
-        onSuccess: (preference) => {
-          const nextPreference = merge(get().preference, preference);
+        onSuccess: (status) => {
+          set({ isStatusInit: true }, false, 'setStatusInit');
 
-          set({ isPreferenceInit: true });
-
-          if (isEqual(get().preference, nextPreference)) return;
-
-          set({ preference: nextPreference }, false, n('initPreference'));
+          get().updateSystemStatus(status, 'initSystemStatus');
         },
       },
     ),

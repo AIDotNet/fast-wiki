@@ -52,11 +52,12 @@ class _SessionGroupModel extends BaseModel {
   // **************** Delete *************** //
   async delete(id: string, removeGroupItem: boolean = false) {
     const { SessionModel } = await import('./session');
-    this.db.sessions.toCollection().modify(async (session) => {
+    this.db.sessions.toCollection().modify((session) => {
       //  update all session associated with the sessionGroup to default
       if (session.group === id) {
-        await SessionModel.update(session.id, { group: 'default' });
+        SessionModel.update(session.id, { group: 'default' });
       }
+
     });
 
     if (!removeGroupItem) {

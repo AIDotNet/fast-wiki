@@ -1,4 +1,4 @@
-'use client';
+
 
 import { Skeleton, SkeletonProps } from 'antd';
 import { createStyles } from 'antd-style';

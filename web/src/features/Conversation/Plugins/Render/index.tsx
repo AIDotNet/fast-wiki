@@ -3,10 +3,10 @@ import { memo } from 'react';
 
 import { LobeToolRenderType } from '@/types/tool';
 
-import BuiltinType from '././BuiltinType';
 import DefaultType from './DefaultType';
 import Markdown from './MarkdownType';
 import Standalone from './StandaloneType';
+import BuiltinType from './BuiltinType';
 
 export interface PluginRenderProps {
   content: string;

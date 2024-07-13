@@ -5,7 +5,7 @@ import { parseGreetingTime } from './greetingTime';
 import { GetChatApplications, GetChatShareApplication } from '@/services/ChatApplicationService';
 
 export const useGreeting = () => {
-  const { t } = useTranslation('welcome') as any;;
+  const { t } = useTranslation('welcome');
 
   const [greeting, setGreeting] = useState<'morning' | 'noon' | 'afternoon' | 'night'>();
 

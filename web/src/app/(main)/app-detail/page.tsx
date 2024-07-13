@@ -1,4 +1,3 @@
-"use client"
 import { useEffect, useState } from 'react';
 import AppDetailInfo from './feautres/AppDetailInfo';
 import { Button } from 'antd';

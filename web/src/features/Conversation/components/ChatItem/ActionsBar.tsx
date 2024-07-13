@@ -39,7 +39,7 @@ const Actions = memo<ActionsProps>(({ index, setEditing }) => {
 
   const handleActionClick = useCallback(
     async (action: ActionEvent) => {
-      switch (action?.key) {
+      switch (action.key) {
         case 'edit': {
           setEditing(true);
         }

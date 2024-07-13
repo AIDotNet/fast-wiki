@@ -11,7 +11,7 @@ import { useActionSWR } from '@/libs/swr';
 import { useChatStore } from '@/store/chat';
 
 const SaveTopic = memo<{ mobile?: boolean }>(({ mobile }) => {
-  const { t } = useTranslation('chat') as any;
+  const { t } = useTranslation('chat');
   const [hasTopic, openNewTopicOrSaveTopic] = useChatStore((s) => [
     !!s.activeTopicId,
     s.openNewTopicOrSaveTopic,

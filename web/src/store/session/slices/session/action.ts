@@ -35,10 +35,9 @@ const SEARCH_SESSIONS_KEY = 'searchSessions';
 /* eslint-disable typescript-sort-keys/interface */
 export interface SessionAction {
   /**
-   * active the session
-   * @param sessionId
+   * switch the session
    */
-  activeSession: (sessionId: string) => void;
+  switchSession: (sessionId: string) => void;
   /**
    * reset sessions to default
    */
@@ -72,7 +71,7 @@ export interface SessionAction {
 
   updateSearchKeywords: (keywords: string) => void;
 
-  useFetchSessions: () => SWRResponse<ChatSessionList>;
+  useFetchSessions: (isLogin: boolean | undefined) => SWRResponse<ChatSessionList>;
   useSearchSessions: (keyword?: string) => SWRResponse<any>;
 
   internal_dispatchSessions: (payload: SessionDispatch) => void;
@@ -94,19 +93,13 @@ export const createSessionSlice: StateCreator<
   [],
   SessionAction
 > = (set, get) => ({
-  activeSession: (sessionId) => {
-    if (get().activeId === sessionId) return;
-
-    set({ activeId: sessionId }, false, n(`activeSession/${sessionId}`));
-  },
-
   clearSessions: async () => {
     await sessionService.removeAllSessions();
     await get().refreshSessions();
   },
 
   createSession: async (agent, isSwitchSession = true) => {
-    const { activeSession, refreshSessions } = get();
+    const { switchSession, refreshSessions } = get();
 
     // merge the defaultAgent in settings
     const defaultAgent = merge(
@@ -120,24 +113,23 @@ export const createSessionSlice: StateCreator<
     await refreshSessions();
 
     // Whether to goto  to the new session after creation, the default is to switch to
-    if (isSwitchSession) activeSession(id);
+    if (isSwitchSession) switchSession(id);
 
     return id;
   },
+
   duplicateSession: async (id) => {
-    const { activeSession, refreshSessions } = get();
+    const { switchSession, refreshSessions } = get();
     const session = sessionSelectors.getSessionById(id)(get());
 
     if (!session) return;
     const title = sessionMetaSelectors.getTitle(session.meta);
 
-    // @ts-ignore
     const newTitle = t('duplicateSession.title', { ns: 'chat', title: title });
 
     const messageLoadingKey = 'duplicateSession.loading';
 
     message.loading({
-      // @ts-ignore
       content: t('duplicateSession.loading', { ns: 'chat' }),
       duration: 0,
       key: messageLoadingKey,
@@ -148,19 +140,16 @@ export const createSessionSlice: StateCreator<
     // duplicate Session Error
     if (!newId) {
       message.destroy(messageLoadingKey);
-      // @ts-ignore
       message.error(t('copyFail', { ns: 'common' }));
       return;
     }
 
     await refreshSessions();
     message.destroy(messageLoadingKey);
-    // @ts-ignore
     message.success(t('duplicateSession.success', { ns: 'chat' }));
 
-    activeSession(newId);
+    switchSession(newId);
   },
-
   pinSession: async (id, pinned) => {
     await get().internal_updateSession(id, { pinned });
   },
@@ -171,8 +160,14 @@ export const createSessionSlice: StateCreator<
 
     // If the active session deleted, switch to the inbox session
     if (sessionId === get().activeId) {
-      get().activeSession(INBOX_SESSION_ID);
+      get().switchSession(INBOX_SESSION_ID);
     }
+  },
+
+  switchSession: (sessionId) => {
+    if (get().activeId === sessionId) return;
+
+    set({ activeId: sessionId }, false, n(`activeSession/${sessionId}`));
   },
 
   updateSearchKeywords: (keywords) => {
@@ -192,28 +187,42 @@ export const createSessionSlice: StateCreator<
 
     const { activeId, refreshSessions } = get();
 
-    await sessionService.updateSession(activeId, { meta });
+    const abortController = get().signalSessionMeta as AbortController;
+    if (abortController) abortController.abort('canceled');
+    const controller = new AbortController();
+    set({ signalSessionMeta: controller }, false, 'updateSessionMetaSignal');
+
+    await sessionService.updateSessionMeta(activeId, meta, controller.signal);
     await refreshSessions();
   },
 
-  useFetchSessions: () =>
-    useClientDataSWR<ChatSessionList>(FETCH_SESSIONS_KEY, sessionService.getGroupedSessions, {
-      onSuccess: (data) => {
-        if (
-          get().isSessionsFirstFetchFinished &&
-          isEqual(get().sessions, data.sessions) &&
-          isEqual(get().sessionGroups, data.sessionGroups)
-        )
-          return;
+  useFetchSessions: (isLogin) =>
+    useClientDataSWR<ChatSessionList>(
+      [FETCH_SESSIONS_KEY, isLogin],
+      () => sessionService.getGroupedSessions(),
+      {
+        fallbackData: {
+          sessionGroups: [],
+          sessions: [],
+        },
+        onSuccess: (data) => {
+          if (
+            get().isSessionsFirstFetchFinished &&
+            isEqual(get().sessions, data.sessions) &&
+            isEqual(get().sessionGroups, data.sessionGroups)
+          )
+            return;
 
-        get().internal_processSessions(
-          data.sessions,
-          data.sessionGroups,
-          n('useFetchSessions/updateData') as any,
-        );
-        set({ isSessionsFirstFetchFinished: true }, false, n('useFetchSessions/onSuccess', data));
+          get().internal_processSessions(
+            data.sessions,
+            data.sessionGroups,
+            n('useFetchSessions/updateData') as any,
+          );
+          set({ isSessionsFirstFetchFinished: true }, false, n('useFetchSessions/onSuccess', data));
+        },
+        suspense: true,
       },
-    }),
+    ),
   useSearchSessions: (keyword) =>
     useSWR<LobeSessions>(
       [SEARCH_SESSIONS_KEY, keyword],
@@ -260,6 +269,6 @@ export const createSessionSlice: StateCreator<
     );
   },
   refreshSessions: async () => {
-    await mutate(FETCH_SESSIONS_KEY);
+    await mutate([FETCH_SESSIONS_KEY, true]);
   },
 });

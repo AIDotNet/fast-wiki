@@ -4,7 +4,9 @@ export default {
     function_call: '函数调用',
     off: '关闭调试',
     on: '查看插件调用信息',
+    payload: '插件载荷',
     response: '返回结果',
+    tool_call: '工具调用请求',
   },
   detailModal: {
     info: {
@@ -68,7 +70,7 @@ export default {
         pattenErrorMessage: '只能输入英文字符、数字 、- 和_ 这两个符号',
       },
       manifest: {
-        desc: 'FastWki-Chat 将会通过该链接安装插件',
+        desc: 'TokenChat 将会通过该链接安装插件',
         label: '插件描述文件 (Manifest) URL',
         preview: '预览 Manifest',
         refresh: '刷新',
@@ -102,7 +104,7 @@ export default {
       edit: '编辑自定义插件',
     },
     type: {
-      lobe: 'FastWki-Chat 插件',
+      lobe: 'TokenChat 插件',
       openai: 'OpenAI 插件',
     },
     update: '更新',
@@ -129,10 +131,6 @@ export default {
     plugin: '插件运行中...',
   },
   pluginList: '插件列表',
-  plugins: {
-    loading: '工具检测中...',
-    unknown: '未知工具',
-  },
   setting: '插件设置',
   settings: {
     indexUrl: {
@@ -164,4 +162,5 @@ export default {
     },
     title: '插件商店',
   },
+  unknownPlugin: '未知插件',
 };

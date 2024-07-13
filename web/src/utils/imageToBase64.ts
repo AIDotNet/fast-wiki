@@ -36,6 +36,7 @@ export const imageToBase64 = ({
   return canvas.toDataURL(type);
 };
 
+
 /**
  * @description: 字符串工具类
  * @param {string} str

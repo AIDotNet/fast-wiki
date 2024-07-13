@@ -1,67 +1,67 @@
-'use client';
-
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { memo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createStoreUpdater } from 'zustand-utils';
 
 import { LOBE_URL_IMPORT_NAME } from '@/const/url';
-import { useImportConfig } from '@/hooks/useImportConfig';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useEnabledDataSync } from '@/hooks/useSyncData';
 import { useAgentStore } from '@/store/agent';
 import { useGlobalStore } from '@/store/global';
+import { useServerConfigStore } from '@/store/serverConfig';
 import { useUserStore } from '@/store/user';
+import { authSelectors } from '@/store/user/selectors';
 
 const StoreInitialization = memo(() => {
-  const [useFetchServerConfig, useFetchUserConfig, useInitPreference] = useUserStore((s) => [
-    s.useFetchServerConfig,
-    s.useFetchUserConfig,
-    s.useInitPreference,
+  // prefetch error ns to avoid don't show error content correctly
+  useTranslation('error');
+
+  const navigate = useNavigate();
+  const [isLogin, useInitUserState, importUrlShareSettings] = useUserStore((s) => [
+    authSelectors.isLogin(s),
+    s.useInitUserState,
+    s.importUrlShareSettings,
   ]);
-  const useInitGlobalPreference = useGlobalStore((s) => s.useInitGlobalPreference);
 
-  const useFetchDefaultAgentConfig = useAgentStore((s) => s.useFetchDefaultAgentConfig);
-  // init the system preference
-  useInitPreference();
-  useInitGlobalPreference();
+  const { serverConfig } = useServerConfigStore();
 
-  useFetchDefaultAgentConfig();
+  const useInitSystemStatus = useGlobalStore((s) => s.useInitSystemStatus);
 
-  const { isLoading } = useFetchServerConfig();
-  useFetchUserConfig(!isLoading);
+  const useInitAgentStore = useAgentStore((s) => s.useInitAgentStore);
 
   useEnabledDataSync();
+  
+  // init the system preference
+  useInitSystemStatus();
+
+  // init inbox agent and default agent config
+  useInitAgentStore(serverConfig.defaultAgent?.config);
+
+  useInitUserState(isLogin, serverConfig, {
+    onSuccess: (state) => {
+      if (state.isOnboard === false) {
+        navigate('/onboard');
+      }
+    },
+  });
 
   const useStoreUpdater = createStoreUpdater(useGlobalStore);
 
   const mobile = useIsMobile();
-  const router = useRouter();
 
   useStoreUpdater('isMobile', mobile);
-  useStoreUpdater('router', router);
 
   // Import settings from the url
-  const { importSettings } = useImportConfig();
-  const searchParam = useSearchParams().get(LOBE_URL_IMPORT_NAME);
+  const searchParam = new URLSearchParams(window.location.search).get(LOBE_URL_IMPORT_NAME);
   useEffect(() => {
-    importSettings(searchParam);
+    importUrlShareSettings(searchParam);
   }, [searchParam]);
 
   useEffect(() => {
-    router.prefetch('/chat');
-    router.prefetch('/market');
-
     if (mobile) {
-      router.prefetch('/me');
-      router.prefetch('/chat/settings');
-      router.prefetch('/settings/common');
-      router.prefetch('/settings/agent');
-      router.prefetch('/settings/sync');
-    } else {
-      router.prefetch('/chat/settings/modal');
-      router.prefetch('/settings/modal');
+      navigate('/me');
     }
-  }, [router, mobile]);
+  }, [navigate, mobile]);
 
   return null;
 });

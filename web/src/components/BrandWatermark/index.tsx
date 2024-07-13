@@ -1,8 +1,8 @@
-'use client';
 
-import { Logo } from '@lobehub/ui';
+
+import { LobeHub } from '@lobehub/ui/brand';
 import { createStyles } from 'antd-style';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { memo } from 'react';
 import { Flexbox, FlexboxProps } from 'react-layout-kit';
 
@@ -17,7 +17,7 @@ const useStyles = createStyles(({ token, css }) => ({
   `,
 }));
 
-const BrandWatermark = memo<Omit<FlexboxProps, 'children'>>(({ style, ...rest }:any) => {
+const BrandWatermark = memo<Omit<FlexboxProps, 'children'>>(({ style, ...rest }) => {
   const { styles, theme } = useStyles();
   return (
     <Flexbox
@@ -29,7 +29,7 @@ const BrandWatermark = memo<Omit<FlexboxProps, 'children'>>(({ style, ...rest }:
       {...rest}
     >
       <span>Powered by</span>
-      <Link className={styles.logoLink} href={'https://token-ai.cn'} target={'_blank'}>
+      <Link className={styles.logoLink} to={'https://token-ai.cn'} target={'_blank'}>
         TokenAI
       </Link>
     </Flexbox>

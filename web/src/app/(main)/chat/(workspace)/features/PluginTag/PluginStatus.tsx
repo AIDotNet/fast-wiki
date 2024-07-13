@@ -17,7 +17,7 @@ interface PluginStatusProps {
   title?: string;
 }
 const PluginStatus = memo<PluginStatusProps>(({ title, id, deprecated }) => {
-  const { t } = useTranslation('common')as any
+  const { t } = useTranslation('common');
   const [status, isCustom, reinstallCustomPlugin] = useToolStore((s) => [
     toolSelectors.getManifestLoadingStatus(id)(s),
     customPluginSelectors.isCustomPlugin(id)(s),

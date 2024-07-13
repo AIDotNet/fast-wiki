@@ -1,8 +1,7 @@
-'use client';
+
 
 import { ConfigProvider } from 'antd';
 import { PropsWithChildren, memo, useEffect, useState } from 'react';
-import { isRtlLang } from 'rtl-detect';
 
 import { createI18nNext } from '@/locales/create';
 import { isOnServerSide } from '@/utils/env';
@@ -37,8 +36,6 @@ const Locale = memo<LocaleLayoutProps>(({ children, defaultLang, antdLocale }) =
 
       if (lang === lng) return;
 
-      const newLocale = await getAntdLocale(lng);
-      setLocale(newLocale);
     };
 
     i18n.instance.on('languageChanged', handleLang);
@@ -47,11 +44,8 @@ const Locale = memo<LocaleLayoutProps>(({ children, defaultLang, antdLocale }) =
     };
   }, [i18n, lang]);
 
-  // detect document direction
-  const documentDir = isRtlLang(lang!) ? 'rtl' : 'ltr';
-
   return (
-    <ConfigProvider direction={documentDir} locale={locale}>
+    <ConfigProvider direction={'ltr'} locale={locale}>
       {children}
     </ConfigProvider>
   );

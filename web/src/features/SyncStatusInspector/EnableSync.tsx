@@ -4,7 +4,7 @@ import { createStyles } from 'antd-style';
 import { TooltipPlacement } from 'antd/es/tooltip';
 import isEqual from 'fast-deep-equal';
 import { LucideCloudy, LucideLaptop, LucideSmartphone, SettingsIcon } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
@@ -36,7 +36,7 @@ interface EnableSyncProps {
 }
 
 const EnableSync = memo<EnableSyncProps>(({ hiddenActions, placement = 'bottomLeft' }) => {
-  const { t } = useTranslation('common') as any;;
+  const { t } = useTranslation('common');
 
   const { styles, theme } = useStyles();
   const [syncStatus, isSyncing, channelName, enableWebRTC, setSettings] = useUserStore((s) => [
@@ -119,7 +119,7 @@ const EnableSync = memo<EnableSyncProps>(({ hiddenActions, placement = 'bottomLe
             )}
           </Flexbox>
           {!hiddenActions && (
-            <Link href={pathString('/settings/sync')}>
+            <Link to={pathString('/settings/sync')}>
               <ActionIcon icon={SettingsIcon} title={t('sync.actions.settings')} />
             </Link>
           )}

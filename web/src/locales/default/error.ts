@@ -2,7 +2,7 @@ export default {
   clerkAuth: {
     loginSuccess: {
       action: '继续会话',
-      desc: '{{greeting}}，很高兴能够继续为你服务。让我们接着刚刚的对话记录聊下去吧',
+      desc: '{{greeting}}，很高兴能够继续为你服务。让我们接着刚刚的话题聊下去吧',
       title: '欢迎回来， {{nickName}}',
     },
   },
@@ -12,6 +12,8 @@ export default {
     retry: '重新加载',
     title: '页面遇到一点问题..',
   },
+  fetchError: '请求失败',
+  fetchErrorDetail: '错误详情',
   notFound: {
     backHome: '返回首页',
     desc: '我们找不到你正在寻找的页面，请检查链接是否正确',
@@ -74,11 +76,22 @@ export default {
     LocationNotSupportError:
       '很抱歉，你的所在地区不支持此模型服务，可能是由于区域限制或服务未开通。请确认当前地区是否支持使用此服务，或尝试使用切换到其他地区后重试。',
 
+    InvalidProviderAPIKey: '{{provider}} API Key 不正确或为空，请检查 {{provider}} API Key 后重试',
+    ProviderBizError: '请求 {{provider}} 服务出错，请根据以下信息排查或重试',
+    /**
+     * @deprecated
+     */
+    NoOpenAIAPIKey: 'OpenAI API Key 不正确或为空，请添加自定义 OpenAI API Key',
     OpenAIBizError: '请求 OpenAI 服务出错，请根据以下信息排查或重试',
-    NoOpenAIAPIKey: 'OpenAI API Key 为空，请添加自定义 OpenAI API Key',
 
+    InvalidBedrockCredentials: 'Bedrock 鉴权未通过，请检查 AccessKeyId/SecretAccessKey 后重试',
 
-    AgentRuntimeError: 'Lobe AI Runtime 执行出错，请根据以下信息排查或重试',
+    InvalidOllamaArgs: 'Ollama 配置不正确，请检查 Ollama 配置后重试',
+    OllamaBizError: '请求 Ollama 服务出错，请根据以下信息排查或重试',
+    OllamaServiceUnavailable:
+      'Ollama 服务连接失败，请检查 Ollama 是否运行正常，或是否正确设置 Ollama 的跨域配置',
+
+    AgentRuntimeError: 'Token AI Runtime 执行出错，请根据以下信息排查或重试',
     /* eslint-enable */
   },
   stt: {
@@ -89,22 +102,17 @@ export default {
   },
   unlock: {
     addProxyUrl: '添加 OpenAI 代理地址（可选）',
+    apiKey: {
+      description: '输入你的 {{name}} API Key 即可开始会话',
+      title: '使用自定义 {{name}} API Key',
+    },
     closeMessage: '关闭提示',
     confirm: '确认并重试',
-
     oauth: {
       description: '管理员已开启统一登录认证，点击下方按钮登录，即可解锁应用',
       success: '登录成功',
       title: '登录账号',
       welcome: '欢迎你！',
-    },
-    ollama: {
-      cancel: '取消下载',
-      confirm: '下载',
-      description: '输入你的 Ollama 模型标签，完成即可继续会话',
-      downloaded: '{{completed}} / {{total}}',
-      starting: '开始下载...',
-      title: '下载指定的 Ollama 模型',
     },
     password: {
       description: '管理员已开启应用加密，输入应用密码后即可解锁应用。密码只需填写一次',
@@ -116,4 +124,5 @@ export default {
       password: '密码',
     },
   },
+  upload: { desc: '详情: {{detail}}', title: '文件上传失败，请检查网络连接或稍后再试' },
 };

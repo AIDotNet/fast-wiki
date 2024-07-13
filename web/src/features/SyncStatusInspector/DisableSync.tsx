@@ -2,7 +2,7 @@ import { Icon, Tag } from '@lobehub/ui';
 import { Badge, Button, Popover } from 'antd';
 import { TooltipPlacement } from 'antd/es/tooltip';
 import { LucideCloudCog, LucideCloudy } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
@@ -16,7 +16,7 @@ interface DisableSyncProps {
 }
 
 const DisableSync = memo<DisableSyncProps>(({ noPopover, placement = 'bottomLeft' }) => {
-  const { t } = useTranslation('common') as any;;
+  const { t } = useTranslation('common');
   const [haveConfig, setSettings] = useUserStore((s) => [
     !!syncSettingsSelectors.webrtcConfig(s).channelName,
     s.setSettings,
@@ -45,7 +45,7 @@ const DisableSync = memo<DisableSyncProps>(({ noPopover, placement = 'bottomLeft
           {t('sync.disabled.desc')}
           {haveConfig ? (
             <Flexbox gap={8} horizontal>
-              <Link href={'/settings/sync'}>
+              <Link to={'/settings/sync'}>
                 <Button block icon={<Icon icon={LucideCloudCog} />}>
                   {t('sync.disabled.actions.settings')}
                 </Button>
@@ -55,7 +55,7 @@ const DisableSync = memo<DisableSyncProps>(({ noPopover, placement = 'bottomLeft
               </Button>
             </Flexbox>
           ) : (
-            <Link href={'/settings/sync'}>
+            <Link to={'/settings/sync'}>
               <Button block icon={<Icon icon={LucideCloudCog} />} type={'primary'}>
                 {t('sync.disabled.actions.settings')}
               </Button>

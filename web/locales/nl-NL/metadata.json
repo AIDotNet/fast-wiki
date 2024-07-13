@@ -1,0 +1,18 @@
+{
+  "chat": {
+    "description": "TokenChat biedt je de beste ChatGPT, OLLaMA, Gemini, Claude WebUI gebruikerservaring",
+    "title": "TokenChat: Persoonlijke LLM-productiviteitstool, geef jezelf een slimmer brein"
+  },
+  "market": {
+    "description": "Content creatie, copywriting, Q&A, beeldgeneratie, videogeneratie, spraakgeneratie, intelligente agent, geautomatiseerde workflows, pas je eigen AI / GPTs / OLLaMA slimme assistent aan",
+    "title": "Assistentenmarkt"
+  },
+  "plugins": {
+    "description": "Zoeken, grafieken genereren, academisch, beeldgeneratie, videogeneratie, spraakgeneratie, geautomatiseerde workflows, pas ChatGPT / OLLaMA exclusieve ToolCall plug-inmogelijkheden aan",
+    "title": "Plug-insmarkt"
+  },
+  "welcome": {
+    "description": "TokenChat biedt je de beste ChatGPT, OLLaMA, Gemini, Claude WebUI gebruikerservaring",
+    "title": "Welkom bij TokenChat: Persoonlijke LLM-productiviteitstool, geef jezelf een slimmer brein"
+  }
+}

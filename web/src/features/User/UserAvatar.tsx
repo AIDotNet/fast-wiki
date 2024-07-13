@@ -1,13 +1,10 @@
-'use client';
-
 import { Avatar, type AvatarProps } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
-import { memo, useEffect, useState } from 'react';
+import { forwardRef } from 'react';
 
 import { DEFAULT_USER_AVATAR_URL } from '@/const/meta';
 import { useUserStore } from '@/store/user';
 import { authSelectors, userProfileSelectors } from '@/store/user/selectors';
-import { GetUser } from '@/services/UserService';
 
 const useStyles = createStyles(({ css, token }) => ({
   clickable: css`
@@ -45,34 +42,23 @@ export interface UserAvatarProps extends AvatarProps {
   clickable?: boolean;
 }
 
-const UserAvatar = memo<UserAvatarProps>(
-  ({ size = 40, avatar, background, clickable, className, style, ...rest }) => {
+const UserAvatar = forwardRef<HTMLDivElement, UserAvatarProps>(
+  ({ size = 40, background, clickable, className, style, ...rest }, ref) => {
     const { styles, cx } = useStyles();
-    const [username] = useUserStore((s) => [
+    const [avatar, username] = useUserStore((s) => [
       userProfileSelectors.userAvatar(s),
       userProfileSelectors.username(s),
     ]);
 
     const isSignedIn = useUserStore(authSelectors.isLogin);
-    function getAvatar() {
-      if (avatar) {
-        return avatar;
-      }
-
-      // 从缓存中获取用户头像
-      var user = JSON.parse(localStorage.getItem('user') as string);
-      if (user && user.avatar) {
-        return user.avatar;
-      }
-
-    }
 
     return (
       <Avatar
-        alt={isSignedIn ? (username as string) : 'FastWki-Chat'}
-        avatar={getAvatar()}
+        alt={isSignedIn ? (username as string) : 'TokenChat'}
+        avatar={isSignedIn ? avatar || DEFAULT_USER_AVATAR_URL : DEFAULT_USER_AVATAR_URL}
         background={isSignedIn && avatar ? background : undefined}
         className={cx(clickable && styles.clickable, className)}
+        ref={ref}
         size={size}
         style={{ flex: 'none', ...style }}
         unoptimized
