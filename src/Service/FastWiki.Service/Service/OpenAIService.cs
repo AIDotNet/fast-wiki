@@ -11,7 +11,6 @@ using Microsoft.KernelMemory.DataFormats.Text;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using TokenApi.Service.Exceptions;
 
 namespace FastWiki.Service.Service;
 
@@ -219,12 +218,6 @@ public class OpenAIService
                 await context.WriteOpenAiResultAsync(item, module.model, requestId,
                     responseId);
             }
-        }
-        catch (NotModelException notModelException)
-        {
-            await context.WriteEndAsync("未找到模型兼容：" + notModelException.Message);
-            logger.LogError(notModelException, "未找到模型兼容");
-            return;
         }
         catch (InvalidOperationException invalidOperationException)
         {

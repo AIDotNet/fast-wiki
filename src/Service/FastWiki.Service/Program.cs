@@ -1,5 +1,4 @@
 using System.Text.Json;
-using AspNetCoreRateLimit;
 using FastWiki.Service;
 using FastWiki.Service.Backgrounds;
 using FastWiki.Service.Options;
@@ -48,10 +47,6 @@ builder.Configuration.GetSection(ConnectionStringsOptions.Name)
 builder
     .AddLoadEnvironment();
 
-builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimit"));
-builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
-
-
 if (ConnectionStringsOptions.DefaultType == "sqlite")
 {
     builder.Services.AddMasaDbContext<SqliteContext>(opt =>
@@ -67,7 +62,7 @@ else
     });
 }
 
-builder.Services.AddInMemoryRateLimiting()
+builder.Services
     .AddCors(options =>
     {
         options.AddPolicy("AllowAll",
@@ -190,7 +185,6 @@ var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider
         [".md"] = "application/octet-stream",
     }
 };
-app.UseIpRateLimiting();
 
 app.UseResponseCompression();
 

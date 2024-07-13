@@ -1,20 +1,17 @@
-﻿using FastWiki.Service.Application.Storage.Queries;
+﻿using System.Collections.Concurrent;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using FastWiki.Service.Contracts.Feishu.Dto;
 using FastWiki.Service.Contracts.Model.Dto;
+using FastWiki.Service.Contracts.OpenAI;
 using FastWiki.Service.Domain.Storage.Aggregates;
-using FastWiki.Service.Infrastructure;
 using FastWiki.Service.Infrastructure.Helper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using System.Collections.Concurrent;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using FastWiki.Service.Contracts.OpenAI;
-using TokenApi.Service.Exceptions;
 
 namespace FastWiki.Service.Service;
 
@@ -284,11 +281,6 @@ public class FeishuService
 
                 await eventBus.PublishAsync(updateChatShareCommand);
             }
-        }
-        catch (NotModelException notModelException)
-        {
-            output.Clear();
-            output.Append(notModelException.Message);
         }
         catch (InvalidOperationException invalidOperationException)
         {

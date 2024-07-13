@@ -9,7 +9,6 @@ using Masa.BuildingBlocks.Data;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using TokenApi.Service.Exceptions;
 
 namespace FastWiki.Service.Service;
 
@@ -174,11 +173,6 @@ public class WeChatService
 
                 await eventBus.PublishAsync(updateChatShareCommand);
             }
-        }
-        catch (NotModelException notModelException)
-        {
-            output.Clear();
-            output.Append(notModelException.Message);
         }
         catch (InvalidOperationException invalidOperationException)
         {
