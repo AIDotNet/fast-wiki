@@ -1,4 +1,3 @@
-'use client'
 import UserList from "./features/UserList";
 
 import styled from "styled-components";

@@ -18,7 +18,9 @@ public class QAHandler : IPipelineStepHandler
     private readonly IPipelineOrchestrator _orchestrator;
     private readonly WikiMemoryService _wikiMemoryService;
     private readonly ILogger<QAHandler> _log;
+#pragma warning disable KMEXP00
     private readonly TextChunker.TokenCounter _tokenCounter;
+#pragma warning restore KMEXP00
 
     /// </inheritdoc>
     public QAHandler(

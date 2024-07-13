@@ -486,8 +486,12 @@ public class OpenAIService
         var qaFunction = kernel.CreateFunctionFromPrompt(prompt, functionName: "QA", description: "QA问答");
 
 
+#pragma warning disable KMEXP00
         var lines = TextChunker.SplitPlainTextLines(value, 299);
+#pragma warning restore KMEXP00
+#pragma warning disable KMEXP00
         var paragraphs = TextChunker.SplitPlainTextParagraphs(lines, 4000);
+#pragma warning restore KMEXP00
 
         foreach (var paragraph in paragraphs)
         {
