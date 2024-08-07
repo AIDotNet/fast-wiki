@@ -59,12 +59,9 @@ const Login = memo(() => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                height: '100vh',
                 margin: '0 auto',
                 width: '100%',
-                height: '100%',
-                justifyContent: 'center',
-                textAlign: 'center',
-
             }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto', width: '380px', marginBottom: '20px' }}>
                     <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '50%' }}>
@@ -138,7 +135,6 @@ const Login = memo(() => {
                     </GithubButton>
                 </div>
             </div>
-            <Footer bottom="TokenAI © 2024" columns={[]} />
         </>
     );
 });

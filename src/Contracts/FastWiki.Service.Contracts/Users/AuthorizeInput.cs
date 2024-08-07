@@ -2,7 +2,7 @@
 
 public class AuthorizeInput
 {
-    public string  account { get; set; }
+    public string Account { get; set; }
 
-    public string pass { get; set; }
+    public string Password { get; set; }
 }

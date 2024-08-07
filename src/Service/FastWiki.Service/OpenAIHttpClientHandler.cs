@@ -19,19 +19,9 @@ public sealed class OpenAiHttpClientHandler : HttpClientHandler
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        UriBuilder uriBuilder;
-        if (!OpenAIOption.ChatEndpoint.IsNullOrWhiteSpace() && request.RequestUri?.LocalPath == "/v1/chat/completions")
-        {
-            uriBuilder = _uri.IsNullOrWhiteSpace() ? new UriBuilder(OpenAIOption.ChatEndpoint.TrimEnd('/') + "/v1/chat/completions") : new UriBuilder(_uri.TrimEnd('/') + "/v1/chat/completions");
-            request.RequestUri = uriBuilder.Uri;
-        }
-        else if (!OpenAIOption.EmbeddingEndpoint.IsNullOrWhiteSpace() &&
-                 request.RequestUri?.LocalPath == "/v1/embeddings")
-        {
-            uriBuilder = _uri.IsNullOrWhiteSpace() ? new UriBuilder(OpenAIOption.EmbeddingEndpoint.TrimEnd('/') + "/v1/embeddings") : new UriBuilder(_uri.TrimEnd('/') + "/v1/embeddings");
-            request.RequestUri = uriBuilder.Uri;
-        }
-        
+        request.RequestUri =
+            new Uri(request.RequestUri.ToString().Replace("https://api.openai.com", _uri.TrimEnd('/')));
+
         return await base.SendAsync(request, cancellationToken);
     }
 }

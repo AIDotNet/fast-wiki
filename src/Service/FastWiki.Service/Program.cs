@@ -148,7 +148,7 @@ var app = builder.Services.AddServices(builder, option => option.MapHttpMethodsF
 
 app.Use((async (context, next) =>
 {
-    var looger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
 
     try
     {
@@ -164,7 +164,7 @@ app.Use((async (context, next) =>
     {
         context.Response.StatusCode = 400;
 
-        looger.LogError(userFriendlyException, userFriendlyException.Message);
+        logger.LogError(userFriendlyException, userFriendlyException.Message);
 
         await context.Response.WriteAsJsonAsync(ResultDto.CreateError(userFriendlyException.Message, "400"));
     }
@@ -172,7 +172,7 @@ app.Use((async (context, next) =>
     {
         context.Response.StatusCode = 500;
 
-        looger.LogError(e, e.Message);
+        logger.LogError(e, e.Message);
 
         await context.Response.WriteAsJsonAsync(ResultDto.CreateError(e.Message, "500"));
     }

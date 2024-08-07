@@ -1,4 +1,4 @@
-import  { FC, useState, useEffect } from 'react';
+import  {  useState, useEffect } from 'react';
 import { ServerConfigStoreProvider } from '@/store/serverConfig';
 
 import AppTheme from './AppTheme';

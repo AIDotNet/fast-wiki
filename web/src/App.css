@@ -1,3 +1,8 @@
 #root{
     height: 100vh;
 }
+
+body{
+    overflow: hidden;
+    margin: 0;
+}

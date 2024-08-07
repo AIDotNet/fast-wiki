@@ -21,17 +21,6 @@ services:
       - OPENAI_CHAT_TOKEN=您的TokenKey
       - OPENAI_EMBEDDING_MODEL=text-embedding-3-small
       - ASPNETCORE_ENVIRONMENT=Development
-  
-  chat:
-    image: hejiale010426/fast-wiki-chat
-    restart: always
-    build: 
-      context: web/
-      dockerfile: ./Dockerfile
-    ports:
-      - "3210:3210"
-    environment:
-      - FAST_API_URL=外网访问地址
 
   postgres: # 当前compose服务名
     image: registry.cn-shenzhen.aliyuncs.com/fast-wiki/pgvector:v0.5.0 # 拉取的数据库镜像

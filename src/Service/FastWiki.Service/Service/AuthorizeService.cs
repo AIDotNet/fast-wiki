@@ -12,7 +12,7 @@ public sealed class AuthorizeService : ApplicationService<AuthorizeService>, IAu
 {
     public async Task<AuthorizeDto> TokenAsync(AuthorizeInput input)
     {
-        var userInfo = new UserInfoQuery(input.account, input.pass);
+        var userInfo = new UserInfoQuery(input.Account, input.Password);
 
         await EventBus.PublishAsync(userInfo);
 
