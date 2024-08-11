@@ -33,4 +33,9 @@ public class OpenAIOption
     /// 量化模型
     /// </summary>
     public static string EmbeddingModel { get; set; } = "text-embedding-3-small";
+
+    /// <summary>
+    /// 网站/服务地址
+    /// </summary>
+    public static string Site { get; set; }
 }

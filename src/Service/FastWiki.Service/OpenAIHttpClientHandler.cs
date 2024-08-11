@@ -7,10 +7,6 @@ public sealed class OpenAiHttpClientHandler : HttpClientHandler
 {
     private readonly string _uri;
 
-    public OpenAiHttpClientHandler()
-    {
-    }
-
     public OpenAiHttpClientHandler(string uri)
     {
         _uri = uri;

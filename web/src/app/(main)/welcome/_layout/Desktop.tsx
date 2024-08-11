@@ -2,8 +2,6 @@ import { GridShowcase } from '@lobehub/ui';
 import { PropsWithChildren } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
-import Follow from '@/features/Follow';
-
 const COPYRIGHT = `© ${new Date().getFullYear()} TokenHub, LLC`;
 
 const DesktopLayout = ({ children }: PropsWithChildren) => {
@@ -36,12 +34,8 @@ const DesktopLayout = ({ children }: PropsWithChildren) => {
         </GridShowcase>
         <Flexbox align={'center'} horizontal justify={'space-between'}>
           <span style={{ opacity: 0.5 }}>{COPYRIGHT}</span>
-          <Follow />
         </Flexbox>
       </Flexbox>
-      {/* ↓ cloud slot ↓ */}
-
-      {/* ↑ cloud slot ↑ */}
     </>
   );
 };

@@ -290,7 +290,7 @@ export const fetchSSE = async (url: string, options: RequestInit & FetchSSEOptio
     await fetchEventSource(url, {
       body: options.body,
       // @ts-ignore
-      fetch: options?.fetcher ,
+      fetch: options?.fetcher,
       headers: options.headers as Record<string, string>,
       method: options.method,
       onerror: (error) => {
@@ -310,54 +310,32 @@ export const fetchSSE = async (url: string, options: RequestInit & FetchSSEOptio
         let data;
         try {
           const value = JSON.parse(ev.data);
-          if (value.choices[0].delta && value.choices[0].delta?.content) {
+          // 如果value还是字符串，说明是文本消息
+          if (typeof value === 'string') {
+            data = value;
+          } else if (!value.choices || !value.choices[0].delta?.content) {
+            return;
+          }
+          else if (value.choices[0].delta && value.choices[0].delta?.content) {
             data = value.choices[0].delta.content;
           } else {
-            return;
+            data = '';
           }
         } catch (e) {
           console.warn('parse error, fallback to stream', e);
           options.onMessageHandle?.({ text: data, type: 'text' });
           return;
         }
+        
+        if (smoothing) {
+          textController.pushToQueue(data);
 
-        switch (ev.event) {
-          case 'text': {
-            if (smoothing) {
-              textController.pushToQueue(data);
-
-              if (!textController.isAnimationActive) textController.startAnimation();
-            } else {
-              output += data;
-              options.onMessageHandle?.({ text: data, type: 'text' });
-            }
-
-            break;
-          }
-
-          case 'tool_calls': {
-            // get finial
-            // if there is no tool calls, we should initialize the tool calls
-            if (!toolCalls) toolCalls = [];
-            toolCalls = parseToolCalls(toolCalls, data);
-
-            if (smoothing) {
-              // make the tool calls smooth
-
-              // push the tool calls to the smooth queue
-              toolCallsController.pushToQueue(data);
-              // if there is no animation active, we should start the animation
-              if (toolCallsController.isAnimationActives.some((value) => !value)) {
-                toolCallsController.startAnimations();
-              }
-            } else {
-              options.onMessageHandle?.({
-                tool_calls: toolCalls,
-                type: 'tool_calls',
-              });
-            }
-          }
+          if (!textController.isAnimationActive) textController.startAnimation();
+        } else {
+          output += data;
+          options.onMessageHandle?.({ text: data, type: 'text' });
         }
+
       },
       onopen: async (res) => {
         response = res.clone();

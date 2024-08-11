@@ -32,7 +32,7 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.7" />
         <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.67.240712.1" />
         <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Postgres" Version="0.67.240712.1" />
-        <PackageReference Include="Microsoft.SemanticKernel" Version="1.15.1" />
+        <PackageReference Include="Microsoft.SemanticKernel" Version="1.17.1" />
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.8.0-alpha" />
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
@@ -51,7 +51,7 @@
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
         <PackageReference Include="SharpToken" Version="2.0.3" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7" />
     </ItemGroup>
 

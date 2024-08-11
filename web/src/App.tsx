@@ -42,9 +42,10 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/app',
-        element: <Suspense fallback={<Loading />}><MainLayout>
-          <AppPage />
-        </MainLayout>
+        element: <Suspense fallback={<Loading />}>
+          <MainLayout>
+            <AppPage />
+          </MainLayout>
         </Suspense>
       },
       {

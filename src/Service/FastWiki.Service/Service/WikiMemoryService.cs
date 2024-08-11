@@ -15,7 +15,7 @@ public sealed class WikiMemoryService : ISingletonDependency
 {
     private static readonly FastWikiFunctionContext Context = new();
 
-    private static readonly OpenAiHttpClientHandler HttpClientHandler = new();
+    private static readonly OpenAiHttpClientHandler HttpClientHandler = new(OpenAIOption.ChatEndpoint);
 
     /// <summary>
     /// 创建知识库内存服务

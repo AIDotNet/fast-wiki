@@ -58,9 +58,6 @@ const StoreInitialization = memo(() => {
   }, [searchParam]);
 
   useEffect(() => {
-    if (mobile) {
-      navigate('/me');
-    }
   }, [navigate, mobile]);
 
   return null;

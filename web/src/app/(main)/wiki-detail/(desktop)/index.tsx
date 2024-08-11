@@ -9,7 +9,9 @@ import UploadWikiFile from '../features/UploadWikiFile';
 import SearchWikiDetail from '../features/SearchWikiDetail';
 import WikiInfo from '../features/WikiInfo';
 import UploadWikiWeb from '../features/UploadWikiWeb';
+
 import { CheckQuantizationState, GetWikis } from '@/services/WikiService';
+import { useParams } from 'react-router-dom';
 const LeftTabs = styled.div`
     width: 190px;
     min-width: 190px;
@@ -21,11 +23,12 @@ const LeftTabs = styled.div`
 
 
 export default memo(() => {
+
     const query = location.search;
 
     // 解析query
     const id = query.split('=')[1];
-
+    
     const [wiki, setWiki] = useState({} as any);
 
     const [tabs, setTabs] = useState([] as any[]);
@@ -95,7 +98,11 @@ export default memo(() => {
     }
 
     return (
-        <>
+        <div style={{
+            display: 'flex',
+            height: '100%',
+            width: '100%',
+        }}>
             <LeftTabs>
                 <div style={{
                     borderBottom: "1px solid #464545",
@@ -166,27 +173,27 @@ export default memo(() => {
                 </div>
             </LeftTabs >
             <div style={{
-                width: '100%',
+                flex: 1,
                 padding: 20,
                 overflow: 'auto',
 
             }}>
                 {
-                    tab?.key === 1 && <WikiData onChagePath={key => changeTab(key)} id={id} />
+                    tab?.key === 1 && <WikiData onChagePath={key => changeTab(key)} id={id ?? ""} />
                 }
                 {
-                    tab?.key === 2 && <SearchWikiDetail onChagePath={key => changeTab(key)} id={id} />
+                    tab?.key === 2 && <SearchWikiDetail onChagePath={key => changeTab(key)} id={id ?? ""} />
                 }
                 {
-                    tab?.key === 3 && <WikiInfo id={id} />
+                    tab?.key === 3 && <WikiInfo id={id ?? ""} />
                 }
                 {
-                    tab === 'upload' && <UploadWikiFile id={id} onChagePath={key => changeTab(key)} />
+                    tab === 'upload' && <UploadWikiFile id={id ?? ""} onChagePath={key => changeTab(key)} />
                 }
                 {
-                    tab === 'upload-web' && <UploadWikiWeb id={id} onChagePath={key => changeTab(key)} />
+                    tab === 'upload-web' && <UploadWikiWeb id={id ?? ""} onChagePath={key => changeTab(key)} />
                 }
             </div>
-        </>
+        </div>
     );
 })

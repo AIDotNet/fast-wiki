@@ -6,3 +6,15 @@ body{
     overflow: hidden;
     margin: 0;
 }
+
+  .ant-tree-treenode-selected::before {
+    background-color: #303c54 !important;
+  }
+  
+  :where(.css-dev-only-do-not-override-1lrvwrk).ant-layout .ant-layout-sider{
+    background-color: transparent !important;
+  }
+  
+  .ant-menu-item-selected{
+    background-color: #303c54 !important;
+  }

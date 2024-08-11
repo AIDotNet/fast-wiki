@@ -119,10 +119,6 @@ export function AppList(props: IAppListProps) {
     }, [props.input])
 
     return (<>
-        <GridShowcase style={{ width: '100%' }}>
-            <LogoThree size={180} style={{ marginTop: -64 }} />
-            <div style={{ fontSize: 48, fontWeight: 600, marginTop: -16 }}>应用列表</div>
-        </GridShowcase>
         <SpotlightCard style={{
             margin: 16,
             borderRadius: 8,

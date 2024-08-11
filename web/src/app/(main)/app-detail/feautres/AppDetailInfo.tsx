@@ -19,8 +19,7 @@ const Container = styled.div`
     margin: auto;
     width: 580px;
     overflow: auto;
-    height: 100%;
-
+    height: calc(100vh - 60px);
     // 隐藏滚动条
     &::-webkit-scrollbar {
         display: none;
