@@ -6,7 +6,7 @@ import { message, Button, Pagination } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { DeleteWikis, GetWikisList } from '@/services/WikiService';
 import { useNavigate } from 'react-router-dom';
-
+import { Empty } from 'antd';
 
 interface IAppListProps {
     input: {
@@ -92,6 +92,13 @@ export function AppList(props: IAppListProps) {
             padding: 0,
         }} size={data.length} renderItem={render} items={data} >
         </SpotlightCard>
+        {
+            data.length === 0 &&
+            <Empty
+                description={'暂无数据'}
+            >
+            </Empty>
+        }
         <Pagination onChange={(page) => {
             props.setInput({
                 ...props.input,

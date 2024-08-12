@@ -12,6 +12,7 @@ import { useActiveTabKey } from '@/hooks/useActiveTabKey';
 import {
   FunctionOutlined,
   UserOutlined,
+  ProjectOutlined,
   FileTextOutlined
 } from '@ant-design/icons';
 
@@ -70,7 +71,7 @@ const DesktopLayout = memo<LayoutProps>(({ children }) => {
             items={[
               {
                 key: 'project',
-                icon: <UserOutlined />,
+                icon: <ProjectOutlined />,
                 label: '项目管理',
                 onClick: () => {
                   navigate('/app');

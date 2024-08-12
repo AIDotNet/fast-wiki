@@ -1,4 +1,4 @@
-import { GridShowcase, LogoThree, SpotlightCard } from '@lobehub/ui';
+import { EmptyCard, GridShowcase, LogoThree, SpotlightCard } from '@lobehub/ui';
 import { useEffect, useState } from 'react';
 import { Flexbox } from 'react-layout-kit';
 import { message, Button, Pagination, Dropdown } from 'antd';
@@ -7,8 +7,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { DeleteChatApplications, GetChatApplicationsList } from '@/services/ChatApplicationService';
 import { useNavigate } from 'react-router-dom';
 import { MenuIcon } from 'lucide-react';
-import { ChatGLM } from '@lobehub/icons';
-import { SiChatwoot } from '@icons-pack/react-simple-icons';
+import { Empty } from 'antd';
 
 const AppItemDetail = styled.div`
     padding: 16px;
@@ -128,6 +127,13 @@ export function AppList(props: IAppListProps) {
             padding: 0,
         }} size={data.length} renderItem={render} items={data} >
         </SpotlightCard>
+        {
+            data.length === 0 &&
+            <Empty
+                description={'暂无数据'}
+            >
+            </Empty>
+        }
         <Pagination onChange={(page) => {
             props.setInput({
                 ...props.input,

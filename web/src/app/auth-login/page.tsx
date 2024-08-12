@@ -106,8 +106,6 @@ const Login = memo(() => {
                                 });
 
                                 localStorage.setItem('token', token.token);
-
-                                if (typeof window === 'undefined') return;
                                 window.location.href = '/';
                             } catch (e) {
 
