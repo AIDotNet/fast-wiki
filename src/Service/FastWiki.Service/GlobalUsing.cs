@@ -1,5 +1,4 @@
 ﻿global using FastWiki.Service.Application.ChatApplications.Commands;
-global using FastWiki.Service.Application.Storage.Commands;
 global using FastWiki.Service.Application.Wikis.Commands;
 global using FastWiki.Service.Application.Wikis.Queries;
 global using FastWiki.Service.Contracts.ChatApplication;
@@ -31,5 +30,5 @@ global using FastWiki.Service.Contracts.ChatApplication.Dto;
 global using FastWiki.Service.Application.ChatApplications.Queries;
 global using FastWiki.Service.Contracts;
 global using FastWiki.Service.Domain.Users.Aggregates;
-global using Masa.BuildingBlocks.Data.Mapping;
+global using MapsterMapper;
 global using Microsoft.AspNetCore.Authorization;

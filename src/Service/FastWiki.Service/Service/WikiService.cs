@@ -1,11 +1,12 @@
-﻿using FastWiki.Service.Backgrounds;
+﻿using System.Web;
+using FastWiki.Service.Backgrounds;
 
 namespace FastWiki.Service.Service;
 
 /// <summary>
 /// 知识库服务
 /// </summary>
-public sealed class WikiService : ApplicationService<WikiService>, IWikiService
+public sealed class WikiService(IWikiRepository wikiRepository) : ApplicationService<WikiService>, IWikiService
 {
     /// <inheritdoc />
     [Authorize]
@@ -20,11 +21,14 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
     [Authorize]
     public async Task<WikiDto> GetAsync(long id)
     {
-        var query = new WikiQuery(id);
+        var wiki = await wikiRepository.FindAsync(id);
 
-        await EventBus.PublishAsync(query);
+        if (wiki == null)
+        {
+            throw new UserFriendlyException("知识库不存在");
+        }
 
-        return query.Result;
+        return Mapper.Map<WikiDto>(wiki);
     }
 
     [Authorize]
@@ -39,11 +43,15 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
     [Authorize]
     public async Task<PaginatedListBase<WikiDto>> GetWikiListAsync(string? keyword, int page, int pageSize)
     {
-        var query = new WikiListQuery(UserContext.GetUserId<Guid>(), keyword, page, pageSize);
+        var wikis = await wikiRepository.GetListAsync(UserContext.GetUserId<Guid>(), keyword, page, pageSize);
 
-        await EventBus.PublishAsync(query);
+        var count = await wikiRepository.GetCountAsync(UserContext.GetUserId<Guid>(), keyword);
 
-        return query.Result;
+        return new PaginatedListBase<WikiDto>()
+        {
+            Result = Mapper.Map<List<WikiDto>>(wikis),
+            Total = count
+        };
     }
 
     /// <inheritdoc />
@@ -132,7 +140,7 @@ public sealed class WikiService : ApplicationService<WikiService>, IWikiService
     [Authorize]
     public async Task RemoveDetailsVectorAsync(string id)
     {
-        var command = new RemoveDetailsVectorCommand(System.Web.HttpUtility.UrlDecode(id));
+        var command = new RemoveDetailsVectorCommand(HttpUtility.UrlDecode(id));
 
         await EventBus.PublishAsync(command);
     }

@@ -63,6 +63,9 @@ else
 }
 
 builder.Services
+    .AddMapster();
+
+builder.Services
     .AddCors(options =>
     {
         options.AddPolicy("AllowAll",
@@ -82,7 +85,6 @@ builder.Services
         options.UserId = ClaimType.DEFAULT_USER_ID;
         options.Role = "role";
     })
-    .AddMapster()
     .AddHttpContextAccessor()
     .AddSwaggerGen(options =>
     {

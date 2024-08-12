@@ -102,7 +102,7 @@ const Login = memo(() => {
                                 setLoading(true);
                                 const token = await login({
                                     account: user,
-                                    pass: password,
+                                    password: password,
                                 });
 
                                 localStorage.setItem('token', token.token);

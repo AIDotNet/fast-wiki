@@ -43,12 +43,13 @@ public class WeChatService
         var memoryCache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
         var fastWikiFunctionCallRepository =
             scope.ServiceProvider.GetRequiredService<IFastWikiFunctionCallRepository>();
+        var fileStorageRepository = scope.ServiceProvider.GetRequiredService<IFileStorageRepository>();
 
         while (await Channel.Reader.WaitToReadAsync())
         {
             var content = await Channel.Reader.ReadAsync();
 
-            await SendMessageAsync(content, eventBus, wikiMemoryService, memoryCache, fastWikiFunctionCallRepository);
+            await SendMessageAsync(content, eventBus, wikiMemoryService, memoryCache, fastWikiFunctionCallRepository, fileStorageRepository);
         }
     }
 
@@ -60,9 +61,10 @@ public class WeChatService
     /// <param name="wikiMemoryService"></param>
     /// <param name="memoryCache"></param>
     /// <param name="fastWikiFunctionCallRepository"></param>
+    /// <param name="fileStorageRepository"></param>
     public static async Task SendMessageAsync(WeChatAI chatAi, IEventBus eventBus,
         WikiMemoryService wikiMemoryService, IMemoryCache memoryCache,
-        IFastWikiFunctionCallRepository fastWikiFunctionCallRepository)
+        IFastWikiFunctionCallRepository fastWikiFunctionCallRepository,IFileStorageRepository fileStorageRepository)
     {
         var chatShareInfoQuery = new ChatShareInfoQuery(chatAi.SharedId);
 
@@ -115,7 +117,7 @@ public class WeChatService
         // 如果为空则不使用知识库
         if (chatApplication.WikiIds.Count != 0)
         {
-            var success = await OpenAIService.WikiPrompt(chatApplication, memoryServerless, chatAi.Content, eventBus,
+            var success = await OpenAIService.WikiPrompt(chatApplication, memoryServerless, chatAi.Content, eventBus, fileStorageRepository,
                 sourceFile, module);
 
             if (!success)

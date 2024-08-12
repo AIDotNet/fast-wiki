@@ -106,6 +106,7 @@ public class FeishuService
 
             var fastWikiFunctionCallRepository =
                 context.RequestServices.GetRequiredService<IFastWikiFunctionCallRepository>();
+            var fileStorageRepository = context.RequestServices.GetRequiredService<IFileStorageRepository>();
 
             // 私聊直接回复
             if (input._event.message.chat_type == "p2p")
@@ -125,7 +126,7 @@ public class FeishuService
                 var userInput = JsonSerializer.Deserialize<FeishuChatUserInput>(input._event.message.content);
 
                 await ChatMessage(context, userInput.text, sessionId, chatApplication, chatShareInfoQuery,
-                    eventBus, wikiMemoryService, fastWikiFunctionCallRepository);
+                    eventBus, wikiMemoryService,fileStorageRepository, fastWikiFunctionCallRepository);
 
                 return;
             }
@@ -162,7 +163,7 @@ public class FeishuService
                 history.AddUserMessage(userInput.text);
 
                 await ChatMessage(context, userInput.text, sessionId, chatApplication, chatShareInfoQuery,
-                    eventBus, wikiMemoryService, fastWikiFunctionCallRepository);
+                    eventBus, wikiMemoryService,fileStorageRepository, fastWikiFunctionCallRepository);
 
                 return;
             }
@@ -177,6 +178,7 @@ public class FeishuService
     public static async Task ChatMessage(HttpContext context, string content, string sessionId,
         ChatApplicationDto chatApplication, ChatShareInfoQuery chatShareInfoQuery, IEventBus eventBus,
         WikiMemoryService wikiMemoryService,
+        IFileStorageRepository fileStorageRepository,
         IFastWikiFunctionCallRepository fastWikiFunctionCallRepository)
     {
         int requestToken = 0;
@@ -215,7 +217,7 @@ public class FeishuService
         {
             var success = await OpenAIService.WikiPrompt(chatApplication, memoryServerless,
                 content,
-                eventBus,
+                eventBus, fileStorageRepository,
                 sourceFile, module);
 
             if (!success)

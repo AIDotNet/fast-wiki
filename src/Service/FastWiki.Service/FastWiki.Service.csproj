@@ -15,12 +15,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Masa.BuildingBlocks.Data.MappingExtensions" Version="$(MasaFrameworkPackageVersion)" />
+        <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
         <PackageReference Include="Masa.Contrib.Authentication.Identity" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.BuildingBlocks.Data.UoW" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Data.EFCore.PostgreSql" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Data.EFCore.Sqlite" Version="$(MasaFrameworkPackageVersion)" />
-        <PackageReference Include="Masa.Contrib.Data.Mapping.Mapster" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Data.UoW.EFCore" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Ddd.Domain" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Ddd.Domain.Repository.EFCore" Version="$(MasaFrameworkPackageVersion)" />
@@ -74,5 +73,6 @@
       <Folder Include="Migrations\" />
       <Folder Include="Migrations\PostgreSQL\" />
       <Folder Include="Migrations\Sqlite\" />
+      <Folder Include="wwwroot\" />
     </ItemGroup>
 </Project>

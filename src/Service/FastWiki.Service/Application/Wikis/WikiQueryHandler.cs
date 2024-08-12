@@ -1,5 +1,4 @@
-﻿using FastWiki.Service.Application.Storage.Queries;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using FastWiki.Service.Service;
 
 namespace FastWiki.Service.Application.Wikis;
@@ -7,21 +6,9 @@ namespace FastWiki.Service.Application.Wikis;
 public sealed class WikiQueryHandler(
     IWikiRepository wikiRepository,
     WikiMemoryService wikiMemoryService,
-    IEventBus eventBus)
+    IMapper mapper,
+    IFileStorageRepository fileStorageRepository)
 {
-    [EventHandler]
-    public async Task GetWiki(WikiQuery query)
-    {
-        var wiki = await wikiRepository.FindAsync(query.Id);
-
-        if (wiki == null)
-        {
-            throw new UserFriendlyException("知识库不存在");
-        }
-
-        query.Result = wiki.Map<WikiDto>();
-    }
-
     [EventHandler]
     public async Task GetWikiList(WikiListQuery query)
     {
@@ -31,7 +18,7 @@ public sealed class WikiQueryHandler(
 
         query.Result = new PaginatedListBase<WikiDto>()
         {
-            Result = wikis.Map<List<WikiDto>>(),
+            Result = mapper.Map<List<WikiDto>>(wikis),
             Total = count
         };
     }
@@ -46,7 +33,7 @@ public sealed class WikiQueryHandler(
 
         query.Result = new PaginatedListBase<WikiDetailDto>()
         {
-            Result = wikis.Map<List<WikiDetailDto>>(),
+            Result = mapper.Map<List<WikiDetailDto>>(wikis),
             Total = count
         };
     }
@@ -149,12 +136,11 @@ public sealed class WikiQueryHandler(
             return -1;
         }).Where(x => x > 0));
 
-        var files = new StorageInfosQuery(fileIds);
-        await eventBus.PublishAsync(files);
+        var files = await fileStorageRepository.GetListAsync(fileIds.ToArray());
 
         foreach (var quantityDto in searchVectorQuantityResult.Result)
         {
-            var file = files.Result.FirstOrDefault(x => x.Id.ToString() == quantityDto.FileId);
+            var file = files.FirstOrDefault(x => x.Id.ToString() == quantityDto.FileId);
             quantityDto.FullPath = file?.Path;
 
             quantityDto.FileName = file?.Name;

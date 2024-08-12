@@ -1,5 +1,3 @@
-using Masa.BuildingBlocks.Data.Mapping.Options;
-
 namespace FastWiki.Service.Domain.ChatApplications.Repositories;
 
 public interface IChatApplicationRepository : IRepository<ChatApplication, string>

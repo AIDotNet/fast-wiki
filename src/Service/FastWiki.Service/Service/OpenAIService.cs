@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.Json;
 using Azure.AI.OpenAI;
-using FastWiki.Service.Application.Storage.Queries;
 using FastWiki.Service.Contracts.OpenAI;
 using FastWiki.Service.Domain.Function.Aggregates;
 using FastWiki.Service.Domain.Function.Repositories;
@@ -71,6 +70,8 @@ public class OpenAIService
         var eventBus = context.RequestServices.GetRequiredService<IEventBus>();
         var fastWikiFunctionCallRepository =
             context.RequestServices.GetRequiredService<IFastWikiFunctionCallRepository>();
+        
+        var fileStorageRepository = context.RequestServices.GetRequiredService<IFileStorageRepository>();
 
         var getAPIKeyChatShareQuery = new GetAPIKeyChatShareQuery(token);
 
@@ -165,7 +166,7 @@ public class OpenAIService
         // 如果为空则不使用知识库
         if (chatApplication.WikiIds.Count != 0)
         {
-            var success = await WikiPrompt(chatApplication, memoryServerless, content.content, eventBus,
+            var success = await WikiPrompt(chatApplication, memoryServerless, content.content, eventBus, fileStorageRepository,
                 sourceFile, module, async x => { await context.WriteEndAsync(x); });
 
             if (!success)
@@ -384,17 +385,19 @@ public class OpenAIService
     /// 知识库Prompt组合
     /// 在向量中搜索响应的知识库内容，然后将其添加到对话中
     /// </summary>
-    /// <param name="context"></param>
     /// <param name="chatApplication"></param>
     /// <param name="memoryServerless"></param>
     /// <param name="content"></param>
     /// <param name="eventBus"></param>
+    /// <param name="fileStorageRepository"></param>
     /// <param name="sourceFile"></param>
     /// <param name="module"></param>
     /// <param name="notFoundAction"></param>
+    /// <param name="context"></param>
     /// <returns></returns>
     public static async ValueTask<bool> WikiPrompt(ChatApplicationDto chatApplication,
         MemoryServerless memoryServerless, string content, IEventBus eventBus,
+        IFileStorageRepository fileStorageRepository,
         List<FileStorage> sourceFile, ChatCompletionDto<ChatCompletionRequestMessage> module,
         Func<string, ValueTask> notFoundAction = null)
     {
@@ -445,11 +448,9 @@ public class OpenAIService
         // 在这里需要获取源文件
         if (fileIds.Count > 0 && chatApplication.ShowSourceFile)
         {
-            var fileQuery = new StorageInfosQuery(fileIds);
+            var fileResult = await fileStorageRepository.GetListAsync(fileIds.ToArray());
 
-            await eventBus.PublishAsync(fileQuery);
-
-            sourceFile.AddRange(fileQuery.Result);
+            sourceFile.AddRange(fileResult);
         }
 
         if (!prompt.IsNullOrEmpty())

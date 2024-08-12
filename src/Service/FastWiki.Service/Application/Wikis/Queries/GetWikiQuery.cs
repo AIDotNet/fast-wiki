@@ -10,12 +10,3 @@ public record WikiListQuery(Guid userId, string? Keyword, int Page, int PageSize
 {
     public override PaginatedListBase<WikiDto> Result { get; set; }
 }
-
-/// <summary>
-/// 获取知识库详情查询
-/// </summary>
-/// <param name="Id"></param>
-public record WikiQuery(long Id) : Query<WikiDto>()
-{
-    public override WikiDto Result { get; set; }
-}
