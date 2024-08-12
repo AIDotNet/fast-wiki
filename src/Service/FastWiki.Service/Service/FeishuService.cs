@@ -6,6 +6,7 @@ using System.Text.Json;
 using FastWiki.Service.Contracts.Feishu.Dto;
 using FastWiki.Service.Contracts.Model.Dto;
 using FastWiki.Service.Contracts.OpenAI;
+using FastWiki.Service.Domain.Function.Repositories;
 using FastWiki.Service.Domain.Storage.Aggregates;
 using FastWiki.Service.Infrastructure.Helper;
 using Microsoft.AspNetCore.Mvc;
@@ -103,6 +104,9 @@ public class FeishuService
                 return;
             }
 
+            var fastWikiFunctionCallRepository =
+                context.RequestServices.GetRequiredService<IFastWikiFunctionCallRepository>();
+
             // 私聊直接回复
             if (input._event.message.chat_type == "p2p")
             {
@@ -121,7 +125,7 @@ public class FeishuService
                 var userInput = JsonSerializer.Deserialize<FeishuChatUserInput>(input._event.message.content);
 
                 await ChatMessage(context, userInput.text, sessionId, chatApplication, chatShareInfoQuery,
-                    eventBus, wikiMemoryService);
+                    eventBus, wikiMemoryService, fastWikiFunctionCallRepository);
 
                 return;
             }
@@ -158,7 +162,7 @@ public class FeishuService
                 history.AddUserMessage(userInput.text);
 
                 await ChatMessage(context, userInput.text, sessionId, chatApplication, chatShareInfoQuery,
-                    eventBus, wikiMemoryService);
+                    eventBus, wikiMemoryService, fastWikiFunctionCallRepository);
 
                 return;
             }
@@ -172,7 +176,8 @@ public class FeishuService
 
     public static async Task ChatMessage(HttpContext context, string content, string sessionId,
         ChatApplicationDto chatApplication, ChatShareInfoQuery chatShareInfoQuery, IEventBus eventBus,
-        WikiMemoryService wikiMemoryService)
+        WikiMemoryService wikiMemoryService,
+        IFastWikiFunctionCallRepository fastWikiFunctionCallRepository)
     {
         int requestToken = 0;
 
@@ -261,9 +266,9 @@ public class FeishuService
 
         try
         {
-            await foreach (var item in OpenAIService.SendChatMessageAsync(chatApplication, eventBus,
+            await foreach (var item in OpenAIService.SendChatMessageAsync(chatApplication,
                                wikiMemoryService,
-                               chatHistory))
+                               chatHistory, fastWikiFunctionCallRepository))
             {
                 if (string.IsNullOrEmpty(item))
                 {

@@ -1,11 +1,8 @@
-using Masa.BuildingBlocks.Authentication.Identity;
-
 namespace FastWiki.Service.Application.ChatApplications;
 
 public class ChatApplicationCommandHandler(
     IChatApplicationRepository chatApplicationRepository,
-    IMapper mapper,
-    IUserContext userContext)
+    IMapper mapper)
 {
     [EventHandler]
     public async Task CreateChatApplicationAsync(CreateChatApplicationCommand command)

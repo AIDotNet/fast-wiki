@@ -1,9 +1,10 @@
 using System.Text;
 using System.Text.Json;
 using Azure.AI.OpenAI;
-using FastWiki.Service.Application.Function.Queries;
 using FastWiki.Service.Application.Storage.Queries;
 using FastWiki.Service.Contracts.OpenAI;
+using FastWiki.Service.Domain.Function.Aggregates;
+using FastWiki.Service.Domain.Function.Repositories;
 using FastWiki.Service.Domain.Storage.Aggregates;
 using FastWiki.Service.Infrastructure;
 using FastWiki.Service.Infrastructure.Helper;
@@ -49,8 +50,8 @@ public class OpenAIService
         {
             chatId = module.ApplicationId;
         }
-        
-        if(chatId.IsNullOrEmpty())
+
+        if (chatId.IsNullOrEmpty())
         {
             chatId = context.Request.Headers["applicationId"];
         }
@@ -61,13 +62,15 @@ public class OpenAIService
         {
             chatShareId = module.SharedId;
         }
-        
-        if(chatShareId.IsNullOrEmpty())
+
+        if (chatShareId.IsNullOrEmpty())
         {
             chatShareId = context.Request.Headers["sharedId"];
         }
 
         var eventBus = context.RequestServices.GetRequiredService<IEventBus>();
+        var fastWikiFunctionCallRepository =
+            context.RequestServices.GetRequiredService<IFastWikiFunctionCallRepository>();
 
         var getAPIKeyChatShareQuery = new GetAPIKeyChatShareQuery(token);
 
@@ -207,7 +210,8 @@ public class OpenAIService
         var output = new StringBuilder();
         try
         {
-            await foreach (var item in SendChatMessageAsync(chatApplication, eventBus, wikiMemoryService, chatHistory))
+            await foreach (var item in SendChatMessageAsync(chatApplication, wikiMemoryService, chatHistory,
+                               fastWikiFunctionCallRepository))
             {
                 if (string.IsNullOrEmpty(item))
                 {
@@ -254,25 +258,27 @@ public class OpenAIService
     /// 提问AI
     /// </summary>
     /// <param name="chatApplication"></param>
-    /// <param name="eventBus"></param>
     /// <param name="wikiMemoryService"></param>
     /// <param name="chatHistory"></param>
+    /// <param name="fastWikiFunctionCallRepository"></param>
     /// <returns></returns>
     public static async IAsyncEnumerable<string> SendChatMessageAsync(ChatApplicationDto chatApplication,
-        IEventBus eventBus, WikiMemoryService wikiMemoryService, ChatHistory chatHistory)
+        WikiMemoryService wikiMemoryService, ChatHistory chatHistory,
+        IFastWikiFunctionCallRepository fastWikiFunctionCallRepository)
     {
-        var functionCall = new ChatApplicationFunctionCallQuery(chatApplication.FunctionIds.ToArray());
+        var functionCall = new List<FastWikiFunctionCall>();
 
         if (chatApplication.FunctionIds.Any())
         {
-            await eventBus.PublishAsync(functionCall);
+            functionCall.AddRange(
+                await fastWikiFunctionCallRepository.GetListAsync(x => chatApplication.FunctionIds.Contains(x.Id)));
         }
 
         var kernel =
-            wikiMemoryService.CreateFunctionKernel(functionCall?.Result?.ToList(), chatApplication.ChatModel);
+            wikiMemoryService.CreateFunctionKernel(functionCall.ToList(), chatApplication.ChatModel);
 
         // 如果有函数调用
-        if (chatApplication.FunctionIds.Any() && functionCall.Result.Any())
+        if (chatApplication.FunctionIds.Any() && functionCall.Count > 0)
         {
             OpenAIPromptExecutionSettings settings = new()
             {

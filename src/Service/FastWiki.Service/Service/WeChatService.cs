@@ -3,6 +3,7 @@ using System.Threading.Channels;
 using System.Xml;
 using FastWiki.Service.Contracts.OpenAI;
 using FastWiki.Service.Contracts.WeChat;
+using FastWiki.Service.Domain.Function.Repositories;
 using FastWiki.Service.Domain.Storage.Aggregates;
 using FastWiki.Service.Infrastructure.Helper;
 using Masa.BuildingBlocks.Data;
@@ -40,12 +41,14 @@ public class WeChatService
         var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
         var wikiMemoryService = scope.ServiceProvider.GetRequiredService<WikiMemoryService>();
         var memoryCache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
+        var fastWikiFunctionCallRepository =
+            scope.ServiceProvider.GetRequiredService<IFastWikiFunctionCallRepository>();
 
         while (await Channel.Reader.WaitToReadAsync())
         {
             var content = await Channel.Reader.ReadAsync();
 
-            await SendMessageAsync(content, eventBus, wikiMemoryService, memoryCache);
+            await SendMessageAsync(content, eventBus, wikiMemoryService, memoryCache, fastWikiFunctionCallRepository);
         }
     }
 
@@ -56,8 +59,10 @@ public class WeChatService
     /// <param name="eventBus"></param>
     /// <param name="wikiMemoryService"></param>
     /// <param name="memoryCache"></param>
+    /// <param name="fastWikiFunctionCallRepository"></param>
     public static async Task SendMessageAsync(WeChatAI chatAi, IEventBus eventBus,
-        WikiMemoryService wikiMemoryService, IMemoryCache memoryCache)
+        WikiMemoryService wikiMemoryService, IMemoryCache memoryCache,
+        IFastWikiFunctionCallRepository fastWikiFunctionCallRepository)
     {
         var chatShareInfoQuery = new ChatShareInfoQuery(chatAi.SharedId);
 
@@ -154,8 +159,8 @@ public class WeChatService
 
         try
         {
-            await foreach (var item in OpenAIService.SendChatMessageAsync(chatApplication, eventBus, wikiMemoryService,
-                               chatHistory))
+            await foreach (var item in OpenAIService.SendChatMessageAsync(chatApplication, wikiMemoryService,
+                               chatHistory, fastWikiFunctionCallRepository))
             {
                 if (string.IsNullOrEmpty(item))
                 {

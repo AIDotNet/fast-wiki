@@ -1,4 +1,3 @@
-using FastWiki.Service.Application.Users.Queries;
 using FastWiki.Service.Contracts.Users;
 using FastWiki.Service.Contracts.Users.Dto;
 using FastWiki.Service.Domain.Users.Repositories;
