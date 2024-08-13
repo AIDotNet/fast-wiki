@@ -69,14 +69,6 @@ const TopicContent = memo<TopicContentProps>(({ id, title, fav, showMore }) => {
   const items = useMemo<MenuProps['items']>(
     () => [
       {
-        icon: <Icon icon={Wand2} />,
-        key: 'autoRename',
-        label: t('topic.actions.autoRename', { ns: 'chat' }),
-        onClick: () => {
-          autoRenameTopicTitle(id);
-        },
-      },
-      {
         icon: <Icon icon={PencilLine} />,
         key: 'rename',
         label: t('rename'),
@@ -95,22 +87,9 @@ const TopicContent = memo<TopicContentProps>(({ id, title, fav, showMore }) => {
           duplicateTopic(id);
         },
       },
-      // {
-      //   icon: <Icon icon={LucideDownload} />,
-      //   key: 'export',
-      //   label: t('topic.actions.export', { ns: 'chat' }),
-      //   onClick: () => {
-      //     configService.exportSingleTopic(sessionId, id);
-      //   },
-      // },
       {
         type: 'divider',
       },
-      // {
-      //   icon: <Icon icon={Share2} />,
-      //   key: 'share',
-      //   label: t('share'),
-      // },
       {
         danger: true,
         icon: <Icon icon={Trash} />,

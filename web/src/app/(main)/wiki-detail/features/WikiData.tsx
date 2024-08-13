@@ -93,7 +93,6 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
                             </span>
                         ),
                     },]
-                // 如果失败了则显示量化。
                 if (item.state !== 0) {
                     items.push({
                         key: '3',

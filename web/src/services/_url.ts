@@ -5,7 +5,7 @@ import { transform } from 'lodash-es';
 
 import { withBasePath } from '@/utils/basePath';
 import { ModelProvider } from '@/libs/agent-runtime';
-import { VITE_API_URL } from '@/utils/env';
+import { } from '@/utils/env';
 
 const mapWithBasePath = <T extends object>(apis: T): T => {
   return transform(apis, (result, value, key) => {
@@ -23,16 +23,16 @@ export const API_ENDPOINTS = mapWithBasePath({
   oauth: '/api/auth',
 
   // agent markets
-  market: VITE_API_URL + '/api/market',
-  marketItem: (identifier: string) => withBasePath(VITE_API_URL + `/api/market/${identifier}`),
+  market: '/api/market',
+  marketItem: (identifier: string) => withBasePath(`/api/market/${identifier}`),
 
   // plugins
   gateway: '/api/plugin/gateway',
-  pluginStore: VITE_API_URL +'/api/plugin/store',
+  pluginStore: '/api/plugin/store',
 
   // chat
   chat: (provider: string) => {
-    return VITE_API_URL+`/v1/chat/completions`
+    return `/v1/chat/completions`
   },
   chatModels: (provider: string) => withBasePath(`/api/chat/models/${provider}`),
 

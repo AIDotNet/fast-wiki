@@ -22,7 +22,7 @@ public sealed class Wiki : FullAggregateRoot<long, Guid?>
     /// </summary>
     public string EmbeddingModel { get; set; }
     
-    protected Wiki()
+    public Wiki()
     {
     }
 

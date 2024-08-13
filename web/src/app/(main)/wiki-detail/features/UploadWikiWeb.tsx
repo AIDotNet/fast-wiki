@@ -171,7 +171,7 @@ export default function UploadWikiWeb({ id, onChagePath }: IUploadWikiFileProps)
                             borderRadius: 8,
                             padding: 10,
                             marginRight: 10
-                        }} value={TrainingPattern.QA}>QA问答拆分</Radio>
+                        }} value={TrainingPattern.QA}>AI文本拆分</Radio>
                     </Radio.Group>
                     {
                         trainingPattern === TrainingPattern.Subsection && <div>
@@ -227,8 +227,12 @@ export default function UploadWikiWeb({ id, onChagePath }: IUploadWikiFileProps)
                     }
                     {
                         trainingPattern === TrainingPattern.QA && <>
-                            <span>QA问答模板：</span>
-                            <TextArea value={qAPromptTemplate} onChange={(v) => {
+                            <div>AI文本拆分提示词：</div>
+                            <TextArea 
+                            style={{
+                                height: 200
+                            }}
+                            value={qAPromptTemplate} onChange={(v) => {
                                 setQAPromptTemplate(v.target.value);
                             }}>
                             </TextArea>

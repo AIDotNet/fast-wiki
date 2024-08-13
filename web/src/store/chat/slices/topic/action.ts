@@ -6,7 +6,6 @@ import { t } from 'i18next';
 import useSWR, { SWRResponse, mutate } from 'swr';
 import { StateCreator } from 'zustand/vanilla';
 
-import { chainSummaryTitle } from '@/chains/summaryTitle';
 import { message } from '@/components/AntdStaticMethods';
 import { LOADING_FLAT } from '@/const/message';
 import { TraceNameMap } from '@/const/trace';
@@ -167,7 +166,7 @@ export const chatTopic: StateCreator<
 
         internal_updateTopicTitleInSummary(topicId, output);
       },
-      params: merge(topicConfig, chainSummaryTitle(messages)),
+      params: merge(topicConfig),
       trace: get().getCurrentTracePayload({ traceName: TraceNameMap.SummaryTopicTitle, topicId }),
     });
   },

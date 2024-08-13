@@ -29,11 +29,11 @@
         <PackageReference Include="Masa.Contrib.Service.MinimalAPIs" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Masa.Contrib.Dispatcher.IntegrationEvents.EventLogs.EFCore" Version="$(MasaFrameworkPackageVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.7" />
-        <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.67.240712.1" />
-        <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Postgres" Version="0.67.240712.1" />
+        <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.70.240803.1" />
+        <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Postgres" Version="0.70.240803.1" />
         <PackageReference Include="Microsoft.SemanticKernel" Version="1.17.1" />
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.8.0-alpha" />
-        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
           <PrivateAssets>all</PrivateAssets>

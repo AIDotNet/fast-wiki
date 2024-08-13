@@ -17,7 +17,7 @@ const Actions = memo<{ mobile?: boolean }>(({ mobile }) => {
       <Button
         block={mobile}
         onClick={() => {
-          startTransition(() => navigate('/chat'));
+          startTransition(() => navigate('/app'));
         }}
         size={'large'}
         style={{ minWidth: 160 }}

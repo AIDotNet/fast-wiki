@@ -1,6 +1,4 @@
-﻿using Masa.BuildingBlocks.Ddd.Domain.Entities.Auditing;
-
-namespace FastWiki.Service.Domain.ChatApplications.Aggregates;
+﻿namespace FastWiki.Service.Domain.ChatApplications.Aggregates;
 
 /// <summary>
 /// 问题热点
