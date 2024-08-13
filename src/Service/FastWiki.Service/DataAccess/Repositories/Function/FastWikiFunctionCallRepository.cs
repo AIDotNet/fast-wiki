@@ -1,5 +1,4 @@
-﻿using FastWiki.Service.Contracts.Function;
-using FastWiki.Service.Domain.Function.Aggregates;
+﻿using FastWiki.Service.Domain.Function.Aggregates;
 using FastWiki.Service.Domain.Function.Repositories;
 
 namespace FastWiki.Service.DataAccess.Repositories.Function;
@@ -49,10 +48,7 @@ public sealed class FastWikiFunctionCallRepository : Repository<WikiDbContext, F
     private IQueryable<FastWikiFunctionCall> CreateQuery(Guid? userId)
     {
         var query = Context.FunctionCalls.AsQueryable();
-        if (userId.HasValue)
-        {
-            query = query.Where(x => x.Creator == userId);
-        }
+        if (userId.HasValue) query = query.Where(x => x.Creator == userId);
 
         return query;
     }

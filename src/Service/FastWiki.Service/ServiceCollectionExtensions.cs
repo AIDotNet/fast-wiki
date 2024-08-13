@@ -8,7 +8,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// 注册JWT Bearer认证服务的静态扩展方法
+    ///     注册JWT Bearer认证服务的静态扩展方法
     /// </summary>
     /// <param name="services"></param>
     public static IServiceCollection AddJwtBearerAuthentication(this IServiceCollection services)
@@ -39,7 +39,7 @@ public static class ServiceCollectionExtensions
 
 
     /// <summary>
-    /// 加载环境变量
+    ///     加载环境变量
     /// </summary>
     /// <param name="builder"></param>
     public static void AddLoadEnvironment(this WebApplicationBuilder builder)
@@ -55,49 +55,23 @@ public static class ServiceCollectionExtensions
         var WIKI_CONNECTION = Environment.GetEnvironmentVariable("WIKI_CONNECTION");
 
 
-        if (!OPENAI_CHAT_ENDPOINT.IsNullOrWhiteSpace())
-        {
-            OpenAIOption.ChatEndpoint = OPENAI_CHAT_ENDPOINT;
-        }
+        if (!OPENAI_CHAT_ENDPOINT.IsNullOrWhiteSpace()) OpenAIOption.ChatEndpoint = OPENAI_CHAT_ENDPOINT;
 
         if (!OPENAI_CHAT_EMBEDDING_ENDPOINT.IsNullOrWhiteSpace())
-        {
             OpenAIOption.EmbeddingEndpoint = OPENAI_CHAT_EMBEDDING_ENDPOINT;
-        }
 
-        if (!OPENAI_CHAT_TOKEN.IsNullOrWhiteSpace())
-        {
-            OpenAIOption.ChatToken = OPENAI_CHAT_TOKEN;
-        }
+        if (!OPENAI_CHAT_TOKEN.IsNullOrWhiteSpace()) OpenAIOption.ChatToken = OPENAI_CHAT_TOKEN;
 
-        if (!OPENAI_EMBEDDING_MODEL.IsNullOrWhiteSpace())
-        {
-            OpenAIOption.EmbeddingModel = OPENAI_EMBEDDING_MODEL;
-        }
+        if (!OPENAI_EMBEDDING_MODEL.IsNullOrWhiteSpace()) OpenAIOption.EmbeddingModel = OPENAI_EMBEDDING_MODEL;
 
-        if (!OPENAI_EMBEDDING_TOKEN.IsNullOrWhiteSpace())
-        {
-            OpenAIOption.EmbeddingToken = OPENAI_EMBEDDING_TOKEN;
-        }
+        if (!OPENAI_EMBEDDING_TOKEN.IsNullOrWhiteSpace()) OpenAIOption.EmbeddingToken = OPENAI_EMBEDDING_TOKEN;
 
-        if (!DEFAULT_TYPE.IsNullOrWhiteSpace())
-        {
-            ConnectionStringsOptions.DefaultType = DEFAULT_TYPE;
-        }
+        if (!DEFAULT_TYPE.IsNullOrWhiteSpace()) ConnectionStringsOptions.DefaultType = DEFAULT_TYPE;
 
-        if (!DEFAULT_CONNECTION.IsNullOrWhiteSpace())
-        {
-            ConnectionStringsOptions.DefaultConnection = DEFAULT_CONNECTION;
-        }
+        if (!DEFAULT_CONNECTION.IsNullOrWhiteSpace()) ConnectionStringsOptions.DefaultConnection = DEFAULT_CONNECTION;
 
-        if (!WIKI_TYPE.IsNullOrWhiteSpace())
-        {
-            ConnectionStringsOptions.WikiType = WIKI_TYPE;
-        }
+        if (!WIKI_TYPE.IsNullOrWhiteSpace()) ConnectionStringsOptions.WikiType = WIKI_TYPE;
 
-        if (!WIKI_CONNECTION.IsNullOrWhiteSpace())
-        {
-            ConnectionStringsOptions.WikiConnection = WIKI_CONNECTION;
-        }
+        if (!WIKI_CONNECTION.IsNullOrWhiteSpace()) ConnectionStringsOptions.WikiConnection = WIKI_CONNECTION;
     }
 }

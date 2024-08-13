@@ -8,7 +8,7 @@ public static class BinaryDataExtensions
     {
         using (var sha256 = SHA256.Create())
         {
-            byte[] hashBytes = sha256.ComputeHash(data.ToArray());
+            var hashBytes = sha256.ComputeHash(data.ToArray());
             return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
         }
     }

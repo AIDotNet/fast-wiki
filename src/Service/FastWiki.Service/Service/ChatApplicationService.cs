@@ -74,7 +74,7 @@ public sealed class ChatApplicationService
     public async Task<PaginatedListBase<ChatShareDto>> GetChatShareListAsync(string chatApplicationId, int page,
         int pageSize)
     {
-        var query = new ChatShareQuery(chatApplicationId, page, pageSize,UserContext.GetUserId<Guid>());
+        var query = new ChatShareQuery(chatApplicationId, page, pageSize, UserContext.GetUserId<Guid>());
 
         await EventBus.PublishAsync(query);
 
@@ -96,7 +96,7 @@ public sealed class ChatApplicationService
 
         await EventBus.PublishAsync(command);
     }
-    
+
     public async Task<List<QuestionsDto>> GetQuestionsAsync(string applicationId)
     {
         var query = new GetQuestionsQuery(applicationId);
@@ -105,7 +105,7 @@ public sealed class ChatApplicationService
 
         return query.Result;
     }
-    
+
     public async Task<List<QuestionsDto>> GetSharedQuestionsAsync(string sharedId)
     {
         var chatShareInfoQuery = new ChatShareInfoQuery(sharedId);
@@ -117,9 +117,8 @@ public sealed class ChatApplicationService
 
         return query.Result;
     }
-    
-    
-    
+
+
     [Authorize]
     public Task RemoveQuestionsAsync(string id)
     {
@@ -127,5 +126,4 @@ public sealed class ChatApplicationService
 
         return EventBus.PublishAsync(command);
     }
-    
 }

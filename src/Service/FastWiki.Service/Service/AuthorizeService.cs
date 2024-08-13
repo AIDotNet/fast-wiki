@@ -6,7 +6,7 @@ using FastWiki.Service.Infrastructure.Helper;
 namespace FastWiki.Service.Service;
 
 /// <summary>
-/// 授权服务
+///     授权服务
 /// </summary>
 public sealed class AuthorizeService(IUserRepository userRepository, IMapper mapper)
     : ApplicationService<AuthorizeService>, IAuthorizeService
@@ -15,20 +15,11 @@ public sealed class AuthorizeService(IUserRepository userRepository, IMapper map
     {
         var dto = await userRepository.FindAsync(x => x.Account == input.Account);
 
-        if (dto == null)
-        {
-            throw new UserFriendlyException("账号不存在");
-        }
+        if (dto == null) throw new UserFriendlyException("账号不存在");
 
-        if (!dto.CheckCipher(input.Password))
-        {
-            throw new UserFriendlyException("密码错误");
-        }
+        if (!dto.CheckCipher(input.Password)) throw new UserFriendlyException("密码错误");
 
-        if (dto.IsDisable)
-        {
-            throw new UserFriendlyException("账号已禁用");
-        }
+        if (dto.IsDisable) throw new UserFriendlyException("账号已禁用");
 
 
         return new AuthorizeDto

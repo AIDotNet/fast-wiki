@@ -3,12 +3,12 @@
 public sealed class CreateWikiDetailDataInput
 {
     /// <summary>
-    /// 知识库Id
+    ///     知识库Id
     /// </summary>
     public long WikiId { get; set; }
 
     /// <summary>
-    /// 名称
+    ///     名称
     /// </summary>
     public string Name { get; set; }
 
@@ -17,7 +17,7 @@ public sealed class CreateWikiDetailDataInput
     public string FilePath { get; set; }
 
     /// <summary>
-    /// 状态
+    ///     状态
     /// </summary>
     public string State { get; set; }
 

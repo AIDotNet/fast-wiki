@@ -9,7 +9,7 @@ public class ChatApplicationCommandHandler(
     {
         var chatApplication = new ChatApplication(Guid.NewGuid().ToString("N"))
         {
-            Name = command.Input.Name,
+            Name = command.Input.Name
         };
 
         await chatApplicationRepository.AddAsync(chatApplication);
@@ -57,10 +57,7 @@ public class ChatApplicationCommandHandler(
     [EventHandler]
     public async Task CreateChatRecordAsync(CreateChatRecordCommand command)
     {
-        if (command.Question.IsNullOrWhiteSpace())
-        {
-            return;
-        }
+        if (command.Question.IsNullOrWhiteSpace()) return;
 
         await chatApplicationRepository.CreateChatRecordAsync(new ChatRecord(Guid.NewGuid().ToString("N"),
             command.ApplicationId, command.Question));
@@ -72,7 +69,7 @@ public class ChatApplicationCommandHandler(
         await chatApplicationRepository.CreateQuestionsAsync(new Questions(Guid.NewGuid().ToString("N"),
             command.QuestionsDto.ApplicationId, command.QuestionsDto.Question, command.QuestionsDto.Order));
     }
-    
+
     [EventHandler]
     public async Task RemoveQuestionsAsync(RemoveQuestionsCommand command)
     {

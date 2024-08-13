@@ -14,7 +14,7 @@ public class FunctionService(
     [Authorize]
     public async Task CreateFunctionAsync(FastWikiFunctionCallInput input)
     {
-        var functionCall = new FastWikiFunctionCall()
+        var functionCall = new FastWikiFunctionCall
         {
             Content = input.Content,
             Description = input.Description,
@@ -41,10 +41,7 @@ public class FunctionService(
     public async Task UpdateFunctionAsync(FastWikiFunctionCallDto input)
     {
         var functionCall = await fastWikiFunctionCallRepository.FindAsync(input.Id);
-        if (functionCall == null)
-        {
-            throw new Exception("function call not found");
-        }
+        if (functionCall == null) throw new Exception("function call not found");
 
         functionCall.Content = input.Content;
         functionCall.Description = input.Description;
@@ -79,7 +76,7 @@ public class FunctionService(
 
         var total = await fastWikiFunctionCallRepository.GetFunctionCountAsync(userContext.GetUserId<Guid>());
 
-        return new PaginatedListBase<FastWikiFunctionCallDto>()
+        return new PaginatedListBase<FastWikiFunctionCallDto>
         {
             Result = mapper.Map<List<FastWikiFunctionCallDto>>(items),
             Total = total

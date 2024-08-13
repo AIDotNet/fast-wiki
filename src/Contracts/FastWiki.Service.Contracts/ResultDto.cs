@@ -10,7 +10,7 @@ public class ResultDto
 
     public static ResultDto CreateSucceed(object data)
     {
-        return new ResultDto()
+        return new ResultDto
         {
             Code = "200",
             Data = data
@@ -19,7 +19,7 @@ public class ResultDto
 
     public static ResultDto CreateError(string message, string code)
     {
-        return new ResultDto()
+        return new ResultDto
         {
             Message = message,
             Code = code
@@ -37,7 +37,7 @@ public class ResultDto<TResult>
 
     public static ResultDto<TResult> CreateSucceed(object data)
     {
-        return new ResultDto<TResult>()
+        return new ResultDto<TResult>
         {
             Code = "200",
             Data = data

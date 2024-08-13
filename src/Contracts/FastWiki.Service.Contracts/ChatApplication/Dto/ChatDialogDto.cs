@@ -31,7 +31,7 @@ public class ChatDialogDto
     }
 
     /// <summary>
-    /// 是否编辑
+    ///     是否编辑
     /// </summary>
     public bool IsEdit { get; set; }
 }

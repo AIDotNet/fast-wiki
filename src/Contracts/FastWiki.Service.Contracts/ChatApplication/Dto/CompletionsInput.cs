@@ -3,12 +3,12 @@
 public sealed class CompletionsInput
 {
     /// <summary>
-    /// 对话Id
+    ///     对话Id
     /// </summary>
     public string ChatDialogId { get; set; }
 
     /// <summary>
-    /// 应用Id
+    ///     应用Id
     /// </summary>
     public string ChatId { get; set; }
 

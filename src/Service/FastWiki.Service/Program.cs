@@ -15,23 +15,19 @@ var builder = WebApplication.CreateBuilder(args);
 WebOptions.Init(builder.Configuration);
 Logger logger;
 if (builder.Environment.IsDevelopment())
-{
     logger = new LoggerConfiguration()
         .MinimumLevel.Information()
         .WriteTo.Console()
         .Enrich.FromLogContext()
         .Enrich.WithProperty("Application", "FastWiki")
         .CreateLogger();
-}
 else
-{
     logger = new LoggerConfiguration()
         .MinimumLevel.Information()
         .WriteTo.Console()
         .Enrich.FromLogContext()
         .Enrich.WithProperty("Application", "FastWiki")
         .CreateLogger();
-}
 
 builder.Host.UseSerilog(logger);
 
@@ -48,19 +44,15 @@ builder
     .AddLoadEnvironment();
 
 if (ConnectionStringsOptions.DefaultType == "sqlite")
-{
     builder.Services.AddMasaDbContext<SqliteContext>(opt =>
     {
         opt.UseSqlite(ConnectionStringsOptions.DefaultConnection);
     });
-}
 else
-{
     builder.Services.AddMasaDbContext<WikiDbContext>(opt =>
     {
         opt.UseNpgsql(ConnectionStringsOptions.DefaultConnection);
     });
-}
 
 builder.Services
     .AddMapster();
@@ -88,7 +80,7 @@ builder.Services
     .AddHttpContextAccessor()
     .AddSwaggerGen(options =>
     {
-        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Name = "Authorization",
             Type = SecuritySchemeType.ApiKey,
@@ -96,7 +88,7 @@ builder.Services
             BearerFormat = "JWT",
             In = ParameterLocation.Header,
             Description =
-                "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer xxxxxxxxxxxxxxx\"",
+                "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer xxxxxxxxxxxxxxx\""
         });
         options.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
@@ -118,7 +110,7 @@ builder.Services
             {
                 Title = "FastWiki.ServiceApp",
                 Version = "v1",
-                Contact = new OpenApiContact { Name = "FastWiki.ServiceApp", }
+                Contact = new OpenApiContact { Name = "FastWiki.ServiceApp" }
             });
         foreach (var item in Directory.GetFiles(Directory.GetCurrentDirectory(), "*.xml"))
             options.IncludeXmlComments(item, true);
@@ -127,13 +119,9 @@ builder.Services
     .AddMasaDbContext<WikiDbContext>(opt =>
     {
         if (ConnectionStringsOptions.DefaultType == "sqlite")
-        {
             opt.UseSqlite(ConnectionStringsOptions.DefaultConnection);
-        }
         else
-        {
             opt.UseNpgsql(ConnectionStringsOptions.DefaultConnection);
-        }
     })
     .AddDomainEventBus(dispatcherOptions =>
     {
@@ -148,7 +136,7 @@ builder.Services.AddAutoInject();
 
 var app = builder.Services.AddServices(builder, option => option.MapHttpMethodsForUnmatched = ["Post"]);
 
-app.Use((async (context, next) =>
+app.Use(async (context, next) =>
 {
     var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
 
@@ -178,13 +166,13 @@ app.Use((async (context, next) =>
 
         await context.Response.WriteAsJsonAsync(ResultDto.CreateError(e.Message, "500"));
     }
-}));
+});
 
 var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider
 {
     Mappings =
     {
-        [".md"] = "application/octet-stream",
+        [".md"] = "application/octet-stream"
     }
 };
 
@@ -217,7 +205,7 @@ app.MapGet("/js/env.js", () =>
         WebOptions.DEFAULT_AVATAR,
         WebOptions.DEFAULT_USER_AVATAR,
         WebOptions.DEFAULT_INBOX_AVATAR,
-        WebOptions.DEFAULT_MODEL,
+        WebOptions.DEFAULT_MODEL
     };
 
     // 返回js
@@ -248,7 +236,7 @@ app.MapPost("/api/v1/WeChatService/ReceiveMessage/{id}", WeChatService.ReceiveMe
     .WithDescription("微信消息接收")
     .WithOpenApi();
 
-app.MapGet("/api/v1/monaco", (async context =>
+app.MapGet("/api/v1/monaco", async context =>
 {
     // 获取monaco目录下的所有文件
     var files = Directory.GetFiles("monaco", "*.ts");
@@ -263,13 +251,11 @@ app.MapGet("/api/v1/monaco", (async context =>
     }
 
     await context.Response.WriteAsJsonAsync(dic);
-}));
+});
 
 if (app.Environment.IsDevelopment())
-{
     app.UseSwagger()
         .UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "FastWiki.ServiceApp"));
-}
 
 
 #region MigrationDb
@@ -288,10 +274,8 @@ else
         await context!.Database.MigrateAsync();
 
         if (!ConnectionStringsOptions.WikiType.Equals("disk", StringComparison.OrdinalIgnoreCase))
-        {
             // TODO: 创建vector插件如果数据库没有则需要提供支持向量的数据库。
             await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");
-        }
     }
 }
 

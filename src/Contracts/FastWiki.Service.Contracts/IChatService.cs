@@ -5,7 +5,7 @@ namespace FastWiki.Service.Contracts;
 public interface IChatService
 {
     /// <summary>
-    /// 智能对话
+    ///     智能对话
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>

@@ -3,17 +3,17 @@
 public class WeChatAI
 {
     /// <summary>
-    /// 对话内容
+    ///     对话内容
     /// </summary>
     public string Content { get; set; }
 
     /// <summary>
-    /// 应用Id
+    ///     应用Id
     /// </summary>
     public string SharedId { get; set; }
 
     /// <summary>
-    /// 内容Id
+    ///     内容Id
     /// </summary>
     public string MessageId { get; set; }
 }

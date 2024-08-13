@@ -3,27 +3,27 @@ namespace FastWiki.Service.Contracts.Users.Dto;
 public class CreateUserInput
 {
     /// <summary>
-    /// ÕË»§
+    ///     ÕË»§
     /// </summary>
-    public string Account { get;  set; }
+    public string Account { get; set; }
 
     /// <summary>
-    /// êÇ³Æ
+    ///     êÇ³Æ
     /// </summary>
-    public string Name { get;  set; }
+    public string Name { get; set; }
 
     /// <summary>
-    /// ÃÜÂë
+    ///     ÃÜÂë
     /// </summary>
-    public string Password { get;  set; }
+    public string Password { get; set; }
 
     /// <summary>
-    /// ÓÊÏä
+    ///     ÓÊÏä
     /// </summary>
-    public string Email { get;  set; }
+    public string Email { get; set; }
 
     /// <summary>
-    /// ÊÖ»úºÅ
+    ///     ÊÖ»úºÅ
     /// </summary>
-    public string Phone { get;  set; }
+    public string Phone { get; set; }
 }

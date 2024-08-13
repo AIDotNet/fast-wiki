@@ -9,7 +9,7 @@ using Microsoft.SemanticKernel;
 namespace FastWiki.Service.Service;
 
 /// <summary>
-/// 知识库内存服务
+///     知识库内存服务
 /// </summary>
 public sealed class WikiMemoryService : ISingletonDependency
 {
@@ -18,7 +18,7 @@ public sealed class WikiMemoryService : ISingletonDependency
     private static readonly OpenAiHttpClientHandler HttpClientHandler = new(OpenAIOption.ChatEndpoint);
 
     /// <summary>
-    /// 创建知识库内存服务
+    ///     创建知识库内存服务
     /// </summary>
     /// <param name="searchClientConfig"></param>
     /// <param name="maxTokensPerLine"></param>
@@ -42,23 +42,23 @@ public sealed class WikiMemoryService : ISingletonDependency
                     Directory = ConnectionStringsOptions.WikiConnection
                 })
                 .WithSearchClientConfig(searchClientConfig)
-                .WithCustomTextPartitioningOptions(new TextPartitioningOptions()
+                .WithCustomTextPartitioningOptions(new TextPartitioningOptions
                 {
                     MaxTokensPerLine = maxTokensPerLine,
                     MaxTokensPerParagraph = maxTokensPerParagraph,
                     OverlappingTokens = overlappingTokens
                 })
-                .WithOpenAITextGeneration(new OpenAIConfig()
+                .WithOpenAITextGeneration(new OpenAIConfig
                 {
                     APIKey = OpenAIOption.ChatToken,
                     TextModel = chatModel
                 }, null, new HttpClient(HttpClientHandler))
-                .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
+                .WithOpenAITextEmbeddingGeneration(new OpenAIConfig
                 {
                     APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
                         ? OpenAIOption.ChatToken
                         : OpenAIOption.EmbeddingToken,
-                    EmbeddingModel = embeddingModel,
+                    EmbeddingModel = embeddingModel
                 }, null, false, new HttpClient(HttpClientHandler))
                 .AddSingleton(new WikiMemoryService())
                 .Build<MemoryServerless>();
@@ -68,7 +68,7 @@ public sealed class WikiMemoryService : ISingletonDependency
         else
         {
             var memory = new KernelMemoryBuilder()
-                .WithPostgresMemoryDb(new PostgresConfig()
+                .WithPostgresMemoryDb(new PostgresConfig
                 {
                     ConnectionString = ConnectionStringsOptions.WikiConnection,
                     TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
@@ -79,24 +79,24 @@ public sealed class WikiMemoryService : ISingletonDependency
                     Directory = "_files"
                 })
                 .WithSearchClientConfig(searchClientConfig)
-                .WithCustomTextPartitioningOptions(new TextPartitioningOptions()
+                .WithCustomTextPartitioningOptions(new TextPartitioningOptions
                 {
                     MaxTokensPerLine = maxTokensPerLine,
                     MaxTokensPerParagraph = maxTokensPerParagraph,
                     OverlappingTokens = overlappingTokens
                 })
-                .WithOpenAITextGeneration(new OpenAIConfig()
+                .WithOpenAITextGeneration(new OpenAIConfig
                 {
                     APIKey = OpenAIOption.ChatToken,
                     TextModel = chatModel
                 }, null, new HttpClient(HttpClientHandler))
-                .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
+                .WithOpenAITextEmbeddingGeneration(new OpenAIConfig
                 {
                     // 如果 EmbeddingToken 为空，则使用 ChatToken
                     APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
                         ? OpenAIOption.ChatToken
                         : OpenAIOption.EmbeddingToken,
-                    EmbeddingModel = embeddingModel,
+                    EmbeddingModel = embeddingModel
                 }, null, false, new HttpClient(HttpClientHandler))
                 .AddSingleton(new WikiMemoryService())
                 .Build<MemoryServerless>();
@@ -106,61 +106,56 @@ public sealed class WikiMemoryService : ISingletonDependency
     }
 
     /// <summary>
-    /// 创建用于操作的内存服务（不要用于向量搜索）
+    ///     创建用于操作的内存服务（不要用于向量搜索）
     /// </summary>
     /// <returns></returns>
     public MemoryServerless CreateMemoryServerless(string? model = null)
     {
         if (ConnectionStringsOptions.WikiType == "disk")
-        {
             return new KernelMemoryBuilder()
                 .WithSimpleVectorDb(new SimpleVectorDbConfig
                 {
                     StorageType = FileSystemTypes.Disk,
                     Directory = ConnectionStringsOptions.WikiConnection
                 })
-                .WithOpenAITextGeneration(new OpenAIConfig()
+                .WithOpenAITextGeneration(new OpenAIConfig
                 {
                     APIKey = OpenAIOption.ChatToken,
                     TextModel = model ?? OpenAIOption.ChatToken
                 }, null, new HttpClient(HttpClientHandler))
-                .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
+                .WithOpenAITextEmbeddingGeneration(new OpenAIConfig
                 {
                     // 如果 EmbeddingToken 为空，则使用 ChatToken
                     APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
                         ? OpenAIOption.ChatToken
                         : OpenAIOption.EmbeddingToken,
-                    EmbeddingModel = OpenAIOption.EmbeddingModel,
+                    EmbeddingModel = OpenAIOption.EmbeddingModel
                 }, null, false, new HttpClient(HttpClientHandler))
                 .Build<MemoryServerless>();
-        }
-        else
-        {
-            return new KernelMemoryBuilder()
-                .WithPostgresMemoryDb(new PostgresConfig()
-                {
-                    ConnectionString = ConnectionStringsOptions.WikiConnection,
-                    TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
-                })
-                .WithOpenAITextGeneration(new OpenAIConfig()
-                {
-                    APIKey = OpenAIOption.ChatToken,
-                    TextModel = model ?? OpenAIOption.ChatModel
-                }, null, new HttpClient(HttpClientHandler))
-                .WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
-                {
-                    // 如果 EmbeddingToken 为空，则使用 ChatToken
-                    APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
-                        ? OpenAIOption.ChatToken
-                        : OpenAIOption.EmbeddingToken,
-                    EmbeddingModel = OpenAIOption.EmbeddingModel,
-                }, null, false, new HttpClient(HttpClientHandler))
-                .Build<MemoryServerless>();
-        }
+        return new KernelMemoryBuilder()
+            .WithPostgresMemoryDb(new PostgresConfig
+            {
+                ConnectionString = ConnectionStringsOptions.WikiConnection,
+                TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
+            })
+            .WithOpenAITextGeneration(new OpenAIConfig
+            {
+                APIKey = OpenAIOption.ChatToken,
+                TextModel = model ?? OpenAIOption.ChatModel
+            }, null, new HttpClient(HttpClientHandler))
+            .WithOpenAITextEmbeddingGeneration(new OpenAIConfig
+            {
+                // 如果 EmbeddingToken 为空，则使用 ChatToken
+                APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
+                    ? OpenAIOption.ChatToken
+                    : OpenAIOption.EmbeddingToken,
+                EmbeddingModel = OpenAIOption.EmbeddingModel
+            }, null, false, new HttpClient(HttpClientHandler))
+            .Build<MemoryServerless>();
     }
 
     /// <summary>
-    /// 创建Function Kernel
+    ///     创建Function Kernel
     /// </summary>
     /// <param name="fastWikiFunctionCalls"></param>
     /// <param name="chatModel"></param>
@@ -170,13 +165,12 @@ public sealed class WikiMemoryService : ISingletonDependency
     {
         var kernel = Kernel.CreateBuilder()
             .AddOpenAIChatCompletion(
-                modelId: chatModel,
-                apiKey: OpenAIOption.ChatToken,
+                chatModel,
+                OpenAIOption.ChatToken,
                 httpClient: new HttpClient(new OpenAiHttpClientHandler(OpenAIOption.ChatEndpoint)))
             .Build();
 
         if (fastWikiFunctionCalls != null)
-        {
             foreach (var fastWikiFunctionCall in fastWikiFunctionCalls)
             {
                 var function = kernel.CreateFunctionFromMethod(async (dynamic value) =>
@@ -197,13 +191,12 @@ public sealed class WikiMemoryService : ISingletonDependency
                 kernel.Plugins.AddFromFunctions(fastWikiFunctionCall.Main, fastWikiFunctionCall.Description,
                     new[] { function });
             }
-        }
 
         return kernel;
     }
 
     /// <summary>
-    /// 创建Function Kernel
+    ///     创建Function Kernel
     /// </summary>
     /// <param name="apiKey"></param>
     /// <param name="modelId"></param>
@@ -213,8 +206,8 @@ public sealed class WikiMemoryService : ISingletonDependency
     {
         var kernel = Kernel.CreateBuilder()
             .AddOpenAIChatCompletion(
-                modelId: modelId,
-                apiKey: apiKey,
+                modelId,
+                apiKey,
                 httpClient: new HttpClient(new OpenAiHttpClientHandler(uri)))
             .Build();
 

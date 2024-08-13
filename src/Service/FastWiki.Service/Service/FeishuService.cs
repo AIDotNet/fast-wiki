@@ -18,13 +18,15 @@ namespace FastWiki.Service.Service;
 
 public class FeishuService
 {
-    private static HttpClient httpClient = new();
+    private static readonly HttpClient httpClient = new();
 
     public static JsonSerializerOptions JsonSerializerOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
+
+    private static readonly ConcurrentDictionary<string, DateTime> MemoryCache = new();
 
     public static async Task Completions(string id, HttpContext context, [FromBody] FeishuChatInput input)
     {
@@ -38,7 +40,7 @@ public class FeishuService
                 message = new
                 {
                     zh_CN = "你配置了 Encrypt Key，请关闭该功能。",
-                    en_US = "You have open Encrypt Key Feature, please close it.",
+                    en_US = "You have open Encrypt Key Feature, please close it."
                 }
             });
             return;
@@ -50,7 +52,7 @@ public class FeishuService
         {
             await context.Response.WriteAsJsonAsync(new
             {
-                input.challenge,
+                input.challenge
             });
             return;
         }
@@ -69,7 +71,7 @@ public class FeishuService
             {
                 await context.Response.WriteAsJsonAsync(new
                 {
-                    code = 0,
+                    code = 0
                 });
 
                 return;
@@ -99,7 +101,7 @@ public class FeishuService
             {
                 await context.Response.WriteAsJsonAsync(new
                 {
-                    code = 2,
+                    code = 2
                 });
                 return;
             }
@@ -117,7 +119,7 @@ public class FeishuService
                     await SendMessages(chatApplication, messageId, "暂不支持其他类型的提问");
                     await context.Response.WriteAsJsonAsync(new
                     {
-                        code = 0,
+                        code = 0
                     });
                     return;
                 }
@@ -126,7 +128,7 @@ public class FeishuService
                 var userInput = JsonSerializer.Deserialize<FeishuChatUserInput>(input._event.message.content);
 
                 await ChatMessage(context, userInput.text, sessionId, chatApplication, chatShareInfoQuery,
-                    eventBus, wikiMemoryService,fileStorageRepository, fastWikiFunctionCallRepository);
+                    eventBus, wikiMemoryService, fileStorageRepository, fastWikiFunctionCallRepository);
 
                 return;
             }
@@ -140,7 +142,7 @@ public class FeishuService
                 {
                     await context.Response.WriteAsJsonAsync(new
                     {
-                        code = 0,
+                        code = 0
                     });
                     return;
                 }
@@ -151,7 +153,7 @@ public class FeishuService
                 {
                     await context.Response.WriteAsJsonAsync(new
                     {
-                        code = 0,
+                        code = 0
                     });
                     return;
                 }
@@ -163,7 +165,7 @@ public class FeishuService
                 history.AddUserMessage(userInput.text);
 
                 await ChatMessage(context, userInput.text, sessionId, chatApplication, chatShareInfoQuery,
-                    eventBus, wikiMemoryService,fileStorageRepository, fastWikiFunctionCallRepository);
+                    eventBus, wikiMemoryService, fileStorageRepository, fastWikiFunctionCallRepository);
 
                 return;
             }
@@ -171,7 +173,7 @@ public class FeishuService
 
         await context.Response.WriteAsJsonAsync(new
         {
-            code = 2,
+            code = 2
         });
     }
 
@@ -181,16 +183,16 @@ public class FeishuService
         IFileStorageRepository fileStorageRepository,
         IFastWikiFunctionCallRepository fastWikiFunctionCallRepository)
     {
-        int requestToken = 0;
+        var requestToken = 0;
 
-        var module = new ChatCompletionDto<ChatCompletionRequestMessage>()
+        var module = new ChatCompletionDto<ChatCompletionRequestMessage>
         {
             messages =
             [
-                new()
+                new ChatCompletionRequestMessage
                 {
                     content = content,
-                    role = "user",
+                    role = "user"
                 }
             ]
         };
@@ -198,10 +200,7 @@ public class FeishuService
         var chatHistory = new ChatHistory();
 
         // 如果设置了Prompt，则添加
-        if (!chatApplication.Prompt.IsNullOrEmpty())
-        {
-            chatHistory.AddSystemMessage(chatApplication.Prompt);
-        }
+        if (!chatApplication.Prompt.IsNullOrEmpty()) chatHistory.AddSystemMessage(chatApplication.Prompt);
 
         // 保存对话提问
         var createChatRecordCommand =
@@ -220,10 +219,7 @@ public class FeishuService
                 eventBus, fileStorageRepository,
                 sourceFile, module);
 
-            if (!success)
-            {
-                return;
-            }
+            if (!success) return;
         }
 
         var output = new StringBuilder();
@@ -242,7 +238,7 @@ public class FeishuService
         {
             // 如果token不足则返回，使用token和当前request总和大于可用token，则返回
             if (chatShareInfoQuery.Result.AvailableToken != -1 &&
-                (chatShareInfoQuery.Result.UsedToken + requestToken) >=
+                chatShareInfoQuery.Result.UsedToken + requestToken >=
                 chatShareInfoQuery.Result.AvailableToken)
             {
                 output.Append("Token不足");
@@ -272,10 +268,7 @@ public class FeishuService
                                wikiMemoryService,
                                chatHistory, fastWikiFunctionCallRepository))
             {
-                if (string.IsNullOrEmpty(item))
-                {
-                    continue;
-                }
+                if (string.IsNullOrEmpty(item)) continue;
 
                 output.Append(item);
             }
@@ -309,18 +302,16 @@ public class FeishuService
 
         await context.Response.WriteAsJsonAsync(new
         {
-            code = 0,
+            code = 0
         });
     }
-
-    private static readonly ConcurrentDictionary<string, DateTime> MemoryCache = new();
 
     public static async ValueTask SendMessages(ChatApplicationDto chatApplication, string sessionId, string message,
         string receive_id_type = "open_id")
     {
         await SendMessages(chatApplication, new FeishuChatSendMessageInput(JsonSerializer.Serialize(new
         {
-            text = message,
+            text = message
         }, JsonSerializerOptions), "text", sessionId), receive_id_type);
     }
 
@@ -339,10 +330,7 @@ public class FeishuService
 
         var result = await response.Content.ReadFromJsonAsync<FeiShuChatResult>();
 
-        if (result?.code != 0)
-        {
-            throw new UserFriendlyException(result?.msg);
-        }
+        if (result?.code != 0) throw new UserFriendlyException(result?.msg);
     }
 
     private static async ValueTask RefreshTokenAsync(HttpRequestMessage requestMessage,
@@ -351,14 +339,10 @@ public class FeishuService
         if (requestMessage.Headers.Contains("Authorization"))
         {
             if (!MemoryCache.TryGetValue(chatApplication.Id, out var _lastTime))
-            {
                 MemoryCache.TryUpdate(chatApplication.Id, DateTime.Now, _lastTime);
-            }
             else if (_lastTime != null && DateTime.Now - _lastTime < TimeSpan.FromHours(1.5))
-            {
                 // 如果LastTime大于1.5小时，刷新token
                 return;
-            }
 
             requestMessage.Headers.Remove("Authorization");
         }
@@ -370,7 +354,7 @@ public class FeishuService
         request.Content = new StringContent(JsonSerializer.Serialize(new
         {
             app_id = chatApplication.GetFeishuAppId(),
-            app_secret = chatApplication.GetFeishuAppSecret(),
+            app_secret = chatApplication.GetFeishuAppSecret()
         }), Encoding.UTF8, "application/json");
         var response = await httpClient.SendAsync(request);
         var result = await response.Content.ReadAsStringAsync();

@@ -3,12 +3,12 @@ namespace FastWiki.Service.Contracts;
 public enum ChatDialogHistoryType
 {
     /// <summary>
-    /// 文本
+    ///     文本
     /// </summary>
     Text,
-    
+
     /// <summary>
-    /// 图片
+    ///     图片
     /// </summary>
-    Image,
+    Image
 }

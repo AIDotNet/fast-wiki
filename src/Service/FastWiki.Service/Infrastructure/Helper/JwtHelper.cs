@@ -1,7 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
 using FastWiki.Service.Contracts.Users.Dto;
 using Masa.Contrib.Authentication.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -9,12 +8,12 @@ using Microsoft.IdentityModel.Tokens;
 namespace FastWiki.Service.Infrastructure.Helper;
 
 /// <summary>
-/// Jwt帮助类
+///     Jwt帮助类
 /// </summary>
 public class JwtHelper
 {
     /// <summary>
-    /// 生成token
+    ///     生成token
     /// </summary>
     /// <param name="claimsIdentity"></param>
     /// <returns></returns>
@@ -34,7 +33,7 @@ public class JwtHelper
     }
 
     /// <summary>
-    /// 生成token
+    ///     生成token
     /// </summary>
     /// <param name="claimsIdentity"></param>
     /// <returns></returns>
@@ -53,7 +52,7 @@ public class JwtHelper
             new(ClaimType.DEFAULT_USER_NAME, user.Account),
             new(ClaimType.DEFAULT_USER_ID, user.Id.ToString()),
             new(ClaimTypes.Role, user.Role.ToString()),
-            new("IsDisable", user.IsDisable.ToString()),
+            new("IsDisable", user.IsDisable.ToString())
         });
     }
 
@@ -65,7 +64,7 @@ public class JwtHelper
         {
             Account = claimsPrincipal.Claims.FirstOrDefault(x => x.Type == ClaimType.DEFAULT_USER_NAME)?.Value,
             Id = Guid.Parse(claimsPrincipal.Claims.FirstOrDefault(x => x.Type == ClaimType.DEFAULT_USER_ID)?.Value!),
-            IsDisable = bool.Parse(claimsPrincipal.Claims.FirstOrDefault(x => x.Type == "IsDisable")?.Value!),
+            IsDisable = bool.Parse(claimsPrincipal.Claims.FirstOrDefault(x => x.Type == "IsDisable")?.Value!)
         };
 
         return user;
@@ -73,20 +72,17 @@ public class JwtHelper
 
     public static UserDto? GetCurrentUser(string token)
     {
-        if (token == null)
-        {
-            return null;
-        }
+        if (token == null) return null;
 
         try
         {
             // 使用jwt解析token
             var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
-            var user = new UserDto()
+            var user = new UserDto
             {
                 Account = jwt.Claims.FirstOrDefault(x => x.Type == ClaimType.DEFAULT_USER_NAME)?.Value,
                 Id = Guid.Parse(jwt.Claims.FirstOrDefault(x => x.Type == ClaimType.DEFAULT_USER_ID)?.Value!),
-                IsDisable = bool.Parse(jwt.Claims.FirstOrDefault(x => x.Type == "IsDisable")?.Value!),
+                IsDisable = bool.Parse(jwt.Claims.FirstOrDefault(x => x.Type == "IsDisable")?.Value!)
             };
             return user;
         }

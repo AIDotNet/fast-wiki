@@ -4,12 +4,12 @@ using System.Text;
 namespace FastWiki.Infrastructure.Common.Helper;
 
 /// <summary>
-/// MD5加密帮助类
+///     MD5加密帮助类
 /// </summary>
 public static class Md5Helper
 {
     /// <summary>
-    /// 加密密码
+    ///     加密密码
     /// </summary>
     /// <param name="password"></param>
     /// <param name="salt"></param>
@@ -23,13 +23,10 @@ public static class Md5Helper
         Array.Copy(saltBytes, 0, saltedPasswordBytes, 0, saltBytes.Length);
         Array.Copy(passwordBytes, 0, saltedPasswordBytes, saltBytes.Length, passwordBytes.Length);
 
-        using MD5 md5 = MD5.Create();
+        using var md5 = MD5.Create();
         var hashedBytes = md5.ComputeHash(saltedPasswordBytes);
         var sb = new StringBuilder();
-        foreach (var t in hashedBytes)
-        {
-            sb.Append(t.ToString("x2"));
-        }
+        foreach (var t in hashedBytes) sb.Append(t.ToString("x2"));
         return sb.ToString();
     }
 }

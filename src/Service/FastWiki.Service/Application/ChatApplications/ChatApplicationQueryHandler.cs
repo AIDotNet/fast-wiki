@@ -14,7 +14,7 @@ public class ChatApplicationQueryHandler(
 
         var total = await chatApplicationRepository.GetCountAsync(query.userId);
 
-        query.Result = new PaginatedListBase<ChatApplicationDto>()
+        query.Result = new PaginatedListBase<ChatApplicationDto>
         {
             Result = mapper.Map<List<ChatApplicationDto>>(result),
             Total = total
@@ -39,7 +39,7 @@ public class ChatApplicationQueryHandler(
             query.chatApplicationId);
 
 
-        query.Result = new PaginatedListBase<ChatShareDto>()
+        query.Result = new PaginatedListBase<ChatShareDto>
         {
             Result = mapper.Map<List<ChatShareDto>>(result),
             Total = total

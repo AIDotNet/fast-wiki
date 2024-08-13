@@ -1,7 +1,7 @@
 ﻿namespace FastWiki.Service.Application.ChatApplications.Commands;
 
 /// <summary>
-/// 创建对话记录
+///     创建对话记录
 /// </summary>
 /// <param name="ApplicationId"></param>
 /// <param name="Question"></param>

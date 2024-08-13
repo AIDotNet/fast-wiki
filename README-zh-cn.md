@@ -19,22 +19,39 @@ FastWiki打造企业级人工智能客服管理系统！
 </div>
 
 [npm-release-shield]: https://img.shields.io/npm/v/@lobehub/chat?color=369eff&labelColor=ffcb47&logo=npm&logoColor=white&style=flat-square
+
 [npm-release-link]: https://www.npmjs.com/package/@lobehub/chat
+
 [github-releasedate-shield]: https://img.shields.io/github/release-date/AIDotNet/fast-wiki?color=8ae8ff&labelColor=ffcb47&style=flat-square
+
 [github-releasedate-link]: https://github.com/AIDotNet/fast-wiki/releases
+
 [github-action-test-shield]: https://img.shields.io/github/actions/workflow/status/AIDotNet/fast-wiki/test.yml?color=8ae8ff&label=test&labelColor=ffcb47&logo=githubactions&logoColor=white&style=flat-square
+
 [github-action-test-link]: https://github.com/AIDotNet/fast-wiki/actions/workflows/test.yml
+
 [github-action-release-shield]: https://img.shields.io/github/actions/workflow/status/AIDotNet/fast-wiki/release.yml?color=8ae8ff&label=release&labelColor=ffcb47&logo=githubactions&logoColor=white&style=flat-square
+
 [github-action-release-link]: https://github.com/AIDotNet/fast-wiki/actions/workflows/release.yml
+
 [github-contributors-shield]: https://img.shields.io/github/contributors/AIDotNet/fast-wiki?color=c4f042&labelColor=ffcb47&style=flat-square
+
 [github-contributors-link]: https://github.com/AIDotNet/fast-wiki/graphs/contributors
+
 [github-forks-shield]: https://img.shields.io/github/forks/AIDotNet/fast-wiki?color=8ae8ff&labelColor=ffcb47&style=flat-square
+
 [github-forks-link]: https://github.com/AIDotNet/fast-wiki/network/members
+
 [github-stars-shield]: https://img.shields.io/github/stars/AIDotNet/fast-wiki?color=ffcb47&labelColor=ffcb47&style=flat-square
+
 [github-stars-link]: https://github.com/AIDotNet/fast-wiki/network/stargazers
+
 [github-issues-shield]: https://img.shields.io/github/issues/AIDotNet/fast-wiki?color=ff80eb&labelColor=ffcb47&style=flat-square
+
 [github-issues-link]: https://github.com/AIDotNet/fast-wiki/issues
+
 [github-license-shield]: https://img.shields.io/github/license/AIDotNet/fast-wiki?color=white&labelColor=ffcb47&style=flat-square
+
 [github-license-link]: https://github.com/AIDotNet/fast-wiki/blob/main/LICENSE
 
 # FastWiki
@@ -44,7 +61,9 @@ FastWiki打造企业级人工智能客服管理系统！
 
 ## 介绍
 
-本项目是一个高性能、基于最新技术栈的知识库系统，专为大规模信息检索和智能搜索设计。利用微软Semantic Kernel进行深度学习和自然语言处理，结合.NET 8与react框架，后台采用MasaFramework，实现了一个高效、易用、可扩展的智能向量搜索平台。我们的目标是提供一个能够理解和处理复杂查询的智能搜索解决方案，帮助用户快速准确地获取所需信息。
+本项目是一个高性能、基于最新技术栈的知识库系统，专为大规模信息检索和智能搜索设计。利用微软Semantic
+Kernel进行深度学习和自然语言处理，结合.NET
+8与react框架，后台采用MasaFramework，实现了一个高效、易用、可扩展的智能向量搜索平台。我们的目标是提供一个能够理解和处理复杂查询的智能搜索解决方案，帮助用户快速准确地获取所需信息。
 
 ## 技术栈
 
@@ -89,10 +108,12 @@ git clone  --recursive  https://github.com/AIDotNet/fast-wiki.git
 3. 将web目录的package-lock.json文件和node_modules目录删除,
 
 4. 在web目录运行
+
 ```
 npm i
 npm run build
 ```
+
 5. 将web目录下的dist下的内容copy到"\fast-wiki\src\Service\FastWiki.Service\wwwroot" 目录下(如果wwwroot没有就创建个)
 
 ## 后端
@@ -125,6 +146,7 @@ dotnet run
 ## 环境变量参数
 
 FastWikiService环境变量参数：
+
 - QUANTIZE_MAX_TASK：量化任务的最大并发数，默认为3
 - OPENAI_CHAT_ENDPOINT：OpenAI API的地址
 - OPENAI_CHAT_EMBEDDING_ENDPOINT： Embedding API的地址
@@ -136,6 +158,7 @@ FastWikiService环境变量参数：
 - WIKI_CONNECTION: wiki数据库连接字符串(如果是disk则是目录)
 
 ## 技术交流
+
 ![群聊二维码](img/wechat.png)
 
 ## 贡献指南

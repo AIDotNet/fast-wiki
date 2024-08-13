@@ -2,9 +2,5 @@
 
 public record ChatApplicationInfoQuery(string Id) : Query<ChatApplicationDto>
 {
-    public override ChatApplicationDto Result
-    {
-        get;
-        set;
-    }
+    public override ChatApplicationDto Result { get; set; }
 }

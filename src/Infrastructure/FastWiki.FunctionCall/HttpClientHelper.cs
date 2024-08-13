@@ -5,7 +5,7 @@ namespace FastWiki.FunctionCall;
 
 public class HttpClientHelper
 {
-    private static readonly HttpClient Client = new ();
+    private static readonly HttpClient Client = new();
 
     static HttpClientHelper()
     {

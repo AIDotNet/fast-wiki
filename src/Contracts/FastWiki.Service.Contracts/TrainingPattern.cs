@@ -3,12 +3,12 @@
 public enum TrainingPattern
 {
     /// <summary>
-    /// 分段
+    ///     分段
     /// </summary>
     Subsection,
 
     /// <summary>
-    /// 问答
+    ///     问答
     /// </summary>
     QA
 }

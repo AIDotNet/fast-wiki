@@ -7,7 +7,7 @@ services:
     restart: always
     ports:
       - "8080:8080"
-    build: 
+    build:
       context: .
       dockerfile: ./src/Service/FastWiki.Service/Dockerfile
     depends_on:
@@ -26,7 +26,7 @@ services:
     image: registry.cn-shenzhen.aliyuncs.com/fast-wiki/pgvector:v0.5.0 # 拉取的数据库镜像
     container_name: postgres  # 容器运行的容器名称
     restart: always  # 开机自启动
-    environment:  # 环境变量
+    environment: # 环境变量
       POSTGRES_USER: token  # 默认账号
       POSTGRES_PASSWORD: dd666666 # 默认密码
       POSTGRES_DB: wiki # 默认数据库

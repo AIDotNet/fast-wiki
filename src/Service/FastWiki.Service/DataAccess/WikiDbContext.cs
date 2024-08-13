@@ -5,7 +5,7 @@ using FastWiki.Service.Domain.Storage.Aggregates;
 namespace FastWiki.Service.DataAccess;
 
 /// <summary>
-/// Wiki数据库上下文
+///     Wiki数据库上下文
 /// </summary>
 /// <param name="options"></param>
 public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDbContext(options)
@@ -25,7 +25,7 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
     public DbSet<FastWikiFunctionCall> FunctionCalls { get; set; }
 
     public DbSet<ChatRecord> ChatRecords { get; set; }
-    
+
     public DbSet<Questions> Questions { get; set; }
 
     protected override void OnModelCreatingExecuting(ModelBuilder modelBuilder)
@@ -120,7 +120,7 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
             entity.HasIndex(x => x.ChatApplicationId);
         });
-        
+
         modelBuilder.Entity<ChatRecord>(entity =>
         {
             entity.ToTable("wiki-chat-record");
@@ -129,13 +129,12 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
 
             entity.HasIndex(x => x.CreationTime);
         });
-        
+
         modelBuilder.Entity<Questions>(entity =>
         {
             entity.ToTable("wiki-questions");
 
             entity.HasKey(x => x.Id);
-
         });
 
 

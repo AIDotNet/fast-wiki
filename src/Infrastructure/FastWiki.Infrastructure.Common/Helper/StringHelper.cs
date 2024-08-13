@@ -2,17 +2,17 @@
 
 public static class StringHelper
 {
-    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    
+    private const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
     /// <summary>
-    /// 将byte转换字符串
+    ///     将byte转换字符串
     /// </summary>
     /// <param name="bytes"></param>
     /// <returns></returns>
     public static string FormatBytes(long bytes)
     {
         string[] suffixes = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
-        int suffixIndex = 0;
+        var suffixIndex = 0;
         double size = bytes;
 
         while (size >= 1024 && suffixIndex < suffixes.Length - 1)
@@ -25,7 +25,7 @@ public static class StringHelper
     }
 
     /// <summary>
-    /// 随机字符串长度的字符串
+    ///     随机字符串长度的字符串
     /// </summary>
     public static string GenerateRandomString(int length)
     {

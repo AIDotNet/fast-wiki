@@ -1,7 +1,7 @@
 ﻿namespace FastWiki.Service;
 
 /// <summary>
-/// 重写SemanticKernel的请求处理
+///     重写SemanticKernel的请求处理
 /// </summary>
 public sealed class OpenAiHttpClientHandler : HttpClientHandler
 {

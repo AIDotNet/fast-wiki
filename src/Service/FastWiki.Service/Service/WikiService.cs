@@ -4,7 +4,7 @@ using FastWiki.Service.Backgrounds;
 namespace FastWiki.Service.Service;
 
 /// <summary>
-/// 知识库服务
+///     知识库服务
 /// </summary>
 public sealed class WikiService(IWikiRepository wikiRepository) : ApplicationService<WikiService>, IWikiService
 {
@@ -23,10 +23,7 @@ public sealed class WikiService(IWikiRepository wikiRepository) : ApplicationSer
     {
         var wiki = await wikiRepository.FindAsync(id);
 
-        if (wiki == null)
-        {
-            throw new UserFriendlyException("知识库不存在");
-        }
+        if (wiki == null) throw new UserFriendlyException("知识库不存在");
 
         return Mapper.Map<WikiDto>(wiki);
     }
@@ -47,7 +44,7 @@ public sealed class WikiService(IWikiRepository wikiRepository) : ApplicationSer
 
         var count = await wikiRepository.GetCountAsync(UserContext.GetUserId<Guid>(), keyword);
 
-        return new PaginatedListBase<WikiDto>()
+        return new PaginatedListBase<WikiDto>
         {
             Result = Mapper.Map<List<WikiDto>>(wikis),
             Total = count
@@ -160,7 +157,7 @@ public sealed class WikiService(IWikiRepository wikiRepository) : ApplicationSer
     }
 
     /// <summary>
-    /// 量化状态检查
+    ///     量化状态检查
     /// </summary>
     /// <param name="wikiId"></param>
     /// <returns></returns>
@@ -170,14 +167,12 @@ public sealed class WikiService(IWikiRepository wikiRepository) : ApplicationSer
         var values = QuantizeBackgroundService.CacheWikiDetails.Values.Where(x => x.Item1.WikiId == wikiId).ToList();
 
         if (values.Any())
-        {
             return values.Select(x => new CheckQuantizationStateDto
             {
                 WikiId = x.Item1.WikiId,
                 FileName = x.Item1.FileName,
                 State = x.Item1.State
             }).ToList();
-        }
 
         return [];
     }

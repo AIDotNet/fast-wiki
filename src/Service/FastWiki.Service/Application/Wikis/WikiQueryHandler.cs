@@ -16,7 +16,7 @@ public sealed class WikiQueryHandler(
 
         var count = await wikiRepository.GetCountAsync(query.userId, query.Keyword);
 
-        query.Result = new PaginatedListBase<WikiDto>()
+        query.Result = new PaginatedListBase<WikiDto>
         {
             Result = mapper.Map<List<WikiDto>>(wikis),
             Total = count
@@ -31,7 +31,7 @@ public sealed class WikiQueryHandler(
 
         var count = await wikiRepository.GetDetailsCountAsync(query.WikiId, query.State, query.Keyword);
 
-        query.Result = new PaginatedListBase<WikiDetailDto>()
+        query.Result = new PaginatedListBase<WikiDetailDto>
         {
             Result = mapper.Map<List<WikiDetailDto>>(wikis),
             Total = count
@@ -56,31 +56,22 @@ public sealed class WikiQueryHandler(
         {
             // 通过pageSize和page获取到最大数量
             var limit = query.PageSize * query.Page;
-            if (limit < 10)
-            {
-                limit = 10;
-            }
+            if (limit < 10) limit = 10;
 
             var filter = new MemoryFilter().ByDocument(query.WikiDetailId);
 
-            int size = 0;
-            await foreach (var item in memoryDb.GetListAsync("wiki", new List<MemoryFilter>()
+            var size = 0;
+            await foreach (var item in memoryDb.GetListAsync("wiki", new List<MemoryFilter>
                            {
                                filter
                            }, limit, true))
             {
                 size++;
-                if (size < query.PageSize * (query.Page - 1))
-                {
-                    continue;
-                }
+                if (size < query.PageSize * (query.Page - 1)) continue;
 
-                if (size > query.PageSize * query.Page)
-                {
-                    break;
-                }
+                if (size > query.PageSize * query.Page) break;
 
-                dto.Add(new WikiDetailVectorQuantityDto()
+                dto.Add(new WikiDetailVectorQuantityDto
                 {
                     Content = item.Payload["text"].ToString() ?? string.Empty,
                     FileId = item.Tags.FirstOrDefault(x => x.Key == "fileId").Value?.FirstOrDefault() ?? string.Empty,
@@ -114,24 +105,19 @@ public sealed class WikiQueryHandler(
         searchVectorQuantityResult.Result = new List<SearchVectorQuantityDto>();
 
         foreach (var resultResult in searchResult.Results)
-        {
             searchVectorQuantityResult.Result.AddRange(resultResult.Partitions.Select(partition =>
-                new SearchVectorQuantityDto()
+                new SearchVectorQuantityDto
                 {
                     Content = partition.Text,
                     DocumentId = resultResult.DocumentId,
                     Relevance = partition.Relevance,
                     FileId = partition.Tags["fileId"].FirstOrDefault() ?? string.Empty
                 }));
-        }
 
         var fileIds = new List<long>();
         fileIds.AddRange(searchVectorQuantityResult.Result.Select(x =>
         {
-            if (long.TryParse(x.FileId, out var i))
-            {
-                return i;
-            }
+            if (long.TryParse(x.FileId, out var i)) return i;
 
             return -1;
         }).Where(x => x > 0));

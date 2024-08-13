@@ -12,15 +12,9 @@ public sealed class UserService(IUserRepository userRepository, IMapper mapper) 
     {
         var user = await userRepository.FindAsync(UserContext.GetUserId<Guid>());
 
-        if (user == null)
-        {
-            throw new UserFriendlyException("用户不存在");
-        }
+        if (user == null) throw new UserFriendlyException("用户不存在");
 
-        if (!user.CheckCipher(password))
-        {
-            throw new UserFriendlyException("密码错误");
-        }
+        if (!user.CheckCipher(password)) throw new UserFriendlyException("密码错误");
 
         user.SetPassword(newPassword);
 
@@ -95,10 +89,7 @@ public sealed class UserService(IUserRepository userRepository, IMapper mapper) 
     public async ValueTask<UserDto> GetAsync()
     {
         var result = await userRepository.FindAsync(UserContext.GetUserId<Guid>());
-        if (result == null)
-        {
-            throw new UnauthorizedAccessException("用户不存在");
-        }
+        if (result == null) throw new UnauthorizedAccessException("用户不存在");
 
         return Mapper.Map<UserDto>(result);
     }

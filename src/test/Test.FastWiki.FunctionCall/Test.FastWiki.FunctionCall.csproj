@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Infrastructure\FastWiki.FunctionCall\FastWiki.FunctionCall.csproj" />
+        <ProjectReference Include="..\..\Infrastructure\FastWiki.FunctionCall\FastWiki.FunctionCall.csproj"/>
     </ItemGroup>
 
 </Project>

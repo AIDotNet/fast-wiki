@@ -14,18 +14,10 @@ using Microsoft.SemanticKernel.ChatCompletion;
 namespace FastWiki.Service.Service;
 
 /// <summary>
-/// 微信服务
+///     微信服务
 /// </summary>
 public class WeChatService
 {
-    static WeChatService()
-    {
-        Task.Run(AIChatAsync);
-    }
-
-
-    private static readonly Channel<WeChatAI> Channel = System.Threading.Channels.Channel.CreateUnbounded<WeChatAI>();
-
     private const string OutputTemplate =
         """
         您好，欢迎关注FastWiki！
@@ -33,6 +25,14 @@ public class WeChatService
         如果获取消息结果，请输入继续。
         如果您有其他问题，可以直接回复，我们会尽快回复您！
         """;
+
+
+    private static readonly Channel<WeChatAI> Channel = System.Threading.Channels.Channel.CreateUnbounded<WeChatAI>();
+
+    static WeChatService()
+    {
+        Task.Run(AIChatAsync);
+    }
 
     public static async Task AIChatAsync()
     {
@@ -49,12 +49,13 @@ public class WeChatService
         {
             var content = await Channel.Reader.ReadAsync();
 
-            await SendMessageAsync(content, eventBus, wikiMemoryService, memoryCache, fastWikiFunctionCallRepository, fileStorageRepository);
+            await SendMessageAsync(content, eventBus, wikiMemoryService, memoryCache, fastWikiFunctionCallRepository,
+                fileStorageRepository);
         }
     }
 
     /// <summary>
-    /// 微信AI对话
+    ///     微信AI对话
     /// </summary>
     /// <param name="chatAi"></param>
     /// <param name="eventBus"></param>
@@ -64,7 +65,7 @@ public class WeChatService
     /// <param name="fileStorageRepository"></param>
     public static async Task SendMessageAsync(WeChatAI chatAi, IEventBus eventBus,
         WikiMemoryService wikiMemoryService, IMemoryCache memoryCache,
-        IFastWikiFunctionCallRepository fastWikiFunctionCallRepository,IFileStorageRepository fileStorageRepository)
+        IFastWikiFunctionCallRepository fastWikiFunctionCallRepository, IFileStorageRepository fileStorageRepository)
     {
         var chatShareInfoQuery = new ChatShareInfoQuery(chatAi.SharedId);
 
@@ -79,21 +80,18 @@ public class WeChatService
 
         var chatApplication = chatApplicationQuery?.Result;
 
-        if (chatApplication == null)
-        {
-            return;
-        }
+        if (chatApplication == null) return;
 
-        int requestToken = 0;
+        var requestToken = 0;
 
-        var module = new ChatCompletionDto<ChatCompletionRequestMessage>()
+        var module = new ChatCompletionDto<ChatCompletionRequestMessage>
         {
             messages =
             [
-                new()
+                new ChatCompletionRequestMessage
                 {
                     content = chatAi.Content,
-                    role = "user",
+                    role = "user"
                 }
             ]
         };
@@ -101,10 +99,7 @@ public class WeChatService
         var chatHistory = new ChatHistory();
 
         // 如果设置了Prompt，则添加
-        if (!chatApplication.Prompt.IsNullOrEmpty())
-        {
-            chatHistory.AddSystemMessage(chatApplication.Prompt);
-        }
+        if (!chatApplication.Prompt.IsNullOrEmpty()) chatHistory.AddSystemMessage(chatApplication.Prompt);
 
         // 保存对话提问
         var createChatRecordCommand = new CreateChatRecordCommand(chatApplication.Id, chatAi.Content);
@@ -117,13 +112,11 @@ public class WeChatService
         // 如果为空则不使用知识库
         if (chatApplication.WikiIds.Count != 0)
         {
-            var success = await OpenAIService.WikiPrompt(chatApplication, memoryServerless, chatAi.Content, eventBus, fileStorageRepository,
+            var success = await OpenAIService.WikiPrompt(chatApplication, memoryServerless, chatAi.Content, eventBus,
+                fileStorageRepository,
                 sourceFile, module);
 
-            if (!success)
-            {
-                return;
-            }
+            if (!success) return;
         }
 
         var output = new StringBuilder();
@@ -142,7 +135,7 @@ public class WeChatService
         {
             // 如果token不足则返回，使用token和当前request总和大于可用token，则返回
             if (chatShare.AvailableToken != -1 &&
-                (chatShare.UsedToken + requestToken) >=
+                chatShare.UsedToken + requestToken >=
                 chatShare.AvailableToken)
             {
                 output.Append("Token不足");
@@ -164,10 +157,7 @@ public class WeChatService
             await foreach (var item in OpenAIService.SendChatMessageAsync(chatApplication, wikiMemoryService,
                                chatHistory, fastWikiFunctionCallRepository))
             {
-                if (string.IsNullOrEmpty(item))
-                {
-                    continue;
-                }
+                if (string.IsNullOrEmpty(item)) continue;
 
                 output.Append(item);
             }
@@ -203,7 +193,7 @@ public class WeChatService
     }
 
     /// <summary>
-    /// 接收消息
+    ///     接收消息
     /// </summary>
     /// <param name="context"></param>
     public static async Task ReceiveMessageAsync(HttpContext context, string? id, IMemoryCache memoryCache)
@@ -243,10 +233,7 @@ public class WeChatService
             Content = input.Content
         };
 
-        if (output.Content.IsNullOrEmpty())
-        {
-            return;
-        }
+        if (output.Content.IsNullOrEmpty()) return;
 
 
         if (id == null)
@@ -256,7 +243,7 @@ public class WeChatService
             return;
         }
 
-        string outputValue = string.Empty;
+        var outputValue = string.Empty;
 
         var messageId = GetMessageId(output);
 
@@ -269,17 +256,16 @@ public class WeChatService
             await WriteMessageAsync(context, output, "暂无消息，请稍后再试！code:no_message");
             return;
         }
-        else if (value is string v && !v.IsNullOrEmpty())
+
+        if (value is string v && !v.IsNullOrEmpty())
         {
             await WriteMessageAsync(context, output, v, messageId);
             return;
-        }
-
-        if (output.Content == "继续")
+        }else if (output.Content == "继续")
         {
-            if (value is string v && !v.IsNullOrEmpty())
+            if (value is string v1 && !v1.IsNullOrEmpty())
             {
-                await WriteMessageAsync(context, output, v, messageId);
+                await WriteMessageAsync(context, output, v1, messageId);
                 return;
             }
 
@@ -288,7 +274,7 @@ public class WeChatService
         }
 
         // 先写入channel，等待后续处理
-        Channel.Writer.TryWrite(new WeChatAI()
+        Channel.Writer.TryWrite(new WeChatAI
         {
             Content = output.Content,
             SharedId = id,
@@ -296,7 +282,7 @@ public class WeChatService
         });
 
         // 等待4s
-        for (int i = 0; i < 9; i++)
+        for (var i = 0; i < 9; i++)
         {
             await Task.Delay(510);
             if (!memoryCache.TryGetValue(messageId, out outputValue) || outputValue.IsNullOrEmpty()) continue;
@@ -326,9 +312,7 @@ public class WeChatService
         context.Response.ContentType = "application/xml";
         await context.Response.WriteAsync(GetOutputXml(chatAi, outputValue));
         if (!messageId.IsNullOrWhiteSpace())
-        {
             context.RequestServices.GetRequiredService<IMemoryCache>().Remove(messageId);
-        }
     }
 
     private static string GetMessageId(WehCahtMe output)
@@ -337,7 +321,7 @@ public class WeChatService
     }
 
     /// <summary>
-    /// 获取返回的xml
+    ///     获取返回的xml
     /// </summary>
     /// <param name="output"></param>
     /// <param name="content"></param>

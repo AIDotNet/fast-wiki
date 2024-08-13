@@ -23,14 +23,14 @@ public sealed class UserRepository : Repository<WikiDbContext, User, Guid>, IUse
     public async Task<bool> DeleteAsync(Guid id)
     {
         // 管理员不能删除
-        return (await Context.Users.Where(x => x.Id == id && x.Role != RoleType.Admin).ExecuteDeleteAsync()) > 1;
+        return await Context.Users.Where(x => x.Id == id && x.Role != RoleType.Admin).ExecuteDeleteAsync() > 1;
     }
 
     public async Task<bool> DisableAsync(Guid id, bool disable)
     {
         // 管理员不能禁用
-        return (await Context.Users.Where(x => x.Id == id && x.Role != RoleType.Admin)
-            .ExecuteUpdateAsync(item => item.SetProperty(x => x.IsDisable, disable))) > 0;
+        return await Context.Users.Where(x => x.Id == id && x.Role != RoleType.Admin)
+            .ExecuteUpdateAsync(item => item.SetProperty(x => x.IsDisable, disable)) > 0;
     }
 
     public async Task UpdateRoleAsync(Guid id, RoleType role)
@@ -47,10 +47,7 @@ public sealed class UserRepository : Repository<WikiDbContext, User, Guid>, IUse
     private IQueryable<User> GetQuery(string? keyword)
     {
         var query = Context.Users.AsQueryable();
-        if (!string.IsNullOrEmpty(keyword))
-        {
-            query = query.Where(x => x.Account.Contains(keyword));
-        }
+        if (!string.IsNullOrEmpty(keyword)) query = query.Where(x => x.Account.Contains(keyword));
 
         return query;
     }

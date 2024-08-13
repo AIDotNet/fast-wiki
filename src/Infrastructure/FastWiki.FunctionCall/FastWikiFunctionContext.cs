@@ -1,6 +1,4 @@
-using System.Runtime.InteropServices.JavaScript;
 using Microsoft.ClearScript;
-using Microsoft.ClearScript.JavaScript;
 using Microsoft.ClearScript.V8;
 
 namespace FastWiki.FunctionCall;
@@ -15,6 +13,11 @@ public sealed class FastWikiFunctionContext : IDisposable
         Engine.AddHostType("HttpClientHelper", typeof(HttpClientHelper));
     }
 
+    public void Dispose()
+    {
+        Engine.Dispose();
+    }
+
     public async Task AddHostObject(string name, object obj)
     {
         Engine.AddHostObject(name, obj);
@@ -27,22 +30,17 @@ public sealed class FastWikiFunctionContext : IDisposable
 
     public async Task<object> FunctionCall(string script, string functionName, params object[] args)
     {
-        
         Engine.Execute(script);
         dynamic resultOrPromise = Engine.Invoke(functionName, args);
 
         var t = resultOrPromise?.GetType();
 
         // 判断v是否空   
-        if (t == Undefined.Value.GetType())
-        {
-            return null;
-        }
+        if (t == Undefined.Value.GetType()) return null;
 
         bool isPromise = Engine.Script.Object.prototype.toString.call(resultOrPromise) == "[object Promise]";
         if (isPromise)
         {
-            
             // 获取返回的结果
             var tcs = new TaskCompletionSource<object>();
             resultOrPromise.then(
@@ -50,27 +48,22 @@ public sealed class FastWikiFunctionContext : IDisposable
                 {
                     // 如果value返回的是Task 或Task<T>类型
                     value = value.GetType().GetProperty("Result")?.GetValue(value) ?? value;
-                    
+
                     tcs.SetResult(value);
                 })
             );
 
             return tcs.Task.GetAwaiter().GetResult();
         }
-        else
-        {
-            return resultOrPromise;
-        }
+
+        return resultOrPromise;
     }
 
     public async Task<T> FunctionCall<T>(string script, string functionName, params object[] args)
     {
         var result = await FunctionCall(script, functionName, args);
 
-        if (result is T t)
-        {
-            return t;
-        }
+        if (result is T t) return t;
 
         return default;
     }
@@ -79,10 +72,5 @@ public sealed class FastWikiFunctionContext : IDisposable
     {
         var result = await Task.Run(() => FunctionCall<T>(script, functionName, args));
         return result;
-    }
-
-    public void Dispose()
-    {
-        Engine.Dispose();
     }
 }

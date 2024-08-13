@@ -106,10 +106,7 @@ public sealed class WikiRepository(
             .AsNoTracking()
             .Where(x => x.Creator == userId);
 
-        if (!string.IsNullOrWhiteSpace(keyword))
-        {
-            query = query.Where(x => x.Name.Contains(keyword));
-        }
+        if (!string.IsNullOrWhiteSpace(keyword)) query = query.Where(x => x.Name.Contains(keyword));
 
         return query;
     }
@@ -118,10 +115,7 @@ public sealed class WikiRepository(
     {
         var query = Context.WikiDetails.AsNoTracking();
 
-        if (!string.IsNullOrWhiteSpace(keyword))
-        {
-            query = query.Where(x => x.FileName.Contains(keyword));
-        }
+        if (!string.IsNullOrWhiteSpace(keyword)) query = query.Where(x => x.FileName.Contains(keyword));
 
         if (queryState.HasValue)
             query = query.Where(x => x.State == queryState.Value);

@@ -1,7 +1,7 @@
 namespace FastWiki.Service.Domain.ChatApplications.Aggregates;
 
 /// <summary>
-/// 对话应用
+///     对话应用
 /// </summary>
 public sealed class ChatApplication : FullAggregateRoot<string, Guid?>
 {
@@ -45,65 +45,65 @@ public sealed class ChatApplication : FullAggregateRoot<string, Guid?>
     public string Name { get; set; }
 
     /// <summary>
-    /// 提示词
+    ///     提示词
     /// </summary>
     public string Prompt { get; set; } = string.Empty;
 
     /// <summary>
-    /// 对话模型
+    ///     对话模型
     /// </summary>
     public string ChatModel { get; set; } = "gpt-4o-mini";
 
     /// <summary>
-    /// 温度
+    ///     温度
     /// </summary>
     public double Temperature { get; set; } = 0;
 
     /// <summary>
-    /// 最大响应Token数量
+    ///     最大响应Token数量
     /// </summary>
     public int MaxResponseToken { get; set; } = 2000;
 
     /// <summary>
-    /// 模板
+    ///     模板
     /// </summary>
     public string Template { get; set; } = string.Empty;
 
     /// <summary>
-    /// 参数
+    ///     参数
     /// </summary>
     public Dictionary<string, string> Parameter { get; set; } = new();
 
     public string Opener { get; set; }
 
     /// <summary>
-    /// 关联的知识库
+    ///     关联的知识库
     /// </summary>
     public List<long> WikiIds { get; set; } = new();
 
     /// <summary>
-    /// 引用上限
+    ///     引用上限
     /// </summary>
     public int ReferenceUpperLimit { get; set; } = 1500;
 
     /// <summary>
-    /// 匹配相似度
+    ///     匹配相似度
     /// </summary>
     public double Relevancy { get; set; } = 0.4;
 
     /// <summary>
-    /// 未找到的回答模板
-    /// 如果模板为空则使用Chat对话模型回答。
+    ///     未找到的回答模板
+    ///     如果模板为空则使用Chat对话模型回答。
     /// </summary>
     public string? NoReplyFoundTemplate { get; set; }
 
     /// <summary>
-    /// 显示引用文件
+    ///     显示引用文件
     /// </summary>
     public bool ShowSourceFile { get; set; }
 
     /// <summary>
-    /// 扩展字段
+    ///     扩展字段
     /// </summary>
     public Dictionary<string, string> Extend { get; set; } = new();
 

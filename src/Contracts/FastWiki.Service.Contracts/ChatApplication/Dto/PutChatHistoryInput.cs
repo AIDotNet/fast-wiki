@@ -7,5 +7,4 @@ public sealed class PutChatHistoryInput
     public string Content { get; set; }
 
     public string? ChatShareId { get; set; }
-    
 }

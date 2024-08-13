@@ -30,7 +30,6 @@ public sealed class WikiCommandHandler(
         await wikiRepository.RemoveDetailsAsync(ids);
 
         foreach (var id in ids)
-        {
             try
             {
                 var memoryServerless = wikiMemoryService.CreateMemoryServerless();
@@ -40,7 +39,6 @@ public sealed class WikiCommandHandler(
             {
                 Console.WriteLine(e);
             }
-        }
     }
 
     [EventHandler]
@@ -138,10 +136,7 @@ public sealed class WikiCommandHandler(
     {
         var wikiDetail = await wikiRepository.GetDetailsAsync(command.Id);
 
-        if (wikiDetail == null)
-        {
-            throw new UserFriendlyException("未找到数据");
-        }
+        if (wikiDetail == null) throw new UserFriendlyException("未找到数据");
 
         await QuantizeBackgroundService.AddWikiDetailAsync(wikiDetail);
     }

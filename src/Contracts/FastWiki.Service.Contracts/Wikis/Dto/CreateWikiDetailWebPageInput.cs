@@ -3,22 +3,22 @@ namespace FastWiki.Service.Contracts.Wikis.Dto;
 public sealed class CreateWikiDetailWebPageInput
 {
     /// <summary>
-    /// 知识库Id
+    ///     知识库Id
     /// </summary>
     public long WikiId { get; set; }
 
     /// <summary>
-    /// 名称
+    ///     名称
     /// </summary>
     public string Name { get; set; }
 
     /// <summary>
-    /// 地址
+    ///     地址
     /// </summary>
     public string Path { get; set; }
 
     /// <summary>
-    /// 状态
+    ///     状态
     /// </summary>
     public string State { get; set; }
 

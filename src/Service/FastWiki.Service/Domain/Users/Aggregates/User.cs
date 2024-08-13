@@ -1,55 +1,10 @@
-﻿using FastWiki.Infrastructure.Common.Helper;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using FastWiki.Infrastructure.Common.Helper;
 
 namespace FastWiki.Service.Domain.Users.Aggregates;
 
 public sealed class User : FullAggregateRoot<Guid, Guid?>
 {
-    /// <summary>
-    /// 账户
-    /// </summary>
-    public string Account { get; private set; }
-
-    /// <summary>
-    /// 昵称
-    /// </summary>
-    public string Name { get; private set; }
-
-    /// <summary>
-    /// 密码
-    /// </summary>
-    public string Password { get; private set; }
-
-    /// <summary>
-    /// 密码盐
-    /// </summary>
-    public string Salt { get; private set; }
-
-    /// <summary>
-    /// 头像
-    /// </summary>
-    public string Avatar { get; private set; }
-
-    /// <summary>
-    /// 邮箱
-    /// </summary>
-    public string Email { get; private set; }
-
-    /// <summary>
-    /// 手机号
-    /// </summary>
-    public string Phone { get; private set; }
-
-    /// <summary>
-    /// 是否禁用
-    /// </summary>
-    public bool IsDisable { get; private set; }
-
-    /// <summary>
-    /// 用户角色
-    /// </summary>
-    public RoleType Role { get; private set; }
-
     protected User()
     {
     }
@@ -67,6 +22,51 @@ public sealed class User : FullAggregateRoot<Guid, Guid?>
         IsDisable = isDisable;
         SetUserRole();
     }
+
+    /// <summary>
+    ///     账户
+    /// </summary>
+    public string Account { get; private set; }
+
+    /// <summary>
+    ///     昵称
+    /// </summary>
+    public string Name { get; private set; }
+
+    /// <summary>
+    ///     密码
+    /// </summary>
+    public string Password { get; private set; }
+
+    /// <summary>
+    ///     密码盐
+    /// </summary>
+    public string Salt { get; private set; }
+
+    /// <summary>
+    ///     头像
+    /// </summary>
+    public string Avatar { get; private set; }
+
+    /// <summary>
+    ///     邮箱
+    /// </summary>
+    public string Email { get; private set; }
+
+    /// <summary>
+    ///     手机号
+    /// </summary>
+    public string Phone { get; private set; }
+
+    /// <summary>
+    ///     是否禁用
+    /// </summary>
+    public bool IsDisable { get; private set; }
+
+    /// <summary>
+    ///     用户角色
+    /// </summary>
+    public RoleType Role { get; private set; }
 
     public void Disable()
     {
@@ -103,25 +103,19 @@ public sealed class User : FullAggregateRoot<Guid, Guid?>
     {
         // 使用正则表达式验证邮箱
         var regex = new Regex(@"^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$");
-        if (!regex.IsMatch(email))
-        {
-            throw new ArgumentException("邮箱格式不正确");
-        }
+        if (!regex.IsMatch(email)) throw new ArgumentException("邮箱格式不正确");
 
         Email = email;
     }
 
     /// <summary>
-    /// 校验密码
+    ///     校验密码
     /// </summary>
     /// <param name="password"></param>
     /// <returns></returns>
     public bool CheckCipher(string password)
     {
-        if (Password == Md5Helper.HashPassword(password, Salt))
-        {
-            return true;
-        }
+        if (Password == Md5Helper.HashPassword(password, Salt)) return true;
 
         return false;
     }

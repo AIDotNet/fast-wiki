@@ -3,12 +3,12 @@
 namespace FastWiki.Service.Service;
 
 /// <summary>
-/// 文件存储服务
+///     文件存储服务
 /// </summary>
 public sealed class StorageService(IFileStorageRepository fileStorageRepository) : ApplicationService<StorageService>
 {
     /// <summary>
-    /// 上传文件
+    ///     上传文件
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
@@ -23,10 +23,7 @@ public sealed class StorageService(IFileStorageRepository fileStorageRepository)
 
         var fileInfo = new FileInfo(fileStreamPath);
 
-        if (fileInfo.Directory?.Exists == false)
-        {
-            fileInfo.Directory.Create();
-        }
+        if (fileInfo.Directory?.Exists == false) fileInfo.Directory.Create();
 
         await using var fileStream = fileInfo.Create();
 

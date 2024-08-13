@@ -7,7 +7,7 @@ public static class TokenHelper
     private static GptEncoding? _encoding;
 
     /// <summary>
-    /// 获取GptEncoding
+    ///     获取GptEncoding
     /// </summary>
     /// <returns></returns>
     public static GptEncoding GetGptEncoding()
@@ -18,7 +18,7 @@ public static class TokenHelper
     }
 
     /// <summary>
-    /// 计算token
+    ///     计算token
     /// </summary>
     /// <param name="tokens"></param>
     /// <returns></returns>

@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Masa.Utils.Models.Config" Version="$(MasaFrameworkPackageVersion)" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Masa.Utils.Models.Config" Version="$(MasaFrameworkPackageVersion)"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Feishu\" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Feishu\"/>
+    </ItemGroup>
 
 </Project>

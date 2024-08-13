@@ -15,10 +15,10 @@ public sealed class CreateWikiDetailsInput
     public int MaxTokensPerLine { get; set; }
 
     public int OverlappingTokens { get; set; }
-    
+
     public ProcessMode Mode { get; set; } = ProcessMode.Auto;
 
     public TrainingPattern TrainingPattern { get; set; } = TrainingPattern.Subsection;
-    
+
     public string? QAPromptTemplate { get; set; }
 }

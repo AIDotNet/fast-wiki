@@ -88,7 +88,7 @@ public sealed class ChatApplicationReoisutory(WikiDbContext context, IUnitOfWork
     public async Task CreateChatRecordAsync(ChatRecord chatRecord)
     {
         await Context.ChatRecords.AddAsync(chatRecord);
-        
+
         await Context.SaveChangesAsync();
     }
 
