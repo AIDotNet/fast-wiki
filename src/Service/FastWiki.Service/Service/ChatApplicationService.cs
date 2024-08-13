@@ -1,9 +1,17 @@
 namespace FastWiki.Service.Service;
 
 /// <inheritdoc />
-public sealed class ChatApplicationService
+public sealed class ChatApplicationService(
+    IChatApplicationRepository chatApplicationRepository,
+    IMapper mapper)
     : ApplicationService<ChatApplicationService>
 {
+    [IgnoreRoute]
+    public async Task<ChatShareDto> GetAPIKeyChatShareAsync(string apiKey)
+    {
+        return mapper.Map<ChatShareDto>(await chatApplicationRepository.GetAPIKeyChatShareAsync(apiKey));
+    }
+
     /// <inheritdoc />
     [Authorize]
     public async Task CreateAsync(CreateChatApplicationInput input)

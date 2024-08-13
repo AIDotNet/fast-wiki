@@ -22,7 +22,7 @@ export const GITHUB_ISSUES = urlJoin(GITHUB, 'issues/new/choose');
 export const CHANGELOG = urlJoin(GITHUB, 'blob/main/CHANGELOG.md');
 export const DOCKER_IMAGE = 'https://hub.docker.com/AIDotNet/lobe-chat';
 
-export const DOCUMENTS = urlJoin(OFFICIAL_SITE, '/docs');
+export const DOCUMENTS = urlJoin(OFFICIAL_SITE, '/fast-wiki');
 export const USAGE_DOCUMENTS = urlJoin(DOCUMENTS, '/usage');
 export const SELF_HOSTING_DOCUMENTS = urlJoin(DOCUMENTS, '/self-hosting');
 

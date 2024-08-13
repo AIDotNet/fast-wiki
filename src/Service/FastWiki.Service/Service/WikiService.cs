@@ -6,7 +6,7 @@ namespace FastWiki.Service.Service;
 /// <summary>
 ///     知识库服务
 /// </summary>
-public sealed class WikiService(IWikiRepository wikiRepository) : ApplicationService<WikiService>, IWikiService
+public sealed class WikiService(IWikiRepository wikiRepository) : ApplicationService<WikiService>
 {
     /// <inheritdoc />
     [Authorize]

@@ -34,7 +34,7 @@ public class FunctionService(
             }).ToList()
         };
 
-        await fastWikiFunctionCallRepository.AddAsync(functionCall);
+        await fastWikiFunctionCallRepository.InsertAsync(functionCall);
     }
 
     [Authorize]

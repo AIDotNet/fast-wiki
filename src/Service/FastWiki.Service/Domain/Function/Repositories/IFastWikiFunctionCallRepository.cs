@@ -41,4 +41,11 @@ public interface IFastWikiFunctionCallRepository : IRepository<FastWikiFunctionC
     /// <param name="id"></param>
     /// <returns></returns>
     Task RemoveAsync(long id);
+    
+    /// <summary>
+    /// 插入function call
+    /// </summary>
+    /// <param name="functionCall"></param>
+    /// <returns></returns>
+    Task InsertAsync(FastWikiFunctionCall functionCall);
 }

@@ -6,6 +6,7 @@ using System.Text.Json;
 using FastWiki.Service.Contracts.Feishu.Dto;
 using FastWiki.Service.Contracts.Model.Dto;
 using FastWiki.Service.Contracts.OpenAI;
+using FastWiki.Service.DataAccess.Repositories.Wikis;
 using FastWiki.Service.Domain.Function.Repositories;
 using FastWiki.Service.Domain.Storage.Aggregates;
 using FastWiki.Service.Infrastructure.Helper;
@@ -28,7 +29,7 @@ public class FeishuService
 
     private static readonly ConcurrentDictionary<string, DateTime> MemoryCache = new();
 
-    public static async Task Completions(string id, HttpContext context, [FromBody] FeishuChatInput input)
+    public static async Task Completions(string id, HttpContext context,ChatApplicationService chatApplicationService, [FromBody] FeishuChatInput input)
     {
         var memoryCache = context.RequestServices.GetRequiredService<IMemoryCache>();
 
@@ -84,12 +85,6 @@ public class FeishuService
             var chatShareInfoQuery = new ChatShareInfoQuery(id);
 
             await eventBus.PublishAsync(chatShareInfoQuery);
-
-            var getApiKeyChatShareQuery = new GetAPIKeyChatShareQuery(string.Empty)
-            {
-                // 如果chatShareId不存在则返回让下面扣款
-                Result = chatShareInfoQuery.Result
-            };
 
             var chatApplicationQuery = new ChatApplicationInfoQuery(chatShareInfoQuery.Result.ChatApplicationId);
 
@@ -209,14 +204,14 @@ public class FeishuService
         await eventBus.PublishAsync(createChatRecordCommand);
 
         var sourceFile = new List<FileStorage>();
-        var memoryServerless = wikiMemoryService.CreateMemoryServerless(chatApplication.ChatModel);
 
         // 如果为空则不使用知识库
         if (chatApplication.WikiIds.Count != 0)
         {
-            var success = await OpenAIService.WikiPrompt(chatApplication, memoryServerless,
+            var success = await OpenAIService.WikiPrompt(chatApplication, wikiMemoryService,
                 content,
-                eventBus, fileStorageRepository,
+                fileStorageRepository,
+                context.RequestServices.GetRequiredService<WikiRepository>(),
                 sourceFile, module);
 
             if (!success) return;

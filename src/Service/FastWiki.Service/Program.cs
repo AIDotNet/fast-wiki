@@ -136,19 +136,6 @@ builder.Services.AddAutoInject();
 
 var app = builder.Services.AddServices(builder, option => option.MapHttpMethodsForUnmatched = ["Post"]);
 
-var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider
-{
-    Mappings =
-    {
-        [".md"] = "application/octet-stream"
-    }
-};
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    ContentTypeProvider = fileExtensionContentTypeProvider
-});
-
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
@@ -186,6 +173,19 @@ app.Use(async (context, next) =>
 
         await context.Response.WriteAsJsonAsync(ResultDto.CreateError(e.Message, "500"));
     }
+});
+
+var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider
+{
+    Mappings =
+    {
+        [".md"] = "application/octet-stream"
+    }
+};
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = fileExtensionContentTypeProvider
 });
 
 app.MapGet("/js/env.js", () =>

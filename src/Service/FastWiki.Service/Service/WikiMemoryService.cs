@@ -109,7 +109,7 @@ public sealed class WikiMemoryService : ISingletonDependency
     ///     创建用于操作的内存服务（不要用于向量搜索）
     /// </summary>
     /// <returns></returns>
-    public MemoryServerless CreateMemoryServerless(string embeddingModel, string? model = null)
+    public MemoryServerless CreateMemoryServerless(string embeddingModel, string? model)
     {
         if (ConnectionStringsOptions.WikiType == "disk")
             return new KernelMemoryBuilder()

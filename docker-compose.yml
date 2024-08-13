@@ -18,6 +18,10 @@ services:
     environment:
       - OPENAI_CHAT_ENDPOINT=https://api.openai.com
       - OPENAI_CHAT_EMBEDDING_ENDPOINT=https://api.openai.com
+      - DEFAULT_TYPE=pgsql
+      - DEFAULT_CONNECTION=Host=postgres;Port=5432;Database=wiki;Username=token;Password=dd666666
+      - WIKI_TYPE=pgsql
+      - WIKI_CONNECTION=Host=postgres;Port=5432;Database=wiki;Username=token;Password=dd666666
       - OPENAI_CHAT_TOKEN=您的TokenKey
       - ASPNETCORE_ENVIRONMENT=Development
 

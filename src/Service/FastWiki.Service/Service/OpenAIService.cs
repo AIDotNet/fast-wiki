@@ -20,7 +20,7 @@ public class OpenAIService
     ///     ChatCompletion
     /// </summary>
     /// <param name="context"></param>
-    public static async Task Completions(HttpContext context)
+    public static async Task Completions(HttpContext context, ChatApplicationService chatApplicationService)
     {
         using var stream = new StreamReader(context.Request.Body);
 
@@ -60,24 +60,25 @@ public class OpenAIService
             context.RequestServices.GetRequiredService<IFastWikiFunctionCallRepository>();
 
         var fileStorageRepository = context.RequestServices.GetRequiredService<IFileStorageRepository>();
+        var wikiRepository = context.RequestServices.GetRequiredService<IWikiRepository>();
 
-        var getAPIKeyChatShareQuery = new GetAPIKeyChatShareQuery(token);
 
         ChatApplicationDto chatApplication = null;
 
+        ChatShareDto apiKeyChatShare = null;
+
         if (token.ToString().Replace("Bearer ", "").Trim().StartsWith("sk-"))
         {
-            getAPIKeyChatShareQuery = new GetAPIKeyChatShareQuery(token.ToString().Replace("Bearer ", "").Trim());
-            await eventBus.PublishAsync(getAPIKeyChatShareQuery);
-
-            if (getAPIKeyChatShareQuery.Result == null)
+            apiKeyChatShare = await
+                chatApplicationService.GetAPIKeyChatShareAsync(token.ToString().Replace("Bearer ", "").Trim());
+            if (apiKeyChatShare == null || apiKeyChatShare.ChatApplicationId.IsNullOrEmpty())
             {
                 context.Response.StatusCode = 401;
                 await context.WriteEndAsync("Token无效");
                 return;
             }
 
-            var chatApplicationQuery = new ChatApplicationInfoQuery(getAPIKeyChatShareQuery.Result.ChatApplicationId);
+            var chatApplicationQuery = new ChatApplicationInfoQuery(apiKeyChatShare.ChatApplicationId);
 
             await eventBus.PublishAsync(chatApplicationQuery);
 
@@ -103,7 +104,7 @@ public class OpenAIService
                 await eventBus.PublishAsync(chatShareInfoQuery);
 
                 // 如果chatShareId不存在则返回让下面扣款
-                getAPIKeyChatShareQuery.Result = chatShareInfoQuery.Result;
+                apiKeyChatShare = chatShareInfoQuery.Result;
 
                 var chatApplicationQuery = new ChatApplicationInfoQuery(chatShareInfoQuery.Result.ChatApplicationId);
 
@@ -144,13 +145,14 @@ public class OpenAIService
 
         var sourceFile = new List<FileStorage>();
         var wikiMemoryService = context.RequestServices.GetRequiredService<WikiMemoryService>();
-        var memoryServerless = wikiMemoryService.CreateMemoryServerless(chatApplication.ChatModel);
+
 
         // 如果为空则不使用知识库
         if (chatApplication.WikiIds.Count != 0)
         {
-            var success = await WikiPrompt(chatApplication, memoryServerless, content.content, eventBus,
+            var success = await WikiPrompt(chatApplication, wikiMemoryService, content.content, 
                 fileStorageRepository,
+                wikiRepository,
                 sourceFile, module, async x => { await context.WriteEndAsync(x); });
 
             if (!success) return;
@@ -166,22 +168,22 @@ public class OpenAIService
         });
 
 
-        if (getAPIKeyChatShareQuery?.Result != null)
+        if (apiKeyChatShare != null)
         {
             // 如果token不足则返回，使用token和当前request总和大于可用token，则返回
-            if (getAPIKeyChatShareQuery.Result.AvailableToken != -1 &&
-                getAPIKeyChatShareQuery.Result.UsedToken + requestToken >=
-                getAPIKeyChatShareQuery.Result.AvailableToken)
+            if (apiKeyChatShare.AvailableToken != -1 &&
+                apiKeyChatShare.UsedToken + requestToken >=
+                apiKeyChatShare.AvailableToken)
             {
-                await context.WriteEndAsync("Token不足");
+                await context.WriteEndAsync("您的Token不足");
                 return;
             }
 
             // 如果没有过期则继续
-            if (getAPIKeyChatShareQuery.Result.Expires != null &&
-                getAPIKeyChatShareQuery.Result.Expires < DateTimeOffset.Now)
+            if (apiKeyChatShare.Expires != null &&
+                apiKeyChatShare.Expires < DateTimeOffset.Now)
             {
-                await context.WriteEndAsync("Token已过期");
+                await context.WriteEndAsync("您的Token已过期");
                 return;
             }
         }
@@ -224,9 +226,9 @@ public class OpenAIService
         await context.WriteEndAsync();
 
         //对于对话扣款
-        if (getAPIKeyChatShareQuery?.Result != null)
+        if (apiKeyChatShare != null)
         {
-            var updateChatShareCommand = new DeductTokenCommand(getAPIKeyChatShareQuery.Result.Id,
+            var updateChatShareCommand = new DeductTokenCommand(apiKeyChatShare.Id,
                 requestToken);
 
             await eventBus.PublishAsync(updateChatShareCommand);
@@ -346,18 +348,18 @@ public class OpenAIService
     ///     在向量中搜索响应的知识库内容，然后将其添加到对话中
     /// </summary>
     /// <param name="chatApplication"></param>
-    /// <param name="memoryServerless"></param>
+    /// <param name="wikiMemoryService"></param>
     /// <param name="content"></param>
-    /// <param name="eventBus"></param>
     /// <param name="fileStorageRepository"></param>
+    /// <param name="wikiRepository"></param>
     /// <param name="sourceFile"></param>
     /// <param name="module"></param>
     /// <param name="notFoundAction"></param>
-    /// <param name="context"></param>
     /// <returns></returns>
     public static async ValueTask<bool> WikiPrompt(ChatApplicationDto chatApplication,
-        MemoryServerless memoryServerless, string content, IEventBus eventBus,
+        WikiMemoryService wikiMemoryService, string content,
         IFileStorageRepository fileStorageRepository,
+        IWikiRepository wikiRepository,
         List<FileStorage> sourceFile, ChatCompletionDto<ChatCompletionRequestMessage> module,
         Func<string, ValueTask> notFoundAction = null)
     {
@@ -365,59 +367,68 @@ public class OpenAIService
         var filters = chatApplication.WikiIds
             .Select(chatApplication => new MemoryFilter().ByTag("wikiId", chatApplication.ToString())).ToList();
 
-        var result = await memoryServerless.SearchAsync(content, "wiki", filters: filters, limit: 3,
-            minRelevance: chatApplication.Relevancy);
+        var wikis = await wikiRepository.GetListAsync(x => chatApplication.WikiIds.Contains(x.Id));
 
-        var fileIds = new List<long>();
 
-        result.Results.ForEach(x =>
+        foreach (var wiki in wikis)
         {
-            // 获取fileId
-            var fileId = x.Partitions.Select(x => x.Tags.FirstOrDefault(x => x.Key == "fileId"))
-                .FirstOrDefault(x => !x.Value.IsNullOrEmpty())
-                .Value.FirstOrDefault();
+            var memoryServerless = wikiMemoryService.CreateMemoryServerless(wiki.EmbeddingModel, wiki.Model);
 
-            if (!fileId.IsNullOrWhiteSpace() && long.TryParse(fileId, out var id)) fileIds.Add(id);
+            var result = await memoryServerless.SearchAsync(content, "wiki", filters: filters, limit: 3,
+                minRelevance: chatApplication.Relevancy);
 
-            prompt += string.Join(Environment.NewLine, x.Partitions.Select(x => x.Text));
-        });
+            var fileIds = new List<long>();
 
-        if (result.Results.Count == 0 &&
-            !string.IsNullOrWhiteSpace(chatApplication.NoReplyFoundTemplate))
-        {
-            await notFoundAction!.Invoke(chatApplication.NoReplyFoundTemplate);
-            return false;
-        }
-
-        var tokens = TokenHelper.GetGptEncoding().Encode(prompt);
-
-        // 这里可以有效的防止token数量超出限制，但是也会降低回复的质量
-        prompt = TokenHelper.GetGptEncoding()
-            .Decode(tokens.Take(chatApplication.MaxResponseToken).ToList());
-
-        // 如果prompt不为空，则需要进行模板替换
-        if (!prompt.IsNullOrEmpty())
-            prompt = chatApplication.Template.Replace("{{quote}}", prompt)
-                .Replace("{{question}}", content);
-
-        // 在这里需要获取源文件
-        if (fileIds.Count > 0 && chatApplication.ShowSourceFile)
-        {
-            var fileResult = await fileStorageRepository.GetListAsync(fileIds.ToArray());
-
-            sourceFile.AddRange(fileResult);
-        }
-
-        if (!prompt.IsNullOrEmpty())
-        {
-            // 删除最后一个消息
-            module.messages.RemoveAt(module.messages.Count - 1);
-            module.messages.Add(new ChatCompletionRequestMessage
+            result.Results.ForEach(x =>
             {
-                content = prompt,
-                role = "user"
+                // 获取fileId
+                var fileId = x.Partitions.Select(x => x.Tags.FirstOrDefault(x => x.Key == "fileId"))
+                    .FirstOrDefault(x => !x.Value.IsNullOrEmpty())
+                    .Value.FirstOrDefault();
+
+                if (!fileId.IsNullOrWhiteSpace() && long.TryParse(fileId, out var id)) fileIds.Add(id);
+
+                prompt += string.Join(Environment.NewLine, x.Partitions.Select(x => x.Text));
             });
+
+            if (result.Results.Count == 0 &&
+                !string.IsNullOrWhiteSpace(chatApplication.NoReplyFoundTemplate))
+            {
+                await notFoundAction!.Invoke(chatApplication.NoReplyFoundTemplate);
+                return false;
+            }
+
+            var tokens = TokenHelper.GetGptEncoding().Encode(prompt);
+
+            // 这里可以有效的防止token数量超出限制，但是也会降低回复的质量
+            prompt = TokenHelper.GetGptEncoding()
+                .Decode(tokens.Take(chatApplication.MaxResponseToken).ToList());
+
+            // 如果prompt不为空，则需要进行模板替换
+            if (!prompt.IsNullOrEmpty())
+                prompt = chatApplication.Template.Replace("{{quote}}", prompt)
+                    .Replace("{{question}}", content);
+
+            // 在这里需要获取源文件
+            if (fileIds.Count > 0 && chatApplication.ShowSourceFile)
+            {
+                var fileResult = await fileStorageRepository.GetListAsync(fileIds.ToArray());
+
+                sourceFile.AddRange(fileResult);
+            }
+
+            if (!prompt.IsNullOrEmpty())
+            {
+                // 删除最后一个消息
+                module.messages.RemoveAt(module.messages.Count - 1);
+                module.messages.Add(new ChatCompletionRequestMessage
+                {
+                    content = prompt,
+                    role = "user"
+                });
+            }
         }
+
 
         return true;
     }

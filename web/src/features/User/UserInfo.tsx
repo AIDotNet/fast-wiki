@@ -28,11 +28,13 @@ export interface UserInfoProps extends FlexboxProps {
 
 const UserInfo = memo<UserInfoProps>(({ avatarProps, ...rest }) => {
   const { styles, theme } = useStyles();
+  const token = localStorage.getItem('token') ?? '';
+  // 解析jwt
+  const jwt = token.split('.')[1];
+  const jwtObj = JSON.parse(atob(jwt));
+  const username = jwtObj.unique_name;
+  const role = jwtObj.role;
 
-  const [nickname, username] = useUserStore((s) => [
-    userProfileSelectors.nickName(s),
-    userProfileSelectors.username(s),
-  ]);
 
   return (
     <Flexbox
@@ -47,8 +49,8 @@ const UserInfo = memo<UserInfoProps>(({ avatarProps, ...rest }) => {
       <Flexbox align={'center'} gap={12} horizontal>
         <UserAvatar background={theme.colorFill} size={48} {...avatarProps} />
         <Flexbox flex={1} gap={6}>
-          <div className={styles.nickname}>{nickname}</div>
-          <div className={styles.username}>{username}</div>
+          <div className={styles.nickname}>{username}</div>
+          <div className={styles.username}>{role}</div>
         </Flexbox>
       </Flexbox>
       <PlanTag />

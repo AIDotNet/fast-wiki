@@ -1,11 +1,8 @@
-using Masa.BuildingBlocks.Authentication.Identity;
-
 namespace FastWiki.Service.Application.ChatApplications;
 
 public class ChatApplicationQueryHandler(
     IChatApplicationRepository chatApplicationRepository,
-    IMapper mapper,
-    IUserContext userContext)
+    IMapper mapper)
 {
     [EventHandler]
     public async Task ChatApplicationAsync(ChatApplicationQuery query)
@@ -60,13 +57,6 @@ public class ChatApplicationQueryHandler(
         var chatApplication = await chatApplicationRepository.ChatShareApplicationAsync(query.chatSharedId);
 
         query.Result = mapper.Map<ChatApplicationDto>(chatApplication);
-    }
-
-    [EventHandler]
-    public async Task GetAPIKeyChatShareAsync(GetAPIKeyChatShareQuery query)
-    {
-        var dto = mapper.Map<ChatShareDto>(await chatApplicationRepository.GetAPIKeyChatShareAsync(query.APIKey));
-        query.Result = dto;
     }
 
     [EventHandler]

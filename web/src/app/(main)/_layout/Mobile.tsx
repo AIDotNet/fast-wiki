@@ -6,7 +6,6 @@ import { memo, useEffect, useState } from 'react';
 import { useQuery } from '@/hooks/useQuery';
 
 import { LayoutProps } from './type';
-import Nav from '../@nav/default';
 
 const MOBILE_NAV_ROUTES = new Set(['/chat', '/market', '/me']);
 
@@ -24,7 +23,6 @@ const Layout = memo(({ children }: LayoutProps) => {
   return (
     <>
       {children}
-      {showNav && <Nav />}
     </>
   );
 });

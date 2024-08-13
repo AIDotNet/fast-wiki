@@ -45,6 +45,13 @@ public sealed class FastWikiFunctionCallRepository : Repository<WikiDbContext, F
         await Context.FunctionCalls.Where(x => x.Id == id).ExecuteDeleteAsync();
     }
 
+    public async Task InsertAsync(FastWikiFunctionCall functionCall)
+    {
+        await Context.FunctionCalls.AddAsync(functionCall);
+
+        await UnitOfWork.SaveChangesAsync();
+    }
+
     private IQueryable<FastWikiFunctionCall> CreateQuery(Guid? userId)
     {
         var query = Context.FunctionCalls.AsQueryable();

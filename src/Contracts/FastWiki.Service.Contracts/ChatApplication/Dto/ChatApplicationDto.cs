@@ -15,6 +15,8 @@ public class ChatApplicationDto
     ///     对话模型
     /// </summary>
     public string ChatModel { get; set; }
+    
+    
 
     /// <summary>
     ///     温度
