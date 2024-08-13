@@ -22,24 +22,7 @@ export interface CreateChatCompletionOptions {
 }
 
 export enum ModelProvider {
-  Anthropic = 'anthropic',
-  Azure = 'azure',
-  Bedrock = 'bedrock',
-  DeepSeek = 'deepseek',
-  Google = 'google',
-  Groq = 'groq',
-  Minimax = 'minimax',
-  Mistral = 'mistral',
-  Moonshot = 'moonshot',
-  Ollama = 'ollama',
   OpenAI = 'openai',
-  OpenRouter = 'openrouter',
-  Perplexity = 'perplexity',
-  Qwen = 'qwen',
-  Stepfun = 'stepfun',
-  TogetherAI = 'togetherai',
-  ZeroOne = 'zeroone',
-  ZhiPu = 'zhipu',
 }
 
 export type ModelProviderKey = Lowercase<keyof typeof ModelProvider>;

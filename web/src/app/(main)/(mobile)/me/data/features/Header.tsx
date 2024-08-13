@@ -1,5 +1,3 @@
-'use client';
-
 import { MobileNavBar, MobileNavBarTitle } from '@lobehub/ui';
 import { useNavigate } from 'react-router-dom';
 import { memo } from 'react';

@@ -15,13 +15,6 @@ const Actions = memo<{ mobile?: boolean }>(({ mobile }) => {
   return (
     <Flexbox gap={16} horizontal={!mobile} justify={'center'} width={'100%'} wrap={'wrap'}>
       <Button
-        onClick={()=>{
-          startTransition(() => navigate('/market'));
-        }}
-        block={mobile} size={'large'} style={{ minWidth: 160 }} type={'default'}>
-        {t('button.market')}
-      </Button>
-      <Button
         block={mobile}
         onClick={() => {
           startTransition(() => navigate('/chat'));
@@ -31,7 +24,7 @@ const Actions = memo<{ mobile?: boolean }>(({ mobile }) => {
         type={'primary'}
       >
         <Flexbox align={'center'} gap={4} horizontal justify={'center'}>
-          {t('button.start')}
+          进入系统
           <Icon icon={SendHorizonal} />
         </Flexbox>
       </Button>

@@ -2,7 +2,7 @@ import { GridShowcase } from '@lobehub/ui';
 import { PropsWithChildren } from 'react';
 import { Flexbox } from 'react-layout-kit';
 
-const COPYRIGHT = `© ${new Date().getFullYear()} TokenHub, LLC`;
+const COPYRIGHT = `© ${new Date().getFullYear()} TokenAI, Inc. All rights reserved.`;
 
 const DesktopLayout = ({ children }: PropsWithChildren) => {
   return (
@@ -23,7 +23,7 @@ const DesktopLayout = ({ children }: PropsWithChildren) => {
           userSelect: 'none',
           color: 'var(--leva-colors-highlight3)',
         }}>
-          TokenChat
+          FastWiki
         </span>
         <GridShowcase
           innerProps={{ gap: 24 }}

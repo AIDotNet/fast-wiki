@@ -12,7 +12,6 @@ export const migrateSettingsToUser = (
     },
     password: settings.password,
     themeMode: settings.themeMode,
-    tts: settings.tts,
   };
 
   return {

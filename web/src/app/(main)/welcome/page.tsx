@@ -6,7 +6,6 @@ import { isMobileDevice } from '@/utils/responsive';
 
 import Actions from './features/Actions';
 import Hero from './features/Hero';
-import Logo from './features/Logo';
 import { useEffect, useState } from 'react';
 
 export const generateMetadata = async () => {
@@ -30,7 +29,6 @@ const Page = async () => {
   return (
     <>
       <StructuredData ld={ld} />
-      <Logo mobile={mobile} />
       <Hero />
       <Actions mobile={mobile} />
     </>

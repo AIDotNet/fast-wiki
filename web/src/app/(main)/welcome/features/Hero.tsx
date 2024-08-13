@@ -43,8 +43,10 @@ const Hero = memo(() => {
         justify={'center'}
         wrap={'wrap'}
       >
-        <strong style={{ fontSize: 'min(56px, 8vw)' }}>TokenChat</strong>
-        <span>{t('slogan.title')}</span>
+        <strong style={{ fontSize: 'min(56px, 8vw)' }}>FastWiki</strong>
+        <span>
+          智能知识库
+        </span>
       </Flexbox>
       <Flexbox
         align={'center'}
@@ -54,7 +56,7 @@ const Hero = memo(() => {
         justify={'center'}
         wrap={'wrap'}
       >
-        {t('slogan.desc1')}
+        智能知识库，让知识更快捷，更高效。
       </Flexbox>
     </>
   );

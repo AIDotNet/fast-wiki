@@ -7,7 +7,6 @@ import { useInitAgentConfig } from '@/app/(main)/chat/(workspace)/_layout/useIni
 import { useQueryRoute } from '@/hooks/useQueryRoute';
 import { featureFlagsSelectors, useServerConfigStore } from '@/store/serverConfig';
 
-import SettingButton from '../../../features/SettingButton';
 import ChatHeaderTitle from './ChatHeaderTitle';
 
 const MobileHeader = memo(() => {
@@ -23,7 +22,6 @@ const MobileHeader = memo(() => {
       onBackClick={() => router.push('/chat', { query: { session: '' }, replace: true })}
       right={
         <>
-          {isAgentEditable && <SettingButton mobile />}
         </>
       }
       showBackButton

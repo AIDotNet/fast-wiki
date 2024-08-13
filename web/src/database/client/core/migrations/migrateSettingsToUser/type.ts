@@ -3,7 +3,6 @@ import type { ThemeMode } from 'antd-style';
 import { LobeAgentTTSConfig } from '@/types/agent';
 import { FewShots, LLMParams } from '@/types/llm';
 import { MetaData } from '@/types/meta';
-import { STTServer } from '@/types/user/settings';
 
 interface V4LobeAgentConfig {
   autoCreateTopicThreshold: number;
@@ -70,16 +69,6 @@ interface OpenAIConfig {
 interface V4LLMConfig {
   openAI: OpenAIConfig;
 }
-
-interface TTSConfig {
-  openAI: {
-    sttModel: 'whisper-1';
-    ttsModel: 'tts-1' | 'tts-1-hd';
-  };
-  sttAutoStop: boolean;
-  sttServer: STTServer;
-}
-
 export interface V4Settings {
   avatar: string;
   defaultAgent: V4DefaultAgent;
@@ -90,7 +79,6 @@ export interface V4Settings {
   password: string;
   primaryColor?: string;
   themeMode: ThemeMode;
-  tts: TTSConfig;
 }
 
 export interface V5Settings {
@@ -104,5 +92,4 @@ export interface V5Settings {
   password: string;
   primaryColor?: string;
   themeMode: ThemeMode;
-  tts: TTSConfig;
 }

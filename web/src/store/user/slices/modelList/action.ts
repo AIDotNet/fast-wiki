@@ -91,18 +91,6 @@ export const createModelListSlice: StateCreator<
     const defaultModelProviderList = produce(DEFAULT_MODEL_PROVIDER_LIST, (draft) => {
       const openai = draft.find((d) => d.id === ModelProvider.OpenAI);
       if (openai) openai.chatModels = mergeModels('openai', openai.chatModels);
-
-      const azure = draft.find((d) => d.id === ModelProvider.Azure);
-      if (azure) azure.chatModels = mergeModels('azure', azure.chatModels);
-
-      const ollama = draft.find((d) => d.id === ModelProvider.Ollama);
-      if (ollama) ollama.chatModels = mergeModels('ollama', ollama.chatModels);
-
-      const openrouter = draft.find((d) => d.id === ModelProvider.OpenRouter);
-      if (openrouter) openrouter.chatModels = mergeModels('openrouter', openrouter.chatModels);
-
-      const togetherai = draft.find((d) => d.id === ModelProvider.TogetherAI);
-      if (togetherai) togetherai.chatModels = mergeModels('togetherai', togetherai.chatModels);
     });
 
     set({ defaultModelProviderList }, false, `refreshDefaultModelList - ${params?.trigger}`);
@@ -110,24 +98,7 @@ export const createModelListSlice: StateCreator<
     get().refreshModelProviderList({ trigger: 'refreshDefaultModelList' });
   },
   refreshModelProviderList: (params) => {
-    const modelProviderList = get().defaultModelProviderList.map((list) => ({
-      ...list,
-      chatModels: modelProviderSelectors
-        .getModelCardsById(list.id)(get())
-        ?.map((model) => {
-          const models = modelProviderSelectors.getEnableModelsById(list.id)(get());
-
-          if (!models) return model;
-
-          return {
-            ...model,
-            enabled: models?.some((m) => m === model.id),
-          };
-        }),
-      enabled: modelProviderSelectors.isProviderEnabled(list.id as any)(get()),
-    }));
-
-    set({ modelProviderList }, false, `refreshModelList - ${params?.trigger}`);
+    
   },
 
   removeEnabledModels: async (provider, model) => {

@@ -10,7 +10,6 @@ import { ChatMessage } from '@/types/message';
 
 import { RenderMessageExtra } from '../types';
 import ExtraContainer from './ExtraContainer';
-import TTS from './TTS';
 import Translate from './Translate';
 
 export const AssistantMessageExtra: RenderMessageExtra = memo<ChatMessage>(
@@ -34,11 +33,6 @@ export const AssistantMessageExtra: RenderMessageExtra = memo<ChatMessage>(
           </div>
         )}
         <>
-          {extra?.tts && (
-            <ExtraContainer>
-              <TTS content={content} id={id} loading={loading} {...extra?.tts} />
-            </ExtraContainer>
-          )}
           {extra?.translate && (
             <ExtraContainer>
               <Translate id={id} loading={loading} {...extra?.translate} />

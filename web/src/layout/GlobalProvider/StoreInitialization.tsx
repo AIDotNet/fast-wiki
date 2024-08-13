@@ -5,7 +5,6 @@ import { createStoreUpdater } from 'zustand-utils';
 
 import { LOBE_URL_IMPORT_NAME } from '@/const/url';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { useEnabledDataSync } from '@/hooks/useSyncData';
 import { useAgentStore } from '@/store/agent';
 import { useGlobalStore } from '@/store/global';
 import { useServerConfigStore } from '@/store/serverConfig';
@@ -29,21 +28,11 @@ const StoreInitialization = memo(() => {
 
   const useInitAgentStore = useAgentStore((s) => s.useInitAgentStore);
 
-  useEnabledDataSync();
-  
   // init the system preference
   useInitSystemStatus();
 
   // init inbox agent and default agent config
   useInitAgentStore(serverConfig.defaultAgent?.config);
-
-  useInitUserState(isLogin, serverConfig, {
-    onSuccess: (state) => {
-      if (state.isOnboard === false) {
-        navigate('/onboard');
-      }
-    },
-  });
 
   const useStoreUpdater = createStoreUpdater(useGlobalStore);
 

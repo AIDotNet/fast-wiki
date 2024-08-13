@@ -6,7 +6,6 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ActionBar from '@/features/ChatInput/ActionBar';
-import STT from '@/features/ChatInput/STT';
 import SaveTopic from '@/features/ChatInput/Topic';
 import { useChatInput } from '@/features/ChatInput/useChatInput';
 
@@ -32,7 +31,6 @@ const MobileChatInput = memo(() => {
         width: '100%',
         zIndex: 101,
       }}
-      textAreaLeftAddons={<STT mobile />}
       textAreaRightAddons={
         <MobileChatSendButton loading={loading} onSend={onSend} onStop={onStop} />
       }

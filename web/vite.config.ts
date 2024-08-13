@@ -44,5 +44,19 @@ export default defineConfig({
       },
     },
   },
-  
+  server:{
+    open: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5124',
+        changeOrigin: true,
+        rewrite: (path) => path
+      },
+      '/v1': {
+        target: 'http://localhost:5124',
+        changeOrigin: true,
+        rewrite: (path) => path
+      }
+    }
+  }
 })

@@ -79,86 +79,9 @@ export function initializeWithClientStore(provider: string, payload: any) {
   };
   let providerOptions = {};
 
-  switch (provider) {
-    default:
-    case ModelProvider.OpenAI: {
-      providerOptions = {
-        baseURL: providerAuthPayload?.endpoint,
-      };
-      break;
-    }
-    case ModelProvider.Azure: {
-      providerOptions = {
-        apiVersion: providerAuthPayload?.azureApiVersion,
-        // That's a wired properity, but just remapped it
-        apikey: providerAuthPayload?.apiKey,
-      };
-      break;
-    }
-    case ModelProvider.ZhiPu: {
-      break;
-    }
-    case ModelProvider.Google: {
-      providerOptions = {
-        baseURL: providerAuthPayload?.endpoint,
-      };
-      break;
-    }
-    case ModelProvider.Moonshot: {
-      break;
-    }
-    case ModelProvider.Bedrock: {
-      if (providerAuthPayload?.apiKey) {
-        providerOptions = {
-          accessKeyId: providerAuthPayload?.awsAccessKeyId,
-          accessKeySecret: providerAuthPayload?.awsSecretAccessKey,
-          region: providerAuthPayload?.awsRegion,
-        };
-      }
-      break;
-    }
-    case ModelProvider.Ollama: {
-      providerOptions = {
-        baseURL: providerAuthPayload?.endpoint,
-      };
-      break;
-    }
-    case ModelProvider.Perplexity: {
-      break;
-    }
-    case ModelProvider.Qwen: {
-      break;
-    }
-    case ModelProvider.Anthropic: {
-      providerOptions = {
-        baseURL: providerAuthPayload?.endpoint,
-      };
-      break;
-    }
-    case ModelProvider.Mistral: {
-      break;
-    }
-    case ModelProvider.Groq: {
-      providerOptions = {
-        apikey: providerAuthPayload?.apiKey,
-        baseURL: providerAuthPayload?.endpoint,
-      };
-      break;
-    }
-    case ModelProvider.DeepSeek: {
-      break;
-    }
-    case ModelProvider.OpenRouter: {
-      break;
-    }
-    case ModelProvider.TogetherAI: {
-      break;
-    }
-    case ModelProvider.ZeroOne: {
-      break;
-    }
-  }
-
+  providerOptions = {
+    baseURL: providerAuthPayload?.endpoint,
+  };
   /**
    * Configuration override order:
    * payload -> providerOptions -> providerAuthPayload -> commonOptions
@@ -242,16 +165,6 @@ class ChatService {
     const { provider = ModelProvider.OpenAI, ...res } = params;
 
     let model = res.model || DEFAULT_AGENT_CONFIG.model;
-
-    // if the provider is Azure, get the deployment name as the request model
-    if (provider === ModelProvider.Azure) {
-      const chatModelCards = modelProviderSelectors.getModelCardsById(provider)(
-        useUserStore.getState(),
-      );
-
-      const deploymentName = chatModelCards.find((i) => i.id === model)?.deploymentName;
-      if (deploymentName) model = deploymentName;
-    }
 
     const payload = merge(
       { model: DEFAULT_AGENT_CONFIG.model, stream: true, ...DEFAULT_AGENT_CONFIG.params },

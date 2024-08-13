@@ -82,6 +82,22 @@ const Login = memo(() => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         size='large'
+                        // 回车键
+                        onPressEnter={async () => {
+                            try {
+                                setLoading(true);
+                                const token = await login({
+                                    account: user,
+                                    password: password,
+                                });
+
+                                localStorage.setItem('token', token.token);
+                                window.location.href = '/';
+                            } catch (e) {
+
+                            }
+                            setLoading(false);
+                        }}
                         placeholder="请输入密码"
                         iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                     />
