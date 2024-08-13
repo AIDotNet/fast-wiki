@@ -213,7 +213,6 @@ public sealed class QuantizeBackgroundService : BackgroundService
         using var asyncServiceScope = _serviceProvider.CreateScope();
 
         var wikiRepository = asyncServiceScope.ServiceProvider.GetRequiredService<IWikiRepository>();
-        var mapper = asyncServiceScope.ServiceProvider.GetRequiredService<IMapper>();
         foreach (var wikiDetail in await wikiRepository.GetFailedDetailsAsync())
         {
             await AddWikiDetailAsync(wikiDetail);

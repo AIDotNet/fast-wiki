@@ -188,8 +188,6 @@ var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider
     }
 };
 
-app.UseResponseCompression();
-
 app.UseStaticFiles(new StaticFileOptions
 {
     ContentTypeProvider = fileExtensionContentTypeProvider
@@ -198,6 +196,19 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseResponseCompression();
+
+app.Use(async (context, next) =>
+{
+    await next(context);
+
+    if (context.Response.StatusCode == 404)
+    {
+        context.Request.Path = "/index.html";
+        await next(context);
+    }
+});
 
 app.MapGet("/js/env.js", () =>
 {
@@ -208,7 +219,7 @@ app.MapGet("/js/env.js", () =>
         WebOptions.DEFAULT_INBOX_AVATAR,
         WebOptions.DEFAULT_MODEL,
     };
-    
+
     // 返回js
     return Results.Text($"window.thor = {JsonSerializer.Serialize(webEnv)};", "application/javascript");
 });
@@ -276,8 +287,11 @@ else
     {
         await context!.Database.MigrateAsync();
 
-        // TODO: 创建vector插件如果数据库没有则需要提供支持向量的数据库。
-        await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");
+        if (!ConnectionStringsOptions.WikiType.Equals("disk", StringComparison.OrdinalIgnoreCase))
+        {
+            // TODO: 创建vector插件如果数据库没有则需要提供支持向量的数据库。
+            await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");
+        }
     }
 }
 

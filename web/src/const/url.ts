@@ -3,18 +3,14 @@ import urlJoin from 'url-join';
 
 import { withBasePath } from '@/utils/basePath';
 
-let VITE_API_URL = 'http://localhost:5124';
+import pkg from '../../package.json';
+import { INBOX_SESSION_ID } from './session';
 
-// 从环境变量中获取
-if (process.env.VITE_API_URL) {
-  VITE_API_URL = process.env.VITE_API_URL;
-}
+const VITE_API_URL ="";
 
 export {
   VITE_API_URL
 }
-import pkg from '../../package.json';
-import { INBOX_SESSION_ID } from './session';
 
 export const OFFICIAL_URL = 'https://thor-chat.token-ai.cn/';
 export const OFFICIAL_SITE = 'https://token-ai.cn/';

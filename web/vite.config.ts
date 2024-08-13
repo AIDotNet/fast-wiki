@@ -43,5 +43,6 @@ export default defineConfig({
         assetFileNames: '[ext]/[name]-[hash].[ext]'
       },
     },
-  }
+  },
+  
 })

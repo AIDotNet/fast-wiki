@@ -134,20 +134,6 @@
     resize-observer-polyfill "^1.5.1"
     throttle-debounce "^5.0.0"
 
-"@anthropic-ai/sdk@^0.24.0":
-  version "0.24.3"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@anthropic-ai/sdk/-/sdk-0.24.3.tgz"
-  integrity sha512-916wJXO6T6k8R6BAAcLhLPv/pnLGy7YSEBZXZ1XTFbLcTZE8oTy3oDW9WJf9KKZwMvVcePIfoTSvzXHRcGxkQQ==
-  dependencies:
-    "@types/node" "^18.11.18"
-    "@types/node-fetch" "^2.6.4"
-    abort-controller "^3.0.0"
-    agentkeepalive "^4.2.1"
-    form-data-encoder "1.7.2"
-    formdata-node "^4.3.2"
-    node-fetch "^2.6.7"
-    web-streams-polyfill "^3.2.1"
-
 "@apidevtools/json-schema-ref-parser@9.0.6":
   version "9.0.6"
   resolved "https://mirrors.huaweicloud.com/repository/npm/@apidevtools/json-schema-ref-parser/-/json-schema-ref-parser-9.0.6.tgz"
@@ -730,11 +716,6 @@
   dependencies:
     giscus "^1.5.0"
 
-"@google/generative-ai@^0.13.0":
-  version "0.13.0"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@google/generative-ai/-/generative-ai-0.13.0.tgz"
-  integrity sha512-F3rI52SbGS8bsFu4bWFfOPdtq91RsBzeVLsbJy/kt7zCuaBr28toR/8zS12zXjj6USIJd0rGeF2HsuPONUz+6w==
-
 "@humanwhocodes/config-array@^0.11.14":
   version "0.11.14"
   resolved "https://mirrors.huaweicloud.com/repository/npm/@humanwhocodes/config-array/-/config-array-0.11.14.tgz"
@@ -1093,7 +1074,7 @@
   dependencies:
     "@babel/runtime" "^7.24.4"
 
-"@rc-component/color-picker@~2.0.0":
+"@rc-component/color-picker@~2.0.1":
   version "2.0.1"
   resolved "https://mirrors.huaweicloud.com/repository/npm/@rc-component/color-picker/-/color-picker-2.0.1.tgz"
   integrity sha512-WcZYwAThV/b2GISQ8F+7650r5ZZJ043E57aVBFkQ+kSY4C6wdofXgB0hBx+GPGpIU0Z81eETNoDUJMr7oy/P8Q==
@@ -1156,10 +1137,10 @@
     classnames "^2.3.2"
     rc-util "^5.24.4"
 
-"@rc-component/trigger@^2.0.0", "@rc-component/trigger@^2.1.1", "@rc-component/trigger@^2.2.0":
-  version "2.2.0"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@rc-component/trigger/-/trigger-2.2.0.tgz"
-  integrity sha512-QarBCji02YE9aRFhZgRZmOpXBj0IZutRippsVBv85sxvG4FGk/vRxwAlkn3MS9zK5mwbETd86mAVg2tKqTkdJA==
+"@rc-component/trigger@^2.0.0", "@rc-component/trigger@^2.1.1", "@rc-component/trigger@^2.2.1":
+  version "2.2.1"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@rc-component/trigger/-/trigger-2.2.1.tgz"
+  integrity sha512-fuU11J8pOt6+U/tU6/CAv8wjCwGaNeRk9f5k8HQth7JBbJ6MMH62WhGycVW75VnXfBZgL/7kO+wbiO2Xc9U9sQ==
   dependencies:
     "@babel/runtime" "^7.23.2"
     "@rc-component/portal" "^1.1.0"
@@ -1789,14 +1770,7 @@
     "@types/node" "*"
     form-data "^4.0.0"
 
-"@types/node@*":
-  version "22.1.0"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@types/node/-/node-22.1.0.tgz"
-  integrity sha512-AOmuRF0R2/5j1knA3c6G3HOk523Ga+l+ZXltX8SF1+5oqcXijjfTd8fY3XRZqSihEu9XhtQnKYLmkFaoxgsJHw==
-  dependencies:
-    undici-types "~6.13.0"
-
-"@types/node@^18.0.0 || >=20.0.0", "@types/node@^20.14.7":
+"@types/node@*", "@types/node@^18.0.0 || >=20.0.0", "@types/node@^20.14.7":
   version "20.14.14"
   resolved "https://mirrors.huaweicloud.com/repository/npm/@types/node/-/node-20.14.14.tgz"
   integrity sha512-d64f00982fS9YoOgJkAMolK7MN8Iq3TDdVjchbYHdEmjth/DHowx82GnoA+tVUAN+7vxfYUgAzi+JXbKNd2SDQ==
@@ -1804,9 +1778,9 @@
     undici-types "~5.26.4"
 
 "@types/node@^18.11.18":
-  version "18.19.43"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@types/node/-/node-18.19.43.tgz"
-  integrity sha512-Mw/YlgXnyJdEwLoFv2dpuJaDFriX+Pc+0qOBJ57jC1H6cDxIj2xc5yUrdtArDVG0m+KV6622a4p2tenEqB3C/g==
+  version "18.19.44"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@types/node/-/node-18.19.44.tgz"
+  integrity sha512-ZsbGerYg72WMXUIE9fYxtvfzLEuq6q8mKERdWFnqTmOvudMxnz+CBNRoOwJ2kNpFOncrKjT1hZwxjlFgQ9qvQA==
   dependencies:
     undici-types "~5.26.4"
 
@@ -2003,85 +1977,85 @@
     "@types/babel__core" "^7.20.5"
     react-refresh "^0.14.2"
 
-"@vue/compiler-core@3.4.36":
-  version "3.4.36"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/compiler-core/-/compiler-core-3.4.36.tgz"
-  integrity sha512-qBkndgpwFKdupmOPoiS10i7oFdN7a+4UNDlezD0GlQ1kuA1pNrscg9g12HnB5E8hrWSuEftRsbJhL1HI2zpJhg==
+"@vue/compiler-core@3.4.37":
+  version "3.4.37"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/compiler-core/-/compiler-core-3.4.37.tgz"
+  integrity sha512-ZDDT/KiLKuCRXyzWecNzC5vTcubGz4LECAtfGPENpo0nrmqJHwuWtRLxk/Sb9RAKtR9iFflFycbkjkY+W/PZUQ==
   dependencies:
     "@babel/parser" "^7.24.7"
-    "@vue/shared" "3.4.36"
+    "@vue/shared" "3.4.37"
     entities "^5.0.0"
     estree-walker "^2.0.2"
     source-map-js "^1.2.0"
 
-"@vue/compiler-dom@3.4.36":
-  version "3.4.36"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/compiler-dom/-/compiler-dom-3.4.36.tgz"
-  integrity sha512-eEIjy4GwwZTFon/Y+WO8tRRNGqylaRlA79T1RLhUpkOzJ7EtZkkb8MurNfkqY6x6Qiu0R7ESspEF7GkPR/4yYg==
+"@vue/compiler-dom@3.4.37":
+  version "3.4.37"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/compiler-dom/-/compiler-dom-3.4.37.tgz"
+  integrity sha512-rIiSmL3YrntvgYV84rekAtU/xfogMUJIclUMeIKEtVBFngOL3IeZHhsH3UaFEgB5iFGpj6IW+8YuM/2Up+vVag==
   dependencies:
-    "@vue/compiler-core" "3.4.36"
-    "@vue/shared" "3.4.36"
+    "@vue/compiler-core" "3.4.37"
+    "@vue/shared" "3.4.37"
 
-"@vue/compiler-sfc@3.4.36":
-  version "3.4.36"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/compiler-sfc/-/compiler-sfc-3.4.36.tgz"
-  integrity sha512-rhuHu7qztt/rNH90dXPTzhB7hLQT2OC4s4GrPVqmzVgPY4XBlfWmcWzn4bIPEWNImt0CjO7kfHAf/1UXOtx3vw==
+"@vue/compiler-sfc@3.4.37":
+  version "3.4.37"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/compiler-sfc/-/compiler-sfc-3.4.37.tgz"
+  integrity sha512-vCfetdas40Wk9aK/WWf8XcVESffsbNkBQwS5t13Y/PcfqKfIwJX2gF+82th6dOpnpbptNMlMjAny80li7TaCIg==
   dependencies:
     "@babel/parser" "^7.24.7"
-    "@vue/compiler-core" "3.4.36"
-    "@vue/compiler-dom" "3.4.36"
-    "@vue/compiler-ssr" "3.4.36"
-    "@vue/shared" "3.4.36"
+    "@vue/compiler-core" "3.4.37"
+    "@vue/compiler-dom" "3.4.37"
+    "@vue/compiler-ssr" "3.4.37"
+    "@vue/shared" "3.4.37"
     estree-walker "^2.0.2"
     magic-string "^0.30.10"
     postcss "^8.4.40"
     source-map-js "^1.2.0"
 
-"@vue/compiler-ssr@3.4.36":
-  version "3.4.36"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/compiler-ssr/-/compiler-ssr-3.4.36.tgz"
-  integrity sha512-Wt1zyheF0zVvRJyhY74uxQbnkXV2Le/JPOrAxooR4rFYKC7cFr+cRqW6RU3cM/bsTy7sdZ83IDuy/gLPSfPGng==
+"@vue/compiler-ssr@3.4.37":
+  version "3.4.37"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/compiler-ssr/-/compiler-ssr-3.4.37.tgz"
+  integrity sha512-TyAgYBWrHlFrt4qpdACh8e9Ms6C/AZQ6A6xLJaWrCL8GCX5DxMzxyeFAEMfU/VFr4tylHm+a2NpfJpcd7+20XA==
   dependencies:
-    "@vue/compiler-dom" "3.4.36"
-    "@vue/shared" "3.4.36"
+    "@vue/compiler-dom" "3.4.37"
+    "@vue/shared" "3.4.37"
 
-"@vue/reactivity@3.4.36":
-  version "3.4.36"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/reactivity/-/reactivity-3.4.36.tgz"
-  integrity sha512-wN1aoCwSoqrt1yt8wO0gc13QaC+Vk1o6AoSt584YHNnz6TGDhh1NCMUYgAnvp4HEIkLdGsaC1bvu/P+wpoDEXw==
+"@vue/reactivity@3.4.37":
+  version "3.4.37"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/reactivity/-/reactivity-3.4.37.tgz"
+  integrity sha512-UmdKXGx0BZ5kkxPqQr3PK3tElz6adTey4307NzZ3whZu19i5VavYal7u2FfOmAzlcDVgE8+X0HZ2LxLb/jgbYw==
   dependencies:
-    "@vue/shared" "3.4.36"
+    "@vue/shared" "3.4.37"
 
-"@vue/runtime-core@3.4.36":
-  version "3.4.36"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/runtime-core/-/runtime-core-3.4.36.tgz"
-  integrity sha512-9+TR14LAVEerZWLOm/N/sG2DVYhrH2bKgFrbH/FVt/Q8Jdw4OtdcGMRC6Tx8VAo0DA1eqAqrZaX0fbOaOxxZ4A==
+"@vue/runtime-core@3.4.37":
+  version "3.4.37"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/runtime-core/-/runtime-core-3.4.37.tgz"
+  integrity sha512-MNjrVoLV/sirHZoD7QAilU1Ifs7m/KJv4/84QVbE6nyAZGQNVOa1HGxaOzp9YqCG+GpLt1hNDC4RbH+KtanV7w==
   dependencies:
-    "@vue/reactivity" "3.4.36"
-    "@vue/shared" "3.4.36"
+    "@vue/reactivity" "3.4.37"
+    "@vue/shared" "3.4.37"
 
-"@vue/runtime-dom@3.4.36":
-  version "3.4.36"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/runtime-dom/-/runtime-dom-3.4.36.tgz"
-  integrity sha512-2Qe2fKkLxgZBVvHrG0QMNLL4bsx7Ae88pyXebY2WnQYABpOnGYvA+axMbcF9QwM4yxnsv+aELbC0eiNVns7mGw==
+"@vue/runtime-dom@3.4.37":
+  version "3.4.37"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/runtime-dom/-/runtime-dom-3.4.37.tgz"
+  integrity sha512-Mg2EwgGZqtwKrqdL/FKMF2NEaOHuH+Ks9TQn3DHKyX//hQTYOun+7Tqp1eo0P4Ds+SjltZshOSRq6VsU0baaNg==
   dependencies:
-    "@vue/reactivity" "3.4.36"
-    "@vue/runtime-core" "3.4.36"
-    "@vue/shared" "3.4.36"
+    "@vue/reactivity" "3.4.37"
+    "@vue/runtime-core" "3.4.37"
+    "@vue/shared" "3.4.37"
     csstype "^3.1.3"
 
-"@vue/server-renderer@3.4.36":
-  version "3.4.36"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/server-renderer/-/server-renderer-3.4.36.tgz"
-  integrity sha512-2XW90Rq8+Y7S1EIsAuubZVLm0gCU8HYb5mRAruFdwfC3XSOU5/YKePz29csFzsch8hXaY5UHh7ZMddmi1XTJEA==
+"@vue/server-renderer@3.4.37":
+  version "3.4.37"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/server-renderer/-/server-renderer-3.4.37.tgz"
+  integrity sha512-jZ5FAHDR2KBq2FsRUJW6GKDOAG9lUTX8aBEGq4Vf6B/35I9fPce66BornuwmqmKgfiSlecwuOb6oeoamYMohkg==
   dependencies:
-    "@vue/compiler-ssr" "3.4.36"
-    "@vue/shared" "3.4.36"
+    "@vue/compiler-ssr" "3.4.37"
+    "@vue/shared" "3.4.37"
 
-"@vue/shared@3.4.36":
-  version "3.4.36"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/shared/-/shared-3.4.36.tgz"
-  integrity sha512-fdPLStwl1sDfYuUftBaUVn2pIrVFDASYerZSrlBvVBfylObPA1gtcWJHy5Ox8jLEJ524zBibss488Q3SZtU1uA==
+"@vue/shared@3.4.37":
+  version "3.4.37"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@vue/shared/-/shared-3.4.37.tgz"
+  integrity sha512-nIh8P2fc3DflG8+5Uw8PT/1i17ccFn0xxN/5oE9RfV5SVnd7G0XEFRwakrnNFE/jlS95fpGXDVG5zDETS26nmg==
 
 abort-controller@^3.0.0:
   version "3.0.0"
@@ -2115,14 +2089,14 @@ agentkeepalive@^4.2.1:
     humanize-ms "^1.2.1"
 
 ahooks@>=3:
-  version "3.8.0"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/ahooks/-/ahooks-3.8.0.tgz"
-  integrity sha512-M01m+mxLRNNeJ/PCT3Fom26UyreTj6oMqJBetUrJnK4VNI5j6eMA543Xxo53OBXn6XibA2FXKcCCgrT6YCTtKQ==
+  version "3.8.1"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/ahooks/-/ahooks-3.8.1.tgz"
+  integrity sha512-JoP9+/RWO7MnI/uSKdvQ8WB10Y3oo1PjLv+4Sv4Vpm19Z86VUMdXh+RhWvMGxZZs06sq2p0xVtFk8Oh5ZObsoA==
   dependencies:
     "@babel/runtime" "^7.21.0"
     dayjs "^1.9.1"
     intersection-observer "^0.12.0"
-    js-cookie "^2.x.x"
+    js-cookie "^3.0.5"
     lodash "^4.17.21"
     react-fast-compare "^3.2.2"
     resize-observer-polyfill "^1.5.1"
@@ -2209,9 +2183,9 @@ antd-style@>=3:
     use-merge-value "^1.2.0"
 
 antd@>=5, antd@>=5.13.0, antd@>=5.8.1:
-  version "5.20.0"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/antd/-/antd-5.20.0.tgz"
-  integrity sha512-wWCFzbry3hov7k8gqhPR+FzD6EkWlhBbGD9mYOSIDoYRGMRqueTh2+2jfU1voHucmwcxDwzU7iwZDU2+PCXZdA==
+  version "5.20.1"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/antd/-/antd-5.20.1.tgz"
+  integrity sha512-YjVCYAfBjrTyNKsg+heAOR0Gm4qJNJoBZQcV1h1BX/ufwoLx0PC5RGs75g6gQFy/1nv8OrJH7DXUGdtwPMB3Vg==
   dependencies:
     "@ant-design/colors" "^7.1.0"
     "@ant-design/cssinjs" "^1.21.0"
@@ -2220,11 +2194,11 @@ antd@>=5, antd@>=5.13.0, antd@>=5.8.1:
     "@ant-design/react-slick" "~1.1.2"
     "@babel/runtime" "^7.24.8"
     "@ctrl/tinycolor" "^3.6.1"
-    "@rc-component/color-picker" "~2.0.0"
+    "@rc-component/color-picker" "~2.0.1"
     "@rc-component/mutate-observer" "^1.1.0"
     "@rc-component/qrcode" "~1.0.0"
     "@rc-component/tour" "~1.15.0"
-    "@rc-component/trigger" "^2.2.0"
+    "@rc-component/trigger" "^2.2.1"
     classnames "^2.5.1"
     copy-to-clipboard "^3.3.3"
     dayjs "^1.11.11"
@@ -2234,22 +2208,22 @@ antd@>=5, antd@>=5.13.0, antd@>=5.8.1:
     rc-dialog "~9.5.2"
     rc-drawer "~7.2.0"
     rc-dropdown "~4.2.0"
-    rc-field-form "~2.2.1"
+    rc-field-form "~2.3.0"
     rc-image "~7.9.0"
-    rc-input "~1.6.2"
+    rc-input "~1.6.3"
     rc-input-number "~9.2.0"
     rc-mentions "~2.15.0"
     rc-menu "~9.14.1"
     rc-motion "^2.9.2"
     rc-notification "~5.6.0"
     rc-pagination "~4.2.0"
-    rc-picker "~4.6.11"
+    rc-picker "~4.6.12"
     rc-progress "~4.0.0"
     rc-rate "~2.13.0"
     rc-resize-observer "^1.4.0"
     rc-segmented "~2.3.0"
     rc-select "~14.15.1"
-    rc-slider "~11.1.3"
+    rc-slider "~11.1.5"
     rc-steps "~6.0.1"
     rc-switch "~4.1.0"
     rc-table "~7.45.7"
@@ -4165,10 +4139,10 @@ jose@^5.4.1:
   resolved "https://mirrors.huaweicloud.com/repository/npm/jose/-/jose-5.6.3.tgz"
   integrity sha512-1Jh//hEEwMhNYPDDLwXHa2ePWgWiFNNUadVmguAAw2IJ6sj9mNxV5tGXJNqlMkJAybF6Lgw1mISDxTePP/187g==
 
-js-cookie@^2.x.x:
-  version "2.2.1"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/js-cookie/-/js-cookie-2.2.1.tgz"
-  integrity sha512-HvdH2LzI/EAZcUwA8+0nKNtWHqS+ZmijLA30RwZA0bo7ToCckjK5MkGhjED9KoRcXO6BaGI3I9UIzSA1FKFPOQ==
+js-cookie@^3.0.5:
+  version "3.0.5"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/js-cookie/-/js-cookie-3.0.5.tgz"
+  integrity sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
@@ -4407,9 +4381,9 @@ lru-cache@^5.1.1:
     yallist "^3.0.2"
 
 lucide-react@>=0.292, lucide-react@>=0.396.0:
-  version "0.424.0"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/lucide-react/-/lucide-react-0.424.0.tgz"
-  integrity sha512-x2Nj2aytk1iOyHqt4hKenfVlySq0rYxNeEf8hE0o+Yh0iE36Rqz0rkngVdv2uQtjZ70LAE73eeplhhptYt9x4Q==
+  version "0.427.0"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/lucide-react/-/lucide-react-0.427.0.tgz"
+  integrity sha512-lv9s6c5BDF/ccuA0EgTdskTxIe11qpwBDmzRZHJAKtp8LTewAvDvOM+pTES9IpbBuTqkjiMhOmGpJ/CB+mKjFw==
 
 magic-string@^0.30.10, magic-string@^0.30.4:
   version "0.30.11"
@@ -5262,12 +5236,7 @@ mri@^1.1.0:
   resolved "https://mirrors.huaweicloud.com/repository/npm/mri/-/mri-1.2.0.tgz"
   integrity sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==
 
-ms@^2.0.0:
-  version "2.1.3"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/ms/-/ms-2.1.3.tgz"
-  integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
-
-ms@2.1.2:
+ms@^2.0.0, ms@2.1.2:
   version "2.1.2"
   resolved "https://mirrors.huaweicloud.com/repository/npm/ms/-/ms-2.1.2.tgz"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
@@ -5372,13 +5341,6 @@ object-keys@~0.4.0:
   resolved "https://mirrors.huaweicloud.com/repository/npm/object-keys/-/object-keys-0.4.0.tgz"
   integrity sha512-ncrLw+X55z7bkl5PnUvHwFK9FcGuFYo9gtjws2XtSzL+aZ8tm830P60WJ0dSmFVaSalWieW5MD7kEdnXda9yJw==
 
-ollama@^0.5.2:
-  version "0.5.6"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/ollama/-/ollama-0.5.6.tgz"
-  integrity sha512-4BySAMt96+OCt4emL6DE78UBCGqC7GvteM9LRCd6WwJyefn0x9w2BrcUcLm9nJ9bYpRsmkhf0Au18Q5MhsA14w==
-  dependencies:
-    whatwg-fetch "^3.6.20"
-
 on-change@^4.0.0:
   version "4.0.2"
   resolved "https://mirrors.huaweicloud.com/repository/npm/on-change/-/on-change-4.0.2.tgz"
@@ -5406,9 +5368,9 @@ open@^8.4.0:
     is-wsl "^2.2.0"
 
 openai@^4.42.0, openai@>=4:
-  version "4.55.0"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/openai/-/openai-4.55.0.tgz"
-  integrity sha512-BR3TUybzdqNeBMgEFvxgBrFks9FY2NoP2jyTf7LT4UxPv8chevRKSxKezsINVSeQ/QLA12CALR1oco6KVdVpVA==
+  version "4.55.5"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/openai/-/openai-4.55.5.tgz"
+  integrity sha512-9OkMAMljFv1LxUFf5HLm/pw7zFd4yMgW+lKOYF80RBwuGWU+ZKF5BQGll+TEGAHu23YMeT8t6VSxI27c/DRAOA==
   dependencies:
     "@types/node" "^18.11.18"
     "@types/node-fetch" "^2.6.4"
@@ -5820,10 +5782,10 @@ rc-dropdown@~4.2.0:
     classnames "^2.2.6"
     rc-util "^5.17.0"
 
-rc-field-form@~2.2.1:
-  version "2.2.1"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/rc-field-form/-/rc-field-form-2.2.1.tgz"
-  integrity sha512-uoNqDoR7A4tn4QTSqoWPAzrR7ZwOK5I+vuZ/qdcHtbKx+ZjEsTg7QXm2wk/jalDiSksAQmATxL0T5LJkRREdIA==
+rc-field-form@~2.3.0:
+  version "2.3.0"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/rc-field-form/-/rc-field-form-2.3.0.tgz"
+  integrity sha512-QyiYrE3uweGGi21MJpxHFmDW+Tb1yt5hitM1k0EbWc5hKDiSf5imOBc6NLLHrYk+sdelrw2Ju/fD4uRQdhSqNg==
   dependencies:
     "@babel/runtime" "^7.18.0"
     "@rc-component/async-validator" "^5.0.3"
@@ -5860,7 +5822,7 @@ rc-input-number@~9.2.0:
     rc-input "~1.6.0"
     rc-util "^5.40.1"
 
-rc-input@~1.6.0, rc-input@~1.6.2:
+rc-input@~1.6.0, rc-input@~1.6.3:
   version "1.6.3"
   resolved "https://mirrors.huaweicloud.com/repository/npm/rc-input/-/rc-input-1.6.3.tgz"
   integrity sha512-wI4NzuqBS8vvKr8cljsvnTUqItMfG1QbJoxovCgL+DX4eVUcHIjVwharwevIxyy7H/jbLryh+K7ysnJr23aWIA==
@@ -5932,10 +5894,10 @@ rc-pagination@~4.2.0:
     classnames "^2.3.2"
     rc-util "^5.38.0"
 
-rc-picker@~4.6.11:
-  version "4.6.11"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/rc-picker/-/rc-picker-4.6.11.tgz"
-  integrity sha512-PEVH5MMTUrdvTTxCmPndsXiJL7TFLSu8q0cDdZrhdcjn8en3NbuhOFacWqKTvdnfG53RPPhiBssXCUHYyc3R/Q==
+rc-picker@~4.6.12:
+  version "4.6.13"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/rc-picker/-/rc-picker-4.6.13.tgz"
+  integrity sha512-yi4JWPGjm420Q8rHjZ6YNy2c5IfV+9EAzx2pewVRPOjJqfg7uifO/Z0uqxdl/h6AhBocuvRvtlyz6ehrAvTq7A==
   dependencies:
     "@babel/runtime" "^7.24.7"
     "@rc-component/trigger" "^2.0.0"
@@ -5995,7 +5957,7 @@ rc-select@~14.15.0, rc-select@~14.15.1:
     rc-util "^5.16.1"
     rc-virtual-list "^3.5.2"
 
-rc-slider@~11.1.3:
+rc-slider@~11.1.5:
   version "11.1.5"
   resolved "https://mirrors.huaweicloud.com/repository/npm/rc-slider/-/rc-slider-11.1.5.tgz"
   integrity sha512-b77H5PbjMKsvkYXAYIkn50QuFX6ICQmCTibDinI9q+BHx65/TV4TeU25+oadhSRzykxs0/vBWeKBwRyySOeWlg==
@@ -7170,11 +7132,6 @@ undici-types@~5.26.4:
   resolved "https://mirrors.huaweicloud.com/repository/npm/undici-types/-/undici-types-5.26.5.tgz"
   integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
 
-undici-types@~6.13.0:
-  version "6.13.0"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/undici-types/-/undici-types-6.13.0.tgz"
-  integrity sha512-xtFJHudx8S2DSoujjMd1WeWvn7KKWFRESZTMeL1RptAYERu29D6jphMjjY+vn96jvN3kVPDNxU/E13VTaXj6jg==
-
 unified@^10.0.0:
   version "10.1.2"
   resolved "https://mirrors.huaweicloud.com/repository/npm/unified/-/unified-10.1.2.tgz"
@@ -7454,23 +7411,23 @@ void-elements@3.1.0:
   resolved "https://mirrors.huaweicloud.com/repository/npm/void-elements/-/void-elements-3.1.0.tgz"
   integrity sha512-Dhxzh5HZuiHQhbvTW9AMetFfBHDMYpo23Uo9btPXgdYP+3T5S+p+jgNy7spra+veYhBP2dCSgxR/i2Y02h5/6w==
 
-vue@^3.3.4, "vue@>=3.2.26 < 4", vue@3.4.36:
-  version "3.4.36"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/vue/-/vue-3.4.36.tgz"
-  integrity sha512-mIFvbLgjODfx3Iy1SrxOsiPpDb8Bo3EU+87ioimOZzZTOp15IEdAels70IjBOLO3ZFlLW5AhdwY4dWbXVQKYow==
+vue@^3.3.4, "vue@>=3.2.26 < 4", vue@3.4.37:
+  version "3.4.37"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/vue/-/vue-3.4.37.tgz"
+  integrity sha512-3vXvNfkKTBsSJ7JP+LyR7GBuwQuckbWvuwAid3xbqK9ppsKt/DUvfqgZ48fgOLEfpy1IacL5f8QhUVl77RaI7A==
   dependencies:
-    "@vue/compiler-dom" "3.4.36"
-    "@vue/compiler-sfc" "3.4.36"
-    "@vue/runtime-dom" "3.4.36"
-    "@vue/server-renderer" "3.4.36"
-    "@vue/shared" "3.4.36"
+    "@vue/compiler-dom" "3.4.37"
+    "@vue/compiler-sfc" "3.4.37"
+    "@vue/runtime-dom" "3.4.37"
+    "@vue/server-renderer" "3.4.37"
+    "@vue/shared" "3.4.37"
 
 web-namespaces@^2.0.0:
   version "2.0.1"
   resolved "https://mirrors.huaweicloud.com/repository/npm/web-namespaces/-/web-namespaces-2.0.1.tgz"
   integrity sha512-bKr1DkiNa2krS7qxNtdrtHAmzuYGFQLiQ13TsorsdT6ULTkPLKuu5+GsFpDlg6JFjUTwX2DyhMPG2be8uPrqsQ==
 
-web-streams-polyfill@^3.0.3, web-streams-polyfill@^3.2.1:
+web-streams-polyfill@^3.0.3:
   version "3.3.3"
   resolved "https://mirrors.huaweicloud.com/repository/npm/web-streams-polyfill/-/web-streams-polyfill-3.3.3.tgz"
   integrity sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==
@@ -7499,11 +7456,6 @@ webidl-conversions@^3.0.0:
   version "3.0.1"
   resolved "https://mirrors.huaweicloud.com/repository/npm/webidl-conversions/-/webidl-conversions-3.0.1.tgz"
   integrity sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==
-
-whatwg-fetch@^3.6.20:
-  version "3.6.20"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/whatwg-fetch/-/whatwg-fetch-3.6.20.tgz"
-  integrity sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==
 
 whatwg-url@^5.0.0:
   version "5.0.0"

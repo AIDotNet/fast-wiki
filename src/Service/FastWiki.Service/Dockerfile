@@ -5,13 +5,6 @@ USER app
 WORKDIR /app
 EXPOSE 8080
 
-FROM node as builder
-WORKDIR /src
-COPY web .
-RUN yarn config set strict-ssl false
-RUN npm config set registry https://registry.npmmirror.com
-RUN npm i
-RUN npm  run build
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -33,5 +26,4 @@ RUN dotnet publish "./FastWiki.Service.csproj" -c $BUILD_CONFIGURATION -o /app/p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY --from=builder /src/dist ./wwwroot
 ENTRYPOINT ["dotnet", "FastWiki.Service.dll"]

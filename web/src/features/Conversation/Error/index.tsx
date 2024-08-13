@@ -14,7 +14,6 @@ import ErrorJsonViewer from './ErrorJsonViewer';
 import InvalidAPIKey from './InvalidAPIKey';
 import InvalidAccessCode from './InvalidAccessCode';
 import OpenAiBizError from './OpenAiBizError';
-import OllamaBizError from './OllamaBizError';
 import PluginSettings from './PluginSettings';
 
 // Config for the errorMessage display
@@ -78,10 +77,6 @@ const ErrorMessageExtra = memo<{ data: ChatMessage }>(({ data }) => {
 
     case AgentRuntimeErrorType.OpenAIBizError: {
       return <OpenAiBizError {...data} />;
-    }
-
-    case AgentRuntimeErrorType.OllamaBizError: {
-      return <OllamaBizError {...data} />;
     }
 
     case ChatErrorType.InvalidClerkUser: {

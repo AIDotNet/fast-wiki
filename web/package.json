@@ -15,10 +15,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.24.0",
     "@azure/openai": "^1.0.0-beta.12",
     "@cfworker/json-schema": "^1.12.8",
-    "@google/generative-ai": "^0.13.0",
     "@icons-pack/react-simple-icons": "^9.5.0",
     "@lobehub/chat-plugin-sdk": "^1.32.3",
     "@lobehub/icons": "^1.23.0",
@@ -49,7 +47,6 @@
     "modern-screenshot": "^4.4.39",
     "monaco-editor": "^0.50.0",
     "numeral": "^2.0.6",
-    "ollama": "^0.5.2",
     "p-map": "^7.0.2",
     "partial-json": "^0.1.7",
     "pino": "^9.2.0",

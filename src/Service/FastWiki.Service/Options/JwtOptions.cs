@@ -5,12 +5,12 @@ public class JwtOptions
     public const string Name = "Jwt";
     
     /// <summary>
-    /// ÃÜÔ¿
+    /// å¯†é’¥
     /// </summary>
     public static string Secret { get; set; }
 
     /// <summary>
-    /// ÓÐÐ§ÆÚ
+    /// æœ‰æ•ˆæœŸ
     /// </summary>
     public static int EffectiveHours { get; set; }
 }
