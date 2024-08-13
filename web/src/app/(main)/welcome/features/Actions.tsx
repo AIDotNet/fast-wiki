@@ -1,12 +1,12 @@
 
 import { Icon } from '@lobehub/ui';
 import { Button } from 'antd';
-import { SendHorizonal } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { memo, startTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flexbox } from 'react-layout-kit';
-import { Link } from 'react-router-dom';
+import { GITHUB } from '@/const/url';
 
 const Actions = memo<{ mobile?: boolean }>(({ mobile }) => {
   const { t } = useTranslation('welcome');
@@ -23,9 +23,13 @@ const Actions = memo<{ mobile?: boolean }>(({ mobile }) => {
         style={{ minWidth: 160 }}
         type={'primary'}
       >
-        <Flexbox align={'center'} gap={4} horizontal justify={'center'}>
-          进入系统
-          <Icon icon={SendHorizonal} />
+        <Flexbox 
+          onClick={()=>{
+            open(GITHUB)
+          }}
+          align={'center'} gap={4} horizontal justify={'center'}>
+          给项目一个Star
+          <Icon icon={Star} />
         </Flexbox>
       </Button>
     </Flexbox>

@@ -109,7 +109,7 @@ public sealed class WikiMemoryService : ISingletonDependency
     ///     创建用于操作的内存服务（不要用于向量搜索）
     /// </summary>
     /// <returns></returns>
-    public MemoryServerless CreateMemoryServerless(string? model = null)
+    public MemoryServerless CreateMemoryServerless(string embeddingModel, string? model = null)
     {
         if (ConnectionStringsOptions.WikiType == "disk")
             return new KernelMemoryBuilder()
@@ -121,7 +121,7 @@ public sealed class WikiMemoryService : ISingletonDependency
                 .WithOpenAITextGeneration(new OpenAIConfig
                 {
                     APIKey = OpenAIOption.ChatToken,
-                    TextModel = model ?? OpenAIOption.ChatToken
+                    TextModel = model
                 }, null, new HttpClient(HttpClientHandler))
                 .WithOpenAITextEmbeddingGeneration(new OpenAIConfig
                 {
@@ -129,7 +129,7 @@ public sealed class WikiMemoryService : ISingletonDependency
                     APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
                         ? OpenAIOption.ChatToken
                         : OpenAIOption.EmbeddingToken,
-                    EmbeddingModel = OpenAIOption.EmbeddingModel
+                    EmbeddingModel = embeddingModel
                 }, null, false, new HttpClient(HttpClientHandler))
                 .Build<MemoryServerless>();
         return new KernelMemoryBuilder()
@@ -141,7 +141,7 @@ public sealed class WikiMemoryService : ISingletonDependency
             .WithOpenAITextGeneration(new OpenAIConfig
             {
                 APIKey = OpenAIOption.ChatToken,
-                TextModel = model ?? OpenAIOption.ChatModel
+                TextModel = model 
             }, null, new HttpClient(HttpClientHandler))
             .WithOpenAITextEmbeddingGeneration(new OpenAIConfig
             {
@@ -149,7 +149,7 @@ public sealed class WikiMemoryService : ISingletonDependency
                 APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
                     ? OpenAIOption.ChatToken
                     : OpenAIOption.EmbeddingToken,
-                EmbeddingModel = OpenAIOption.EmbeddingModel
+                EmbeddingModel = embeddingModel
             }, null, false, new HttpClient(HttpClientHandler))
             .Build<MemoryServerless>();
     }

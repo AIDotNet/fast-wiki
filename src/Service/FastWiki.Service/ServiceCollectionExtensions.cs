@@ -47,7 +47,6 @@ public static class ServiceCollectionExtensions
         var OPENAI_CHAT_ENDPOINT = Environment.GetEnvironmentVariable("OPENAI_CHAT_ENDPOINT");
         var OPENAI_CHAT_EMBEDDING_ENDPOINT = Environment.GetEnvironmentVariable("OPENAI_CHAT_EMBEDDING_ENDPOINT");
         var OPENAI_CHAT_TOKEN = Environment.GetEnvironmentVariable("OPENAI_CHAT_TOKEN");
-        var OPENAI_EMBEDDING_MODEL = Environment.GetEnvironmentVariable("OPENAI_EMBEDDING_MODEL");
         var OPENAI_EMBEDDING_TOKEN = Environment.GetEnvironmentVariable("OPENAI_EMBEDDING_TOKEN");
         var DEFAULT_TYPE = Environment.GetEnvironmentVariable("DEFAULT_TYPE");
         var DEFAULT_CONNECTION = Environment.GetEnvironmentVariable("DEFAULT_CONNECTION");
@@ -61,8 +60,6 @@ public static class ServiceCollectionExtensions
             OpenAIOption.EmbeddingEndpoint = OPENAI_CHAT_EMBEDDING_ENDPOINT;
 
         if (!OPENAI_CHAT_TOKEN.IsNullOrWhiteSpace()) OpenAIOption.ChatToken = OPENAI_CHAT_TOKEN;
-
-        if (!OPENAI_EMBEDDING_MODEL.IsNullOrWhiteSpace()) OpenAIOption.EmbeddingModel = OPENAI_EMBEDDING_MODEL;
 
         if (!OPENAI_EMBEDDING_TOKEN.IsNullOrWhiteSpace()) OpenAIOption.EmbeddingToken = OPENAI_EMBEDDING_TOKEN;
 

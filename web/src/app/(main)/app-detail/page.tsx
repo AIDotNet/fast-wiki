@@ -42,6 +42,10 @@ export default function AppDetail() {
     return (
         <Tabs
             tabPosition={'left'}
+            style={{
+                marginTop: 20,
+                height: '100%',
+            }}
             items={[
                 {
                     key: '1',

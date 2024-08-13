@@ -136,38 +136,6 @@ builder.Services.AddAutoInject();
 
 var app = builder.Services.AddServices(builder, option => option.MapHttpMethodsForUnmatched = ["Post"]);
 
-app.Use(async (context, next) =>
-{
-    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-
-    try
-    {
-        await next(context);
-
-        if (context.Response.StatusCode == 404)
-        {
-            context.Request.Path = "/index.html";
-            await next(context);
-        }
-    }
-    catch (UserFriendlyException userFriendlyException)
-    {
-        context.Response.StatusCode = 400;
-
-        logger.LogError(userFriendlyException, userFriendlyException.Message);
-
-        await context.Response.WriteAsJsonAsync(ResultDto.CreateError(userFriendlyException.Message, "400"));
-    }
-    catch (Exception e)
-    {
-        context.Response.StatusCode = 500;
-
-        logger.LogError(e, e.Message);
-
-        await context.Response.WriteAsJsonAsync(ResultDto.CreateError(e.Message, "500"));
-    }
-});
-
 var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider
 {
     Mappings =
@@ -189,12 +157,34 @@ app.UseResponseCompression();
 
 app.Use(async (context, next) =>
 {
-    await next(context);
+    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
 
-    if (context.Response.StatusCode == 404)
+    try
     {
-        context.Request.Path = "/index.html";
         await next(context);
+
+        if (context.Response.StatusCode == 404)
+        {
+            context.Request.Path = "/index.html";
+            await next(context);
+            
+        }
+    }
+    catch (UserFriendlyException userFriendlyException)
+    {
+        context.Response.StatusCode = 400;
+
+        logger.LogError(userFriendlyException, userFriendlyException.Message);
+
+        await context.Response.WriteAsJsonAsync(ResultDto.CreateError(userFriendlyException.Message, "400"));
+    }
+    catch (Exception e)
+    {
+        context.Response.StatusCode = 500;
+
+        logger.LogError(e, e.Message);
+
+        await context.Response.WriteAsJsonAsync(ResultDto.CreateError(e.Message, "500"));
     }
 });
 

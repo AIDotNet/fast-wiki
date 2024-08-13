@@ -2,11 +2,11 @@
   "name": "web",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://github.com/AIDotNet/ThorChat",
+  "homepage": "https://github.com/AIDotNet/fast-wiki",
   "description": "Token Chat - an open-source, high-performance chatbot framework that supports speech synthesis, multimodal, and extensible Function Call plugin system. Supports one-click free deployment of your private ChatGPT/LLM web application.",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/AIDotNet/ThorChat/issues/new/choose"
+    "url": "https://github.com/AIDotNet/fast-wiki/issues/new/choose"
   },
   "scripts": {
     "dev": "vite",
