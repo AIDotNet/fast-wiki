@@ -29,10 +29,12 @@ public sealed class WikiCommandHandler(
 
         await wikiRepository.RemoveDetailsAsync(ids);
 
+        var wiki = await wikiRepository.FindAsync(command.Id);
+
         foreach (var id in ids)
             try
             {
-                var memoryServerless = wikiMemoryService.CreateMemoryServerless(string.Empty,string.Empty);
+                var memoryServerless = wikiMemoryService.CreateMemoryServerless(wiki.EmbeddingModel, wiki.Model);
                 await memoryServerless.DeleteDocumentAsync(id.ToString(), "wiki");
             }
             catch (Exception e)
@@ -102,7 +104,7 @@ public sealed class WikiCommandHandler(
 
         try
         {
-            var memoryServerless = wikiMemoryService.CreateMemoryServerless(string.Empty,string.Empty);
+            var memoryServerless = wikiMemoryService.CreateMemoryServerless(string.Empty, string.Empty);
             await memoryServerless.DeleteDocumentAsync(command.Id.ToString(), "wiki");
         }
         catch (Exception e)
@@ -114,7 +116,8 @@ public sealed class WikiCommandHandler(
     [EventHandler]
     public async Task RemoveWikiDetailVectorQuantityAsync(RemoveWikiDetailVectorQuantityCommand command)
     {
-        var memoryServerless = wikiMemoryService.CreateMemoryServerless(string.Empty,string.Empty);
+        
+        var memoryServerless = wikiMemoryService.CreateMemoryServerless(string.Empty, string.Empty);
         await memoryServerless.DeleteDocumentAsync(command.DocumentId, "wiki");
     }
 

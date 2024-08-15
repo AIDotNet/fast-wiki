@@ -49,7 +49,7 @@ public sealed class FastWikiFunctionCallRepository : Repository<WikiDbContext, F
     {
         await Context.FunctionCalls.AddAsync(functionCall);
 
-        await UnitOfWork.SaveChangesAsync();
+        await Context.SaveChangesAsync();
     }
 
     private IQueryable<FastWikiFunctionCall> CreateQuery(Guid? userId)

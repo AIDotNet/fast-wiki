@@ -41,7 +41,9 @@ public sealed class WikiQueryHandler(
     [EventHandler]
     public async Task WikiDetailVectorQuantityAsync(WikiDetailVectorQuantityQuery query)
     {
-        var memoryServerless = wikiMemoryService.CreateMemoryServerless(string.Empty,string.Empty);
+        var wiki = await wikiRepository.FindAsync(x => long.Parse(query.WikiDetailId) == x.Id);
+
+        var memoryServerless = wikiMemoryService.CreateMemoryServerless(wiki.EmbeddingModel, wiki.Model);
         var memoryDbs = memoryServerless.Orchestrator.GetMemoryDbs();
 
         var result = new PaginatedListBase<WikiDetailVectorQuantityDto>();
@@ -92,7 +94,10 @@ public sealed class WikiQueryHandler(
     public async Task SearchVectorQuantityAsync(SearchVectorQuantityQuery query)
     {
         var stopwatch = Stopwatch.StartNew();
-        var memoryServerless = wikiMemoryService.CreateMemoryServerless(string.Empty,string.Empty);
+
+        var wiki = await wikiRepository.FindAsync(query.WikiId);
+
+        var memoryServerless = wikiMemoryService.CreateMemoryServerless(wiki.EmbeddingModel, wiki.Model);
         var searchResult = await memoryServerless.SearchAsync(query.Search, "wiki",
             new MemoryFilter().ByTag("wikiId", query.WikiId.ToString()), minRelevance: query.MinRelevance, limit: 5);
 

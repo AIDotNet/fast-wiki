@@ -82,7 +82,7 @@ public sealed class UserService(IUserRepository userRepository, IMapper mapper) 
             "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", input.Email, input.Phone,
             false);
 
-        await userRepository.AddAsync(user);
+        await userRepository.InsertAsync(user);
     }
 
     [Authorize]

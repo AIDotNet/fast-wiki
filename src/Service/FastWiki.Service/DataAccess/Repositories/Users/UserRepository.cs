@@ -22,13 +22,13 @@ public sealed class UserRepository : Repository<WikiDbContext, User, Guid>, IUse
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        // ¹ÜÀíÔ±²»ÄÜÉ¾³ý
+        // ç®¡ç†å‘˜ä¸èƒ½åˆ é™¤
         return await Context.Users.Where(x => x.Id == id && x.Role != RoleType.Admin).ExecuteDeleteAsync() > 1;
     }
 
     public async Task<bool> DisableAsync(Guid id, bool disable)
     {
-        // ¹ÜÀíÔ±²»ÄÜ½ûÓÃ
+        // ç®¡ç†å‘˜ä¸èƒ½ç¦ç”¨
         return await Context.Users.Where(x => x.Id == id && x.Role != RoleType.Admin)
             .ExecuteUpdateAsync(item => item.SetProperty(x => x.IsDisable, disable)) > 0;
     }
@@ -42,6 +42,13 @@ public sealed class UserRepository : Repository<WikiDbContext, User, Guid>, IUse
     public async Task<bool> IsExistAccountAsync(string account)
     {
         return await Context.Users.AnyAsync(x => x.Account == account);
+    }
+
+    public async Task InsertAsync(User user)
+    {
+        await Context.Users.AddAsync(user);
+        
+        await Context.SaveChangesAsync();
     }
 
     private IQueryable<User> GetQuery(string? keyword)
