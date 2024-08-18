@@ -15,7 +15,7 @@ namespace FastWiki.Service.Migrations.Sqlite
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.7");
 
             modelBuilder.Entity("FastWiki.Service.Domain.ChatApplications.Aggregates.ChatApplication", b =>
                 {
@@ -183,8 +183,6 @@ namespace FastWiki.Service.Migrations.Sqlite
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreationTime");
-
                     b.ToTable("wiki-questions", (string)null);
                 });
 
@@ -340,20 +338,53 @@ namespace FastWiki.Service.Migrations.Sqlite
                     b.HasData(
                         new
                         {
-                            Id = new Guid("e45c6b3f-70b4-4ba2-a992-2179607d752b"),
+                            Id = new Guid("6206211d-6e07-42ea-8750-7d415a2ffaa8"),
                             Account = "admin",
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                            CreationTime = new DateTime(2024, 5, 12, 14, 58, 27, 64, DateTimeKind.Utc).AddTicks(7298),
+                            CreationTime = new DateTime(2024, 8, 18, 14, 8, 56, 546, DateTimeKind.Utc).AddTicks(8987),
                             Email = "239573049@qq.com",
                             IsDeleted = false,
                             IsDisable = false,
-                            ModificationTime = new DateTime(2024, 5, 12, 14, 58, 27, 64, DateTimeKind.Utc).AddTicks(7301),
+                            ModificationTime = new DateTime(2024, 8, 18, 14, 8, 56, 546, DateTimeKind.Utc).AddTicks(8990),
                             Name = "admin",
-                            Password = "40237cc3bff510e141de01a3f036be71",
+                            Password = "f0f6d913839798fff09760727a015264",
                             Phone = "13049809673",
                             Role = 2,
-                            Salt = "445acb533eca439b90ebd887084438ab"
+                            Salt = "ff4cdcea6d814b80a4777acf20cdc52f"
                         });
+                });
+
+            modelBuilder.Entity("FastWiki.Service.Domain.Wikis.Aggregates.QuantizedList", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ProcessTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("State")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("WikiDetailId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("WikiId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WikiDetailId");
+
+                    b.HasIndex("WikiId");
+
+                    b.ToTable("wiki-quantized-lists", (string)null);
                 });
 
             modelBuilder.Entity("FastWiki.Service.Domain.Wikis.Aggregates.Wiki", b =>
@@ -389,6 +420,9 @@ namespace FastWiki.Service.Migrations.Sqlite
                     b.Property<string>("Name")
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("VectorType")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -460,6 +494,51 @@ namespace FastWiki.Service.Migrations.Sqlite
                     b.HasKey("Id");
 
                     b.ToTable("wiki-wiki-details", (string)null);
+                });
+
+            modelBuilder.Entity("mem0.Core.Model.History", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Event")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("MemoryId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NewValue")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PrevValue")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TrackId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MemoryId");
+
+                    b.HasIndex("TrackId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("wiki-histories", (string)null);
                 });
 #pragma warning restore 612, 618
         }

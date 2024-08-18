@@ -5,6 +5,9 @@ import { PlusOutlined } from '@ant-design/icons';
 import { CreateWikis } from "@/services/WikiService";
 import { UploadFile } from "@/services/StorageService";
 import { getModels } from "@/utils/model";
+import {
+    Select
+} from 'antd';
 
 interface ICreateAppProps {
     visible: boolean;
@@ -72,6 +75,7 @@ export function CreateApp(props: ICreateAppProps) {
             }
             const resultFile = await UploadFile(fileList[0].originFileObj)
             values.icon = resultFile.path;
+            values.vectorType = Number(values.vectorType) ;
             await CreateWikis(values);
             message.success('创建成功');
             props.onSuccess();
@@ -102,7 +106,7 @@ export function CreateApp(props: ICreateAppProps) {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    marginBottom: 0
+                    marginBottom: 10
                 }}>
                     <Upload
                         listType="picture-card"
@@ -151,10 +155,20 @@ export function CreateApp(props: ICreateAppProps) {
                         options={embeddingModel}
                     />
                 </Form.Item>
+                <Form.Item
+                    label="知识库类型"
+                    name="vectorType"
+                    initialValue={'0'}
+                    rules={[{ required: true, message: '请选择知识库类型' }]}>
+                    <Select>
+                        <Select.Option value="0">默认类型</Select.Option>
+                        <Select.Option value="1">Mem0类型</Select.Option>
+                    </Select>
+                </Form.Item>
 
                 <Form.Item>
                     <Button block htmlType="submit">
-                        创建
+                        创建知识库
                     </Button>
                 </Form.Item>
             </Form>

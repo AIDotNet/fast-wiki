@@ -109,7 +109,6 @@ docker run -d \
   -e OPENAI_CHAT_EMBEDDING_ENDPOINT=https://api.openai.com \
   -e DEFAULT_TYPE=sqlite \
   -e DEFAULT_CONNECTION=Data\ Source=/app/data/fast-wiki.db \
-  -e WIKI_TYPE=sqlite \
   -e WIKI_CONNECTION=/app/data/wiki.db \
   -e OPENAI_CHAT_TOKEN=您的TokenKey \
   -e ASPNETCORE_ENVIRONMENT=Development \
@@ -183,7 +182,6 @@ FastWikiService环境变量参数：
 - OPENAI_EMBEDDING_TOKEN: Embedding的Token, 默认为空，为空则使用对话的Token
 - DEFAULT_TYPE：业务数据库类型 默认sqlite|[pgsql|postgres]
 - DEFAULT_CONNECTION：业务数据库连接字符串
-- WIKI_TYPE: wiki数据库类型 默认disk|[pgsql|postgres]
 - WIKI_CONNECTION: wiki数据库连接字符串(如果是disk则是目录)
 
 ## 技术交流

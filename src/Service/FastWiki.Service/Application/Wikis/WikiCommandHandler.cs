@@ -6,13 +6,15 @@ namespace FastWiki.Service.Application.Wikis;
 public sealed class WikiCommandHandler(
     IWikiRepository wikiRepository,
     WikiMemoryService wikiMemoryService,
+    mem0.NET.Services.MemoryService memoryService,
     IMapper mapper,
     IEventBus eventBus)
 {
     [EventHandler]
     public async Task CreateWiki(CreateWikiCommand command)
     {
-        var wiki = new Wiki(command.Input.Icon, command.Input.Name, command.Input.Model, command.Input.EmbeddingModel);
+        var wiki = new Wiki(command.Input.Icon, command.Input.Name, command.Input.Model, command.Input.EmbeddingModel,
+            command.Input.VectorType);
         await wikiRepository.AddAsync(wiki);
     }
 
@@ -100,12 +102,22 @@ public sealed class WikiCommandHandler(
     [EventHandler]
     public async Task RemoveWikiDetailsCommand(RemoveWikiDetailsCommand command)
     {
+        var wikiDetail = await wikiRepository.GetDetailsAsync(command.Id);
+
         await wikiRepository.RemoveDetailsAsync(command.Id);
 
         try
         {
-            var memoryServerless = wikiMemoryService.CreateMemoryServerless(string.Empty, string.Empty);
-            await memoryServerless.DeleteDocumentAsync(command.Id.ToString(), "wiki");
+            var wiki = await wikiRepository.FindAsync(wikiDetail.WikiId);
+            if (wiki?.VectorType == VectorType.Mem0)
+            {
+                await memoryService.DeleteAll(null, wiki.Id.ToString(), command.Id.ToString());
+            }
+            else
+            {
+                var memoryServerless = wikiMemoryService.CreateMemoryServerless(string.Empty, string.Empty);
+                await memoryServerless.DeleteDocumentAsync(command.Id.ToString(), "wiki");
+            }
         }
         catch (Exception e)
         {
@@ -116,7 +128,6 @@ public sealed class WikiCommandHandler(
     [EventHandler]
     public async Task RemoveWikiDetailVectorQuantityAsync(RemoveWikiDetailVectorQuantityCommand command)
     {
-        
         var memoryServerless = wikiMemoryService.CreateMemoryServerless(string.Empty, string.Empty);
         await memoryServerless.DeleteDocumentAsync(command.DocumentId, "wiki");
     }

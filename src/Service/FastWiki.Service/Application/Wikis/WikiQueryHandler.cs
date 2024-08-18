@@ -6,6 +6,7 @@ namespace FastWiki.Service.Application.Wikis;
 public sealed class WikiQueryHandler(
     IWikiRepository wikiRepository,
     WikiMemoryService wikiMemoryService,
+    mem0.NET.Services.MemoryService memoryService,
     IMapper mapper,
     IFileStorageRepository fileStorageRepository)
 {
@@ -41,53 +42,99 @@ public sealed class WikiQueryHandler(
     [EventHandler]
     public async Task WikiDetailVectorQuantityAsync(WikiDetailVectorQuantityQuery query)
     {
-        var wiki = await wikiRepository.FindAsync(x => long.Parse(query.WikiDetailId) == x.Id);
+        var wiki = await wikiRepository.WikiDetailGetWikiAsync(long.Parse(query.WikiDetailId));
 
-        var memoryServerless = wikiMemoryService.CreateMemoryServerless(wiki.EmbeddingModel, wiki.Model);
-        var memoryDbs = memoryServerless.Orchestrator.GetMemoryDbs();
+        if (wiki == null)
+            throw new UserFriendlyException("知识库不存在 with id: " + query.WikiDetailId);
 
-        var result = new PaginatedListBase<WikiDetailVectorQuantityDto>();
-
-        var dto = new List<WikiDetailVectorQuantityDto>();
-
-        var entity = await wikiRepository.GetDetailsAsync(long.Parse(query.WikiDetailId));
-
-        result.Total = entity.DataCount;
-
-        foreach (var memoryDb in memoryDbs)
+        if (wiki.VectorType == VectorType.Mem0)
         {
-            // 通过pageSize和page获取到最大数量
-            var limit = query.PageSize * query.Page;
-            if (limit < 10) limit = 10;
+            int limit = query.PageSize * (query.Page);
 
-            var filter = new MemoryFilter().ByDocument(query.WikiDetailId);
+            var result = await memoryService.GetMemoryAll(null, wiki.Id.ToString(), query.WikiDetailId, (uint)limit);
 
-            var size = 0;
-            await foreach (var item in memoryDb.GetListAsync("wiki", new List<MemoryFilter>
-                           {
-                               filter
-                           }, limit, true))
+            var dto = new List<WikiDetailVectorQuantityDto>();
+
+            var index = 0;
+            foreach (var item in result)
             {
-                size++;
-                if (size < query.PageSize * (query.Page - 1)) continue;
+                // 需要跳过前面的数据
+                if (index < query.PageSize * (query.Page - 1))
+                {
+                    index++;
+                    continue;
+                }
 
-                if (size > query.PageSize * query.Page) break;
+                if (index > query.PageSize * query.Page) break;
 
                 dto.Add(new WikiDetailVectorQuantityDto
                 {
-                    Content = item.Payload["text"].ToString() ?? string.Empty,
-                    FileId = item.Tags.FirstOrDefault(x => x.Key == "fileId").Value?.FirstOrDefault() ?? string.Empty,
-                    Id = item.Id,
-                    Index = size,
-                    WikiDetailId = item.Tags["wikiDetailId"].FirstOrDefault() ?? string.Empty,
-                    Document_Id = item.Tags["__document_id"].FirstOrDefault() ?? string.Empty
+                    Content = item.MetaData["metaData"],
+                    FileId = item.MetaData.FirstOrDefault(x => x.Key == "fileId").Value ?? string.Empty,
+                    Id = item.Id.ToString(),
+                    Index = index,
+                    WikiDetailId = item.MetaData["wikiDetailId"] ?? string.Empty,
+                    Document_Id = item.Id.ToString()
                 });
             }
+            
+            query.Result = new PaginatedListBase<WikiDetailVectorQuantityDto>
+            {
+                Result = dto,
+                Total = result.Count
+            };
+
+            return;
         }
+        else
+        {
+            var memoryServerless = wikiMemoryService.CreateMemoryServerless(wiki.EmbeddingModel, wiki.Model);
+            var memoryDbs = memoryServerless.Orchestrator.GetMemoryDbs();
 
-        result.Result = dto;
+            var result = new PaginatedListBase<WikiDetailVectorQuantityDto>();
 
-        query.Result = result;
+            var dto = new List<WikiDetailVectorQuantityDto>();
+
+            var entity = await wikiRepository.GetDetailsAsync(long.Parse(query.WikiDetailId));
+
+            result.Total = entity.DataCount;
+
+            foreach (var memoryDb in memoryDbs)
+            {
+                // 通过pageSize和page获取到最大数量
+                var limit = query.PageSize * query.Page;
+                if (limit < 10) limit = 10;
+
+                var filter = new MemoryFilter().ByDocument(query.WikiDetailId);
+
+                var size = 0;
+                await foreach (var item in memoryDb.GetListAsync("wiki", new List<MemoryFilter>
+                               {
+                                   filter
+                               }, limit, true))
+                {
+                    size++;
+                    if (size < query.PageSize * (query.Page - 1)) continue;
+
+                    if (size > query.PageSize * query.Page) break;
+
+                    dto.Add(new WikiDetailVectorQuantityDto
+                    {
+                        Content = item.Payload["text"].ToString() ?? string.Empty,
+                        FileId = item.Tags.FirstOrDefault(x => x.Key == "fileId").Value?.FirstOrDefault() ??
+                                 string.Empty,
+                        Id = item.Id,
+                        Index = size,
+                        WikiDetailId = item.Tags["wikiDetailId"].FirstOrDefault() ?? string.Empty,
+                        Document_Id = item.Tags["__document_id"].FirstOrDefault() ?? string.Empty
+                    });
+                }
+            }
+
+            result.Result = dto;
+
+            query.Result = result;
+        }
     }
 
     [EventHandler]

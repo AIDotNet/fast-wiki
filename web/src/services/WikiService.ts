@@ -1,3 +1,4 @@
+import { QuantizedListState } from '@/types/wiki';
 import { del, get, post, postJson, putJson } from '../utils/fetch';
 
 
@@ -116,7 +117,7 @@ export function DelDetailsVector(id: string) {
  * @param id 
  * @returns 
  */
-export function RetryVectorDetail(id:number){
+export function RetryVectorDetail(id: number) {
     return post(`${prefix}/RetryVectorDetail/${id}`)
 }
 
@@ -134,6 +135,12 @@ export function DetailsRenameName(id: string, name: string) {
  * 检查知识库向量状态
  * @returns 
  */
-export function CheckQuantizationState(wikiId: string) {
-    return post(`${prefix}/CheckQuantizationState?wikiId=${wikiId}`)
+export function CheckQuantizationState(wikiId: string, state: QuantizedListState | null, page: number, pageSize: number) {
+    let query;
+    if (state) {
+        query = `?wikiId=${wikiId}&state=${state}&page=${page}&pageSize=${pageSize}`
+    } else {
+        query = `?wikiId=${wikiId}&page=${page}&pageSize=${pageSize}`
+    }
+    return post(`${prefix}/CheckQuantizationState${query}`)
 }

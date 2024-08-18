@@ -135,7 +135,7 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
 
     const items: MenuProps['items'] = [
         {
-            key: '1',
+            key: 'upload',
             onClick: () => {
                 onChagePath('upload')
             },
@@ -146,7 +146,7 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
             ),
         },
         {
-            key: '2',
+            key: 'upload-web',
             onClick: () => {
                 onChagePath('upload-web')
             },
@@ -157,7 +157,10 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
             ),
         },
         {
-            key: '3',
+            key: 'upload-data',
+            onClick: () => {
+                onChagePath('upload-data')
+            },
             label: (
                 <span>
                     自定义文本

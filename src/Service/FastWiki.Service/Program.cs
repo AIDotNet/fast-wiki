@@ -4,7 +4,10 @@ using FastWiki.Service.Backgrounds;
 using FastWiki.Service.Options;
 using FastWiki.Service.Service;
 using Masa.Contrib.Authentication.Identity;
+using mem0.Core.VectorStores;
+using mem0.NET.Options;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.DependencyInjection.Options;
 using Serilog;
 using Serilog.Core;
 
@@ -56,6 +59,21 @@ else
 
 builder.Services
     .AddMapster();
+
+builder.Services.AddOptions<Mem0Options>()
+    .Bind(builder.Configuration.GetSection("Mem0"));
+
+builder.Services.AddOptions<QdrantOptions>()
+    .Bind(builder.Configuration.GetSection("Qdrant"));
+
+var options = builder.Configuration.GetSection("Mem0")
+    .Get<Mem0Options>();
+
+var qdrantOptions = builder.Configuration.GetSection("Qdrant")
+    .Get<QdrantOptions>();
+
+builder.Services.AddMem0DotNet(options)
+    .WithVectorQdrant(qdrantOptions);
 
 builder.Services
     .AddCors(options =>
@@ -114,8 +132,9 @@ builder.Services
             });
         foreach (var item in Directory.GetFiles(Directory.GetCurrentDirectory(), "*.xml"))
             options.IncludeXmlComments(item, true);
-        options.DocInclusionPredicate((docName, action) => true);
+        options.DocInclusionPredicate((_, _) => true);
     })
+    .AddScoped<IHistoryService, HistoryService>()
     .AddMasaDbContext<WikiDbContext>(opt =>
     {
         if (ConnectionStringsOptions.DefaultType == "sqlite")
@@ -154,7 +173,6 @@ app.Use(async (context, next) =>
         {
             context.Request.Path = "/index.html";
             await next(context);
-            
         }
     }
     catch (UserFriendlyException userFriendlyException)
@@ -175,17 +193,15 @@ app.Use(async (context, next) =>
     }
 });
 
-var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider
-{
-    Mappings =
-    {
-        [".md"] = "application/octet-stream"
-    }
-};
-
 app.UseStaticFiles(new StaticFileOptions
 {
-    ContentTypeProvider = fileExtensionContentTypeProvider
+    ContentTypeProvider =  new FileExtensionContentTypeProvider
+    {
+        Mappings =
+        {
+            [".md"] = "application/octet-stream"
+        }
+    }
 });
 
 app.MapGet("/js/env.js", () =>
@@ -262,10 +278,6 @@ else
     await using var context = app.Services.CreateScope().ServiceProvider.GetService<WikiDbContext>();
     {
         await context!.Database.MigrateAsync();
-
-        if (!ConnectionStringsOptions.WikiType.Equals("disk", StringComparison.OrdinalIgnoreCase))
-            // TODO: 创建vector插件如果数据库没有则需要提供支持向量的数据库。
-            await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");
     }
 }
 

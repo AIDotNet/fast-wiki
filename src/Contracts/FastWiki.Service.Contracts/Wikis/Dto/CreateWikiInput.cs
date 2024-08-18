@@ -21,4 +21,9 @@ public sealed class CreateWikiInput
     ///     知识库向量化模型
     /// </summary>
     public string EmbeddingModel { get; set; } = "text-embedding-3-small";
+    
+    /// <summary>
+    /// 向量数据库类型
+    /// </summary>
+    public VectorType VectorType { get; set; }
 }

@@ -37,6 +37,11 @@ public class UpdateChatApplicationInput
     ///     参数
     /// </summary>
     public Dictionary<string, string> Parameter { get; set; }
+    
+    /// <summary>
+    ///     匹配相似度
+    /// </summary>
+    public double Relevancy { get; set; } = 0.4;
 
     public string Opener { get; set; }
 

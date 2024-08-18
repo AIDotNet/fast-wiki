@@ -1,8 +1,14 @@
 using System.Collections.Concurrent;
+using System.Text.Json;
 using System.Threading.Channels;
 using FastWiki.Service.Infrastructure.KM;
 using FastWiki.Service.Service;
+using mem0.Core;
 using Microsoft.KernelMemory.Handlers;
+using Microsoft.SemanticKernel.Text;
+using MemoryService = mem0.NET.Services.MemoryService;
+
+#pragma warning disable SKEXP0050
 
 namespace FastWiki.Service.Backgrounds;
 
@@ -11,6 +17,20 @@ namespace FastWiki.Service.Backgrounds;
 /// </summary>
 public sealed class QuantizeBackgroundService : BackgroundService
 {
+    private const string Mem0Prompt = """
+                                      推断出提供文本中的事实、偏好和记忆。
+                                      只需以要点形式返回事实、偏好和记忆。:
+                                      自然语言文本: {user_input}
+                                      User/Agent details: {metadata}
+
+                                      推导事实、偏好和记忆的约束：
+                                      - 事实、偏好和记忆应简洁明了，但是需要含有重要信息。
+                                      - 不要以“这个人喜欢披萨”开头。相反，从“喜欢披萨”开始。
+                                      - 不要记住所提供的User/Agent详细信息。只记住事实、偏好和回忆。
+                                      推导出的事实、偏好和记忆:
+
+                                      """;
+
     /// <summary>
     ///     当前任务数量
     /// </summary>
@@ -40,11 +60,6 @@ public sealed class QuantizeBackgroundService : BackgroundService
         _serviceProvider = serviceProvider;
         _logger = logger;
     }
-
-    /// <summary>
-    ///     线程安全字典
-    /// </summary>
-    public static ConcurrentDictionary<string, (WikiDetail, Wiki)> CacheWikiDetails { get; } = new();
 
     /// <summary>
     ///     执行
@@ -101,8 +116,116 @@ public sealed class QuantizeBackgroundService : BackgroundService
 
         var wiki = await wikiRepository.FindAsync(x => x.Id == wikiDetail.WikiId);
 
-        CacheWikiDetails.TryAdd(wikiDetail.Id.ToString(), new ValueTuple<WikiDetail, Wiki>(wikiDetail, wiki));
+        var id = await wikiRepository.CreateQuantizationListAsync(wiki.Id, wikiDetail.Id,
+            $"创建量化任务：{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId}");
+        try
+        {
+            if (wiki.VectorType == VectorType.Mem0)
+            {
+                await HandlerMem0(fileStorageRepository, wikiRepository, wikiDetail, wiki,
+                    service.GetRequiredService<MemoryService>(), id);
+            }
+            else
+            {
+                if (wikiDetail.Mode == ProcessMode.Auto)
+                {
+                    wikiDetail.MaxTokensPerLine = 300;
+                    wikiDetail.MaxTokensPerParagraph = 1000;
+                    wikiDetail.OverlappingTokens = 100;
+                }
 
+                // 获取知识库配置的模型，如果没有则使用默认模型
+                var serverless = wikiMemoryService.CreateMemoryServerless(new SearchClientConfig(),
+                    wikiDetail.MaxTokensPerLine, wikiDetail.MaxTokensPerParagraph, wikiDetail.OverlappingTokens,
+                    wiki?.Model,
+                    wiki?.EmbeddingModel);
+                _logger.LogInformation($"开始量化：{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId}");
+                List<string> step = [];
+
+                if (wikiDetail.TrainingPattern == TrainingPattern.QA)
+                {
+                    QAHandler._wikiDetail.Value = (wiki, wikiDetail);
+                    var stepName = wikiDetail.Id.ToString();
+                    serverless.Orchestrator.AddHandler<TextExtractionHandler>("extract_text");
+                    serverless.Orchestrator.AddHandler<QAHandler>(stepName);
+                    serverless.Orchestrator.AddHandler<GenerateEmbeddingsHandler>("generate_embeddings");
+                    serverless.Orchestrator.AddHandler<SaveRecordsHandler>("save_memory_records");
+                    step.Add("extract_text");
+                    step.Add(stepName);
+                    step.Add("generate_embeddings");
+                    step.Add("save_memory_records");
+                }
+
+                var result = string.Empty;
+                if (wikiDetail.Type == "file")
+                {
+                    var fileInfoQuery = await fileStorageRepository.FindAsync(x => x.Id == wikiDetail.FileId);
+
+                    result = await serverless.ImportDocumentAsync(fileInfoQuery.FullName,
+                        wikiDetail.Id.ToString(),
+                        new TagCollection
+                        {
+                            {
+                                "wikiId", wikiDetail.WikiId.ToString()
+                            },
+                            {
+                                "fileId", wikiDetail.FileId.ToString()
+                            },
+                            {
+                                "wikiDetailId", wikiDetail.Id.ToString()
+                            }
+                        }, "wiki", step.ToArray());
+                }
+                else if (wikiDetail.Type == "web")
+                {
+                    result = await serverless.ImportWebPageAsync(wikiDetail.Path,
+                        wikiDetail.Id.ToString(),
+                        new TagCollection
+                        {
+                            {
+                                "wikiId", wikiDetail.WikiId.ToString()
+                            },
+                            {
+                                "wikiDetailId", wikiDetail.Id.ToString()
+                            }
+                        }, "wiki", step.ToArray());
+                }
+                else if (wikiDetail.Type == "data")
+                {
+                    result = await serverless.ImportDocumentAsync(wikiDetail.Path,
+                        wikiDetail.Id.ToString(),
+                        new TagCollection
+                        {
+                            {
+                                "wikiId", wikiDetail.WikiId.ToString()
+                            },
+                            {
+                                "wikiDetailId", wikiDetail.Id.ToString()
+                            }
+                        }, "wiki", step.ToArray());
+                }
+
+                await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Accomplish);
+
+                await wikiRepository.CompleteQuantizationListAsync(id,
+                    $"量化成功：{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {result}",
+                    QuantizedListState.Success);
+            }
+        }
+        catch (Exception e)
+        {
+            await wikiRepository.CompleteQuantizationListAsync(id,
+                $"量化失败：{wikiDetail.FileName} {e.Message}",
+                QuantizedListState.Fail);
+
+            if (wikiDetail.State != WikiQuantizationState.Fail)
+                await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Fail);
+        }
+    }
+
+    private async Task HandlerMem0(IFileStorageRepository fileStorageRepository, IWikiRepository wikiRepository,
+        WikiDetail wikiDetail, Wiki wiki, MemoryService requiredService, long quantizedListId)
+    {
         if (wikiDetail.Mode == ProcessMode.Auto)
         {
             wikiDetail.MaxTokensPerLine = 300;
@@ -110,92 +233,81 @@ public sealed class QuantizeBackgroundService : BackgroundService
             wikiDetail.OverlappingTokens = 100;
         }
 
-        // 获取知识库配置的模型，如果没有则使用默认模型
-        var serverless = wikiMemoryService.CreateMemoryServerless(new SearchClientConfig(),
-            wikiDetail.MaxTokensPerLine, wikiDetail.MaxTokensPerParagraph, wikiDetail.OverlappingTokens, wiki?.Model,
-            wiki?.EmbeddingModel);
-        try
+        ApplicationContext.HistoryTrackId.Value = wikiDetail.Id.ToString();
+
+        var result = string.Empty;
+        if (wikiDetail.Type == "file")
         {
-            _logger.LogInformation($"开始量化：{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId}");
-            List<string> step = [];
-            if (wikiDetail.TrainingPattern == TrainingPattern.QA)
-            {
-                var stepName = wikiDetail.Id.ToString();
-                serverless.Orchestrator.AddHandler<TextExtractionHandler>("extract_text");
-                serverless.Orchestrator.AddHandler<QAHandler>(stepName);
-                serverless.Orchestrator.AddHandler<GenerateEmbeddingsHandler>("generate_embeddings");
-                serverless.Orchestrator.AddHandler<SaveRecordsHandler>("save_memory_records");
-                step.Add("extract_text");
-                step.Add(stepName);
-                step.Add("generate_embeddings");
-                step.Add("save_memory_records");
-            }
+            var fileInfoQuery = await fileStorageRepository.FindAsync(x => x.Id == wikiDetail.FileId);
 
-            var result = string.Empty;
-            if (wikiDetail.Type == "file")
-            {
-                var fileInfoQuery = await fileStorageRepository.FindAsync(x => x.Id == wikiDetail.FileId);
+            var files = await File.ReadAllTextAsync(fileInfoQuery.FullName);
 
-                result = await serverless.ImportDocumentAsync(fileInfoQuery.FullName,
-                    wikiDetail.Id.ToString(),
-                    new TagCollection
-                    {
-                        {
-                            "wikiId", wikiDetail.WikiId.ToString()
-                        },
-                        {
-                            "fileId", wikiDetail.FileId.ToString()
-                        },
-                        {
-                            "wikiDetailId", wikiDetail.Id.ToString()
-                        }
-                    }, "wiki", step.ToArray());
-            }
-            else if (wikiDetail.Type == "web")
-            {
-                result = await serverless.ImportWebPageAsync(wikiDetail.Path,
-                    wikiDetail.Id.ToString(),
-                    new TagCollection
-                    {
-                        {
-                            "wikiId", wikiDetail.WikiId.ToString()
-                        },
-                        {
-                            "wikiDetailId", wikiDetail.Id.ToString()
-                        }
-                    }, "wiki", step.ToArray());
-            }
-            else if (wikiDetail.Type == "data")
-            {
-                result = await serverless.ImportDocumentAsync(wikiDetail.Path,
-                    wikiDetail.Id.ToString(),
-                    new TagCollection
-                    {
-                        {
-                            "wikiId", wikiDetail.WikiId.ToString()
-                        },
-                        {
-                            "wikiDetailId", wikiDetail.Id.ToString()
-                        }
-                    }, "wiki", step.ToArray());
-            }
+            var fileContents = TextChunker.SplitMarkdownParagraphs([files], wikiDetail.MaxTokensPerParagraph,
+                wikiDetail.OverlappingTokens);
 
-            await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Accomplish);
-            _logger.LogInformation($"量化成功：{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {result}");
+            foreach (var item in fileContents)
+            {
+                ApplicationContext.AddMemoryMetadata.Value = new Dictionary<string, string>
+                {
+                    { "wikiId", wikiDetail.WikiId.ToString() },
+                    {
+                        "user_id", wiki.Creator.ToString()
+                    },
+                    {
+                        "run_id", wikiDetail.Id.ToString()
+                    },
+                    {
+                        "agent_id", wiki.Id.ToString()
+                    },
+                    { "wikiDetailId", wikiDetail.Id.ToString() },
+                    {
+                        "fileIds", fileInfoQuery.Id.ToString()
+                    },
+                    { "metaData", item }
+                };
+
+                await requiredService.CreateMemoryAsync(new CreateMemoryInput()
+                {
+                    Data = item,
+                    UserId = wiki.Creator.ToString(),
+                    RunId = wikiDetail.Id.ToString(),
+                    AgentId = wiki.Id.ToString(),
+                    Prompt = Mem0Prompt.Replace("{user_input}", item)
+                        .Replace("{metadata}", JsonSerializer.Serialize(new { }))
+                });
+            }
         }
-        catch (Exception e)
+        else if (wikiDetail.Type == "data")
         {
-            _logger.LogError(e, $"量化失败{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId}");
+            var fileContents = TextChunker.SplitMarkdownParagraphs([wikiDetail.Path],
+                wikiDetail.MaxTokensPerParagraph,
+                wikiDetail.OverlappingTokens);
 
-            if (wikiDetail.State != WikiQuantizationState.Fail)
-                await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Fail);
+            foreach (var item in fileContents)
+            {
+                ApplicationContext.AddMemoryMetadata.Value = new Dictionary<string, string>
+                {
+                    { "wikiId", wikiDetail.WikiId.ToString() },
+                    { "wikiDetailId", wikiDetail.Id.ToString() },
+                    { "metaData", item }
+                };
+
+                await requiredService.CreateMemoryAsync(new CreateMemoryInput()
+                {
+                    Data = item,
+                    UserId = wiki.Creator.ToString(),
+                    RunId = wikiDetail.Id.ToString(),
+                    AgentId = wiki.Id.ToString(),
+                });
+            }
         }
-        finally
-        {
-            CacheWikiDetails.Remove(wikiDetail.Id.ToString(), out _);
-        }
+
+        await wikiRepository.UpdateDetailsState(wikiDetail.Id, WikiQuantizationState.Accomplish);
+
+        await wikiRepository.CompleteQuantizationListAsync(quantizedListId,
+            $"量化成功：{wikiDetail.FileName} {wikiDetail.Path} {wikiDetail.FileId} {result}",
+            QuantizedListState.Success);
     }
-
 
     private async Task LoadingWikiDetailAsync()
     {

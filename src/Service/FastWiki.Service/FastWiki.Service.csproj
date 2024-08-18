@@ -55,6 +55,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\mem0.NET\src\mem0.NET.Qdrant\mem0.NET.Qdrant.csproj" />
+        <ProjectReference Include="..\..\..\mem0.NET\src\mem0.NET\mem0.NET.csproj" />
         <ProjectReference Include="..\..\Contracts\FastWiki.Service.Contracts\FastWiki.Service.Contracts.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\FastWiki.FunctionCall\FastWiki.FunctionCall.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\FastWiki.Infrastructure.Common\FastWiki.Infrastructure.Common.csproj"/>
@@ -74,5 +76,15 @@
         <Folder Include="Migrations\PostgreSQL\"/>
         <Folder Include="Migrations\Sqlite\"/>
         <Folder Include="wwwroot\"/>
+        <Folder Include="wwwroot\uploads\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\uploads\20240813\4995d7be2339411b8b34b985d0e94c14163431636.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\uploads\20240813\781a2e24cd4144bb9fdd71925af88a3cweather.md" />
+      <_ContentIncludedByDefault Remove="wwwroot\uploads\20240816\2494c8e580804bdf9af218971c2d20ca基础组件发版(gp-gateway-center).md" />
+      <_ContentIncludedByDefault Remove="wwwroot\uploads\20240816\259aedb6af2d4da9ad396a73dfe2ecb7README.txt" />
+      <_ContentIncludedByDefault Remove="wwwroot\uploads\20240816\27166df2bf0042058a77bfcadef29b2a1.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\uploads\20240816\7ccbd188751846fd972d4bf71db86236基础组件发版(gp-gateway-center).md" />
     </ItemGroup>
 </Project>

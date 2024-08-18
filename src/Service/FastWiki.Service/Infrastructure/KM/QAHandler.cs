@@ -1,5 +1,4 @@
-﻿using FastWiki.Service.Backgrounds;
-using FastWiki.Service.Service;
+﻿using FastWiki.Service.Service;
 using Microsoft.KernelMemory.AI.OpenAI;
 using Microsoft.KernelMemory.Configuration;
 using Microsoft.KernelMemory.DataFormats.Text;
@@ -13,6 +12,8 @@ namespace FastWiki.Service.Infrastructure.KM;
 /// </summary>
 public class QAHandler : IPipelineStepHandler
 {
+    public static readonly AsyncLocal<(Wiki, WikiDetail)> _wikiDetail = new();
+
     private readonly ILogger<QAHandler> _log;
     private readonly TextPartitioningOptions _options;
     private readonly IPipelineOrchestrator _orchestrator;
@@ -94,17 +95,17 @@ public class QAHandler : IPipelineStepHandler
                         _log.LogDebug("Partitioning text file {0}", file.Name);
                         var content = partitionContent.ToString();
 
-                        if (QuantizeBackgroundService.CacheWikiDetails.TryGetValue(StepName, out var wikiDetail))
-                            await foreach (var item in OpenAIService
-                                               .QaAsync(wikiDetail.Item1.QAPromptTemplate, content,
-                                                   wikiDetail.Item2.Model, OpenAIOption.ChatToken,
-                                                   OpenAIOption.ChatEndpoint, _wikiMemoryService)
-                                               .WithCancellation(cancellationToken))
-                            {
-                                partitions.Add(item);
-                                sentences.Add(item);
-                            }
+                        var (wiki, wikiDetail) = _wikiDetail.Value;
 
+                        await foreach (var item in OpenAIService
+                                           .QaAsync(wikiDetail.QAPromptTemplate, content,
+                                               wiki.Model, OpenAIOption.ChatToken,
+                                               OpenAIOption.ChatEndpoint, _wikiMemoryService)
+                                           .WithCancellation(cancellationToken))
+                        {
+                            partitions.Add(item);
+                            sentences.Add(item);
+                        }
 
                         break;
                     }

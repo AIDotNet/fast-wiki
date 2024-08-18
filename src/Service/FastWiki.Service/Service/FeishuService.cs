@@ -29,7 +29,8 @@ public class FeishuService
 
     private static readonly ConcurrentDictionary<string, DateTime> MemoryCache = new();
 
-    public static async Task Completions(string id, HttpContext context,ChatApplicationService chatApplicationService, [FromBody] FeishuChatInput input)
+    public static async Task Completions(string id, HttpContext context, ChatApplicationService chatApplicationService,
+        [FromBody] FeishuChatInput input)
     {
         var memoryCache = context.RequestServices.GetRequiredService<IMemoryCache>();
 
@@ -212,7 +213,8 @@ public class FeishuService
                 content,
                 fileStorageRepository,
                 context.RequestServices.GetRequiredService<WikiRepository>(),
-                sourceFile, module);
+                sourceFile, module, null,
+                context.RequestServices.GetRequiredService<mem0.NET.Services.MemoryService>());
 
             if (!success) return;
         }

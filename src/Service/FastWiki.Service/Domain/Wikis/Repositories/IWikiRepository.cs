@@ -103,4 +103,40 @@ public interface IWikiRepository : IRepository<Wiki, long>
     Task RemoveDetailsVectorAsync(string index, string id);
 
     Task DetailsRenameNameAsync(long id, string name);
+
+    /// <summary>
+    /// 通过详情id查找知识库
+    /// </summary>
+    /// <param name="wikiDetailId"></param>
+    /// <returns></returns>
+    Task<Wiki> WikiDetailGetWikiAsync(long wikiDetailId);
+
+    /// <summary>
+    /// 创建一个量化列表任务
+    /// </summary>
+    /// <param name="wikiId"></param>
+    /// <param name="wikiDetailId"></param>
+    /// <param name="remark"></param>
+    public Task<long> CreateQuantizationListAsync(long wikiId, long wikiDetailId, string remark);
+
+    /// <summary>
+    /// 完成量化任务
+    /// </summary>
+    public Task CompleteQuantizationListAsync(long id, string remark, QuantizedListState state);
+
+    /// <summary>
+    /// 获取指定知识库的量化任务列表
+    /// </summary>
+    public Task<List<QuantizedList>> GetQuantizedListAsync(long wikiId, QuantizedListState? state, int page,
+        int pageSize);
+    
+    /// <summary>
+    /// 获取指定知识库的量化任务列表数量
+    /// </summary>
+    public Task<long> GetQuantizedListCountAsync(long wikiId, QuantizedListState? state);
+    
+    /// <summary>
+    /// 通过wiki详情ids获取wiki详情
+    /// </summary>
+    public Task<List<WikiDetail>> GetDetailsByIdsAsync(List<long> wikiDetailIds);
 }
