@@ -21,11 +21,12 @@ services:
       - OPENAI_CHAT_EMBEDDING_ENDPOINT=https://api.openai.com
       - DEFAULT_TYPE=pgsql
       - DEFAULT_CONNECTION=Host=postgres;Port=5432;Database=wiki;Username=token;Password=dd666666
-      - WIKI_TYPE=pgsql
-      - WIKI_CONNECTION=Host=postgres;Port=5432;Database=wiki;Username=token;Password=dd666666
+      - WIKI_CONNECTION=http://qdrant:6333
+      - QDRANT_PORT=6334
+      - QDRANT_API_KEY=dd666666
+      - QDRANT_ENDPOINT=qdrant
       - OPENAI_CHAT_TOKEN=您的TokenKey
       - ASPNETCORE_ENVIRONMENT=Development
-      - TZ=Asia/Shanghai
 
   qdrant:
     image: registry.token-ai.cn/qdrant/qdrant:latest
@@ -38,9 +39,6 @@ services:
       - 6333
       - 6334
       - 6335
-    configs:
-      - source: qdrant_config
-        target: /qdrant/config/production.yaml
     volumes:
       - ./qdrant_data:/qdrant/storage
   
@@ -55,8 +53,3 @@ services:
       TZ: Asia/Shanghai  # 数据库时区
     volumes:
       - ./postgresql:/var/lib/postgresql/data # 将PostgreSql数据持久化
-
-configs:
-  qdrant_config:
-    content: |
-      log_level: INFO      

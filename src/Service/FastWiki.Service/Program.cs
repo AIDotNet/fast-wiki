@@ -72,8 +72,20 @@ var options = builder.Configuration.GetSection("Mem0")
 var qdrantOptions = builder.Configuration.GetSection("Qdrant")
     .Get<QdrantOptions>();
 
+var port = qdrantOptions.Port;
+if (!string.IsNullOrEmpty(ConnectionStringsOptions.QdrantPort))
+{
+    port = int.Parse(ConnectionStringsOptions.QdrantPort);
+}
+
 builder.Services.AddMem0DotNet(options)
-    .WithVectorQdrant(qdrantOptions);
+    .WithVectorQdrant(new QdrantOptions()
+    {
+        ApiKey = ConnectionStringsOptions.QdrantAPIKey ?? qdrantOptions.ApiKey,
+        Https = false,
+        Host = ConnectionStringsOptions.QdrantEndpoint ?? qdrantOptions.Host,
+        Port = port,
+    });
 
 builder.Services
     .AddCors(options =>
@@ -195,7 +207,7 @@ app.Use(async (context, next) =>
 
 app.UseStaticFiles(new StaticFileOptions
 {
-    ContentTypeProvider =  new FileExtensionContentTypeProvider
+    ContentTypeProvider = new FileExtensionContentTypeProvider
     {
         Mappings =
         {

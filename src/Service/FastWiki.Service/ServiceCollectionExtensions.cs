@@ -51,6 +51,9 @@ public static class ServiceCollectionExtensions
         var DEFAULT_TYPE = Environment.GetEnvironmentVariable("DEFAULT_TYPE");
         var DEFAULT_CONNECTION = Environment.GetEnvironmentVariable("DEFAULT_CONNECTION");
         var WIKI_CONNECTION = Environment.GetEnvironmentVariable("WIKI_CONNECTION");
+        var QdrantPort = Environment.GetEnvironmentVariable("QDRANT_PORT");
+        var QDRANT_API_KEY = Environment.GetEnvironmentVariable("QDRANT_API_KEY");
+        var QDRANT_ENDPOINT = Environment.GetEnvironmentVariable("QDRANT_ENDPOINT");
 
 
         if (!OPENAI_CHAT_ENDPOINT.IsNullOrWhiteSpace()) OpenAIOption.ChatEndpoint = OPENAI_CHAT_ENDPOINT;
@@ -67,5 +70,11 @@ public static class ServiceCollectionExtensions
         if (!DEFAULT_CONNECTION.IsNullOrWhiteSpace()) ConnectionStringsOptions.DefaultConnection = DEFAULT_CONNECTION;
 
         if (!WIKI_CONNECTION.IsNullOrWhiteSpace()) ConnectionStringsOptions.WikiConnection = WIKI_CONNECTION;
+        
+        if (!QdrantPort.IsNullOrWhiteSpace()) ConnectionStringsOptions.QdrantPort = QdrantPort;
+        
+        if (!QDRANT_API_KEY.IsNullOrWhiteSpace()) ConnectionStringsOptions.QdrantAPIKey = QDRANT_API_KEY;
+        
+        if (!QDRANT_ENDPOINT.IsNullOrWhiteSpace()) ConnectionStringsOptions.QdrantEndpoint = QDRANT_ENDPOINT;
     }
 }
