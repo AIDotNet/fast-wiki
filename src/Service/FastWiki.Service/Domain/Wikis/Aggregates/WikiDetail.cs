@@ -19,7 +19,7 @@ public class WikiDetail : Entity<long>, IAuditEntity<long>
         State = WikiQuantizationState.None;
     }
 
-    protected WikiDetail()
+    public WikiDetail()
     {
     }
 
