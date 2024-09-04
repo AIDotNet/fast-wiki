@@ -1,20 +1,26 @@
 import { useEffect, useState } from "react";
 import { Table } from "antd";
 import { Radio, Button } from "antd";
+import { ExposeParam, MdEditor } from "md-editor-rt";
 import { EditableMessage, Input, TextArea } from "@lobehub/ui";
 import { UploadFile } from "@/services/StorageService";
 import { CreateWikiDetails } from "@/services/WikiService";
 import { ProcessMode, TrainingPattern } from './index.d';
+import { useUserStore } from "@/store/user";
+import 'md-editor-rt/lib/style.css';
+import { userGeneralSettingsSelectors } from "@/store/user/selectors";
 
 interface IUploadWikiDataProps {
     id: string;
     onChagePath(key: any): void;
 }
 
+let isUploading = false;
 export default function UploadWikiData(props: IUploadWikiDataProps) {
     const [editing, setEdit] = useState(true)
     const [content, setContent] = useState('');
-    
+
+    const themeMode = useUserStore(userGeneralSettingsSelectors.currentThemeMode);
     const [processMode, setProcessMode] = useState(ProcessMode.Auto);
     const [trainingPattern, setTrainingPattern] = useState(TrainingPattern.Subsection);
     const [maxTokensPerParagraph, setMaxTokensPerParagraph] = useState(1000); // 每个段落标记的最大数量。当对文档进行分区时，每个分区通常包含一个段落。
@@ -57,6 +63,25 @@ export default function UploadWikiData(props: IUploadWikiDataProps) {
         props.onChagePath('data-item');
     }
 
+
+    function getTheme() {
+        if (themeMode === 'dark') {
+            return 'dark'
+        } else if (themeMode === 'light') {
+            return 'light'
+        }
+        else if (themeMode === 'auto') {
+            // 得到系统的主题
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                return 'dark'
+            }
+            return 'light'
+        }
+
+        return 'light'
+    }
+
+
     return (
         <>
 
@@ -64,37 +89,52 @@ export default function UploadWikiData(props: IUploadWikiDataProps) {
                 <Button onClick={() => {
                     props.onChagePath('data-item')
                 }}>返回</Button>
+                <Button
+                type="primary"
+                onClick={save} style={{
+                    marginLeft: 10
+                }}>保存</Button>
+
             </div>
 
             <div style={{
                 display: 'flex',
                 padding: '20px',
             }}>
-                <EditableMessage
-                    styles={{
-                        input: {
-                            width: '100%',
-                            height: '100%'
-                        },
-                        markdown: {
-                            width: '100%',
-                            height: '100%'
+
+                <MdEditor
+                    showCodeRowNumber={true}
+                    style={{
+                        height: '100%',
+                        borderRadius: 8,
+                        overflow: 'auto',
+                        maxHeight: '500px',
+                    }}
+                    autoFocus={true}
+                    onUploadImg={(files, callback) => {
+                        if (isUploading) return;
+                        isUploading = true;
+                        for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+                            UploadFile(file).then((data) => {
+                                callback([
+                                    {
+                                        url: data.path,
+                                        alt: file.name,
+                                        title: file.name
+                                    }
+                                ]);
+                                isUploading = false;
+                            })
+
                         }
                     }}
-                    editing={editing}
-                    text={{
-                        cancel: "取消",
-                        confirm: "保存",
-                        edit: "编辑",
-                    }}
-                    placeholder="请输入您的内容"
-                    onEditingChange={() => {
-                        // 
-                        save();
-                    }}
-                    value={content}
-                    onChange={setContent}
-                />
+                    autoDetectCode={true}
+                    theme={getTheme()}
+                    modelValue={content}
+                    onChange={(v) => {
+                        setContent(v);
+                    }} />
             </div>
 
             <div style={{
