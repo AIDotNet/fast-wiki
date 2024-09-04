@@ -87,4 +87,8 @@
       <_ContentIncludedByDefault Remove="wwwroot\uploads\20240816\27166df2bf0042058a77bfcadef29b2a1.png" />
       <_ContentIncludedByDefault Remove="wwwroot\uploads\20240816\7ccbd188751846fd972d4bf71db86236基础组件发版(gp-gateway-center).md" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Migrations\PostgreSQL\WikiDbContextModelSnapshot.cs" />
+    </ItemGroup>
 </Project>
