@@ -1,6 +1,8 @@
 using System.Text.Json;
 using FastWiki.Service;
 using FastWiki.Service.Backgrounds;
+using FastWiki.Service.Contracts.Model.Dto;
+using FastWiki.Service.Contracts.OpenAI;
 using FastWiki.Service.Options;
 using FastWiki.Service.Service;
 using Masa.Contrib.Authentication.Identity;
@@ -87,6 +89,11 @@ builder.Services.AddMem0DotNet(options)
         Port = port,
     });
 
+builder.Services.AddScoped<OpenAIService>();
+builder.Services.AddScoped<FeishuService>();
+
+builder.Services.AddHostedService<WeChatBackgroundService>();
+
 builder.Services
     .AddCors(options =>
     {
@@ -108,9 +115,9 @@ builder.Services
         options.Role = "role";
     })
     .AddHttpContextAccessor()
-    .AddSwaggerGen(options =>
+    .AddSwaggerGen(swaggerGenOptions =>
     {
-        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        swaggerGenOptions.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Name = "Authorization",
             Type = SecuritySchemeType.ApiKey,
@@ -120,7 +127,7 @@ builder.Services
             Description =
                 "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer xxxxxxxxxxxxxxx\""
         });
-        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        swaggerGenOptions.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
             {
                 new OpenApiSecurityScheme
@@ -131,11 +138,11 @@ builder.Services
                         Id = "Bearer"
                     }
                 },
-                new string[] { }
+                []
             }
         });
 
-        options.SwaggerDoc("v1",
+        swaggerGenOptions.SwaggerDoc("v1",
             new OpenApiInfo
             {
                 Title = "FastWiki.ServiceApp",
@@ -143,8 +150,8 @@ builder.Services
                 Contact = new OpenApiContact { Name = "FastWiki.ServiceApp" }
             });
         foreach (var item in Directory.GetFiles(Directory.GetCurrentDirectory(), "*.xml"))
-            options.IncludeXmlComments(item, true);
-        options.DocInclusionPredicate((_, _) => true);
+            swaggerGenOptions.IncludeXmlComments(item, true);
+        swaggerGenOptions.DocInclusionPredicate((_, _) => true);
     })
     .AddScoped<IHistoryService, HistoryService>()
     .AddMasaDbContext<WikiDbContext>(opt =>
@@ -230,13 +237,18 @@ app.MapGet("/js/env.js", () =>
     return Results.Text($"window.thor = {JsonSerializer.Serialize(webEnv)};", "application/javascript");
 });
 
-app.MapPost("/v1/chat/completions", OpenAIService.Completions)
+app.MapPost("/v1/chat/completions", (OpenAIService openAiService, HttpContext context,
+            ChatCompletionDto<ChatCompletionRequestMessage> input,
+            ChatApplicationService chatApplicationService) =>
+        openAiService.Completions(context, input, chatApplicationService))
     .WithTags("OpenAI")
     .WithGroupName("OpenAI")
     .WithDescription("OpenAI Completions")
     .WithOpenApi();
 
-app.MapPost("/v1/feishu/completions/{id}", FeishuService.Completions)
+app.MapPost("/v1/feishu/completions/{id}", (FeishuService feiShuService, HttpContext context,
+            FeishuChatInput input, string id) =>
+        feiShuService.Completions(id, context, input))
     .WithTags("Feishu")
     .WithGroupName("Feishu")
     .WithDescription("飞书对话接入处理")

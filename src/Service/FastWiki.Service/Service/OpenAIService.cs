@@ -16,54 +16,41 @@ using MemoryService = mem0.NET.Services.MemoryService;
 
 namespace FastWiki.Service.Service;
 
-public class OpenAIService
+/// <summary>
+/// OpenAI服务
+/// </summary>
+/// <param name="logger"></param>
+public class OpenAIService(
+    ILogger<OpenAIService> logger,
+    IEventBus eventBus,
+    IFastWikiFunctionCallRepository fastWikiFunctionCallRepository,
+    IFileStorageRepository fileStorageRepository,
+    IWikiRepository wikiRepository,
+    WikiMemoryService wikiMemoryService)
 {
     /// <summary>
     ///     ChatCompletion
     /// </summary>
     /// <param name="context"></param>
-    public static async Task Completions(HttpContext context, ChatApplicationService chatApplicationService)
+    /// <param name="input"></param>
+    /// <param name="chatApplicationService"></param>
+    public async Task Completions(HttpContext context, ChatCompletionDto<ChatCompletionRequestMessage> input,
+        ChatApplicationService chatApplicationService)
     {
-        using var stream = new StreamReader(context.Request.Body);
-
-        var module =
-            JsonSerializer.Deserialize<ChatCompletionDto<ChatCompletionRequestMessage>>(await stream.ReadToEndAsync(),
-                new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
         context.Response.ContentType = "text/event-stream";
-
-        if (module == null)
-        {
-            await context.WriteEndAsync("Invalid request");
-
-            return;
-        }
-
-        var logger = context.RequestServices.GetRequiredService<ILogger<OpenAIService>>();
 
         var chatId = context.Request.Query["ChatId"].ToString();
         var token = context.Request.Headers.Authorization;
 
-        if (chatId.IsNullOrEmpty()) chatId = module.ApplicationId;
+        if (chatId.IsNullOrEmpty()) chatId = input.ApplicationId;
 
         if (chatId.IsNullOrEmpty()) chatId = context.Request.Headers["applicationId"];
 
         // 获取分享Id
         var chatShareId = context.Request.Query["ChatShareId"].ToString();
-        if (chatShareId.IsNullOrEmpty()) chatShareId = module.SharedId;
+        if (chatShareId.IsNullOrEmpty()) chatShareId = input.SharedId;
 
         if (chatShareId.IsNullOrEmpty()) chatShareId = context.Request.Headers["sharedId"];
-
-        var eventBus = context.RequestServices.GetRequiredService<IEventBus>();
-        var fastWikiFunctionCallRepository =
-            context.RequestServices.GetRequiredService<IFastWikiFunctionCallRepository>();
-
-        var fileStorageRepository = context.RequestServices.GetRequiredService<IFileStorageRepository>();
-        var wikiRepository = context.RequestServices.GetRequiredService<IWikiRepository>();
-
 
         ChatApplicationDto chatApplication = null;
 
@@ -137,7 +124,7 @@ public class OpenAIService
         if (!chatApplication.Prompt.IsNullOrEmpty()) chatHistory.AddSystemMessage(chatApplication.Prompt);
 
 
-        var content = module.messages.Last();
+        var content = input.messages.Last();
         var question = content.content;
 
         // 保存对话提问
@@ -146,8 +133,6 @@ public class OpenAIService
         await eventBus.PublishAsync(createChatRecordCommand);
 
         var sourceFile = new List<FileStorage>();
-        var wikiMemoryService = context.RequestServices.GetRequiredService<WikiMemoryService>();
-
 
         // 如果为空则不使用知识库
         if (chatApplication.WikiIds.Count != 0)
@@ -155,14 +140,14 @@ public class OpenAIService
             var success = await WikiPrompt(chatApplication, wikiMemoryService, content.content,
                 fileStorageRepository,
                 wikiRepository,
-                sourceFile, module, async x => { await context.WriteEndAsync(x); },
+                sourceFile, input, async x => { await context.WriteEndAsync(x); },
                 context.RequestServices.GetRequiredService<mem0.NET.Services.MemoryService>());
 
             if (!success) return;
         }
 
         // 添加用户输入，并且计算请求token数量
-        module.messages.ForEach(x =>
+        input.messages.ForEach(x =>
         {
             if (x.content.IsNullOrEmpty()) return;
             requestToken += TokenHelper.ComputeToken(x.content);
@@ -197,13 +182,12 @@ public class OpenAIService
         var output = new StringBuilder();
         try
         {
-            await foreach (var item in SendChatMessageAsync(chatApplication, wikiMemoryService, chatHistory,
-                               fastWikiFunctionCallRepository))
+            await foreach (var item in SendChatMessageAsync(chatApplication, chatHistory))
             {
                 if (string.IsNullOrEmpty(item)) continue;
 
                 output.Append(item);
-                await context.WriteOpenAiResultAsync(item, module.model, requestId,
+                await context.WriteOpenAiResultAsync(item, input.model, requestId,
                     responseId);
             }
         }
@@ -242,13 +226,10 @@ public class OpenAIService
     ///     提问AI
     /// </summary>
     /// <param name="chatApplication"></param>
-    /// <param name="wikiMemoryService"></param>
     /// <param name="chatHistory"></param>
-    /// <param name="fastWikiFunctionCallRepository"></param>
     /// <returns></returns>
-    public static async IAsyncEnumerable<string> SendChatMessageAsync(ChatApplicationDto chatApplication,
-        WikiMemoryService wikiMemoryService, ChatHistory chatHistory,
-        IFastWikiFunctionCallRepository fastWikiFunctionCallRepository)
+    public async IAsyncEnumerable<string> SendChatMessageAsync(ChatApplicationDto chatApplication,
+        ChatHistory chatHistory)
     {
         var functionCall = new List<FastWikiFunctionCall>();
 
@@ -388,7 +369,7 @@ public class OpenAIService
                 {
                     // 如果使用metaData那么可能会导致MaxToken超出限制。
                     var metaData = x.MetaData["metaData"];
-                    prompt +=  metaData + Environment.NewLine;
+                    prompt += metaData + Environment.NewLine;
                 });
                 if (values.Count == 0 && !string.IsNullOrWhiteSpace(chatApplication.NoReplyFoundTemplate))
                 {

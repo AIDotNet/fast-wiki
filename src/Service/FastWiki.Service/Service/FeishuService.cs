@@ -17,11 +17,19 @@ using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace FastWiki.Service.Service;
 
-public class FeishuService
+public class FeishuService(
+    IFastWikiFunctionCallRepository fastWikiFunctionCallRepository,
+    IEventBus eventBus,
+    OpenAIService openAIService,
+    WikiMemoryService wikiMemoryService,
+    IFileStorageRepository fileStorageRepository)
 {
-    private static readonly HttpClient httpClient = new();
+    private static readonly HttpClient HttpClient = new();
 
-    public static JsonSerializerOptions JsonSerializerOptions = new()
+    /// <summary>
+    /// JSON序列化配置
+    /// </summary>
+    public static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
@@ -29,7 +37,7 @@ public class FeishuService
 
     private static readonly ConcurrentDictionary<string, DateTime> MemoryCache = new();
 
-    public static async Task Completions(string id, HttpContext context, ChatApplicationService chatApplicationService,
+    public async Task Completions(string id, HttpContext context,
         [FromBody] FeishuChatInput input)
     {
         var memoryCache = context.RequestServices.GetRequiredService<IMemoryCache>();
@@ -123,8 +131,7 @@ public class FeishuService
                 // 是文本消息，直接回复
                 var userInput = JsonSerializer.Deserialize<FeishuChatUserInput>(input._event.message.content);
 
-                await ChatMessage(context, userInput.text, sessionId, chatApplication, chatShareInfoQuery,
-                    eventBus, wikiMemoryService, fileStorageRepository, fastWikiFunctionCallRepository);
+                await ChatMessage(context, userInput.text, sessionId, chatApplication, chatShareInfoQuery);
 
                 return;
             }
@@ -160,8 +167,7 @@ public class FeishuService
                 var history = new ChatHistory();
                 history.AddUserMessage(userInput.text);
 
-                await ChatMessage(context, userInput.text, sessionId, chatApplication, chatShareInfoQuery,
-                    eventBus, wikiMemoryService, fileStorageRepository, fastWikiFunctionCallRepository);
+                await ChatMessage(context, userInput.text, sessionId, chatApplication, chatShareInfoQuery);
 
                 return;
             }
@@ -173,11 +179,8 @@ public class FeishuService
         });
     }
 
-    public static async Task ChatMessage(HttpContext context, string content, string sessionId,
-        ChatApplicationDto chatApplication, ChatShareInfoQuery chatShareInfoQuery, IEventBus eventBus,
-        WikiMemoryService wikiMemoryService,
-        IFileStorageRepository fileStorageRepository,
-        IFastWikiFunctionCallRepository fastWikiFunctionCallRepository)
+    public async Task ChatMessage(HttpContext context, string content, string sessionId,
+        ChatApplicationDto chatApplication, ChatShareInfoQuery chatShareInfoQuery)
     {
         var requestToken = 0;
 
@@ -261,9 +264,8 @@ public class FeishuService
 
         try
         {
-            await foreach (var item in OpenAIService.SendChatMessageAsync(chatApplication,
-                               wikiMemoryService,
-                               chatHistory, fastWikiFunctionCallRepository))
+            await foreach (var item in openAIService.SendChatMessageAsync(chatApplication,
+                               chatHistory))
             {
                 if (string.IsNullOrEmpty(item)) continue;
 
@@ -303,7 +305,7 @@ public class FeishuService
         });
     }
 
-    public static async ValueTask SendMessages(ChatApplicationDto chatApplication, string sessionId, string message,
+    public async ValueTask SendMessages(ChatApplicationDto chatApplication, string sessionId, string message,
         string receive_id_type = "open_id")
     {
         await SendMessages(chatApplication, new FeishuChatSendMessageInput(JsonSerializer.Serialize(new
@@ -312,7 +314,7 @@ public class FeishuService
         }, JsonSerializerOptions), "text", sessionId), receive_id_type);
     }
 
-    private static async ValueTask SendMessages(ChatApplicationDto chatApplication, FeishuChatSendMessageInput input,
+    private async Task SendMessages(ChatApplicationDto chatApplication, FeishuChatSendMessageInput input,
         string receive_id_type = "open_id")
     {
         var requestMessage = new HttpRequestMessage(HttpMethod.Post,
@@ -323,14 +325,14 @@ public class FeishuService
 
         await RefreshTokenAsync(requestMessage, chatApplication);
 
-        var response = await httpClient.SendAsync(requestMessage);
+        var response = await HttpClient.SendAsync(requestMessage);
 
         var result = await response.Content.ReadFromJsonAsync<FeiShuChatResult>();
 
         if (result?.code != 0) throw new UserFriendlyException(result?.msg);
     }
 
-    private static async ValueTask RefreshTokenAsync(HttpRequestMessage requestMessage,
+    private static async Task RefreshTokenAsync(HttpRequestMessage requestMessage,
         ChatApplicationDto chatApplication)
     {
         if (requestMessage.Headers.Contains("Authorization"))
@@ -353,7 +355,7 @@ public class FeishuService
             app_id = chatApplication.GetFeishuAppId(),
             app_secret = chatApplication.GetFeishuAppSecret()
         }), Encoding.UTF8, "application/json");
-        var response = await httpClient.SendAsync(request);
+        var response = await HttpClient.SendAsync(request);
         var result = await response.Content.ReadAsStringAsync();
         var token = JsonSerializer.Deserialize<FeiShuChatToken>(result);
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.TenantAccessToken);
