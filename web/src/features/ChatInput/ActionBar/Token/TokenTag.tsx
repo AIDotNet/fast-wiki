@@ -11,8 +11,6 @@ import { useAgentStore } from '@/store/agent';
 import { agentSelectors } from '@/store/agent/selectors';
 import { useChatStore } from '@/store/chat';
 import { chatSelectors } from '@/store/chat/selectors';
-import { useToolStore } from '@/store/tool';
-import { toolSelectors } from '@/store/tool/selectors';
 import { useUserStore } from '@/store/user';
 import { modelProviderSelectors } from '@/store/user/selectors';
 
@@ -34,19 +32,7 @@ const Token = memo(() => {
 
   const maxTokens = useUserStore(modelProviderSelectors.modelMaxToken(model));
 
-  // Tool usage token
-  const canUseTool = useUserStore(modelProviderSelectors.isModelEnabledFunctionCall(model));
-  const plugins = useAgentStore(agentSelectors.currentAgentPlugins);
-  const toolsString = useToolStore((s) => {
-    const pluginSystemRoles = toolSelectors.enabledSystemRoles(plugins)(s);
-    const schemaNumber = toolSelectors
-      .enabledSchema(plugins)(s)
-      .map((i) => JSON.stringify(i))
-      .join('');
-
-    return pluginSystemRoles + schemaNumber;
-  });
-  const toolsToken = useTokenCount(canUseTool ? toolsString : '');
+  const toolsToken = useTokenCount( '');
 
   // Chat usage token
   const inputTokenCount = useTokenCount(input);

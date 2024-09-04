@@ -149,14 +149,14 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
     return (<>
         <div >
             <Button onClick={() => {
-                onChagePath(1)
+                onChagePath('data-item')
             }}>返回</Button>
         </div>
 
         <Steps
             style={{
                 marginTop: '20px',
-                marginBottom: '20px',
+                marginBottom: '10px',
             }}
             size="small"
             current={current}

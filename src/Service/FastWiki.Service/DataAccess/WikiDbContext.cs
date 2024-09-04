@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using FastWiki.Service.Domain.Function.Aggregates;
 using FastWiki.Service.Domain.Storage.Aggregates;
+using mem0.Core.Model;
 
 namespace FastWiki.Service.DataAccess;
 
@@ -27,6 +28,10 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
     public DbSet<ChatRecord> ChatRecords { get; set; }
 
     public DbSet<Questions> Questions { get; set; }
+
+    public DbSet<History> Histories { get; set; }
+    
+    public DbSet<QuantizedList> QuantizedLists { get; set; }
 
     protected override void OnModelCreatingExecuting(ModelBuilder modelBuilder)
     {
@@ -161,6 +166,29 @@ public class WikiDbContext(MasaDbContextOptions<WikiDbContext> options) : MasaDb
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
                     v => JsonSerializer.Deserialize<List<string>>(v, new JsonSerializerOptions()));
+        });
+
+        modelBuilder.Entity<History>(entity =>
+        {
+            entity.ToTable("wiki-histories");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+            entity.HasIndex(x => x.UserId);
+            entity.HasIndex(x => x.MemoryId);
+            entity.HasIndex(x => x.TrackId);
+            
+        });
+        
+        modelBuilder.Entity<QuantizedList>(entity =>
+        {
+            entity.ToTable("wiki-quantized-lists");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+            entity.HasIndex(x => x.WikiId);
+            entity.HasIndex(x => x.WikiDetailId);
+            
         });
 
         var user = new User("admin", "admin", "Aa123456",

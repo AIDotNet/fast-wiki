@@ -3,16 +3,19 @@ using System;
 using FastWiki.Service.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace FastWiki.Service.Migrations.PostgreSQL
+namespace FastWiki.Service.Migrations.Sqlite
 {
-    [DbContext(typeof(WikiDbContext))]
-    partial class WikiDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(SqliteContext))]
+    [Migration("20240818140856_AddWikiQuantized")]
+    partial class AddWikiQuantized
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.7");
@@ -338,19 +341,19 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c61a32ee-9254-4018-a34d-6df4c9269946"),
+                            Id = new Guid("6206211d-6e07-42ea-8750-7d415a2ffaa8"),
                             Account = "admin",
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                            CreationTime = new DateTime(2024, 8, 18, 14, 7, 58, 699, DateTimeKind.Utc).AddTicks(6364),
+                            CreationTime = new DateTime(2024, 8, 18, 14, 8, 56, 546, DateTimeKind.Utc).AddTicks(8987),
                             Email = "239573049@qq.com",
                             IsDeleted = false,
                             IsDisable = false,
-                            ModificationTime = new DateTime(2024, 8, 18, 14, 7, 58, 699, DateTimeKind.Utc).AddTicks(6367),
+                            ModificationTime = new DateTime(2024, 8, 18, 14, 8, 56, 546, DateTimeKind.Utc).AddTicks(8990),
                             Name = "admin",
-                            Password = "8b0378cf4c257b662603ccf76cc61d29",
+                            Password = "f0f6d913839798fff09760727a015264",
                             Phone = "13049809673",
                             Role = 2,
-                            Salt = "37c8e92134974dc4b28d875436da2afd"
+                            Salt = "ff4cdcea6d814b80a4777acf20cdc52f"
                         });
                 });
 

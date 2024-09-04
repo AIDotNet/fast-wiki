@@ -6,12 +6,13 @@ public sealed class Wiki : FullAggregateRoot<long, Guid?>
     {
     }
 
-    public Wiki(string icon, string name, string model, string embeddingModel)
+    public Wiki(string icon, string name, string model, string embeddingModel, VectorType vectorType)
     {
         Icon = icon;
         Name = name;
         Model = model;
         EmbeddingModel = embeddingModel;
+        VectorType = vectorType;
     }
 
     /// <summary>
@@ -33,4 +34,9 @@ public sealed class Wiki : FullAggregateRoot<long, Guid?>
     ///     知识库向量化模型
     /// </summary>
     public string EmbeddingModel { get; set; }
+    
+    /// <summary>
+    /// 向量数据库类型
+    /// </summary>
+    public VectorType VectorType { get; set; }
 }

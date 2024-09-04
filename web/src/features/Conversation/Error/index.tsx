@@ -14,7 +14,6 @@ import ErrorJsonViewer from './ErrorJsonViewer';
 import InvalidAPIKey from './InvalidAPIKey';
 import InvalidAccessCode from './InvalidAccessCode';
 import OpenAiBizError from './OpenAiBizError';
-import PluginSettings from './PluginSettings';
 
 // Config for the errorMessage display
 const getErrorAlertConfig = (
@@ -71,9 +70,6 @@ const ErrorMessageExtra = memo<{ data: ChatMessage }>(({ data }) => {
   if (!error?.type) return;
 
   switch (error.type) {
-    case PluginErrorType.PluginSettingsInvalid: {
-      return <PluginSettings id={data.id} plugin={data.plugin} />;
-    }
 
     case AgentRuntimeErrorType.OpenAIBizError: {
       return <OpenAiBizError {...data} />;

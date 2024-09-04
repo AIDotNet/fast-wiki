@@ -160,20 +160,39 @@ public sealed class WikiService(IWikiRepository wikiRepository) : ApplicationSer
     ///     量化状态检查
     /// </summary>
     /// <param name="wikiId"></param>
+    /// <param name="state"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
     /// <returns></returns>
     [Authorize]
-    public async Task<List<CheckQuantizationStateDto>> CheckQuantizationStateAsync(long wikiId)
+    public async Task<PaginatedListBase<CheckQuantizationStateDto>> CheckQuantizationStateAsync(
+        long wikiId,
+        QuantizedListState? state,
+        int page,
+        int pageSize)
     {
-        var values = QuantizeBackgroundService.CacheWikiDetails.Values.Where(x => x.Item1.WikiId == wikiId).ToList();
+        var value = await wikiRepository.GetQuantizedListAsync(wikiId, state, page, pageSize);
 
-        if (values.Any())
-            return values.Select(x => new CheckQuantizationStateDto
+        var count = await wikiRepository.GetQuantizedListCountAsync(wikiId, state);
+
+        var wikiDetailIds = value.Select(x => x.WikiDetailId).ToList();
+
+        var wikiDetails = (await wikiRepository.GetDetailsByIdsAsync(wikiDetailIds))
+            .ToDictionary(x => x.Id, x => x);
+
+        return new PaginatedListBase<CheckQuantizationStateDto>()
+        {
+            Result = value.Select(x =>
             {
-                WikiId = x.Item1.WikiId,
-                FileName = x.Item1.FileName,
-                State = x.Item1.State
-            }).ToList();
+                var dto = Mapper.Map<CheckQuantizationStateDto>(x);
+                if (wikiDetails.TryGetValue(x.WikiDetailId, out var detail))
+                {
+                    dto.FileName = detail.FileName;
+                }
 
-        return [];
+                return dto;
+            }).ToList(),
+            Total = count
+        };
     }
 }

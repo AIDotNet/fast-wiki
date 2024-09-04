@@ -76,8 +76,11 @@ public sealed class WikiRepository(
 
     public Task<List<WikiDetail>> GetFailedDetailsAsync()
     {
-        return Context.WikiDetails
-            .Where(x => x.State == WikiQuantizationState.Fail || x.State == WikiQuantizationState.None).ToListAsync();
+        var query = Context.QuantizedLists
+            .Where(x => x.State == QuantizedListState.Fail || x.State == QuantizedListState.Pending)
+            .Select(x => x.WikiDetailId);
+
+        return Context.WikiDetails.Where(x => query.Contains(x.Id)).ToListAsync();
     }
 
     public async Task RemoveDetailsVectorAsync(string index, string id)
@@ -97,6 +100,94 @@ public sealed class WikiRepository(
     {
         return Context.WikiDetails.Where(x => x.Id == id)
             .ExecuteUpdateAsync(s => s.SetProperty(b => b.FileName, b => name));
+    }
+
+    public async Task<Wiki> WikiDetailGetWikiAsync(long wikiDetailId)
+    {
+        var query = await Context.WikiDetails.Where(x => x.Id == wikiDetailId).Select(x => x.WikiId)
+            .FirstOrDefaultAsync();
+
+        return await Context.Wikis.FindAsync(query);
+    }
+
+    public async Task<long> CreateQuantizationListAsync(long wikiId, long wikiDetailId, string remark)
+    {
+        // 判断是否已经存在
+        var exist = await Context.QuantizedLists.AnyAsync(x => x.WikiId == wikiId && x.WikiDetailId == wikiDetailId);
+
+        if (exist)
+        {
+            var entity = await Context.QuantizedLists.Where(x => x.WikiId == wikiId && x.WikiDetailId == wikiDetailId)
+                .FirstOrDefaultAsync();
+
+            await Context.QuantizedLists
+                .Where(x => x.Id == entity.Id)
+                .ExecuteUpdateAsync(s => s.SetProperty(b => b.State, QuantizedListState.Pending)
+                    .SetProperty(b => b.Remark, b => remark)
+                    .SetProperty(b => b.ProcessTime, b => null));
+
+            return entity.Id;
+        }
+        else
+        {
+            var entity = await Context.QuantizedLists.AddAsync(new QuantizedList()
+            {
+                WikiId = wikiId,
+                WikiDetailId = wikiDetailId,
+                Remark = remark,
+                CreationTime = DateTime.Now,
+                State = QuantizedListState.Pending,
+            });
+
+            await Context.SaveChangesAsync();
+
+            return entity.Entity.Id;
+        }
+    }
+
+    public async Task CompleteQuantizationListAsync(long id, string remark, QuantizedListState state)
+    {
+        await Context.QuantizedLists.Where(x => x.Id == id)
+            .ExecuteUpdateAsync(s => s.SetProperty(b => b.State, state)
+                .SetProperty(b => b.Remark, b => remark)
+                .SetProperty(b => b.CreationTime, b => DateTime.Now)
+                .SetProperty(b => b.ProcessTime, b => DateTime.Now));
+    }
+
+    public Task<List<QuantizedList>> GetQuantizedListAsync(long wikiId, QuantizedListState? state, int page,
+        int pageSize)
+    {
+        var query = Context.QuantizedLists
+            .Where(x => x.WikiId == wikiId);
+
+        if (state.HasValue)
+        {
+            query = query.Where(x => x.State == state.Value);
+        }
+
+        return query
+            .OrderByDescending(x => x.CreationTime)
+            .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+    }
+
+    public Task<long> GetQuantizedListCountAsync(long wikiId, QuantizedListState? state)
+    {
+        var query = Context.QuantizedLists
+            .Where(x => x.WikiId == wikiId);
+
+        if (state.HasValue)
+        {
+            query = query.Where(x => x.State == state.Value);
+        }
+
+        return query.LongCountAsync();
+    }
+
+    public Task<List<WikiDetail>> GetDetailsByIdsAsync(List<long> wikiDetailIds)
+    {
+        return Context.WikiDetails.Where(x => wikiDetailIds.Contains(x.Id))
+            .AsNoTracking()
+            .ToListAsync();
     }
 
 

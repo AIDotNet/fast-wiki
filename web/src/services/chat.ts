@@ -11,8 +11,6 @@ import { AgentRuntime, ChatCompletionErrorPayload, ModelProvider } from '@/libs/
 import { filesSelectors, useFileStore } from '@/store/file';
 import { useSessionStore } from '@/store/session';
 import { sessionMetaSelectors } from '@/store/session/selectors';
-import { useToolStore } from '@/store/tool';
-import { pluginSelectors, toolSelectors } from '@/store/tool/selectors';
 import { useUserStore } from '@/store/user';
 import {
   modelConfigSelectors,
@@ -120,22 +118,15 @@ class ChatService {
       options,
     );
 
-    // ============  2. preprocess tools   ============ //
-
-    const filterTools = toolSelectors.enabledSchema(enabledPlugins)(useToolStore.getState());
-
     // check this model can use function call
     const canUseFC = modelProviderSelectors.isModelEnabledFunctionCall(payload.model)(
       useUserStore.getState(),
     );
-    // the rule that model can use tools:
-    // 1. tools is not empty
-    // 2. model can use function call
-    const shouldUseTools = filterTools.length > 0 && canUseFC;
 
-    const tools = shouldUseTools ? filterTools : undefined;
+    const shouldUseTools =  canUseFC;
 
-    return this.getChatCompletion({ ...params, messages: oaiMessages, tools }, options);
+
+    return this.getChatCompletion({ ...params, messages: oaiMessages }, options);
   };
 
   createAssistantMessageStream = async ({
@@ -222,38 +213,6 @@ class ChatService {
       onMessageHandle: options?.onMessageHandle,
       signal,
     });
-  };
-
-  /**
-   * run the plugin api to get result
-   * @param params
-   * @param options
-   */
-  runPluginApi = async (params: PluginRequestPayload, options?: FetchOptions) => {
-    const s = useToolStore.getState();
-
-    const settings = pluginSelectors.getPluginSettingsById(params.identifier)(s);
-    const manifest = pluginSelectors.getPluginManifestById(params.identifier)(s);
-
-    const headers = await createHeaderWithAuth({
-      headers: { ...createHeadersWithPluginSettings(settings) },
-    });
-
-    const gatewayURL = manifest?.gateway ?? API_ENDPOINTS.gateway;
-
-    const res = await fetch(gatewayURL, {
-      body: JSON.stringify({ ...params, manifest }),
-      headers,
-      method: 'POST',
-      signal: options?.signal,
-    });
-
-    if (!res.ok) {
-      throw await getMessageError(res);
-    }
-
-    const text = await res.text();
-    return { text };
   };
 
   fetchPresetTaskResult = async ({
@@ -373,15 +332,8 @@ class ChatService {
         options?.trace?.sessionId === INBOX_SESSION_ID &&
         INBOX_GUIDE_SYSTEMROLE;
 
-      // Inject Tool SystemRole
-      const hasTools = tools && tools?.length > 0;
-      const hasFC =
-        hasTools &&
-        modelProviderSelectors.isModelEnabledFunctionCall(model)(useUserStore.getState());
-      const toolsSystemRoles =
-        hasFC && toolSelectors.enabledSystemRoles(tools)(useToolStore.getState());
-
-      const injectSystemRoles = [inboxGuideSystemRole, toolsSystemRoles]
+        
+      const injectSystemRoles = [inboxGuideSystemRole]
         .filter(Boolean)
         .join('\n\n');
 

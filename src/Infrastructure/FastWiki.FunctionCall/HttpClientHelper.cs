@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net.Http.Json;
+using System.Text;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace FastWiki.FunctionCall;

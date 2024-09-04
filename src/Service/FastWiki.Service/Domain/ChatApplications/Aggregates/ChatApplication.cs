@@ -36,6 +36,7 @@ public sealed class ChatApplication : FullAggregateRoot<string, Guid?>
             - 保持答案与 <data></data> 中描述的一致。
             - 使用 Markdown 语法优化回答格式。
             - 使用与问题相同的语言回答。
+            - 不要进行过多解释。
             - 如果 Markdown中有图片则正常显示。
 
             问题:"""{{question}}"""
@@ -62,7 +63,7 @@ public sealed class ChatApplication : FullAggregateRoot<string, Guid?>
     /// <summary>
     ///     最大响应Token数量
     /// </summary>
-    public int MaxResponseToken { get; set; } = 2000;
+    public int MaxResponseToken { get; set; } = 4000;
 
     /// <summary>
     ///     模板

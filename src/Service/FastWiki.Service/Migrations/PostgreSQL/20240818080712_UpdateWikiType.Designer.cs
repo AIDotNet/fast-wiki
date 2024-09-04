@@ -3,6 +3,7 @@ using System;
 using FastWiki.Service.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FastWiki.Service.Migrations.PostgreSQL
 {
     [DbContext(typeof(WikiDbContext))]
-    partial class WikiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240818080712_UpdateWikiType")]
+    partial class UpdateWikiType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.7");
@@ -338,53 +341,20 @@ namespace FastWiki.Service.Migrations.PostgreSQL
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c61a32ee-9254-4018-a34d-6df4c9269946"),
+                            Id = new Guid("3667f5ec-65d4-4543-84cd-00a246c77215"),
                             Account = "admin",
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg",
-                            CreationTime = new DateTime(2024, 8, 18, 14, 7, 58, 699, DateTimeKind.Utc).AddTicks(6364),
+                            CreationTime = new DateTime(2024, 8, 18, 8, 7, 12, 702, DateTimeKind.Utc).AddTicks(9179),
                             Email = "239573049@qq.com",
                             IsDeleted = false,
                             IsDisable = false,
-                            ModificationTime = new DateTime(2024, 8, 18, 14, 7, 58, 699, DateTimeKind.Utc).AddTicks(6367),
+                            ModificationTime = new DateTime(2024, 8, 18, 8, 7, 12, 702, DateTimeKind.Utc).AddTicks(9183),
                             Name = "admin",
-                            Password = "8b0378cf4c257b662603ccf76cc61d29",
+                            Password = "6726a2a303e85cffa4eb309d66715aee",
                             Phone = "13049809673",
                             Role = 2,
-                            Salt = "37c8e92134974dc4b28d875436da2afd"
+                            Salt = "93b6fe5a96f94c64b7ddff515a007e2f"
                         });
-                });
-
-            modelBuilder.Entity("FastWiki.Service.Domain.Wikis.Aggregates.QuantizedList", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ProcessTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Remark")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("State")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long>("WikiDetailId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long>("WikiId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WikiDetailId");
-
-                    b.HasIndex("WikiId");
-
-                    b.ToTable("wiki-quantized-lists", (string)null);
                 });
 
             modelBuilder.Entity("FastWiki.Service.Domain.Wikis.Aggregates.Wiki", b =>

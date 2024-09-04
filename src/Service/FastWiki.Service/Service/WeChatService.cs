@@ -53,7 +53,7 @@ public class WeChatService
 
             await SendMessageAsync(content, eventBus, wikiMemoryService, memoryCache, wikiRepository,
                 fastWikiFunctionCallRepository,
-                fileStorageRepository);
+                fileStorageRepository, scope.ServiceProvider.GetRequiredService<mem0.NET.Services.MemoryService>());
         }
     }
 
@@ -69,7 +69,8 @@ public class WeChatService
     public static async Task SendMessageAsync(WeChatAI chatAi, IEventBus eventBus,
         WikiMemoryService wikiMemoryService, IMemoryCache memoryCache,
         WikiRepository wikiRepository,
-        IFastWikiFunctionCallRepository fastWikiFunctionCallRepository, IFileStorageRepository fileStorageRepository)
+        IFastWikiFunctionCallRepository fastWikiFunctionCallRepository, IFileStorageRepository fileStorageRepository,
+        mem0.NET.Services.MemoryService memoryService)
     {
         var chatShareInfoQuery = new ChatShareInfoQuery(chatAi.SharedId);
 
@@ -117,7 +118,7 @@ public class WeChatService
             var success = await OpenAIService.WikiPrompt(chatApplication, wikiMemoryService, chatAi.Content,
                 fileStorageRepository,
                 wikiRepository,
-                sourceFile, module);
+                sourceFile, module, null, memoryService);
 
             if (!success) return;
         }

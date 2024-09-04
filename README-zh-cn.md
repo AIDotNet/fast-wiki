@@ -87,6 +87,34 @@ Kernel进行深度学习和自然语言处理，结合.NET
 - 快速接入微信公众号
 - 快速接入企业项目
 
+## 快速部署
+
+### 先决条件
+- Docker
+- AI模型接口/需要支持AI对话模型和Embedding模型
+
+### 部署
+
+使用docker命令运行：
+
+```bash
+docker run -d \
+  --name fast-wiki-service \
+  --user root \
+  --restart always \
+  -p 8080:8080 \
+  -v $(pwd)/wwwroot/uploads:/app/wwwroot/uploads \
+  -v $(pwd)/data:/app/data \
+  -e OPENAI_CHAT_ENDPOINT=https://api.openai.com \
+  -e OPENAI_CHAT_EMBEDDING_ENDPOINT=https://api.openai.com \
+  -e DEFAULT_TYPE=sqlite \
+  -e DEFAULT_CONNECTION=Data\ Source=/app/data/fast-wiki.db \
+  -e WIKI_CONNECTION=/app/data/wiki.db \
+  -e OPENAI_CHAT_TOKEN=您的TokenKey \
+  -e ASPNETCORE_ENVIRONMENT=Development \
+  registry.token-ai.cn/ai-dotnet/fast-wiki-service
+```
+
 ## 快速开始
 
 ### 先决条件
@@ -154,7 +182,6 @@ FastWikiService环境变量参数：
 - OPENAI_EMBEDDING_TOKEN: Embedding的Token, 默认为空，为空则使用对话的Token
 - DEFAULT_TYPE：业务数据库类型 默认sqlite|[pgsql|postgres]
 - DEFAULT_CONNECTION：业务数据库连接字符串
-- WIKI_TYPE: wiki数据库类型 默认disk|[pgsql|postgres]
 - WIKI_CONNECTION: wiki数据库连接字符串(如果是disk则是目录)
 
 ## 技术交流
