@@ -2,6 +2,7 @@
 using FastWiki.Service.Backgrounds;
 using FastWiki.Service.Contracts.WeChat;
 using Microsoft.Extensions.Caching.Memory;
+using Serilog;
 
 namespace FastWiki.Service.Service;
 
@@ -83,8 +84,12 @@ public class WeChatService
             {
                 await Task.Delay(500);
 
+                Console.WriteLine($"Try to get message from cache: {messageId}");
+
                 // 从缓存中获取,如果有则返回
                 memoryCache.TryGetValue(messageId, out var value);
+
+                Log.Information($"Try to get message from cache: {messageId}, value: {value} Type: {value?.GetType()}");
 
                 if (value is string s && !s.IsNullOrEmpty())
                 {

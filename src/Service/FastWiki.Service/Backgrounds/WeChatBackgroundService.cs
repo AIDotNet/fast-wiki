@@ -36,6 +36,8 @@ public class WeChatBackgroundService(
         {
             var content = await Channel.Reader.ReadAsync(stoppingToken);
 
+            logger.LogInformation("接收到消息 {0} MessageId:{1}", content.Content, content.MessageId);
+
             await SendMessageAsync(content, memoryService, eventBus, openAiService, wikiRepository,
                 fileStorageRepository);
         }
@@ -90,7 +92,8 @@ public class WeChatBackgroundService(
             var chatHistory = new ChatHistory();
 
             // 如果设置了Prompt，则添加
-            if (!chatApplication.Prompt.IsNullOrEmpty()) chatHistory.AddSystemMessage(chatApplication.Prompt);
+            if (!chatApplication.Prompt.IsNullOrEmpty())
+                chatHistory.AddSystemMessage(chatApplication.Prompt);
 
             // 保存对话提问
             var createChatRecordCommand = new CreateChatRecordCommand(chatApplication.Id, chatAi.Content);
@@ -106,9 +109,12 @@ public class WeChatBackgroundService(
                     wikiRepository,
                     sourceFile, module, null, memoryService);
 
-                if (!success) return;
+                if (!success)
+                {
+                    output.Append("知识库异常");
+                    return;
+                }
             }
-
 
             // 添加用户输入，并且计算请求token数量
             module.messages.ForEach(x =>
@@ -139,6 +145,8 @@ public class WeChatBackgroundService(
                     return;
                 }
             }
+
+            logger.LogInformation("ChatApplicationId:{0} RequestToken:{1}", chatApplication.Id, requestToken);
 
             await foreach (var item in openAiService.SendChatMessageAsync(chatApplication,
                                chatHistory))
