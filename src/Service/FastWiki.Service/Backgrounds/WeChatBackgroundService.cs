@@ -13,6 +13,7 @@ using MemoryService = mem0.NET.Services.MemoryService;
 namespace FastWiki.Service.Backgrounds;
 
 public class WeChatBackgroundService(
+    ILogger<WeChatBackgroundService> logger,
     IServiceProvider serviceProvider,
     WikiMemoryService wikiMemoryService,
     IMemoryCache memoryCache) : BackgroundService
@@ -27,7 +28,7 @@ public class WeChatBackgroundService(
             scope.ServiceProvider.GetRequiredService<MemoryService>();
 
         var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
-        var openAIService = scope.ServiceProvider.GetRequiredService<OpenAIService>();
+        var openAiService = scope.ServiceProvider.GetRequiredService<OpenAIService>();
         var wikiRepository = scope.ServiceProvider.GetRequiredService<IWikiRepository>();
         var fileStorageRepository = scope.ServiceProvider.GetRequiredService<IFileStorageRepository>();
 
@@ -35,18 +36,10 @@ public class WeChatBackgroundService(
         {
             var content = await Channel.Reader.ReadAsync(stoppingToken);
 
-            await SendMessageAsync(content, memoryService,eventBus,openAIService,wikiRepository,fileStorageRepository);
+            await SendMessageAsync(content, memoryService, eventBus, openAiService, wikiRepository,
+                fileStorageRepository);
         }
     }
-
-
-    private const string OutputTemplate =
-        """
-        您好，欢迎关注FastWiki！
-        由于微信限制，我们无法立即回复您的消息，但是您的消息已经收到，我们会尽快回复您！
-        如果获取消息结果，请输入继续。
-        如果您有其他问题，可以直接回复，我们会尽快回复您！
-        """;
 
 
     /// <summary>
@@ -61,92 +54,92 @@ public class WeChatBackgroundService(
     public async Task SendMessageAsync(WeChatAI chatAi, MemoryService memoryService, IEventBus eventBus,
         OpenAIService openAiService, IWikiRepository wikiRepository, IFileStorageRepository fileStorageRepository)
     {
-        var chatShareInfoQuery = new ChatShareInfoQuery(chatAi.SharedId);
-
-        await eventBus.PublishAsync(chatShareInfoQuery);
-
-        // 如果chatShareId不存在则返回让下面扣款
-        var chatShare = chatShareInfoQuery.Result;
-
-        var chatApplicationQuery = new ChatApplicationInfoQuery(chatShareInfoQuery.Result.ChatApplicationId);
-
-        await eventBus.PublishAsync(chatApplicationQuery);
-
-        var chatApplication = chatApplicationQuery?.Result;
-
-        if (chatApplication == null) return;
-
-        var requestToken = 0;
-
-        var module = new ChatCompletionDto<ChatCompletionRequestMessage>
-        {
-            messages =
-            [
-                new ChatCompletionRequestMessage
-                {
-                    content = chatAi.Content,
-                    role = "user"
-                }
-            ]
-        };
-
-        var chatHistory = new ChatHistory();
-
-        // 如果设置了Prompt，则添加
-        if (!chatApplication.Prompt.IsNullOrEmpty()) chatHistory.AddSystemMessage(chatApplication.Prompt);
-
-        // 保存对话提问
-        var createChatRecordCommand = new CreateChatRecordCommand(chatApplication.Id, chatAi.Content);
-
-        await eventBus.PublishAsync(createChatRecordCommand);
-
-        var sourceFile = new List<FileStorage>();
-        // 如果为空则不使用知识库
-        if (chatApplication.WikiIds.Count != 0)
-        {
-            var success = await OpenAIService.WikiPrompt(chatApplication, wikiMemoryService, chatAi.Content,
-                fileStorageRepository,
-                wikiRepository,
-                sourceFile, module, null, memoryService);
-
-            if (!success) return;
-        }
-
         var output = new StringBuilder();
-
-        // 添加用户输入，并且计算请求token数量
-        module.messages.ForEach(x =>
-        {
-            if (x.content.IsNullOrEmpty()) return;
-            requestToken += TokenHelper.ComputeToken(x.content);
-
-            chatHistory.Add(new ChatMessageContent(new AuthorRole(x.role), x.content));
-        });
-
-
-        if (chatShare != null)
-        {
-            // 如果token不足则返回，使用token和当前request总和大于可用token，则返回
-            if (chatShare.AvailableToken != -1 &&
-                chatShare.UsedToken + requestToken >=
-                chatShare.AvailableToken)
-            {
-                output.Append("Token不足");
-                return;
-            }
-
-            // 如果没有过期则继续
-            if (chatShare.Expires != null &&
-                chatShare.Expires < DateTimeOffset.Now)
-            {
-                output.Append("Token已过期");
-                return;
-            }
-        }
-
 
         try
         {
+            var chatShareInfoQuery = new ChatShareInfoQuery(chatAi.SharedId);
+
+            await eventBus.PublishAsync(chatShareInfoQuery);
+
+            // 如果chatShareId不存在则返回让下面扣款
+            var chatShare = chatShareInfoQuery.Result;
+
+            var chatApplicationQuery = new ChatApplicationInfoQuery(chatShareInfoQuery.Result.ChatApplicationId);
+
+            await eventBus.PublishAsync(chatApplicationQuery);
+
+            var chatApplication = chatApplicationQuery?.Result;
+
+            if (chatApplication == null) return;
+
+            var requestToken = 0;
+
+            var module = new ChatCompletionDto<ChatCompletionRequestMessage>
+            {
+                messages =
+                [
+                    new ChatCompletionRequestMessage
+                    {
+                        content = chatAi.Content,
+                        role = "user"
+                    }
+                ]
+            };
+
+            var chatHistory = new ChatHistory();
+
+            // 如果设置了Prompt，则添加
+            if (!chatApplication.Prompt.IsNullOrEmpty()) chatHistory.AddSystemMessage(chatApplication.Prompt);
+
+            // 保存对话提问
+            var createChatRecordCommand = new CreateChatRecordCommand(chatApplication.Id, chatAi.Content);
+
+            await eventBus.PublishAsync(createChatRecordCommand);
+
+            var sourceFile = new List<FileStorage>();
+            // 如果为空则不使用知识库
+            if (chatApplication.WikiIds.Count != 0)
+            {
+                var success = await OpenAIService.WikiPrompt(chatApplication, wikiMemoryService, chatAi.Content,
+                    fileStorageRepository,
+                    wikiRepository,
+                    sourceFile, module, null, memoryService);
+
+                if (!success) return;
+            }
+
+
+            // 添加用户输入，并且计算请求token数量
+            module.messages.ForEach(x =>
+            {
+                if (x.content.IsNullOrEmpty()) return;
+                requestToken += TokenHelper.ComputeToken(x.content);
+
+                chatHistory.Add(new ChatMessageContent(new AuthorRole(x.role), x.content));
+            });
+
+
+            if (chatShare != null)
+            {
+                // 如果token不足则返回，使用token和当前request总和大于可用token，则返回
+                if (chatShare.AvailableToken != -1 &&
+                    chatShare.UsedToken + requestToken >=
+                    chatShare.AvailableToken)
+                {
+                    output.Append("Token不足");
+                    return;
+                }
+
+                // 如果没有过期则继续
+                if (chatShare.Expires != null &&
+                    chatShare.Expires < DateTimeOffset.Now)
+                {
+                    output.Append("Token已过期");
+                    return;
+                }
+            }
+
             await foreach (var item in openAiService.SendChatMessageAsync(chatApplication,
                                chatHistory))
             {
@@ -168,20 +161,30 @@ public class WeChatBackgroundService(
         {
             output.Clear();
             output.Append("对话异常:" + invalidOperationException.Message);
+            logger.LogError(invalidOperationException, "对话异常");
         }
         catch (ArgumentException argumentException)
         {
             output.Clear();
             output.Append("对话异常:" + argumentException.Message);
+            logger.LogError(argumentException, "对话异常");
         }
         catch (Exception e)
         {
             output.Clear();
             output.Append("对话异常,请联系管理员");
+            logger.LogError(e, "对话异常");
         }
-        finally
+
+        var content = output.ToString();
+
+        if (content.IsNullOrEmpty())
         {
-            memoryCache.Set(chatAi.MessageId, output.ToString(), TimeSpan.FromMinutes(5));
+            memoryCache.Set(chatAi.MessageId, "抱歉，似乎出现了问题，产生空的消息内容，请联系管理员", TimeSpan.FromMinutes(15));
+            return;
         }
+
+        // 写入缓存,15分钟过期
+        memoryCache.Set(chatAi.MessageId, content, TimeSpan.FromMinutes(15));
     }
 }

@@ -179,7 +179,7 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                     justifyContent: 'center',
                     alignItems: 'center',
                     flexDirection: 'column'
-                }} height={200}>
+                }} >
                     <p className="ant-upload-drag-icon">
                         <InboxOutlined />
                     </p>
@@ -194,7 +194,7 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                     display: 'flex',
                     flexWrap: 'wrap',
                     overflow: 'auto',
-                    height: '200px',
+                    height: 'calc(100vh - 450px)',
                     alignContent: 'flex-start'
                 }}>
 
@@ -318,7 +318,11 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                         </>
                     }
                 </div>
-                <Table dataSource={fileList.map(item => {
+                <Table 
+                scroll={{
+                    y: 'calc(100vh - 500px)'
+                }}
+                dataSource={fileList.map(item => {
                     return {
                         fileName: item.name,
                         progress: item.progress || 0,

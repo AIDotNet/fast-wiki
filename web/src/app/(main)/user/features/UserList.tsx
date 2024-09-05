@@ -162,11 +162,7 @@ export default function UserList({
 
     useEffect(() => {
         loadingData();
-    }, [keyword]);
-
-    useEffect(() => {
-        loadingData();
-    }, [input]);
+    }, [keyword,input]);
 
 
     return (

@@ -56,7 +56,8 @@ if (ConnectionStringsOptions.DefaultType == "sqlite")
 else
     builder.Services.AddMasaDbContext<WikiDbContext>(opt =>
     {
-        opt.UseNpgsql(ConnectionStringsOptions.DefaultConnection);
+        opt.UseNpgsql(ConnectionStringsOptions.DefaultConnection)
+            .EnableDetailedErrors();
     });
 
 builder.Services
@@ -172,7 +173,11 @@ builder.Services
 
 builder.Services.AddAutoInject();
 
-var app = builder.Services.AddServices(builder, option => option.MapHttpMethodsForUnmatched = ["Post"]);
+var app = builder.Services.AddServices(builder, option =>
+{
+    option.MapHttpMethodsForUnmatched = ["Post"];
+    
+});
 
 app.UseCors("AllowAll");
 app.UseAuthentication();

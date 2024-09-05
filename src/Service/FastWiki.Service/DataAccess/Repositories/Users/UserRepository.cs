@@ -11,7 +11,9 @@ public sealed class UserRepository : Repository<WikiDbContext, User, Guid>, IUse
     public async Task<List<User>> GetListAsync(string? keyword, int page, int pageSize)
     {
         var query = GetQuery(keyword);
-        return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+        return await query.Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     public async Task<long> GetCountAsync(string? keyword)
@@ -53,7 +55,9 @@ public sealed class UserRepository : Repository<WikiDbContext, User, Guid>, IUse
 
     private IQueryable<User> GetQuery(string? keyword)
     {
-        var query = Context.Users.AsQueryable();
+        var query = Context.Users
+            .AsNoTracking()
+            .AsQueryable();
         if (!string.IsNullOrEmpty(keyword)) query = query.Where(x => x.Account.Contains(keyword));
 
         return query;

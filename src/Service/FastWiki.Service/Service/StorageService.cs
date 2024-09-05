@@ -5,7 +5,7 @@ namespace FastWiki.Service.Service;
 /// <summary>
 ///     文件存储服务
 /// </summary>
-public sealed class StorageService(IFileStorageRepository fileStorageRepository) : ApplicationService<StorageService>
+public sealed class StorageService(IServiceProvider serviceProvider) : ApplicationService<StorageService>
 {
     /// <summary>
     ///     上传文件
@@ -33,6 +33,9 @@ public sealed class StorageService(IFileStorageRepository fileStorageRepository)
             file.Length, false);
 
         fileStorage.SetFullName(fileInfo.FullName);
+
+
+        var fileStorageRepository = GetService<IFileStorageRepository>();
 
         fileStorage = await fileStorageRepository.AddAsync(fileStorage);
 
