@@ -4,7 +4,7 @@
 
 <h1>FastWiki</h1>
 
-FastWiki打造企业级人工智能客服管理系统！
+FastWiki creates an enterprise-level AI customer service management system!
 
 [![][github-contributors-shield]][github-contributors-link]
 [![][github-forks-shield]][github-forks-link]
@@ -57,49 +57,67 @@ FastWiki打造企业级人工智能客服管理系统！
 # FastWiki
 
 -----
-Document Language: [English](README.md) | [简体中文](README-zh-cn.md)
+Documentation Language: [English](README.md) | [简体中文](README-zh-cn.md)
 
 ## Introduction
 
-This project is a high-performance knowledge base system based on the latest technology stack, designed for large-scale
-information retrieval and intelligent search. Leveraging Microsoft's Semantic Kernel for deep learning and natural
-language processing, combined with .NET 8 and React framework, with the backend using MasaFramework, it has implemented
-an efficient, user-friendly, and scalable intelligent vector search platform. Our goal is to provide an intelligent
-search solution that can understand and process complex queries, helping users quickly and accurately obtain the
-information they need.
+This project is a high-performance knowledge base system designed for large-scale information retrieval and intelligent search, built on the latest tech stack. Utilizing Microsoft's Semantic Kernel for deep learning and natural language processing, combined with .NET 8 and the React framework, and powered by MasaFramework in the backend, it implements an efficient, user-friendly, and scalable intelligent vector search platform. Our goal is to provide an intelligent search solution capable of understanding and handling complex queries, helping users quickly and accurately obtain the information they need.
 
-## Technology Stack
+## Tech Stack
 
 - Frontend Framework: React + LobeChat + TypeScript
 - Backend Framework: MasaFramework based on .NET 8
-- Implemented dynamic functions based on the JS V8 engine
-- Vector Search Engine: Utilizes PostgreSQL's vector plugin to optimize search performance and also provides DISK
-- Deep Learning and NLP: Microsoft's Semantic Kernel to enhance the semantic understanding capability of search
+- Dynamic Functions implemented using JS V8 engine
+- Vector Search Engine: Uses PostgreSQL's vector plugin to optimize search performance and provides DISK storage
+- Deep Learning & NLP: Microsoft Semantic Kernel enhances semantic understanding of searches
 - License: Apache-2.0, encouraging community contributions and usage
 
 ## Features
 
-- Intelligent Search: Leveraging Semantic Kernel's deep learning and natural language processing technology to
-  understand complex queries and provide precise search results.
-- High Performance: Optimizes vector search performance through pgsql's vector plugin, ensuring quick responses even
-  with large amounts of data.
-- Modern Frontend: Utilizes the React + LobeUI frontend framework, offering responsive design and user-friendly
-  interfaces.
-- Powerful Backend: Based on the latest .NET 8 and MasaFramework, ensuring code efficiency and maintainability.
-- Open Source and Community-Driven: Adopts the Apache-2.0 license, encouraging developers and enterprises to use and
-  contribute.
-- Powerful dynamic JS Function and provides Monaco for convenient intelligent code suggestions.
-- Powerful QA question-answer split mode for more intelligent knowledge base responses.
-- Fast integration with Feishu bots.
-- Fast integration with WeChat Official Accounts.
-- Fast integration with enterprise projects.
+- Intelligent Search: Leveraging deep learning and natural language processing technologies of Semantic Kernel, capable of understanding complex queries and providing precise search results.
+- High Performance: Optimized vector search performance through PostgreSQL's vector plugin, ensuring quick responses even with large datasets.
+- Modern Frontend: Utilizes React + LobeUI frontend framework, providing responsive design and user-friendly interfaces.
+- Powerful Backend: Based on the latest .NET 8 and MasaFramework, ensuring efficient and maintainable code.
+- Open Source and Community Driven: Uses Apache-2.0 license, encouraging developers and businesses to use and contribute.
+- Robust Dynamic JS Functions, with convenient smart code suggestions provided by Monaco.
+- Powerful QA question-answer splitting mode, making knowledge base responses more intelligent.
+- Quick integration with FeiShu Bot
+- Quick integration with WeChat Official Account
+- Quick integration with corporate projects
+
+## Quick Deployment
+
+### Prerequisites
+- Docker
+- AI model interfaces / need support for AI dialogue models and embedding models
+
+### Deployment
+
+Run with the docker command:
+
+```bash
+docker run -d \
+  --name fast-wiki-service \
+  --user root \
+  --restart always \
+  -p 8080:8080 \
+  -v $(pwd)/wwwroot/uploads:/app/wwwroot/uploads \
+  -v $(pwd)/data:/app/data \
+  -e OPENAI_CHAT_ENDPOINT=https://api.openai.com \
+  -e OPENAI_CHAT_EMBEDDING_ENDPOINT=https://api.openai.com \
+  -e DEFAULT_TYPE=sqlite \
+  -e DEFAULT_CONNECTION=Data\ Source=/app/data/fast-wiki.db \
+  -e WIKI_CONNECTION=/app/data/wiki.db \
+  -e OPENAI_CHAT_TOKEN=YourTokenKey \
+  -e ASPNETCORE_ENVIRONMENT=Development \
+  registry.token-ai.cn/ai-dotnet/fast-wiki-service
+```
 
 ## Quick Start
 
 ### Prerequisites
 
-Ensure you have installed the .NET 8 SDK, PostgreSQL database, the PostgreSQL vector plugin, and have configured the
-corresponding environments.
+Ensure you have installed the .NET 8 SDK, PostgreSQL database, and the PostgreSQL vector plugin, and configured the respective environment.
 
 ## Frontend
 
@@ -111,25 +129,24 @@ corresponding environments.
 git clone --recursive https://github.com/AIDotNet/fast-wiki.git
 ```
 
-2. Install node.js, the latest version (https://nodejs.p2hp.com/).
+2. Install Node.js, the latest version (https://nodejs.p2hp.com/).
 
-3. Delete the package-lock.json file and node_modules directory in the web directory.
+3. Delete the `package-lock.json` file and `node_modules` directory in the web directory.
 
-4. Run the following commands in the web directory:
+4. Run in the web directory:
 
 ```
 npm i
 npm run build
 ```
 
-5. Copy the contents under the dist directory in the web directory to the "
-   \fast-wiki\src\Service\FastWiki.Service\wwwroot" directory (create one if wwwroot doesn't exist).
+5. Copy the contents from the `dist` directory in the web directory to the `\fast-wiki\src\Service\FastWiki.Service\wwwroot` directory (create `wwwroot` if it doesn't exist).
 
 ## Backend
 
 1. Install dependencies:
 
-Execute the following in the project root directory:
+Execute in the project root directory:
 
 ```
 cd src/Service/FastWiki.Service
@@ -138,34 +155,32 @@ dotnet restore
 
 2. Database Configuration:
 
-Ensure your PostgreSQL database is running properly and has the necessary databases created. Modify the database
-connection string in `appsettings.json` according to your configuration.
+Ensure your PostgreSQL database is running correctly and that the necessary database has been created. Modify the database connection string in `appsettings.json` according to your configuration.
 
 ### Running
 
-Execute the following in the project root directory:
+Execute in the project root directory:
 
 ```
 dotnet run
 ```
 
-This will start the backend service. Visit http://localhost:5124/ to see the frontend page.
+This will start the backend service. Access http://localhost:5124/ to view the frontend page.
 
 Default username and password: admin Aa123456
 
-## Environment Variables
+## Environment Variable Parameters
 
-FastWikiService environment variables:
+FastWikiService environment variable parameters:
 
-- QUANTIZE_MAX_TASK: Maximum concurrency of quantization tasks, default is 3
+- QUANTIZE_MAX_TASK: Maximum concurrent quantization tasks, default is 3
 - OPENAI_CHAT_ENDPOINT: Address of the OpenAI API
 - OPENAI_CHAT_EMBEDDING_ENDPOINT: Address of the Embedding API
-- OPENAI_CHAT_TOKEN: Token for the OpenAI API
-- OPENAI_EMBEDDING_TOKEN: Token for Embedding, default is empty, if empty, the conversation Token is used
-- DEFAULT_TYPE: Business database type default sqlite|[pgsql|postgres]
+- OPENAI_CHAT_TOKEN: Token for OpenAI API
+- OPENAI_EMBEDDING_TOKEN: Token for Embedding, defaults to empty, if empty, uses the dialogue token
+- DEFAULT_TYPE: Business database type, defaults to sqlite | [pgsql | postgres]
 - DEFAULT_CONNECTION: Business database connection string
-- WIKI_TYPE: Wiki database type default disk|[pgsql|postgres]
-- WIKI_CONNECTION: Wiki database connection string (if disk, it should be a directory)
+- WIKI_CONNECTION: Wiki database connection string (if disk, then it's the directory)
 
 ## Technical Communication
 
@@ -173,9 +188,8 @@ FastWikiService environment variables:
 
 ## Contribution Guidelines
 
-We welcome all forms of contributions, whether it's feature requests, bug reports, code submissions, documentation, or
-any other type of support. Please refer to `CONTRIBUTING.md` to get started.
+We welcome all forms of contributions, whether feature requests, bug reports, code submissions, documentation, or other types of support. Please refer to `CONTRIBUTING.md` for how to get started.
 
 ## License
 
-This project is licensed under Apache-2.0. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache-2.0 license. For details, please see the [LICENSE](LICENSE) file.
