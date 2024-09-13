@@ -128,7 +128,7 @@ docker run -d \
 1. 克隆仓库：
 
 ```
-git clone  --recursive  https://github.com/AIDotNet/fast-wiki.git
+git clone  --recursive https://github.com/AIDotNet/fast-wiki.git
 ```
 
 2. 安装好node.js，最新版本(https://nodejs.p2hp.com/)。
