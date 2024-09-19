@@ -25,7 +25,7 @@ public sealed class OpenAiHttpClientHandler : HttpClientHandler
             Encoding.UTF8, mediaType);
 
         request.RequestUri =
-            new Uri(request.RequestUri.ToString().Replace("https://api.openai.com", _uri.TrimEnd('/')));
+            new Uri(request.RequestUri.ToString().Replace("https://api.openai.com/v1", _uri.TrimEnd('/')));
 
         return await base.SendAsync(request, cancellationToken);
     }
@@ -39,10 +39,11 @@ public sealed class OpenAiHttpClientHandler : HttpClientHandler
     {
         try
         {
-            var str = JsonSerializer.Serialize(JsonSerializer.Deserialize(stream, typeof(object), new JsonSerializerOptions()
-            {
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            }), new JsonSerializerOptions()
+            var str = JsonSerializer.Serialize(JsonSerializer.Deserialize(stream, typeof(object),
+                new JsonSerializerOptions()
+                {
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                }), new JsonSerializerOptions()
             {
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             });

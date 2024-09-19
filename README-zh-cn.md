@@ -105,8 +105,8 @@ docker run -d \
   -p 8080:8080 \
   -v $(pwd)/wwwroot/uploads:/app/wwwroot/uploads \
   -v $(pwd)/data:/app/data \
-  -e OPENAI_CHAT_ENDPOINT=https://api.openai.com \
-  -e OPENAI_CHAT_EMBEDDING_ENDPOINT=https://api.openai.com \
+  -e OPENAI_CHAT_ENDPOINT=https://api.openai.com/v1 \
+  -e OPENAI_CHAT_EMBEDDING_ENDPOINT=https://api.openai.com/v1 \
   -e DEFAULT_TYPE=sqlite \
   -e DEFAULT_CONNECTION=Data\ Source=/app/data/fast-wiki.db \
   -e WIKI_CONNECTION=/app/data/wiki.db \
