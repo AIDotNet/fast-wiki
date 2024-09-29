@@ -240,19 +240,20 @@ public class OpenAIService(
         var kernel =
             wikiMemoryService.CreateFunctionKernel(functionCall.ToList(), chatApplication.ChatModel);
 
+        var chat = kernel.GetRequiredService<IChatCompletionService>();
+
         // 如果有函数调用
-        if (chatApplication.FunctionIds.Any() && functionCall.Count > 0)
+        if (chatApplication.FunctionIds.Count != 0 && functionCall.Count > 0)
         {
             OpenAIPromptExecutionSettings settings = new()
             {
                 ToolCallBehavior = ToolCallBehavior.EnableKernelFunctions
             };
 
-            var chat = kernel.GetRequiredService<IChatCompletionService>();
-
             var result =
                 (OpenAIChatMessageContent)await chat.GetChatMessageContentAsync(chatHistory, settings,
                     kernel);
+
 
             var toolCalls =
                 result.ToolCalls.OfType<ChatCompletionsFunctionToolCall>().ToList();
@@ -307,24 +308,22 @@ public class OpenAIService(
                 yield return message;
             }
         }
-        else
+
+
+        await foreach (var item in chat.GetStreamingChatMessageContentsAsync(chatHistory))
         {
-            var chat = kernel.GetRequiredService<IChatCompletionService>();
+            var message = item.Content;
+            if (string.IsNullOrEmpty(message)) continue;
 
-            await foreach (var item in chat.GetStreamingChatMessageContentsAsync(chatHistory))
-            {
-                var message = item.Content;
-                if (string.IsNullOrEmpty(message)) continue;
-
-                yield return message;
-            }
+            yield return message;
         }
     }
 
     public static async IAsyncEnumerable<string> SendChatMessageAsync(IChatCompletionService chat,
         ChatHistory chatHistory)
     {
-        await foreach (var item in chat.GetStreamingChatMessageContentsAsync(chatHistory)) yield return item.Content;
+        await foreach (var item in chat.GetStreamingChatMessageContentsAsync(chatHistory).ConfigureAwait(false))
+            yield return item.Content;
     }
 
     /// <summary>
