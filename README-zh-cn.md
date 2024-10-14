@@ -1,6 +1,6 @@
 <div align="center"><a name="readme-top"></a>
 
-<img height="160" src="https://api.token-ai.cn/logo.png">
+<img height="160" src="./img/logo.png">
 
 <h1>FastWiki</h1>
 
